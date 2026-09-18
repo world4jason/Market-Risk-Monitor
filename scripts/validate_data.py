@@ -6,6 +6,8 @@ import json
 import sys
 from pathlib import Path
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -18,6 +20,15 @@ from pipeline.validate import (
 )
 
 
+METRIC_SCHEMA = json.loads(
+    (ROOT / "schemas" / "metric-series.schema.json").read_text(encoding="utf-8")
+)
+METRIC_SCHEMA_VALIDATOR = Draft202012Validator(
+    METRIC_SCHEMA,
+    format_checker=FormatChecker(),
+)
+
+
 SPECIAL_VALIDATORS = {
     "catalog.json": validate_catalog,
     "coverage.json": validate_coverage_report,
@@ -26,8 +37,20 @@ SPECIAL_VALIDATORS = {
 }
 
 
+def validate_metric_with_schema(payload: dict) -> None:
+    errors = sorted(
+        METRIC_SCHEMA_VALIDATOR.iter_errors(payload),
+        key=lambda error: list(error.absolute_path),
+    )
+    if errors:
+        first = errors[0]
+        location = ".".join(str(p) for p in first.absolute_path) or "<root>"
+        raise ValueError(f"schema error at {location}: {first.message}")
+    validate_metric(payload)
+
+
 def validator_for(path: Path):
-    return SPECIAL_VALIDATORS.get(path.name, validate_metric)
+    return SPECIAL_VALIDATORS.get(path.name, validate_metric_with_schema)
 
 
 def main():
