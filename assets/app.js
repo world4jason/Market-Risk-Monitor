@@ -1,6 +1,7 @@
 const CATALOG_URL = "./data/generated/catalog.json";
 const EVENTS_URL = "./data/events.json";
 const SIGNALS_URL = "./data/generated/signals.json";
+const REFRESH_REPORT_URL = "./data/generated/refresh-report.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
 const state = {
@@ -8,6 +9,8 @@ const state = {
   metrics: new Map(),
   events: [],
   signals: null,
+  refreshReport: null,
+  refreshErrors: new Map(),
 };
 
 const pillarLabels = {
@@ -68,8 +71,42 @@ function formatValue(value, units) {
   return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
+function effectiveFreshness(metric) {
+  if (!metric) return { state: "missing", reason: "metric missing" };
+
+  const refreshError = state.refreshErrors.get(metric.metric?.id);
+  if (refreshError) {
+    return {
+      state: "error",
+      reason: refreshError.error || "latest refresh failed; previous snapshot preserved",
+    };
+  }
+
+  const stored = metric.freshness?.state || "missing";
+  if (["missing", "error", "insufficient_data"].includes(stored)) {
+    return { state: stored, reason: metric.freshness?.reason || null };
+  }
+
+  const asOf = metric.latest?.as_of;
+  const maxAge = Number(metric.freshness?.max_age_days);
+  if (asOf && Number.isFinite(maxAge)) {
+    const ageDays = Math.floor((Date.now() - Date.parse(`${asOf}T00:00:00Z`)) / 86400000);
+    if (ageDays > maxAge) {
+      return {
+        state: "stale",
+        reason: `source observation is ${ageDays} days old (limit ${maxAge})`,
+      };
+    }
+  }
+
+  return {
+    state: stored === "stale" ? "stale" : "fresh",
+    reason: metric.freshness?.reason || null,
+  };
+}
+
 function freshnessBadge(metric) {
-  const status = metric?.freshness?.state || "missing";
+  const status = effectiveFreshness(metric).state;
   const cls = ["fresh", "stale", "error", "missing"].includes(status)
     ? `badge-${status}`
     : "badge-neutral";
@@ -338,7 +375,7 @@ function renderRegime() {
     .map((pillar) => {
       const metricsForPillar = byPillar.get(pillar);
       const stale = metricsForPillar.filter(
-        (m) => m.freshness.state !== "fresh",
+        (m) => effectiveFreshness(m).state !== "fresh",
       ).length;
       const percentiles = metricsForPillar
         .map(rollingPercentile)
@@ -670,7 +707,7 @@ function openMetric(id) {
   fullChart(metric, $("#dialog-chart"), { height: 390 });
   $("#dialog-source").innerHTML =
     `Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
-     Snapshot fetched: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(metric.freshness.state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}`;
+     Snapshot fetched: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}`;
 
   $("#metric-dialog").showModal();
 }
@@ -691,6 +728,20 @@ function flattenRuleDetails(rule, out = []) {
   return out;
 }
 
+function effectiveConditionStatus(condition) {
+  const staleInputs = (condition.metrics || [])
+    .map((id) => state.metrics.get(id))
+    .filter(Boolean)
+    .filter((metric) => effectiveFreshness(metric).state !== "fresh");
+
+  const missingInputs = (condition.metrics || []).filter(
+    (id) => !state.metrics.has(id),
+  );
+
+  if (staleInputs.length || missingInputs.length) return "unknown";
+  return condition.status || "unknown";
+}
+
 function renderSignals() {
   const summaryEl = $("#signal-summary");
   const grid = $("#signal-grid");
@@ -706,7 +757,18 @@ function renderSignals() {
     return;
   }
 
-  const summary = snapshot.current.summary;
+  const displayConditions = (snapshot.current.conditions || []).map((condition) => ({
+    ...condition,
+    displayStatus: effectiveConditionStatus(condition),
+  }));
+  const summary = {
+    active: displayConditions.filter((c) => c.displayStatus === "active").length,
+    inactive: displayConditions.filter((c) => c.displayStatus === "inactive").length,
+    unknown: displayConditions.filter((c) => c.displayStatus === "unknown").length,
+    total: displayConditions.length,
+  };
+  summary.known = summary.active + summary.inactive;
+
   summaryEl.innerHTML = `
     <div class="signal-summary-main">
       <strong>${summary.active} active</strong>
@@ -715,7 +777,7 @@ function renderSignals() {
     <span class="meta">Evaluated ${escapeHtml(snapshot.current.as_of || "—")}</span>
   `;
 
-  grid.innerHTML = (snapshot.current.conditions || [])
+  grid.innerHTML = displayConditions
     .map((condition) => {
       const details = flattenRuleDetails(condition.rules);
       const detailText = details
@@ -724,8 +786,8 @@ function renderSignals() {
           return `${detail.label}: ${detail.status}${asOf}`;
         })
         .join("<br>");
-      return `<article class="signal-card" data-status="${escapeHtml(condition.status)}">
-        <span class="signal-status">${escapeHtml(condition.status)}</span>
+      return `<article class="signal-card" data-status="${escapeHtml(condition.displayStatus)}">
+        <span class="signal-status">${escapeHtml(condition.displayStatus)}</span>
         <h3>${escapeHtml(condition.name)}</h3>
         <p>${escapeHtml(condition.description || "")}</p>
         <div class="signal-rule">${detailText}</div>
@@ -813,7 +875,7 @@ function updateGlobalFreshness() {
     return;
   }
 
-  const bad = metrics.filter((m) => m.freshness.state !== "fresh");
+  const bad = metrics.filter((m) => effectiveFreshness(m).state !== "fresh");
   if (bad.length) {
     badge.className = "badge badge-stale";
     badge.textContent = `${bad.length} stale / missing`;
@@ -845,10 +907,11 @@ async function loadData() {
   state.metrics.clear();
 
   try {
-    const [catalogResp, eventsResp, signalsResp] = await Promise.all([
+    const [catalogResp, eventsResp, signalsResp, refreshResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(EVENTS_URL, { cache: "no-store" }),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
+      fetch(REFRESH_REPORT_URL, { cache: "no-store" }).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
 
@@ -857,6 +920,13 @@ async function loadData() {
       ? (await eventsResp.json()).events || []
       : [];
     state.signals = signalsResp?.ok ? await signalsResp.json() : null;
+    state.refreshReport = refreshResp?.ok ? await refreshResp.json() : null;
+    state.refreshErrors.clear();
+    for (const result of state.refreshReport?.results || []) {
+      if (result.status === "error" && result.metric) {
+        state.refreshErrors.set(result.metric, result);
+      }
+    }
 
     $("#data-generated").textContent = state.catalog.generated_at
       ? `Generated ${state.catalog.generated_at}`
