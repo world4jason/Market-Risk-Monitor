@@ -59,15 +59,23 @@
             <p class="eyebrow">古往今來</p>
             <h2 id="history-title">Historical context</h2>
           </div>
-          <select id="history-metric" class="select-control" aria-label="Historical metric">
-            <option value="">No metric data</option>
-          </select>
+          <div class="history-controls">
+            <select id="history-metric" class="select-control" aria-label="Historical metric">
+              <option value="">No metric data</option>
+            </select>
+            <select id="history-mode" class="select-control" aria-label="Historical comparison mode">
+              <option value="absolute">Absolute level</option>
+              <option value="pit_percentile">Point-in-time percentile</option>
+              <option value="rolling_percentile">Rolling percentile</option>
+              <option value="rate_change">Rate of change</option>
+            </select>
+          </div>
         </div>
         <div id="history-chart" class="chart-frame">
           <div class="empty-state compact">Historical series will appear here.</div>
         </div>
         <div class="chart-legend">
-          <span><i class="legend-dot"></i> Raw level</span>
+          <span id="history-mode-label"><i class="legend-dot"></i> Absolute level</span>
           <span id="history-coverage">Coverage unavailable</span>
         </div>
       </div>
