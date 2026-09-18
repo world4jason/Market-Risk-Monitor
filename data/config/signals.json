@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "name": "Deleveraging Watch",
+  "description": "Transparent concurrent-deterioration checks. Conditions are descriptive confirmations, not crash predictions or trading signals.",
+  "history_start": "1997-01-31",
+  "conditions": [
+    {
+      "id": "margin_debt_rollover",
+      "name": "Margin leverage rolling over",
+      "description": "FINRA margin-debt growth has turned negative year-over-year or decelerated sharply over three monthly observations.",
+      "rules": {
+        "type": "any",
+        "children": [
+          {
+            "type": "latest_below",
+            "metric": "finra_margin_debt_yoy_pct",
+            "threshold": 0,
+            "label": "YoY margin-debt growth ≤ 0%"
+          },
+          {
+            "type": "delta_periods_below",
+            "metric": "finra_margin_debt_yoy_pct",
+            "periods": 3,
+            "threshold": -10,
+            "label": "3-month YoY-growth change ≤ -10 percentage points"
+          }
+        ]
+      }
+    },
+    {
+      "id": "financial_conditions_tight",
+      "name": "Financial conditions tightening",
+      "description": "The Chicago Fed NFCI is above its historical-average zero line or has tightened materially over roughly one quarter.",
+      "rules": {
+        "type": "any",
+        "children": [
+          {
+            "type": "latest_above",
+            "metric": "nfci",
+            "threshold": 0,
+            "label": "NFCI ≥ 0 (tighter than historical average)"
+          },
+          {
+            "type": "delta_periods_above",
+            "metric": "nfci",
+            "periods": 13,
+            "threshold": 0.5,
+            "label": "13-week NFCI increase ≥ 0.5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "risk_subindex_extreme",
+      "name": "Financial risk unusually high",
+      "description": "The NFCI risk subindex is at or above its strict-past 90th percentile.",
+      "rules": {
+        "type": "percentile_above",
+        "metric": "nfci_risk",
+        "threshold": 90,
+        "min_observations": 52,
+        "label": "NFCI risk strict-past percentile ≥ 90"
+      }
+    },
+    {
+      "id": "vix_stress",
+      "name": "Volatility stress unusually high",
+      "description": "VIX is at or above its strict-past 90th percentile.",
+      "rules": {
+        "type": "percentile_above",
+        "metric": "vix",
+        "threshold": 90,
+        "min_observations": 252,
+        "label": "VIX strict-past percentile ≥ 90"
+      }
+    },
+    {
+      "id": "market_trend_down",
+      "name": "Market trend deteriorating",
+      "description": "Shiller real total-return price is below its level six monthly observations earlier.",
+      "rules": {
+        "type": "return_periods_below",
+        "metric": "shiller_real_tr_price",
+        "periods": 6,
+        "threshold": 0,
+        "label": "6-month real total-return change ≤ 0%"
+      }
+    }
+  ]
+}
