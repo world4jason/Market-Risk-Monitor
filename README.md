@@ -36,6 +36,14 @@ Install pipeline dependencies:
 python -m pip install -r requirements.txt
 ```
 
+Bootstrap official sources, refresh snapshots, validate data, and run the static-site smoke check in one command:
+
+```bash
+python scripts/bootstrap_sources.py
+```
+
+FINRA may occasionally require a browser download because its CDN can reject automated workbook requests; the bootstrap command prints the exact manual fallback without substituting another data provider.
+
 Run deterministic tests:
 
 ```bash
@@ -88,10 +96,16 @@ Build/rebuild Deleveraging Watch from whatever valid metric snapshots are presen
 python scripts/build_signals.py
 ```
 
-Validate generated metric files:
+Validate all generated JSON artifacts:
 
 ```bash
 python scripts/validate_data.py
+```
+
+Run the no-GHA static-site smoke check:
+
+```bash
+python scripts/site_smoke.py
 ```
 
 Serve locally:
