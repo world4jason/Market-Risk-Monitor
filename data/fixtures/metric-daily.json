@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "fixture",
+  "metric": {
+    "id": "vix_fixture",
+    "name": "VIX fixture",
+    "description": "Illustrative daily contract fixture only.",
+    "pillar": "volatility",
+    "units": "index",
+    "frequency": "daily",
+    "polarity": "higher_is_riskier"
+  },
+  "source": {
+    "provider": "Fixture",
+    "dataset": "Illustrative daily series",
+    "series_id": null,
+    "url": "https://example.com/daily",
+    "license_note": "Fixture only; not production data.",
+    "redistribution": "allowed"
+  },
+  "coverage": {
+    "history_start": "2026-01-02",
+    "history_end": "2026-01-06",
+    "timezone": "America/New_York",
+    "expected_observation_lag_days": 1
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 4,
+    "age_days": 1,
+    "evaluated_at": "2026-01-07T12:00:00Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "rolling-252d",
+      "type": "rolling_percentile",
+      "window_observations": 252,
+      "min_observations": 60,
+      "point_in_time": true,
+      "notes": "Fixture configuration only."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-01-06",
+    "fetched_at": "2026-01-07T12:00:00Z",
+    "value": 19.2,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2026-01-02",
+      "value": 17.5,
+      "status": "observed"
+    },
+    {
+      "date": "2026-01-05",
+      "value": 18.1,
+      "status": "observed"
+    },
+    {
+      "date": "2026-01-06",
+      "value": 19.2,
+      "status": "observed"
+    }
+  ]
+}
