@@ -1,0 +1,170 @@
+{
+  "fred": [
+    {
+      "id": "nfci",
+      "name": "National Financial Conditions Index",
+      "description": "Chicago Fed broad financial-conditions index; higher values indicate tighter-than-average conditions.",
+      "pillar": "financial_stress",
+      "units": "index",
+      "frequency": "weekly",
+      "polarity": "higher_is_riskier",
+      "dataset": "Chicago Fed National Financial Conditions Index",
+      "series_id": "NFCI",
+      "max_age_days": 14,
+      "expected_observation_lag_days": 7,
+      "redistribution": "allowed",
+      "license_note": "Public FRED series; source methodology is Chicago Fed.",
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 52,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-520w",
+          "type": "rolling_percentile",
+          "window_observations": 520,
+          "min_observations": 104,
+          "point_in_time": true,
+          "notes": "Trailing ten-year weekly baseline."
+        }
+      ]
+    },
+    {
+      "id": "nfci_risk",
+      "name": "NFCI Risk Subindex",
+      "description": "Risk component of the Chicago Fed NFCI.",
+      "pillar": "credit_risk",
+      "units": "index",
+      "frequency": "weekly",
+      "polarity": "higher_is_riskier",
+      "dataset": "Chicago Fed NFCI Risk Subindex",
+      "series_id": "NFCIRISK",
+      "max_age_days": 14,
+      "expected_observation_lag_days": 7,
+      "redistribution": "allowed",
+      "license_note": "Public FRED series; source methodology is Chicago Fed.",
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 52,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        }
+      ]
+    },
+    {
+      "id": "nfci_credit",
+      "name": "NFCI Credit Subindex",
+      "description": "Credit component of the Chicago Fed NFCI.",
+      "pillar": "credit_risk",
+      "units": "index",
+      "frequency": "weekly",
+      "polarity": "higher_is_riskier",
+      "dataset": "Chicago Fed NFCI Credit Subindex",
+      "series_id": "NFCICREDIT",
+      "max_age_days": 14,
+      "expected_observation_lag_days": 7,
+      "redistribution": "allowed",
+      "license_note": "Public FRED series; source methodology is Chicago Fed.",
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 52,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        }
+      ]
+    },
+    {
+      "id": "nfci_nonfinancial_leverage",
+      "name": "NFCI Nonfinancial Leverage Subindex",
+      "description": "Nonfinancial leverage component of the Chicago Fed NFCI.",
+      "pillar": "leverage",
+      "units": "index",
+      "frequency": "weekly",
+      "polarity": "higher_is_riskier",
+      "dataset": "Chicago Fed NFCI Nonfinancial Leverage Subindex",
+      "series_id": "NFCINONFINLEVERAGE",
+      "max_age_days": 14,
+      "expected_observation_lag_days": 7,
+      "redistribution": "allowed",
+      "license_note": "Public FRED series; source methodology is Chicago Fed.",
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 52,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        }
+      ]
+    },
+    {
+      "id": "vix",
+      "name": "CBOE Volatility Index (VIX)",
+      "description": "Daily VIX closing level distributed through FRED.",
+      "pillar": "volatility",
+      "units": "index",
+      "frequency": "daily",
+      "polarity": "higher_is_riskier",
+      "dataset": "CBOE Volatility Index: VIX",
+      "series_id": "VIXCLS",
+      "max_age_days": 5,
+      "expected_observation_lag_days": 1,
+      "redistribution": "unknown",
+      "license_note": "Underlying index is Cboe; review redistribution terms before republishing large vendor datasets.",
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 252,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-2520d",
+          "type": "rolling_percentile",
+          "window_observations": 2520,
+          "min_observations": 504,
+          "point_in_time": true,
+          "notes": "Approximate trailing ten trading years."
+        }
+      ]
+    },
+    {
+      "id": "us_recession",
+      "name": "NBER Recession Indicator",
+      "description": "Monthly U.S. recession indicator distributed by FRED for chart context only.",
+      "pillar": "context",
+      "units": "binary",
+      "frequency": "monthly",
+      "polarity": "neutral",
+      "dataset": "NBER based Recession Indicators for the United States",
+      "series_id": "USREC",
+      "max_age_days": 90,
+      "expected_observation_lag_days": 45,
+      "redistribution": "allowed",
+      "license_note": "Context/shading only; not interpreted as a leading signal.",
+      "baselines": [
+        {
+          "id": "none",
+          "type": "none",
+          "window_observations": null,
+          "min_observations": 1,
+          "point_in_time": true,
+          "notes": "No percentile baseline."
+        }
+      ]
+    }
+  ]
+}
