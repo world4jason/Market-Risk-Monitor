@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Market Risk Monitor</title>
+  <meta name="description" content="Explainable U.S. market leverage and stress dashboard with historical context.">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">US MARKET STRESS &amp; LEVERAGE</p>
+      <h1>Market Risk Monitor</h1>
+      <p class="subtitle">Current conditions, provenance, and historical context — without a hidden BUY/SELL score.</p>
+    </div>
+    <div class="header-actions">
+      <span id="global-freshness" class="badge badge-neutral">Loading data…</span>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel hero-panel" aria-labelledby="regime-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">MARKET STATE</p>
+          <h2 id="regime-title">Regime summary</h2>
+        </div>
+        <p id="data-generated" class="meta">Snapshot not loaded</p>
+      </div>
+      <div id="regime-grid" class="regime-grid">
+        <div class="empty-state compact">Waiting for production snapshots.</div>
+      </div>
+      <p class="disclaimer">Descriptive monitoring only. A stressed or elevated indicator is not a market-timing recommendation.</p>
+    </section>
+
+    <section class="section-block" aria-labelledby="metrics-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CORE PILLARS</p>
+          <h2 id="metrics-title">Current metrics</h2>
+        </div>
+        <button id="refresh-view" class="text-button" type="button">Reload snapshot</button>
+      </div>
+      <div id="metric-grid" class="metric-grid">
+        <div class="panel empty-state">
+          <strong>No production snapshot loaded.</strong>
+          <span>Run the repository refresh command, validate the generated files, commit them, then this page will populate automatically.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block history-layout" aria-labelledby="history-title">
+      <div class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">古往今來</p>
+            <h2 id="history-title">Historical context</h2>
+          </div>
+          <select id="history-metric" class="select-control" aria-label="Historical metric">
+            <option value="">No metric data</option>
+          </select>
+        </div>
+        <div id="history-chart" class="chart-frame">
+          <div class="empty-state compact">Historical series will appear here.</div>
+        </div>
+        <div class="chart-legend">
+          <span><i class="legend-dot"></i> Raw level</span>
+          <span id="history-coverage">Coverage unavailable</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">EVENT WINDOWS</p>
+            <h2>Cycle comparison</h2>
+          </div>
+        </div>
+        <div id="event-list" class="event-list"></div>
+        <div id="event-chart" class="chart-frame short">
+          <div class="empty-state compact">Select a metric with sufficient event history.</div>
+        </div>
+        <p class="meta">Event paths are indexed to 100 at each anchor. Missing pre-history stays unavailable rather than being backfilled with a proxy.</p>
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="coverage-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">DATA LINEAGE</p>
+          <h2 id="coverage-title">Coverage &amp; freshness</h2>
+        </div>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Pillar</th>
+              <th>Coverage</th>
+              <th>As of</th>
+              <th>Freshness</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody id="coverage-body">
+            <tr><td colspan="6" class="empty-cell">No generated metrics yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="metric-dialog" class="metric-dialog">
+    <form method="dialog" class="dialog-shell">
+      <div class="dialog-header">
+        <div>
+          <p id="dialog-pillar" class="eyebrow"></p>
+          <h2 id="dialog-title">Metric</h2>
+        </div>
+        <button class="icon-button" value="close" aria-label="Close">×</button>
+      </div>
+      <div id="dialog-summary" class="detail-summary"></div>
+      <div id="dialog-chart" class="chart-frame detail-chart"></div>
+      <div id="dialog-source" class="source-box"></div>
+    </form>
+  </dialog>
+
+  <footer>
+    <span>Market Risk Monitor</span>
+    <a href="./docs/methodology.md">Methodology</a>
+    <a href="./docs/data-sources.md">Data sources</a>
+    <a href="https://github.com/world4jason/Market-Risk-Monitor">GitHub</a>
+  </footer>
+
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>
