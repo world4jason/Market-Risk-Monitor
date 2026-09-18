@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "fixture",
+  "metric": {
+    "id": "nfci_fixture",
+    "name": "NFCI fixture",
+    "description": "Illustrative weekly contract fixture only.",
+    "pillar": "financial_stress",
+    "units": "index",
+    "frequency": "weekly",
+    "polarity": "higher_is_riskier"
+  },
+  "source": {
+    "provider": "Fixture",
+    "dataset": "Illustrative weekly series",
+    "series_id": null,
+    "url": "https://example.com/weekly",
+    "license_note": "Fixture only; not production data.",
+    "redistribution": "allowed"
+  },
+  "coverage": {
+    "history_start": "2025-12-19",
+    "history_end": "2026-01-02",
+    "timezone": "America/Chicago",
+    "expected_observation_lag_days": 5
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 12,
+    "age_days": 6,
+    "evaluated_at": "2026-01-08T12:00:00Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "expanding-pit",
+      "type": "full_history_percentile",
+      "window_observations": null,
+      "min_observations": 52,
+      "point_in_time": true,
+      "notes": "Expanding history through each evaluation date."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-01-02",
+    "fetched_at": "2026-01-08T12:00:00Z",
+    "value": -0.4,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2025-12-19",
+      "value": -0.5,
+      "status": "observed"
+    },
+    {
+      "date": "2025-12-26",
+      "value": -0.45,
+      "status": "observed"
+    },
+    {
+      "date": "2026-01-02",
+      "value": -0.4,
+      "status": "observed"
+    }
+  ]
+}
