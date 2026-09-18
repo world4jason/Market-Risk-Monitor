@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "id": "dotcom_peak",
+      "name": "Dot-com peak / unwind",
+      "anchor_date": "2000-03-24",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "Anchor marks the late-March 2000 U.S. equity peak period; metric charts use nearest valid observation where exact dates differ."
+    },
+    {
+      "id": "gfc",
+      "name": "Global Financial Crisis",
+      "anchor_date": "2008-09-15",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "Lehman bankruptcy date used as a reproducible stress anchor; broader GFC regime began earlier."
+    },
+    {
+      "id": "covid_shock",
+      "name": "COVID market shock",
+      "anchor_date": "2020-03-16",
+      "window": {
+        "pre_months": 12,
+        "post_months": 18
+      },
+      "notes": "March 2020 acute market-stress anchor."
+    },
+    {
+      "id": "tightening_2022",
+      "name": "2022 tightening / bear market",
+      "anchor_date": "2022-01-03",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "Start-of-year anchor for the 2022 tightening/bear-market comparison."
+    },
+    {
+      "id": "current",
+      "name": "Current period",
+      "anchor_date": null,
+      "window": {
+        "pre_months": 12,
+        "post_months": 0
+      },
+      "notes": "Anchor resolves to the latest valid observation per metric."
+    }
+  ]
+}
