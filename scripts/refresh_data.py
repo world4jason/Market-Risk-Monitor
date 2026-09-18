@@ -14,6 +14,7 @@ from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
+from pipeline.signals import build_signal_snapshot
 from pipeline.validate import validate_metric
 
 
@@ -98,6 +99,26 @@ def refresh_shiller(input_path: Path, output_dir: Path):
         atomic_json(dest, metric)
         report.append({"metric": metric_id, "status": "updated", "path": str(dest.relative_to(ROOT))})
     return report
+
+
+def load_generated_metrics(output_dir: Path) -> dict[str, dict]:
+    metrics = {}
+    for path in sorted(output_dir.glob("*.json")):
+        if path.name in {"catalog.json", "refresh-report.json", "signals.json"}:
+            continue
+        try:
+            metric = json.loads(path.read_text(encoding="utf-8"))
+            validate_metric(metric)
+        except Exception:
+            continue
+        metrics[metric["metric"]["id"]] = metric
+    return metrics
+
+
+def build_signals(output_dir: Path):
+    config_path = ROOT / "data" / "config" / "signals.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    return build_signal_snapshot(load_generated_metrics(output_dir), config)
 
 
 def build_catalog(output_dir: Path):
@@ -190,6 +211,7 @@ def main():
     if args.shiller_file:
         report.extend(refresh_shiller(args.shiller_file, args.output_dir))
 
+    atomic_json(args.output_dir / "signals.json", build_signals(args.output_dir))
     atomic_json(args.output_dir / "catalog.json", build_catalog(args.output_dir))
     atomic_json(
         args.output_dir / "refresh-report.json",
