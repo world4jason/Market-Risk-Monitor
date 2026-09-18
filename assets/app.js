@@ -584,15 +584,25 @@ function renderEvents(metric) {
   }
 
   const coverageStart = Date.parse(metric.coverage.history_start);
+  const colors = [
+    "#5dc2aa",
+    "#e7b75f",
+    "#ff8278",
+    "#7c9cff",
+    "#b58cff",
+    "#63b3ed",
+    "#d98bc6",
+    "#8fbf62",
+  ];
+
   list.innerHTML = state.events
-    .map((event) => {
+    .map((event, index) => {
       const anchor = event.anchor_date || metric.latest.as_of;
       const unavailable = !anchor || Date.parse(anchor) < coverageStart;
-      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}">${escapeHtml(event.name)}</span>`;
+      const color = colors[index % colors.length];
+      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}"><i class="event-dot" style="background:${color}"></i>${escapeHtml(event.name)}</span>`;
     })
     .join("");
-
-  const colors = ["#5dc2aa", "#e7b75f", "#ff8278", "#7c9cff", "#b58cff"];
   const lines = [];
 
   state.events.forEach((event, index) => {
