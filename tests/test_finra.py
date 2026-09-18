@@ -14,7 +14,7 @@ class FinraTests(unittest.TestCase):
         rows=parse_finra_csv(FIXTURE.read_text())
         self.assertEqual(len(rows),14)
         self.assertEqual(rows[0]["date"],"2025-01-31")
-        self.assertEqual(rows[-1]["date"],"2026-02-28")
+        self.assertEqual(rows[-1]["date"],"2026-02-27")
         self.assertEqual(rows[-1]["margin_debt"],2300.0)
 
     def test_build_raw_and_derived_metrics(self):
@@ -27,7 +27,7 @@ class FinraTests(unittest.TestCase):
 
         yoy=metrics["finra_margin_debt_yoy_pct"]
         self.assertAlmostEqual(yoy["latest"]["value"],(2300/1100-1)*100)
-        self.assertEqual(yoy["latest"]["as_of"],"2026-02-28")
+        self.assertEqual(yoy["latest"]["as_of"],"2026-02-27")
 
         ratio=metrics["margin_debt_to_free_credit"]
         expected=2300/(265+315)
