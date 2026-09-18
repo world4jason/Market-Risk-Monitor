@@ -38,6 +38,15 @@ def refresh_fred(config_path: Path, output_dir: Path, selected: set[str] | None)
         try:
             text = fetch_fred_csv(item["series_id"])
             observations = parse_fred_csv(text, item["series_id"])
+            expected_start = item.get("expected_history_start")
+            if expected_start and (
+                not observations or observations[0]["date"] > expected_start
+            ):
+                raise ValueError(
+                    f"{item['id']} history starts at "
+                    f"{observations[0]['date'] if observations else 'missing'}, "
+                    f"expected <= {expected_start}"
+                )
             metric = build_metric(item, observations, fetched_at)
             validate_metric(metric)
             atomic_json(dest, metric)
@@ -55,7 +64,13 @@ def refresh_fred(config_path: Path, output_dir: Path, selected: set[str] | None)
 def refresh_cboe_vix(output_dir: Path):
     dest = output_dir / "vix.json"
     try:
-        metric = build_vix_metric(parse_vix_csv(fetch_vix_csv()))
+        observations = parse_vix_csv(fetch_vix_csv())
+        if not observations or observations[0]["date"] > "1990-01-31":
+            raise ValueError(
+                f"VIX history unexpectedly starts at "
+                f"{observations[0]['date'] if observations else 'missing'}"
+            )
+        metric = build_vix_metric(observations)
         validate_metric(metric)
         atomic_json(dest, metric)
         return [{"metric": "vix", "status": "updated", "path": str(dest.relative_to(ROOT))}]
@@ -76,6 +91,12 @@ def refresh_finra(input_path: Path, output_dir: Path):
     else:
         raise SystemExit("FINRA input must be CSV or XLSX")
 
+    if not rows or rows[0]["date"] > "1997-01-31":
+        raise SystemExit(
+            "FINRA historical file does not reach the official Jan-1997 start; "
+            f"first parsed month={rows[0]['date'] if rows else 'missing'}"
+        )
+
     metrics = build_finra_metrics(rows)
     report = []
     for metric_id, metric in metrics.items():
@@ -91,6 +112,11 @@ def refresh_shiller(input_path: Path, output_dir: Path):
         raise SystemExit("Shiller input must be the official ie_data.xls workbook from shillerdata.com")
 
     rows = parse_shiller_xls(input_path)
+    if not rows or rows[0]["date"] != "1871-01-01":
+        raise SystemExit(
+            "Shiller workbook coverage changed unexpectedly; "
+            f"first parsed month={rows[0]['date'] if rows else 'missing'}"
+        )
     metrics = build_shiller_metrics(rows)
     report = []
     for metric_id, metric in metrics.items():
@@ -104,7 +130,7 @@ def refresh_shiller(input_path: Path, output_dir: Path):
 def load_generated_metrics(output_dir: Path) -> dict[str, dict]:
     metrics = {}
     for path in sorted(output_dir.glob("*.json")):
-        if path.name in {"catalog.json", "refresh-report.json", "signals.json"}:
+        if path.name in {"catalog.json", "refresh-report.json", "signals.json", "coverage.json"}:
             continue
         try:
             metric = json.loads(path.read_text(encoding="utf-8"))
@@ -119,6 +145,52 @@ def build_signals(output_dir: Path):
     config_path = ROOT / "data" / "config" / "signals.json"
     config = json.loads(config_path.read_text(encoding="utf-8"))
     return build_signal_snapshot(load_generated_metrics(output_dir), config)
+
+
+EXPECTED_STARTS = {
+    "nfci": "1971-01-08",
+    "nfci_risk": "1971-01-08",
+    "nfci_credit": "1971-01-08",
+    "nfci_nonfinancial_leverage": "1971-01-08",
+    "us_recession": "1854-12-01",
+    "vix": "1990-01-01",
+    "finra_margin_debt": "1997-01-01",
+    "finra_total_free_credit": "1997-01-01",
+    "finra_margin_debt_mom_pct": "1997-01-01",
+    "finra_margin_debt_yoy_pct": "1997-01-01",
+    "margin_debt_to_free_credit": "1997-01-01",
+    "finra_cash_free_credit": "2010-02-01",
+    "finra_margin_free_credit": "2010-02-01",
+    "shiller_price": "1871-01-01",
+    "shiller_cape": "1871-01-01",
+    "shiller_real_tr_price": "1871-01-01",
+}
+
+
+def build_coverage(output_dir: Path):
+    rows = []
+    for metric_id, metric in sorted(load_generated_metrics(output_dir).items()):
+        actual_start = metric["coverage"]["history_start"]
+        expected_start = EXPECTED_STARTS.get(metric_id)
+        status = "ok"
+        if expected_start and actual_start and actual_start > expected_start:
+            status = "short_history"
+        rows.append(
+            {
+                "id": metric_id,
+                "name": metric["metric"]["name"],
+                "expected_history_start": expected_start,
+                "actual_history_start": actual_start,
+                "actual_history_end": metric["coverage"]["history_end"],
+                "observations": len(metric.get("observations", [])),
+                "status": status,
+            }
+        )
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "metrics": rows,
+    }
 
 
 def build_catalog(output_dir: Path):
@@ -212,6 +284,7 @@ def main():
         report.extend(refresh_shiller(args.shiller_file, args.output_dir))
 
     atomic_json(args.output_dir / "signals.json", build_signals(args.output_dir))
+    atomic_json(args.output_dir / "coverage.json", build_coverage(args.output_dir))
     atomic_json(args.output_dir / "catalog.json", build_catalog(args.output_dir))
     atomic_json(
         args.output_dir / "refresh-report.json",
