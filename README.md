@@ -25,6 +25,8 @@ See:
 - `docs/data-contract.md`
 - `docs/data-sources.md`
 - `docs/methodology.md`
+- `docs/signals.md`
+- `docs/qa.md`
 
 ## Quick start
 
@@ -40,10 +42,22 @@ Run deterministic tests:
 python -m unittest discover -s tests -v
 ```
 
-Refresh configured public FRED series:
+Refresh network-accessible public sources (configured FRED series + official Cboe VIX):
+
+```bash
+python scripts/refresh_data.py --public
+```
+
+Refresh configured FRED series only:
 
 ```bash
 python scripts/refresh_data.py --fred
+```
+
+Refresh official Cboe VIX only:
+
+```bash
+python scripts/refresh_data.py --cboe-vix
 ```
 
 Refresh only selected FRED metrics:
@@ -56,6 +70,22 @@ Import an official FINRA margin-statistics file already downloaded locally:
 
 ```bash
 python scripts/refresh_data.py --finra-file /path/to/margin-statistics.xlsx
+```
+
+FINRA source page:
+
+`https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics`
+
+Import the live Robert Shiller workbook downloaded from shillerdata.com:
+
+```bash
+python scripts/refresh_data.py --shiller-file /path/to/ie_data.xls
+```
+
+Build/rebuild Deleveraging Watch from whatever valid metric snapshots are present:
+
+```bash
+python scripts/build_signals.py
 ```
 
 Validate generated metric files:
@@ -124,13 +154,16 @@ Completed:
 - no-GHA architecture
 - canonical data contract
 - point-in-time historical methodology
-- initial FRED / FINRA ingestion code
-- static responsive dashboard shell
-- historical raw-series and event-window UI scaffolding
+- FRED / FINRA / Cboe VIX / Shiller ingestion adapters
+- static responsive dashboard
+- absolute / point-in-time percentile / rolling percentile / rate-of-change history views
+- event-window comparison with recession context
+- transparent Deleveraging Watch with historical backfill
+- runtime stale/error protection and QA fixtures
 
 In progress:
 - production long-history snapshots
 - official FINRA 1997+ import verification
-- complete dashboard data population
-- Deleveraging Watch
-- final QA / Pages publication
+- complete production dashboard data population
+- execute the deterministic QA suite against real generated snapshots
+- final Pages publication
