@@ -1,36 +1,60 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from math import isfinite
 
 
-ALLOWED_STATES = {"fresh","stale","missing","error","insufficient_data"}
+ALLOWED_STATES = {"fresh", "stale", "missing", "error", "insufficient_data"}
+ALLOWED_SIGNAL_STATES = {"active", "inactive", "unknown"}
+ALLOWED_REFRESH_STATES = {"updated", "error"}
 
 
 class ValidationError(ValueError):
     pass
 
 
+def _date(value: str, *, field: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except Exception as exc:
+        raise ValidationError(f"Invalid {field}: {value!r}") from exc
+
+
+def _datetime(value: str, *, field: str) -> datetime:
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except Exception as exc:
+        raise ValidationError(f"Invalid {field}: {value!r}") from exc
+
+
 def validate_metric(metric: dict) -> None:
-    required = {"schema_version","environment","metric","source","coverage","freshness","lineage","baselines","latest","observations"}
+    required = {
+        "schema_version",
+        "environment",
+        "metric",
+        "source",
+        "coverage",
+        "freshness",
+        "lineage",
+        "baselines",
+        "latest",
+        "observations",
+    }
     missing = required - set(metric)
     if missing:
         raise ValidationError(f"Missing top-level keys: {sorted(missing)}")
     if metric["schema_version"] != "1.0.0":
         raise ValidationError("Unsupported schema_version")
-    if metric["environment"] not in {"production","fixture"}:
+    if metric["environment"] not in {"production", "fixture"}:
         raise ValidationError("Invalid environment")
     if metric["freshness"]["state"] not in ALLOWED_STATES:
         raise ValidationError("Invalid freshness state")
 
-    dates=[]
+    dates = []
     for obs in metric["observations"]:
-        try:
-            date.fromisoformat(obs["date"])
-        except Exception as exc:
-            raise ValidationError(f"Invalid observation date: {obs.get('date')}") from exc
+        _date(obs["date"], field="observation date")
         dates.append(obs["date"])
-        value=obs.get("value")
+        value = obs.get("value")
         if value is not None and not isfinite(float(value)):
             raise ValidationError(f"Non-finite observation at {obs['date']}")
 
@@ -45,8 +69,8 @@ def validate_metric(metric: dict) -> None:
         if metric["coverage"]["history_end"] != dates[-1]:
             raise ValidationError("coverage.history_end does not match last observation")
 
-    present=[o for o in metric["observations"] if o.get("value") is not None]
-    latest=present[-1] if present else None
+    present = [o for o in metric["observations"] if o.get("value") is not None]
+    latest = present[-1] if present else None
     if latest:
         if metric["latest"]["as_of"] != latest["date"]:
             raise ValidationError("latest.as_of does not match last non-null observation")
@@ -55,3 +79,123 @@ def validate_metric(metric: dict) -> None:
     else:
         if metric["latest"]["value"] is not None:
             raise ValidationError("latest.value must be null when all observations are missing")
+
+
+def _validate_signal_summary(summary: dict, *, context: str) -> None:
+    required = {"active", "inactive", "unknown", "known", "total"}
+    if required - set(summary):
+        raise ValidationError(f"{context}: incomplete summary")
+
+    values = {key: int(summary[key]) for key in required}
+    if any(value < 0 for value in values.values()):
+        raise ValidationError(f"{context}: negative summary count")
+    if values["known"] != values["active"] + values["inactive"]:
+        raise ValidationError(f"{context}: known != active + inactive")
+    if values["total"] != values["known"] + values["unknown"]:
+        raise ValidationError(f"{context}: total != known + unknown")
+
+
+def validate_signal_snapshot(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("signals: unsupported schema_version")
+    if "current" not in payload or "history" not in payload:
+        raise ValidationError("signals: missing current/history")
+    _datetime(payload["generated_at"], field="signals.generated_at")
+    _date(payload["current"]["as_of"], field="signals.current.as_of")
+
+    current_conditions = payload["current"].get("conditions", [])
+    ids = [condition.get("id") for condition in current_conditions]
+    if len(ids) != len(set(ids)):
+        raise ValidationError("signals: duplicate current condition id")
+    for condition in current_conditions:
+        if condition.get("status") not in ALLOWED_SIGNAL_STATES:
+            raise ValidationError(
+                f"signals: invalid condition status {condition.get('status')!r}"
+            )
+
+    _validate_signal_summary(payload["current"]["summary"], context="signals.current")
+    if payload["current"]["summary"]["total"] != len(current_conditions):
+        raise ValidationError("signals.current: total does not match condition count")
+
+    dates = []
+    for point in payload["history"]:
+        _date(point["date"], field="signals.history.date")
+        dates.append(point["date"])
+        _validate_signal_summary(point["summary"], context=f"signals.history[{point['date']}]")
+        for status in point.get("conditions", {}).values():
+            if status not in ALLOWED_SIGNAL_STATES:
+                raise ValidationError(
+                    f"signals.history[{point['date']}]: invalid status {status!r}"
+                )
+
+    if dates != sorted(dates):
+        raise ValidationError("signals: history dates are not monotonically ascending")
+    if len(dates) != len(set(dates)):
+        raise ValidationError("signals: duplicate history dates")
+
+
+def validate_coverage_report(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("coverage: unsupported schema_version")
+    _datetime(payload["generated_at"], field="coverage.generated_at")
+
+    ids = []
+    for metric in payload.get("metrics", []):
+        metric_id = metric.get("id")
+        if not metric_id:
+            raise ValidationError("coverage: metric id missing")
+        ids.append(metric_id)
+
+        start = metric.get("actual_history_start")
+        end = metric.get("actual_history_end")
+        if start:
+            _date(start, field=f"coverage[{metric_id}].actual_history_start")
+        if end:
+            _date(end, field=f"coverage[{metric_id}].actual_history_end")
+        if start and end and start > end:
+            raise ValidationError(f"coverage[{metric_id}]: start > end")
+        if int(metric.get("observations", 0)) < 0:
+            raise ValidationError(f"coverage[{metric_id}]: negative observation count")
+        if metric.get("status") not in {"ok", "short_history"}:
+            raise ValidationError(
+                f"coverage[{metric_id}]: invalid status {metric.get('status')!r}"
+            )
+
+    if len(ids) != len(set(ids)):
+        raise ValidationError("coverage: duplicate metric id")
+
+
+def validate_catalog(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("catalog: unsupported schema_version")
+    generated_at = payload.get("generated_at")
+    if generated_at is not None:
+        _datetime(generated_at, field="catalog.generated_at")
+
+    ids = []
+    for metric in payload.get("metrics", []):
+        metric_id = metric.get("id")
+        if not metric_id:
+            raise ValidationError("catalog: metric id missing")
+        ids.append(metric_id)
+        path = metric.get("path")
+        if not isinstance(path, str) or not path.startswith("./"):
+            raise ValidationError(f"catalog[{metric_id}]: path must be project-relative")
+        if metric.get("freshness") not in ALLOWED_STATES:
+            raise ValidationError(f"catalog[{metric_id}]: invalid freshness state")
+
+    if len(ids) != len(set(ids)):
+        raise ValidationError("catalog: duplicate metric id")
+
+
+def validate_refresh_report(payload: dict) -> None:
+    _datetime(payload["generated_at"], field="refresh-report.generated_at")
+    for result in payload.get("results", []):
+        if result.get("status") not in ALLOWED_REFRESH_STATES:
+            raise ValidationError(
+                f"refresh-report: invalid result status {result.get('status')!r}"
+            )
+        if not result.get("metric"):
+            raise ValidationError("refresh-report: result metric missing")
+        if result["status"] == "error" and not result.get("error"):
+            raise ValidationError("refresh-report: error result missing error message")
