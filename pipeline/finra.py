@@ -5,7 +5,7 @@ import io
 import json
 import re
 from calendar import monthrange
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from .methodology import period_pct_change
@@ -36,7 +36,7 @@ def _parse_amount(raw):
     return -value if negative else value
 
 
-def _month_end(value) -> str:
+def _business_month_end(value) -> str:
     if isinstance(value, datetime):
         d = value.date()
     elif isinstance(value, date):
@@ -59,7 +59,10 @@ def _month_end(value) -> str:
                 continue
         if d is None:
             raise FinraError(f"Unrecognized month/date value: {value!r}")
-    return date(d.year, d.month, monthrange(d.year, d.month)[1]).isoformat()
+    last = date(d.year, d.month, monthrange(d.year, d.month)[1])
+    while last.weekday() >= 5:
+        last -= timedelta(days=1)
+    return last.isoformat()
 
 
 ALIASES = {
@@ -107,7 +110,7 @@ def parse_finra_csv(text: str) -> list[dict]:
         if not (row.get(cols["month"]) or "").strip():
             continue
         rows.append({
-            "date": _month_end(row[cols["month"]]),
+            "date": _business_month_end(row[cols["month"]]),
             "margin_debt": _parse_amount(row.get(cols["margin_debt"])),
             "cash_free_credit": _parse_amount(row.get(cols["cash_free_credit"])),
             "margin_free_credit": _parse_amount(row.get(cols["margin_free_credit"])),
@@ -141,7 +144,7 @@ def parse_finra_xlsx(path: str | Path) -> list[dict]:
                     continue
                 try:
                     parsed.append({
-                        "date": _month_end(values[indexes["month"]]),
+                        "date": _business_month_end(values[indexes["month"]]),
                         "margin_debt": _parse_amount(values[indexes["margin_debt"]]),
                         "cash_free_credit": _parse_amount(values[indexes["cash_free_credit"]]),
                         "margin_free_credit": _parse_amount(values[indexes["margin_free_credit"]]),
