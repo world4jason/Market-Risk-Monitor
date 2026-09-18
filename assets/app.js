@@ -1,11 +1,13 @@
 const CATALOG_URL = "./data/generated/catalog.json";
 const EVENTS_URL = "./data/events.json";
+const SIGNALS_URL = "./data/generated/signals.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
 const state = {
   catalog: null,
   metrics: new Map(),
   events: [],
+  signals: null,
 };
 
 const pillarLabels = {
@@ -673,6 +675,134 @@ function openMetric(id) {
   $("#metric-dialog").showModal();
 }
 
+
+function flattenRuleDetails(rule, out = []) {
+  if (!rule) return out;
+  if (rule.children) {
+    rule.children.forEach((child) => flattenRuleDetails(child, out));
+    return out;
+  }
+  out.push({
+    label: rule.label || rule.type || "rule",
+    reason: rule.reason || "",
+    asOf: rule.as_of || null,
+    status: rule.status || "unknown",
+  });
+  return out;
+}
+
+function renderSignals() {
+  const summaryEl = $("#signal-summary");
+  const grid = $("#signal-grid");
+  const chart = $("#signal-history-chart");
+  const snapshot = state.signals;
+
+  if (!snapshot?.current) {
+    summaryEl.innerHTML =
+      '<div class="empty-state compact">Signal snapshot not built yet. Run <code>python scripts/build_signals.py</code> after refreshing metrics.</div>';
+    grid.innerHTML = "";
+    chart.innerHTML =
+      '<div class="empty-state compact">Historical signal state will appear here.</div>';
+    return;
+  }
+
+  const summary = snapshot.current.summary;
+  summaryEl.innerHTML = `
+    <div class="signal-summary-main">
+      <strong>${summary.active} active</strong>
+      <span class="meta">/ ${summary.known} known · ${summary.unknown} unknown · ${summary.total} total</span>
+    </div>
+    <span class="meta">Evaluated ${escapeHtml(snapshot.current.as_of || "—")}</span>
+  `;
+
+  grid.innerHTML = (snapshot.current.conditions || [])
+    .map((condition) => {
+      const details = flattenRuleDetails(condition.rules);
+      const detailText = details
+        .map((detail) => {
+          const asOf = detail.asOf ? ` · as of ${detail.asOf}` : "";
+          return `${detail.label}: ${detail.status}${asOf}`;
+        })
+        .join("<br>");
+      return `<article class="signal-card" data-status="${escapeHtml(condition.status)}">
+        <span class="signal-status">${escapeHtml(condition.status)}</span>
+        <h3>${escapeHtml(condition.name)}</h3>
+        <p>${escapeHtml(condition.description || "")}</p>
+        <div class="signal-rule">${detailText}</div>
+      </article>`;
+    })
+    .join("");
+
+  renderSignalHistory(snapshot, chart);
+}
+
+function renderSignalHistory(snapshot, element) {
+  const history = snapshot.history || [];
+  if (history.length < 2) {
+    element.innerHTML =
+      '<div class="empty-state compact">Not enough historical signal states.</div>';
+    return;
+  }
+
+  const width = 1000;
+  const height = 250;
+  const left = 48;
+  const right = 22;
+  const top = 20;
+  const bottom = 38;
+  const firstTs = Date.parse(history[0].date);
+  const lastTs = Date.parse(history.at(-1).date);
+  const span = Math.max(lastTs - firstTs, 1);
+  const total = Math.max(...history.map((point) => point.summary.total || 0), 1);
+
+  const x = (dateValue) =>
+    left + ((Date.parse(dateValue) - firstTs) / span) * (width - left - right);
+  const y = (value) =>
+    top + ((total - value) / total) * (height - top - bottom);
+
+  const activePath = history
+    .map(
+      (point, index) =>
+        `${index ? "L" : "M"} ${x(point.date).toFixed(1)} ${y(point.summary.active).toFixed(1)}`,
+    )
+    .join(" ");
+  const unknownPath = history
+    .map(
+      (point, index) =>
+        `${index ? "L" : "M"} ${x(point.date).toFixed(1)} ${y(point.summary.unknown).toFixed(1)}`,
+    )
+    .join(" ");
+
+  const grids = Array.from({ length: total + 1 }, (_, value) => {
+    const yy = y(value);
+    return `<line class="gridline" x1="${left}" y1="${yy}" x2="${width - right}" y2="${yy}"/>
+      <text x="${left - 8}" y="${yy + 4}" text-anchor="end" fill="currentColor" opacity=".5" font-size="10">${value}</text>`;
+  }).join("");
+
+  const eventLines = state.events
+    .filter((event) => event.anchor_date)
+    .filter((event) => {
+      const ts = Date.parse(event.anchor_date);
+      return ts >= firstTs && ts <= lastTs;
+    })
+    .map((event) => {
+      const xx = x(event.anchor_date);
+      return `<line class="signal-event-line" x1="${xx}" y1="${top}" x2="${xx}" y2="${height - bottom}">
+        <title>${escapeHtml(event.name)}</title>
+      </line>`;
+    })
+    .join("");
+
+  element.innerHTML = `<svg class="history-svg signal-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Historical Deleveraging Watch condition counts">
+    ${grids}
+    ${eventLines}
+    <path class="active-line" d="${activePath}"><title>Active conditions</title></path>
+    <path class="unknown-line" d="${unknownPath}"><title>Unknown conditions</title></path>
+    <text x="${left}" y="${height - 11}" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(history[0].date)}</text>
+    <text x="${width - right}" y="${height - 11}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(history.at(-1).date)}</text>
+  </svg>`;
+}
+
 function updateGlobalFreshness() {
   const badge = $("#global-freshness");
   const metrics = [...state.metrics.values()];
@@ -715,9 +845,10 @@ async function loadData() {
   state.metrics.clear();
 
   try {
-    const [catalogResp, eventsResp] = await Promise.all([
+    const [catalogResp, eventsResp, signalsResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(EVENTS_URL, { cache: "no-store" }),
+      fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
 
@@ -725,6 +856,7 @@ async function loadData() {
     state.events = eventsResp.ok
       ? (await eventsResp.json()).events || []
       : [];
+    state.signals = signalsResp?.ok ? await signalsResp.json() : null;
 
     $("#data-generated").textContent = state.catalog.generated_at
       ? `Generated ${state.catalog.generated_at}`
@@ -756,6 +888,7 @@ async function loadData() {
   renderMetrics();
   renderRegime();
   renderCoverage();
+  renderSignals();
   renderHistorySelector();
   updateGlobalFreshness();
 }
