@@ -2,24 +2,54 @@
   "schema_version": "1.0.0",
   "events": [
     {
+      "id": "crash_1929",
+      "name": "1929 peak / crash",
+      "anchor_date": "1929-09-03",
+      "window": {
+        "pre_months": 24,
+        "post_months": 36
+      },
+      "notes": "Dow peak date before the October 1929 crash. Only metrics whose source history existed then are shown."
+    },
+    {
+      "id": "bear_1973",
+      "name": "1973–74 bear market",
+      "anchor_date": "1973-01-11",
+      "window": {
+        "pre_months": 12,
+        "post_months": 30
+      },
+      "notes": "S&P 500 peak period preceding the 1973–74 bear market."
+    },
+    {
+      "id": "black_monday_1987",
+      "name": "Black Monday 1987",
+      "anchor_date": "1987-10-19",
+      "window": {
+        "pre_months": 12,
+        "post_months": 18
+      },
+      "notes": "October 19, 1987 market crash. VIX history begins later, so older-source availability is shown honestly."
+    },
+    {
       "id": "dotcom_peak",
       "name": "Dot-com peak / unwind",
       "anchor_date": "2000-03-24",
       "window": {
         "pre_months": 12,
-        "post_months": 24
+        "post_months": 30
       },
-      "notes": "Anchor marks the late-March 2000 U.S. equity peak period; metric charts use nearest valid observation where exact dates differ."
+      "notes": "Late-March 2000 U.S. equity peak period."
     },
     {
       "id": "gfc",
       "name": "Global Financial Crisis",
       "anchor_date": "2008-09-15",
       "window": {
-        "pre_months": 12,
-        "post_months": 24
+        "pre_months": 18,
+        "post_months": 30
       },
-      "notes": "Lehman bankruptcy date used as a reproducible stress anchor; broader GFC regime began earlier."
+      "notes": "Lehman bankruptcy date used as a reproducible acute-stress anchor; the broader GFC began earlier."
     },
     {
       "id": "covid_shock",
