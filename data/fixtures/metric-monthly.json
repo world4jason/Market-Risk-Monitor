@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "fixture",
+  "metric": {
+    "id": "margin_debt_fixture",
+    "name": "Margin debt fixture",
+    "description": "Illustrative monthly contract fixture only.",
+    "pillar": "leverage",
+    "units": "USD millions",
+    "frequency": "monthly",
+    "polarity": "contextual"
+  },
+  "source": {
+    "provider": "Fixture",
+    "dataset": "Illustrative monthly series",
+    "series_id": null,
+    "url": "https://example.com/monthly",
+    "license_note": "Fixture only; not production data.",
+    "redistribution": "allowed"
+  },
+  "coverage": {
+    "history_start": "2025-10-31",
+    "history_end": "2025-12-31",
+    "timezone": "America/New_York",
+    "expected_observation_lag_days": 25
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 50,
+    "age_days": 20,
+    "evaluated_at": "2026-01-20T12:00:00Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "rolling-120m",
+      "type": "rolling_percentile",
+      "window_observations": 120,
+      "min_observations": 36,
+      "point_in_time": true,
+      "notes": "Example rolling decade baseline."
+    },
+    {
+      "id": "event",
+      "type": "event_window",
+      "window_observations": 24,
+      "min_observations": 12,
+      "point_in_time": true,
+      "notes": "Example event-window support."
+    }
+  ],
+  "latest": {
+    "as_of": "2025-12-31",
+    "fetched_at": "2026-01-20T12:00:00Z",
+    "value": 1020000,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2025-10-31",
+      "value": 980000,
+      "status": "observed"
+    },
+    {
+      "date": "2025-11-30",
+      "value": 1000000,
+      "status": "observed"
+    },
+    {
+      "date": "2025-12-31",
+      "value": 1020000,
+      "status": "observed"
+    }
+  ]
+}
