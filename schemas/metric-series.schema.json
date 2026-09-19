@@ -131,6 +131,34 @@
             "null"
           ],
           "description": "Market/universe scope such as NYSE when materially relevant."
+        },
+        "membership_mode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Constituent-membership methodology when universe membership matters."
+        },
+        "membership_snapshot": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional membership snapshot/version identifier."
+        },
+        "price_adjustment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Price adjustment convention for self-computed metrics."
+        },
+        "point_in_time_membership": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether historical membership reflects the constituent universe at each observation date."
         }
       }
     },
