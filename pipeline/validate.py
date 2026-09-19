@@ -52,10 +52,19 @@ def validate_metric(metric: dict) -> None:
 
     if metric["metric"].get("pillar") == "breadth":
         scope = metric["source"].get("market_scope")
-        if scope != "NYSE":
-            raise ValidationError(
-                f"breadth metric market_scope must be 'NYSE', got {scope!r}"
-            )
+        metric_id = metric["metric"].get("id", "")
+        if metric_id.startswith("sp500_above_"):
+            if scope != "S&P 500":
+                raise ValidationError(
+                    f"S&P 500 moving-average breadth scope must be 'S&P 500', got {scope!r}"
+                )
+        elif metric_id.startswith("nyse_") or metric_id.startswith("mrm_mcclellan_"):
+            if scope != "NYSE":
+                raise ValidationError(
+                    f"NYSE breadth metric market_scope must be 'NYSE', got {scope!r}"
+                )
+        elif not scope:
+            raise ValidationError("breadth metric market_scope is required")
 
     dates = []
     for obs in metric["observations"]:
