@@ -18,6 +18,7 @@ from pipeline.ma_breadth_study import build_event_study as build_ma_breadth_even
 from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
+from pipeline.tradermonty_ma_breadth import build_tradermonty_metrics, fetch_tradermonty_csv
 from pipeline.signals import build_signal_snapshot
 from pipeline.validate import validate_metric
 
@@ -152,6 +153,45 @@ def refresh_ma_breadth(input_path: Path, output_dir: Path):
 
     audit_dest = output_dir / "ma-breadth-audit.json"
     atomic_json(audit_dest, audit_ma_breadth_rows(rows))
+    return report
+
+
+def refresh_tradermonty_ma_breadth(output_dir: Path):
+    metrics = build_tradermonty_metrics(fetch_tradermonty_csv())
+    report = []
+    for metric_id, metric in metrics.items():
+        validate_metric(metric)
+        dest = output_dir / f"{metric_id}.json"
+
+        if dest.exists():
+            try:
+                previous = json.loads(dest.read_text(encoding="utf-8"))
+                validate_metric(previous)
+                # A public current-constituent source must never overwrite a
+                # point-in-time canonical history for the same metric.
+                if (
+                    previous.get("source", {}).get("point_in_time_membership") is True
+                    and metric.get("source", {}).get("point_in_time_membership") is not True
+                ):
+                    report.append({
+                        "metric": metric_id,
+                        "status": "error",
+                        "error": (
+                            "refusing to overwrite canonical point-in-time "
+                            "MA breadth with current-constituent retroactive source"
+                        ),
+                        "preserved_previous": True,
+                    })
+                    continue
+            except Exception:
+                pass
+
+        atomic_json(dest, metric)
+        report.append({
+            "metric": metric_id,
+            "status": "updated",
+            "path": str(dest.relative_to(ROOT)),
+        })
     return report
 
 
@@ -333,6 +373,14 @@ def main():
         help="Refresh all network-accessible public sources (FRED + Cboe VIX).",
     )
     parser.add_argument(
+        "--tradermonty-ma-breadth",
+        action="store_true",
+        help=(
+            "Fetch public TraderMonty S&P 500 50/200DMA breadth. "
+            "Historical rows are marked current-constituent retroactive."
+        ),
+    )
+    parser.add_argument(
         "--breadth-file",
         type=Path,
         help="Path to an authorized NYSE breadth CSV export using docs/breadth-sources.md contract.",
@@ -363,8 +411,8 @@ def main():
     run_fred = args.fred or args.public
     run_vix = args.cboe_vix or args.public
 
-    if not any([run_fred, run_vix, args.breadth_file, args.ma_breadth_file, args.finra_file, args.shiller_file]):
-        parser.error("choose --public, --fred, --cboe-vix, --breadth-file, --ma-breadth-file, --finra-file and/or --shiller-file")
+    if not any([run_fred, run_vix, args.tradermonty_ma_breadth, args.breadth_file, args.ma_breadth_file, args.finra_file, args.shiller_file]):
+        parser.error("choose --public, --fred, --cboe-vix, --tradermonty-ma-breadth, --breadth-file, --ma-breadth-file, --finra-file and/or --shiller-file")
 
     report = []
 
@@ -379,6 +427,9 @@ def main():
 
     if run_vix:
         report.extend(refresh_cboe_vix(args.output_dir))
+
+    if args.tradermonty_ma_breadth:
+        report.extend(refresh_tradermonty_ma_breadth(args.output_dir))
 
     if args.breadth_file:
         report.extend(refresh_breadth(args.breadth_file, args.output_dir))
