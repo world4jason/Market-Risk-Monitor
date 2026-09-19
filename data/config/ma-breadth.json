@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "custom_heuristics": {
+    "supplied_chart": {
+      "label": "Supplied chart heuristic",
+      "euphoria_above": 85,
+      "greed_above": 75,
+      "fear_below": 25,
+      "capitulation_below": 15
+    },
+    "common_30_70": {
+      "label": "Common 30/70 reference",
+      "overbought_above": 70,
+      "oversold_below": 30
+    }
+  },
+  "event_study": {
+    "metric": "sp500_above_50dma_pct",
+    "thresholds": [
+      25,
+      15
+    ],
+    "directions": [
+      "down",
+      "up"
+    ],
+    "cooldown_sessions": 20,
+    "forward_sessions": {
+      "1W": 5,
+      "1M": 21,
+      "3M": 63,
+      "6M": 126
+    },
+    "local_low_window_sessions": 63
+  }
+}
