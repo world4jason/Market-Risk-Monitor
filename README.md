@@ -252,3 +252,26 @@ The Trend Participation module supports:
 - independent Deleveraging Watch conditions
 
 Historical event-study/backfill use requires point-in-time constituent-aware breadth. A current-constituent retroactive reconstruction is blocked from canonical historical analysis.
+
+
+### Open point-in-time MA breadth research path
+
+For historical S&P 500 20/50/200DMA breadth without a paid breadth export:
+
+```bash
+python scripts/bootstrap_ma_breadth_open.py
+
+python scripts/refresh_data.py \
+  --ma-breadth-file .cache/ma-breadth-open/sp500-ma-breadth-open.csv
+
+python scripts/build_ma_breadth_study.py
+python scripts/validate_data.py
+```
+
+This path uses:
+- MIT-licensed community point-in-time S&P 500 membership history (1996+)
+- Apache-2.0 FINSABER delisted-inclusive adjusted-close prices (2000–2024)
+
+The ~253MB price file is cached under `.cache/` and is not committed to this repository. The resulting breadth is a reproducible open-data reconstruction, not an official S&P Dow Jones breadth feed.
+
+See `docs/moving-average-breadth-sources.md` for source, survivorship, and post-2024 limitations.
