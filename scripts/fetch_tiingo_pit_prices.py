@@ -282,15 +282,16 @@ def main() -> None:
         f"done: files={manifest['files_present']}/{len(tickers)}, "
         f"new={new_downloads}, failures={manifest['failure_count']}"
     )
+    membership_arg = (
+        f"--membership-file {args.membership_file} "
+        if args.membership_file
+        else f"--membership-url {args.membership_url} "
+    )
     print(
         "Next: python scripts/build_ma_breadth_self_compute.py "
-        (
-            f"--membership-file {args.membership_file} "
-            if args.membership_file
-            else f"--membership-url {args.membership_url} "
-        )
+        + membership_arg
         + f"--price-dir {args.output_dir} "
-        f"--start-date {args.start_date} --end-date {args.end_date}"
+        + f"--start-date {args.start_date} --end-date {args.end_date}"
     )
 
 
