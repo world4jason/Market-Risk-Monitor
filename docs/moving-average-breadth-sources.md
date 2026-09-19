@@ -6,9 +6,9 @@ Issue: #23
 
 The v0.2b Trend Participation module tracks the percentage of S&P 500 constituents above:
 
-- 20-day moving average
-- 50-day moving average
-- 200-day moving average
+- 20-day moving average — common provider symbol `S5TW`
+- 50-day moving average — common provider symbol `S5FI`
+- 200-day moving average — common provider symbol `S5TH`
 
 The core 50-day reference is the TradingView/Barchart-style `S5FI` series.
 
@@ -299,3 +299,19 @@ Independent public pages agree on recent S5FI closes:
 - EODData: 2026-09-18 close = 27.83
 
 This is useful as a current-value cross-provider sanity check, while long-history licensing remains separate.
+
+
+## Exact provider-style symbol cross-checks
+
+Current public historical pages confirm the three moving-average breadth families:
+
+- `S5TW` — S&P 500 Stocks Above 20-Day Average
+- `S5FI` — S&P 500 Stocks Above 50-Day Average
+- `S5TH` — S&P 500 Stocks Above 200-Day Average
+
+Recent public reference observations:
+- S5TW: 2026-09-17 = 21.07
+- S5FI: 2026-09-18 = 27.83
+- S5TH: 2026-09-18 = 49.50
+
+These small fixed references are suitable for cross-provider sanity checks. They are not a substitute for a licensed historical dataset.
