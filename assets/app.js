@@ -399,10 +399,14 @@ function renderTrendParticipation() {
         return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>not loaded</small></div>`;
       }
       const pct = rollingPercentile(metric);
+      const pit = metric?.source?.point_in_time_membership;
+      const context = pit === false
+        ? "non-PIT history · percentile disabled"
+        : (pct == null ? "percentile —" : `${pct.toFixed(0)}th rolling pct`);
       return `<button class="trend-stat" type="button" data-ma-metric="${metric.metric.id}">
         <span>${horizon}DMA</span>
         <strong>${formatValue(metric.latest?.value, "percent")}</strong>
-        <small>${pct == null ? "percentile —" : `${pct.toFixed(0)}th rolling pct`} · ${escapeHtml(metric.latest?.as_of || "—")}</small>
+        <small>${escapeHtml(context)} · ${escapeHtml(metric.latest?.as_of || "—")}</small>
       </button>`;
     })
     .join("");
@@ -562,7 +566,7 @@ function renderTrendParticipationChart() {
         .map(([label, value]) => {
           const yy = y(Number(value));
           return `<line class="ma-heuristic-line" x1="${left}" y1="${yy}" x2="${width - right}" y2="${yy}"/>
-            <text x="${width - right - 5}" y="${yy - 5}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(label)} ${value}% · custom</text>`;
+            <text x="${width - right - 5}" y="${yy - 5}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(label)} ${value}% · 50DMA custom</text>`;
         })
         .join("");
     }
@@ -1037,9 +1041,13 @@ function openMetric(id) {
     .join("");
 
   fullChart(metric, $("#dialog-chart"), { height: 390 });
+  const membershipContext =
+    metric.source?.membership_mode
+      ? ` · membership: ${escapeHtml(metric.source.membership_mode)}`
+      : "";
   $("#dialog-source").innerHTML =
     `Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
-     Snapshot fetched: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}`;
+     Snapshot fetched: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}`;
 
   $("#metric-dialog").showModal();
 }
