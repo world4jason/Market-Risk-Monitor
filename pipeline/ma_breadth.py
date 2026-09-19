@@ -416,6 +416,33 @@ def audit_rows(rows: list[dict]) -> dict:
             ),
         }
 
+    observations = []
+    for row in rows:
+        observations.append(
+            {
+                "date": row["date"],
+                "membership_snapshot": row.get("membership_snapshot"),
+                "20": {
+                    "pct": row.get("above_20dma_pct"),
+                    "eligible": row.get("eligible_20d"),
+                    "above": row.get("above_20d_count"),
+                    "missing_price": row.get("missing_20d"),
+                },
+                "50": {
+                    "pct": row.get("above_50dma_pct"),
+                    "eligible": row.get("eligible_50d"),
+                    "above": row.get("above_50d_count"),
+                    "missing_price": row.get("missing_50d"),
+                },
+                "200": {
+                    "pct": row.get("above_200dma_pct"),
+                    "eligible": row.get("eligible_200d"),
+                    "above": row.get("above_200d_count"),
+                    "missing_price": row.get("missing_200d"),
+                },
+            }
+        )
+
     return {
         "schema_version": "1.0.0",
         "market_scope": rows[0]["market_scope"],
@@ -426,6 +453,7 @@ def audit_rows(rows: list[dict]) -> dict:
         ),
         "price_adjustment": rows[0].get("price_adjustment"),
         "horizons": horizons,
+        "observations": observations,
     }
 
 
