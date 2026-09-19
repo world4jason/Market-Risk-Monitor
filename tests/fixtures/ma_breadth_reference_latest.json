@@ -1,0 +1,15 @@
+{
+  "source": "Investing.com + EODData cross-check",
+  "symbols": [
+    "S5FI",
+    "INDEX:S5FI"
+  ],
+  "urls": [
+    "https://www.investing.com/indices/s-p-500-stocks-above-50-day-average-historical-data",
+    "https://www.eoddata.com/stockquote/INDEX/S5FI.htm"
+  ],
+  "date": "2026-09-18",
+  "reference_value": 27.83,
+  "tolerance_pp": 0.5,
+  "note": "Both public historical pages showed a 27.83 close for 2026-09-18. This fixture validates cross-provider sanity only; it is not a licensed historical dataset."
+}
