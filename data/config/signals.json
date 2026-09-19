@@ -85,6 +85,30 @@
         "threshold": 0,
         "label": "6-month real total-return change ≤ 0%"
       }
+    },
+    {
+      "id": "high_low_breadth_collapse",
+      "name": "High/low breadth unusually weak",
+      "description": "NYSE normalized high-low breadth is at or below its strict-past 10th percentile.",
+      "rules": {
+        "type": "percentile_below",
+        "metric": "nyse_high_low_pct",
+        "threshold": 10,
+        "min_observations": 252,
+        "label": "NYSE High-Low Breadth strict-past percentile ≤ 10"
+      }
+    },
+    {
+      "id": "volume_breadth_collapse",
+      "name": "Volume breadth unusually weak",
+      "description": "MRM Classic McClellan Volume Summation is at or below its strict-past 10th percentile.",
+      "rules": {
+        "type": "percentile_below",
+        "metric": "mrm_mcclellan_volume_summation",
+        "threshold": 10,
+        "min_observations": 252,
+        "label": "McClellan Volume Summation strict-past percentile ≤ 10"
+      }
     }
   ]
 }
