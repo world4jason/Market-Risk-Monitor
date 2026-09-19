@@ -416,3 +416,57 @@ price_adjustment = adjusted_close
 but it is still a community/open-data reconstruction. It must not be described as the official S&P Dow Jones Indices breadth series.
 
 Cross-provider validation against S5FI/SPXA50R remains part of QA.
+
+
+## Optional 2025/2026 recent-price supplement
+
+The open FINSABER price file ends at 2024-12-31. For local research of the supplied chart's 2025/2026 episodes, the repository includes an **optional local-only** recent supplement:
+
+```bash
+python -m pip install -r requirements-research.txt
+python scripts/bootstrap_ma_breadth_hybrid.py
+```
+
+The supplement:
+- derives the required ticker universe from point-in-time membership snapshots, including members removed during the target period;
+- requests a generous pre-2025 lookback (default 2024-01-01) so 200DMA state is mature when merged with FINSABER history;
+- fetches daily prices with yfinance/Yahoo Finance;
+- records unresolved/failed tickers in `.cache/ma-breadth-open/yahoo_recent_failures.json`;
+- never counts an unresolved ticker as below its moving average;
+- keeps raw recent prices under `.cache/`;
+- merges historical FINSABER first and recent Yahoo second.
+
+### Overlap precedence
+
+For an identical `(symbol,date)`:
+
+```text
+historical FINSABER row
+        ↓
+recent supplement row
+        ↓
+recent supplement wins
+```
+
+This rule is deterministic and reported by the pipeline. Older non-overlapping historical rows remain untouched.
+
+### Yahoo/yfinance rights warning
+
+The yfinance project is open-source software, but its own documentation states that Yahoo Finance API data is intended for personal use and tells users to review Yahoo's terms for actual data rights.
+
+Therefore the recent supplement is:
+- optional;
+- intended for local research;
+- not automatically committed as raw data;
+- marked with redistribution/data-rights caveats in provenance.
+
+Before publishing derived recent snapshots from this supplement in a public repository, review the applicable Yahoo/data-provider terms.
+
+### Hybrid provenance
+
+Hybrid output is labeled as a reconstruction combining:
+- point-in-time community membership history;
+- Apache-2.0 FINSABER historical adjusted-close prices;
+- Yahoo Finance/yfinance recent local prices.
+
+It is not represented as an official S&P Dow Jones breadth series.
