@@ -275,3 +275,22 @@ This path uses:
 The ~253MB price file is cached under `.cache/` and is not committed to this repository. The resulting breadth is a reproducible open-data reconstruction, not an official S&P Dow Jones breadth feed.
 
 See `docs/moving-average-breadth-sources.md` for source, survivorship, and post-2024 limitations.
+
+
+### Extend MA breadth through current date (optional local research)
+
+The open FINSABER dataset ends at 2024-12-31. To extend the point-in-time reconstruction into 2025/2026:
+
+```bash
+python -m pip install -r requirements-research.txt
+python scripts/bootstrap_ma_breadth_open.py
+python scripts/bootstrap_ma_breadth_hybrid.py
+
+python scripts/refresh_data.py \
+  --ma-breadth-file .cache/ma-breadth-open/sp500-ma-breadth-hybrid.csv
+
+python scripts/build_ma_breadth_study.py
+python scripts/validate_data.py
+```
+
+The hybrid path uses Yahoo Finance through yfinance only as an optional local recent-price supplement. yfinance documents the underlying Yahoo Finance API data as intended for personal use; review Yahoo's terms before redistributing any resulting recent data. Raw recent files remain under `.cache/` and are not committed.
