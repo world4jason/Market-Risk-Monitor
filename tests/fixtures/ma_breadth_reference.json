@@ -1,0 +1,9 @@
+{
+  "source": "Barchart",
+  "symbol": "$S5FI",
+  "url": "https://www.barchart.com/stocks/quotes/%24S5FI/price-history",
+  "date": "2026-09-01",
+  "reference_value": 45.52,
+  "tolerance_pp": 0.5,
+  "note": "Fixed external-reference fixture from the Barchart historical page used only to validate tolerance plumbing; production datasets may use different dates/providers."
+}
