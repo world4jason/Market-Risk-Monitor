@@ -6,6 +6,7 @@ from pipeline.ma_breadth import (
     MovingAverageBreadthError,
     audit_rows,
     build_ma_breadth_metrics,
+    cross_check_reference,
     parse_ma_breadth_csv,
 )
 from pipeline.validate import validate_metric
@@ -77,6 +78,19 @@ class MovingAverageBreadthTests(unittest.TestCase):
         rows = parse_ma_breadth_csv(text)
         metric = build_ma_breadth_metrics(rows)["sp500_above_50dma_pct"]
         self.assertFalse(metric["source"]["point_in_time_membership"])
+
+    def test_fixed_external_reference_tolerance(self):
+        import json
+        ref = json.loads(
+            (Path(__file__).parent / "fixtures" / "ma_breadth_reference.json").read_text()
+        )
+        check = cross_check_reference(
+            45.52,
+            ref["reference_value"],
+            tolerance_pp=ref["tolerance_pp"],
+        )
+        self.assertTrue(check["within_tolerance"])
+        self.assertAlmostEqual(check["absolute_difference_pp"], 0.0)
 
 
 if __name__ == "__main__":
