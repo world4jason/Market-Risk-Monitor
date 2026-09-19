@@ -700,6 +700,59 @@ function renderEvents(metric) {
   </svg>`;
 }
 
+
+function relatedBreadthStats(metric) {
+  const id = metric.metric.id;
+  const stats = [];
+
+  const add = (metricId, label) => {
+    const related = state.metrics.get(metricId);
+    if (!related) return;
+    stats.push({
+      label,
+      value: formatValue(related.latest?.value, related.metric.units),
+      asOf: related.latest?.as_of || "—",
+    });
+  };
+
+  if ([
+    "nyse_new_52w_highs",
+    "nyse_new_52w_lows",
+    "nyse_net_new_52w_highs",
+    "nyse_high_low_pct",
+  ].includes(id)) {
+    add("nyse_new_52w_highs", "52W highs");
+    add("nyse_new_52w_lows", "52W lows");
+    add("nyse_net_new_52w_highs", "Net highs");
+    add("nyse_high_low_pct", "High-Low %");
+  } else if ([
+    "nyse_up_volume",
+    "nyse_down_volume",
+    "nyse_up_down_volume",
+    "mrm_mcclellan_volume_oscillator",
+    "mrm_mcclellan_volume_summation",
+  ].includes(id)) {
+    add("nyse_up_volume", "Up volume");
+    add("nyse_down_volume", "Down volume");
+    add("nyse_up_down_volume", "Up-Down volume");
+    add("mrm_mcclellan_volume_oscillator", "McClellan oscillator");
+    add("mrm_mcclellan_volume_summation", "Volume summation");
+  } else if ([
+    "nyse_advancing_issues",
+    "nyse_declining_issues",
+    "nyse_advance_decline_diff",
+    "nyse_advance_decline_pct",
+    "nyse_advance_decline_line",
+  ].includes(id)) {
+    add("nyse_advancing_issues", "Advancing");
+    add("nyse_declining_issues", "Declining");
+    add("nyse_advance_decline_diff", "A-D difference");
+    add("nyse_advance_decline_pct", "A-D %");
+  }
+
+  return stats;
+}
+
 function openMetric(id) {
   const metric = state.metrics.get(id);
   if (!metric) return;
@@ -710,11 +763,17 @@ function openMetric(id) {
 
   const pct = rollingPercentile(metric);
   const change = recentChange(metric);
-  $("#dialog-summary").innerHTML = `
-    <div class="detail-stat"><strong>${formatValue(metric.latest.value, metric.metric.units)}</strong><span>Current value</span></div>
-    <div class="detail-stat"><strong>${change == null ? "—" : `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`}</strong><span>Last observation</span></div>
-    <div class="detail-stat"><strong>${pct == null ? "—" : `${pct.toFixed(0)}th`}</strong><span>Rolling percentile</span></div>
-    <div class="detail-stat"><strong>${escapeHtml(metric.latest.as_of || "—")}</strong><span>Source observation</span></div>`;
+  const related = relatedBreadthStats(metric);
+  const baseStats = [
+    { value: formatValue(metric.latest.value, metric.metric.units), label: "Current value" },
+    { value: change == null ? "—" : `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`, label: "Last observation" },
+    { value: pct == null ? "—" : `${pct.toFixed(0)}th`, label: "Rolling percentile" },
+    { value: escapeHtml(metric.latest.as_of || "—"), label: "Source observation" },
+  ];
+  const stats = related.length ? related.map((item) => ({ value: item.value, label: `${item.label} · ${item.asOf}` })) : baseStats;
+  $("#dialog-summary").innerHTML = stats
+    .map((item) => `<div class="detail-stat"><strong>${item.value}</strong><span>${escapeHtml(item.label)}</span></div>`)
+    .join("");
 
   fullChart(metric, $("#dialog-chart"), { height: 390 });
   $("#dialog-source").innerHTML =
