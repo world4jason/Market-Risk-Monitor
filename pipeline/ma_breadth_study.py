@@ -17,32 +17,41 @@ def _valid(metric: dict) -> list[dict]:
     ]
 
 
-def _crossings(
+def _threshold_events(
     observations: list[dict],
     threshold: float,
-    direction: str,
     cooldown_sessions: int,
-) -> list[int]:
-    if direction not in {"down", "up"}:
-        raise MovingAverageBreadthStudyError(f"unsupported direction {direction!r}")
+) -> list[dict]:
+    """
+    Detect threshold crossings without counting every choppy day as a new episode.
 
-    indexes = []
-    last_accepted = None
+    A same-direction crossing inside the cooldown is ignored, unless an opposite
+    crossing has been accepted in between. This matches the documented episode
+    rule and never uses future observations to decide whether today's crossing exists.
+    """
+    events = []
     for i in range(1, len(observations)):
         prev = observations[i - 1]["value"]
         cur = observations[i]["value"]
-        crossed = (
-            prev >= threshold and cur < threshold
-            if direction == "down"
-            else prev <= threshold and cur > threshold
-        )
-        if not crossed:
+        direction = None
+        if prev >= threshold and cur < threshold:
+            direction = "down"
+        elif prev <= threshold and cur > threshold:
+            direction = "up"
+
+        if direction is None:
             continue
-        if last_accepted is not None and i - last_accepted < cooldown_sessions:
-            continue
-        indexes.append(i)
-        last_accepted = i
-    return indexes
+
+        if events:
+            previous = events[-1]
+            if (
+                previous["direction"] == direction
+                and i - previous["index"] < cooldown_sessions
+            ):
+                continue
+
+        events.append({"index": i, "direction": direction})
+    return events
 
 
 def _align_price(price_obs: list[dict], event_date: str):
@@ -133,13 +142,17 @@ def build_event_study(
 
     for threshold in config["event_study"]["thresholds"]:
         threshold = float(threshold)
+        threshold_events = _threshold_events(
+            breadth_obs,
+            threshold,
+            int(config["event_study"]["cooldown_sessions"]),
+        )
         for direction in config["event_study"]["directions"]:
-            crossing_indexes = _crossings(
-                breadth_obs,
-                threshold,
-                direction,
-                int(config["event_study"]["cooldown_sessions"]),
-            )
+            crossing_indexes = [
+                event["index"]
+                for event in threshold_events
+                if event["direction"] == direction
+            ]
             event_rows = []
 
             for breadth_index in crossing_indexes:
