@@ -112,8 +112,14 @@ class MovingAverageBreadthTests(unittest.TestCase):
         ref = json.loads(
             (Path(__file__).parent / "fixtures" / "ma_breadth_reference.json").read_text()
         )
+        imported = parse_ma_breadth_csv(
+            """date,market_scope,provider,above_50dma_pct,membership_mode
+2026-09-01,S&P 500,Barchart-reference,45.52,provider_point_in_time
+"""
+        )
+        metric = build_ma_breadth_metrics(imported)["sp500_above_50dma_pct"]
         check = cross_check_reference(
-            45.52,
+            metric["latest"]["value"],
             ref["reference_value"],
             tolerance_pp=ref["tolerance_pp"],
         )
