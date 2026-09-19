@@ -14,6 +14,8 @@ sys.path.insert(0, str(ROOT))
 from pipeline.validate import (
     validate_catalog,
     validate_coverage_report,
+    validate_ma_breadth_audit,
+    validate_ma_breadth_study,
     validate_metric,
     validate_refresh_report,
     validate_signal_snapshot,
@@ -34,6 +36,8 @@ SPECIAL_VALIDATORS = {
     "coverage.json": validate_coverage_report,
     "refresh-report.json": validate_refresh_report,
     "signals.json": validate_signal_snapshot,
+    "ma-breadth-audit.json": validate_ma_breadth_audit,
+    "ma-breadth-event-study.json": validate_ma_breadth_study,
 }
 
 
