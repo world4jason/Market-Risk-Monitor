@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
@@ -81,6 +82,22 @@ def refresh_cboe_vix(output_dir: Path):
             "error": str(exc),
             "preserved_previous": dest.exists(),
         }]
+
+
+def refresh_breadth(input_path: Path, output_dir: Path):
+    rows = parse_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
+    metrics = build_breadth_metrics(rows)
+    report = []
+    for metric_id, metric in metrics.items():
+        validate_metric(metric)
+        dest = output_dir / f"{metric_id}.json"
+        atomic_json(dest, metric)
+        report.append({
+            "metric": metric_id,
+            "status": "updated",
+            "path": str(dest.relative_to(ROOT)),
+        })
+    return report
 
 
 def refresh_finra(input_path: Path, output_dir: Path):
@@ -245,6 +262,11 @@ def main():
         help="Refresh all network-accessible public sources (FRED + Cboe VIX).",
     )
     parser.add_argument(
+        "--breadth-file",
+        type=Path,
+        help="Path to an authorized NYSE breadth CSV export using docs/breadth-sources.md contract.",
+    )
+    parser.add_argument(
         "--finra-file",
         type=Path,
         help="Path to official FINRA margin-statistics CSV/XLSX downloaded from FINRA.",
@@ -260,8 +282,8 @@ def main():
     run_fred = args.fred or args.public
     run_vix = args.cboe_vix or args.public
 
-    if not any([run_fred, run_vix, args.finra_file, args.shiller_file]):
-        parser.error("choose --public, --fred, --cboe-vix, --finra-file and/or --shiller-file")
+    if not any([run_fred, run_vix, args.breadth_file, args.finra_file, args.shiller_file]):
+        parser.error("choose --public, --fred, --cboe-vix, --breadth-file, --finra-file and/or --shiller-file")
 
     report = []
 
@@ -276,6 +298,9 @@ def main():
 
     if run_vix:
         report.extend(refresh_cboe_vix(args.output_dir))
+
+    if args.breadth_file:
+        report.extend(refresh_breadth(args.breadth_file, args.output_dir))
 
     if args.finra_file:
         report.extend(refresh_finra(args.finra_file, args.output_dir))
