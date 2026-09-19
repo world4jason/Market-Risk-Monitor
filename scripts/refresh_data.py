@@ -13,25 +13,48 @@ sys.path.insert(0, str(ROOT))
 from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
-from pipeline.ma_breadth import assert_history_not_truncated, audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
-from pipeline.ma_breadth_study import build_event_study as build_ma_breadth_event_study
-from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
+from pipeline.ma_breadth import (
+    assert_history_not_truncated,
+    audit_rows as audit_ma_breadth_rows,
+    build_ma_breadth_metrics,
+    parse_ma_breadth_csv,
+)
+from pipeline.ma_breadth_study import (
+    build_event_study as build_ma_breadth_event_study,
+)
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
-from pipeline.tradermonty_ma_breadth import build_tradermonty_metrics, fetch_tradermonty_csv
 from pipeline.signals import build_signal_snapshot
+from pipeline.tradermonty_ma_breadth import (
+    build_tradermonty_metrics,
+    fetch_tradermonty_csv,
+)
 from pipeline.validate import validate_metric
 
 
-def atomic_json(path: Path, payload: dict):
+SPECIAL_ARTIFACTS = {
+    "catalog.json",
+    "refresh-report.json",
+    "signals.json",
+    "coverage.json",
+    "ma-breadth-audit.json",
+    "ma-breadth-event-study.json",
+}
+
+
+def atomic_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     tmp.replace(path)
 
 
-def refresh_fred(config_path: Path, output_dir: Path, selected: set[str] | None):
-    config = json.loads(config_path.read_text())
+def refresh_fred(
+    config_path: Path,
+    output_dir: Path,
+    selected: set[str] | None,
+) -> list[dict]:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
     report = []
     fetched_at = datetime.now(timezone.utc)
 
@@ -41,8 +64,10 @@ def refresh_fred(config_path: Path, output_dir: Path, selected: set[str] | None)
 
         dest = output_dir / f"{item['id']}.json"
         try:
-            text = fetch_fred_csv(item["series_id"])
-            observations = parse_fred_csv(text, item["series_id"])
+            observations = parse_fred_csv(
+                fetch_fred_csv(item["series_id"]),
+                item["series_id"],
+            )
             expected_start = item.get("expected_history_start")
             if expected_start and (
                 not observations or observations[0]["date"] > expected_start
@@ -52,43 +77,60 @@ def refresh_fred(config_path: Path, output_dir: Path, selected: set[str] | None)
                     f"{observations[0]['date'] if observations else 'missing'}, "
                     f"expected <= {expected_start}"
                 )
+
             metric = build_metric(item, observations, fetched_at)
             validate_metric(metric)
             atomic_json(dest, metric)
-            report.append({"metric": item["id"], "status": "updated", "path": str(dest.relative_to(ROOT))})
+            report.append(
+                {
+                    "metric": item["id"],
+                    "status": "updated",
+                    "path": str(dest.relative_to(ROOT)),
+                }
+            )
         except Exception as exc:
-            report.append({
-                "metric": item["id"],
-                "status": "error",
-                "error": str(exc),
-                "preserved_previous": dest.exists(),
-            })
+            report.append(
+                {
+                    "metric": item["id"],
+                    "status": "error",
+                    "error": str(exc),
+                    "preserved_previous": dest.exists(),
+                }
+            )
     return report
 
 
-def refresh_cboe_vix(output_dir: Path):
+def refresh_cboe_vix(output_dir: Path) -> list[dict]:
     dest = output_dir / "vix.json"
     try:
         observations = parse_vix_csv(fetch_vix_csv())
         if not observations or observations[0]["date"] > "1990-01-31":
             raise ValueError(
-                f"VIX history unexpectedly starts at "
+                "VIX history unexpectedly starts at "
                 f"{observations[0]['date'] if observations else 'missing'}"
             )
         metric = build_vix_metric(observations)
         validate_metric(metric)
         atomic_json(dest, metric)
-        return [{"metric": "vix", "status": "updated", "path": str(dest.relative_to(ROOT))}]
+        return [
+            {
+                "metric": "vix",
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        ]
     except Exception as exc:
-        return [{
-            "metric": "vix",
-            "status": "error",
-            "error": str(exc),
-            "preserved_previous": dest.exists(),
-        }]
+        return [
+            {
+                "metric": "vix",
+                "status": "error",
+                "error": str(exc),
+                "preserved_previous": dest.exists(),
+            }
+        ]
 
 
-def refresh_breadth(input_path: Path, output_dir: Path):
+def refresh_breadth(input_path: Path, output_dir: Path) -> list[dict]:
     rows = parse_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
     metrics = build_breadth_metrics(rows)
     report = []
@@ -96,21 +138,23 @@ def refresh_breadth(input_path: Path, output_dir: Path):
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
         atomic_json(dest, metric)
-        report.append({
-            "metric": metric_id,
-            "status": "updated",
-            "path": str(dest.relative_to(ROOT)),
-        })
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
     return report
 
 
-def refresh_ma_breadth(input_path: Path, output_dir: Path):
+def refresh_ma_breadth(input_path: Path, output_dir: Path) -> list[dict]:
     rows = parse_ma_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
     metrics = build_ma_breadth_metrics(rows)
     report = []
 
-    # Source-agnostic coverage guard: once a valid historical snapshot exists,
-    # a later import may extend history but may not silently truncate it.
+    # Once canonical history exists, a later import may extend it but may not
+    # silently truncate its start date.
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
@@ -122,43 +166,36 @@ def refresh_ma_breadth(input_path: Path, output_dir: Path):
             except ValueError:
                 raise
             except Exception:
-                # An invalid previous artifact must not block replacement by a valid one.
+                # An invalid prior artifact must not block a valid replacement.
                 pass
 
         atomic_json(dest, metric)
-        report.append({
-            "metric": metric_id,
-            "status": "updated",
-            "path": str(dest.relative_to(ROOT)),
-        })
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
 
-    audit_dest = output_dir / "ma-breadth-audit.json"
-    atomic_json(audit_dest, audit_ma_breadth_rows(rows))
+    atomic_json(
+        output_dir / "ma-breadth-audit.json",
+        audit_ma_breadth_rows(rows),
+    )
     return report
 
 
-def refresh_ma_breadth(input_path: Path, output_dir: Path):
-    rows = parse_ma_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
-    metrics = build_ma_breadth_metrics(rows)
-    report = []
-    for metric_id, metric in metrics.items():
-        validate_metric(metric)
-        dest = output_dir / f"{metric_id}.json"
-        atomic_json(dest, metric)
-        report.append({
-            "metric": metric_id,
-            "status": "updated",
-            "path": str(dest.relative_to(ROOT)),
-        })
+def refresh_tradermonty_ma_breadth(output_dir: Path) -> list[dict]:
+    """
+    Public convenience source for current/recent context.
 
-    audit_dest = output_dir / "ma-breadth-audit.json"
-    atomic_json(audit_dest, audit_ma_breadth_rows(rows))
-    return report
-
-
-def refresh_tradermonty_ma_breadth(output_dir: Path):
+    TraderMonty's historical computation uses a current constituent universe,
+    so it is explicitly non-PIT and must never overwrite an existing PIT
+    canonical history.
+    """
     metrics = build_tradermonty_metrics(fetch_tradermonty_csv())
     report = []
+
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
@@ -167,37 +204,48 @@ def refresh_tradermonty_ma_breadth(output_dir: Path):
             try:
                 previous = json.loads(dest.read_text(encoding="utf-8"))
                 validate_metric(previous)
-                # A public current-constituent source must never overwrite a
-                # point-in-time canonical history for the same metric.
                 if (
-                    previous.get("source", {}).get("point_in_time_membership") is True
-                    and metric.get("source", {}).get("point_in_time_membership") is not True
+                    previous.get("source", {}).get("point_in_time_membership")
+                    is True
+                    and metric.get("source", {}).get(
+                        "point_in_time_membership"
+                    )
+                    is not True
                 ):
-                    report.append({
-                        "metric": metric_id,
-                        "status": "error",
-                        "error": (
-                            "refusing to overwrite canonical point-in-time "
-                            "MA breadth with current-constituent retroactive source"
-                        ),
-                        "preserved_previous": True,
-                    })
+                    report.append(
+                        {
+                            "metric": metric_id,
+                            "status": "error",
+                            "error": (
+                                "refusing to overwrite canonical point-in-time "
+                                "MA breadth with current-constituent retroactive "
+                                "source"
+                            ),
+                            "preserved_previous": True,
+                        }
+                    )
                     continue
             except Exception:
+                # If the previous artifact itself is unreadable, allow a valid
+                # current-context replacement rather than preserving corruption.
                 pass
 
         atomic_json(dest, metric)
-        report.append({
-            "metric": metric_id,
-            "status": "updated",
-            "path": str(dest.relative_to(ROOT)),
-        })
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
     return report
 
 
-def refresh_finra(input_path: Path, output_dir: Path):
+def refresh_finra(input_path: Path, output_dir: Path) -> list[dict]:
     if input_path.suffix.lower() == ".csv":
-        rows = parse_finra_csv(input_path.read_text(encoding="utf-8-sig"))
+        rows = parse_finra_csv(
+            input_path.read_text(encoding="utf-8-sig")
+        )
     elif input_path.suffix.lower() in {".xlsx", ".xlsm"}:
         rows = parse_finra_xlsx(input_path)
     else:
@@ -215,13 +263,22 @@ def refresh_finra(input_path: Path, output_dir: Path):
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
         atomic_json(dest, metric)
-        report.append({"metric": metric_id, "status": "updated", "path": str(dest.relative_to(ROOT))})
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
     return report
 
 
-def refresh_shiller(input_path: Path, output_dir: Path):
+def refresh_shiller(input_path: Path, output_dir: Path) -> list[dict]:
     if input_path.suffix.lower() != ".xls":
-        raise SystemExit("Shiller input must be the official ie_data.xls workbook from shillerdata.com")
+        raise SystemExit(
+            "Shiller input must be the official ie_data.xls workbook "
+            "from shillerdata.com"
+        )
 
     rows = parse_shiller_xls(input_path)
     if not rows or rows[0]["date"] != "1871-01-01":
@@ -229,20 +286,27 @@ def refresh_shiller(input_path: Path, output_dir: Path):
             "Shiller workbook coverage changed unexpectedly; "
             f"first parsed month={rows[0]['date'] if rows else 'missing'}"
         )
+
     metrics = build_shiller_metrics(rows)
     report = []
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
         atomic_json(dest, metric)
-        report.append({"metric": metric_id, "status": "updated", "path": str(dest.relative_to(ROOT))})
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
     return report
 
 
 def load_generated_metrics(output_dir: Path) -> dict[str, dict]:
     metrics = {}
     for path in sorted(output_dir.glob("*.json")):
-        if path.name in {"catalog.json", "refresh-report.json", "signals.json", "coverage.json", "ma-breadth-audit.json"}:
+        if path.name in SPECIAL_ARTIFACTS:
             continue
         try:
             metric = json.loads(path.read_text(encoding="utf-8"))
@@ -253,13 +317,19 @@ def load_generated_metrics(output_dir: Path) -> dict[str, dict]:
     return metrics
 
 
-def build_signals(output_dir: Path):
-    config_path = ROOT / "data" / "config" / "signals.json"
-    config = json.loads(config_path.read_text(encoding="utf-8"))
-    return build_signal_snapshot(load_generated_metrics(output_dir), config)
+def build_signals(output_dir: Path) -> dict:
+    config = json.loads(
+        (ROOT / "data" / "config" / "signals.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    return build_signal_snapshot(
+        load_generated_metrics(output_dir),
+        config,
+    )
 
 
-def maybe_build_ma_breadth_study(output_dir: Path):
+def maybe_build_ma_breadth_study(output_dir: Path) -> dict | None:
     breadth_path = output_dir / "sp500_above_50dma_pct.json"
     price_path = output_dir / "sp500_index.json"
     if not breadth_path.exists() or not price_path.exists():
@@ -269,8 +339,11 @@ def maybe_build_ma_breadth_study(output_dir: Path):
     price = json.loads(price_path.read_text(encoding="utf-8"))
     validate_metric(breadth)
     validate_metric(price)
+
     config = json.loads(
-        (ROOT / "data" / "config" / "ma-breadth.json").read_text(encoding="utf-8")
+        (ROOT / "data" / "config" / "ma-breadth.json").read_text(
+            encoding="utf-8"
+        )
     )
     return build_ma_breadth_event_study(breadth, price, config)
 
@@ -295,14 +368,17 @@ EXPECTED_STARTS = {
 }
 
 
-def build_coverage(output_dir: Path):
+def build_coverage(output_dir: Path) -> dict:
     rows = []
-    for metric_id, metric in sorted(load_generated_metrics(output_dir).items()):
+    for metric_id, metric in sorted(
+        load_generated_metrics(output_dir).items()
+    ):
         actual_start = metric["coverage"]["history_start"]
         expected_start = EXPECTED_STARTS.get(metric_id)
         status = "ok"
         if expected_start and actual_start and actual_start > expected_start:
             status = "short_history"
+
         rows.append(
             {
                 "id": metric_id,
@@ -314,48 +390,62 @@ def build_coverage(output_dir: Path):
                 "status": status,
             }
         )
+
     return {
         "schema_version": "1.0.0",
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "generated_at": datetime.now(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z"),
         "metrics": rows,
     }
 
 
-def build_catalog(output_dir: Path):
+def build_catalog(output_dir: Path) -> dict:
     metrics = []
     for path in sorted(output_dir.glob("*.json")):
-        if path.name in {"catalog.json", "refresh-report.json", "signals.json", "coverage.json", "ma-breadth-audit.json"}:
+        if path.name in SPECIAL_ARTIFACTS:
             continue
+
         try:
-            metric = json.loads(path.read_text())
+            metric = json.loads(path.read_text(encoding="utf-8"))
             validate_metric(metric)
         except Exception:
             continue
 
-        metrics.append({
-            "id": metric["metric"]["id"],
-            "name": metric["metric"]["name"],
-            "pillar": metric["metric"]["pillar"],
-            "frequency": metric["metric"]["frequency"],
-            "history_start": metric["coverage"]["history_start"],
-            "history_end": metric["coverage"]["history_end"],
-            "freshness": metric["freshness"]["state"],
-            "as_of": metric["latest"]["as_of"],
-            "path": f"./{path.name}",
-        })
+        metrics.append(
+            {
+                "id": metric["metric"]["id"],
+                "name": metric["metric"]["name"],
+                "pillar": metric["metric"]["pillar"],
+                "frequency": metric["metric"]["frequency"],
+                "history_start": metric["coverage"]["history_start"],
+                "history_end": metric["coverage"]["history_end"],
+                "freshness": metric["freshness"]["state"],
+                "as_of": metric["latest"]["as_of"],
+                "path": f"./{path.name}",
+            }
+        )
 
     return {
         "schema_version": "1.0.0",
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "generated_at": datetime.now(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z"),
         "metrics": metrics,
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Refresh Market Risk Monitor static snapshots without GitHub Actions."
+        description=(
+            "Refresh Market Risk Monitor static snapshots without GitHub Actions."
+        )
     )
-    parser.add_argument("--fred", action="store_true", help="Refresh configured FRED series.")
+    parser.add_argument(
+        "--fred",
+        action="store_true",
+        help="Refresh configured FRED series.",
+    )
     parser.add_argument(
         "--fred-id",
         action="append",
@@ -377,42 +467,64 @@ def main():
         action="store_true",
         help=(
             "Fetch public TraderMonty S&P 500 50/200DMA breadth. "
-            "Historical rows are marked current-constituent retroactive."
+            "Historical rows are current-constituent retroactive and non-PIT."
         ),
     )
     parser.add_argument(
         "--breadth-file",
         type=Path,
-        help="Path to an authorized NYSE breadth CSV export using docs/breadth-sources.md contract.",
+        help=(
+            "Authorized NYSE breadth CSV using docs/breadth-sources.md contract."
+        ),
     )
     parser.add_argument(
         "--ma-breadth-file",
         type=Path,
-        help="Path to authorized S&P 500 20/50/200DMA breadth CSV using docs/moving-average-breadth-sources.md contract.",
-    )
-    parser.add_argument(
-        "--ma-breadth-file",
-        type=Path,
-        help="Path to authorized S&P 500 20/50/200DMA breadth CSV using docs/moving-average-breadth-sources.md contract.",
+        help=(
+            "S&P 500 20/50/200DMA breadth CSV using "
+            "docs/moving-average-breadth-sources.md contract."
+        ),
     )
     parser.add_argument(
         "--finra-file",
         type=Path,
-        help="Path to official FINRA margin-statistics CSV/XLSX downloaded from FINRA.",
+        help=(
+            "Official FINRA margin-statistics CSV/XLSX downloaded from FINRA."
+        ),
     )
     parser.add_argument(
         "--shiller-file",
         type=Path,
-        help="Path to official live ie_data.xls downloaded from shillerdata.com.",
+        help=(
+            "Official live ie_data.xls downloaded from shillerdata.com."
+        ),
     )
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "data" / "generated")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=ROOT / "data" / "generated",
+    )
     args = parser.parse_args()
 
     run_fred = args.fred or args.public
     run_vix = args.cboe_vix or args.public
 
-    if not any([run_fred, run_vix, args.tradermonty_ma_breadth, args.breadth_file, args.ma_breadth_file, args.finra_file, args.shiller_file]):
-        parser.error("choose --public, --fred, --cboe-vix, --tradermonty-ma-breadth, --breadth-file, --ma-breadth-file, --finra-file and/or --shiller-file")
+    if not any(
+        [
+            run_fred,
+            run_vix,
+            args.tradermonty_ma_breadth,
+            args.breadth_file,
+            args.ma_breadth_file,
+            args.finra_file,
+            args.shiller_file,
+        ]
+    ):
+        parser.error(
+            "choose --public, --fred, --cboe-vix, "
+            "--tradermonty-ma-breadth, --breadth-file, "
+            "--ma-breadth-file, --finra-file and/or --shiller-file"
+        )
 
     report = []
 
@@ -429,38 +541,61 @@ def main():
         report.extend(refresh_cboe_vix(args.output_dir))
 
     if args.tradermonty_ma_breadth:
-        report.extend(refresh_tradermonty_ma_breadth(args.output_dir))
+        report.extend(
+            refresh_tradermonty_ma_breadth(args.output_dir)
+        )
 
     if args.breadth_file:
-        report.extend(refresh_breadth(args.breadth_file, args.output_dir))
+        report.extend(
+            refresh_breadth(args.breadth_file, args.output_dir)
+        )
 
     if args.ma_breadth_file:
-        report.extend(refresh_ma_breadth(args.ma_breadth_file, args.output_dir))
-
-    if args.ma_breadth_file:
-        report.extend(refresh_ma_breadth(args.ma_breadth_file, args.output_dir))
+        report.extend(
+            refresh_ma_breadth(args.ma_breadth_file, args.output_dir)
+        )
 
     if args.finra_file:
-        report.extend(refresh_finra(args.finra_file, args.output_dir))
+        report.extend(
+            refresh_finra(args.finra_file, args.output_dir)
+        )
 
     if args.shiller_file:
-        report.extend(refresh_shiller(args.shiller_file, args.output_dir))
+        report.extend(
+            refresh_shiller(args.shiller_file, args.output_dir)
+        )
 
-    atomic_json(args.output_dir / "signals.json", build_signals(args.output_dir))
+    atomic_json(
+        args.output_dir / "signals.json",
+        build_signals(args.output_dir),
+    )
+
     ma_study = maybe_build_ma_breadth_study(args.output_dir)
     if ma_study is not None:
-        atomic_json(args.output_dir / "ma-breadth-event-study.json", ma_study)
-    atomic_json(args.output_dir / "coverage.json", build_coverage(args.output_dir))
-    atomic_json(args.output_dir / "catalog.json", build_catalog(args.output_dir))
+        atomic_json(
+            args.output_dir / "ma-breadth-event-study.json",
+            ma_study,
+        )
+
+    atomic_json(
+        args.output_dir / "coverage.json",
+        build_coverage(args.output_dir),
+    )
+    atomic_json(
+        args.output_dir / "catalog.json",
+        build_catalog(args.output_dir),
+    )
     atomic_json(
         args.output_dir / "refresh-report.json",
         {
-            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "generated_at": datetime.now(timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
             "results": report,
         },
     )
 
-    errors = [r for r in report if r["status"] == "error"]
+    errors = [item for item in report if item["status"] == "error"]
     print(json.dumps(report, indent=2))
     raise SystemExit(1 if errors else 0)
 
