@@ -135,7 +135,19 @@ def _create_db(db_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def ingest_prices_csv(price_path: Path, conn: sqlite3.Connection) -> dict:
+def ingest_prices_csv(
+    price_path: Path,
+    conn: sqlite3.Connection,
+    *,
+    source_label: str | None = None,
+) -> dict:
+    """
+    Ingest one price CSV into the work database.
+
+    Conflict precedence is deterministic: later ingest calls win for an
+    identical (symbol, date) because INSERT OR REPLACE is used. This lets an
+    explicitly supplied recent supplement override overlapping historical rows.
+    """
     inserted = 0
     skipped = 0
     min_date = None
@@ -186,10 +198,12 @@ def ingest_prices_csv(price_path: Path, conn: sqlite3.Connection) -> dict:
     if inserted == 0:
         raise PointInTimeBreadthError("no usable price rows were ingested")
     return {
+        "source": source_label or str(price_path),
         "rows": inserted,
         "skipped": skipped,
         "first_date": min_date,
         "last_date": max_date,
+        "precedence": "later_ingest_wins_on_symbol_date_conflict",
     }
 
 
@@ -373,15 +387,23 @@ def write_output_csv(rows: list[dict], path: Path) -> None:
     tmp.replace(path)
 
 
-def compute_from_files(
+def compute_from_price_files(
     membership_path: Path,
-    price_path: Path,
+    price_paths: list[Path],
     output_path: Path,
     *,
-    provider: str = "Open PIT membership + FINSABER",
+    provider: str,
     min_coverage: float = 0.90,
     work_db: Path | None = None,
+    source_labels: list[str] | None = None,
 ) -> dict:
+    if not price_paths:
+        raise PointInTimeBreadthError("at least one price file is required")
+    if source_labels is not None and len(source_labels) != len(price_paths):
+        raise PointInTimeBreadthError(
+            "source_labels length must match price_paths length"
+        )
+
     snapshots = parse_membership_csv(
         membership_path.read_text(encoding="utf-8-sig")
     )
@@ -397,7 +419,21 @@ def compute_from_files(
 
     try:
         conn = _create_db(work_db)
-        price_report = ingest_prices_csv(price_path, conn)
+        price_reports = []
+        for index, price_path in enumerate(price_paths):
+            label = (
+                source_labels[index]
+                if source_labels is not None
+                else str(price_path)
+            )
+            price_reports.append(
+                ingest_prices_csv(
+                    price_path,
+                    conn,
+                    source_label=label,
+                )
+            )
+
         flag_report = compute_flags(conn)
         breadth_rows = aggregate_point_in_time_breadth(
             conn,
@@ -412,7 +448,11 @@ def compute_from_files(
             "membership_snapshots": len(snapshots),
             "membership_start": snapshots[0].date,
             "membership_end": snapshots[-1].date,
-            "price": price_report,
+            "price_sources": price_reports,
+            "price_conflict_precedence": (
+                "files are ingested in listed order; later file wins for "
+                "identical symbol/date"
+            ),
             "flags": flag_report,
             "output_rows": len(breadth_rows),
             "output_start": breadth_rows[0]["date"],
@@ -423,3 +463,26 @@ def compute_from_files(
     finally:
         if temporary is not None:
             temporary.cleanup()
+
+
+def compute_from_files(
+    membership_path: Path,
+    price_path: Path,
+    output_path: Path,
+    *,
+    provider: str = "Open PIT membership + FINSABER",
+    min_coverage: float = 0.90,
+    work_db: Path | None = None,
+) -> dict:
+    """Backward-compatible one-price-file wrapper."""
+    report = compute_from_price_files(
+        membership_path,
+        [price_path],
+        output_path,
+        provider=provider,
+        min_coverage=min_coverage,
+        work_db=work_db,
+    )
+    # Preserve the original single-source report key for existing callers.
+    report["price"] = report["price_sources"][0]
+    return report
