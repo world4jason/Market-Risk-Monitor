@@ -14,6 +14,7 @@ from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
 from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
+from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
 from pipeline.signals import build_signal_snapshot
@@ -98,6 +99,25 @@ def refresh_breadth(input_path: Path, output_dir: Path):
             "status": "updated",
             "path": str(dest.relative_to(ROOT)),
         })
+    return report
+
+
+def refresh_ma_breadth(input_path: Path, output_dir: Path):
+    rows = parse_ma_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
+    metrics = build_ma_breadth_metrics(rows)
+    report = []
+    for metric_id, metric in metrics.items():
+        validate_metric(metric)
+        dest = output_dir / f"{metric_id}.json"
+        atomic_json(dest, metric)
+        report.append({
+            "metric": metric_id,
+            "status": "updated",
+            "path": str(dest.relative_to(ROOT)),
+        })
+
+    audit_dest = output_dir / "ma-breadth-audit.json"
+    atomic_json(audit_dest, audit_ma_breadth_rows(rows))
     return report
 
 
@@ -292,6 +312,11 @@ def main():
         help="Path to authorized S&P 500 20/50/200DMA breadth CSV using docs/moving-average-breadth-sources.md contract.",
     )
     parser.add_argument(
+        "--ma-breadth-file",
+        type=Path,
+        help="Path to authorized S&P 500 20/50/200DMA breadth CSV using docs/moving-average-breadth-sources.md contract.",
+    )
+    parser.add_argument(
         "--finra-file",
         type=Path,
         help="Path to official FINRA margin-statistics CSV/XLSX downloaded from FINRA.",
@@ -326,6 +351,9 @@ def main():
 
     if args.breadth_file:
         report.extend(refresh_breadth(args.breadth_file, args.output_dir))
+
+    if args.ma_breadth_file:
+        report.extend(refresh_ma_breadth(args.ma_breadth_file, args.output_dir))
 
     if args.ma_breadth_file:
         report.extend(refresh_ma_breadth(args.ma_breadth_file, args.output_dir))
