@@ -315,3 +315,104 @@ Recent public reference observations:
 - S5TH: 2026-09-18 = 49.50
 
 These small fixed references are suitable for cross-provider sanity checks. They are not a substitute for a licensed historical dataset.
+
+
+## Open-data point-in-time research path
+
+To avoid making the historical study depend entirely on a paid breadth vendor, the repository also supports a self-computed research path using two public datasets.
+
+### Point-in-time S&P 500 membership
+
+Repository:
+
+https://github.com/chinobing/historical_sp500_constituents
+
+File:
+
+`sp_500_historical_components.csv`
+
+Properties:
+- daily/snapshot-style `date,tickers` history;
+- coverage from 1996-01-02 to present;
+- repository license: MIT;
+- maintained forward through current S&P 500 changes.
+
+This is an **open community-maintained membership history**, not an official S&P Dow Jones Indices constituent feed. Results should therefore keep the provider/provenance visible and should be cross-checked for important historical episodes.
+
+### Delisted-inclusive constituent prices
+
+Dataset:
+
+https://huggingface.co/datasets/finsaber-team/FINSABER-reproduce
+
+File:
+
+`data/price/all_sp500_prices_2000_2024_delisted_include.csv`
+
+Properties:
+- dataset card license: Apache-2.0;
+- roughly 4.74 million daily rows;
+- 2000-01-03 through 2024-12-31;
+- includes delisted S&P 500 symbols;
+- includes `adjusted_close`;
+- price-only CSV is roughly 253–265 MB.
+
+Using a delisted-inclusive dataset is materially better than downloading prices only for today's surviving constituents.
+
+### Self-compute pipeline
+
+Run:
+
+```bash
+python scripts/bootstrap_ma_breadth_open.py
+```
+
+The bootstrap:
+1. downloads/caches the open membership history;
+2. downloads/caches the FINSABER price CSV;
+3. streams the large price file into a temporary SQLite database;
+4. sorts each symbol chronologically inside SQLite;
+5. calculates close > SMA20 / SMA50 / SMA200 using `adjusted_close`;
+6. selects the most recent constituent snapshot whose date is <= each observation date;
+7. counts eligible / above / missing-price members separately;
+8. requires a configurable minimum member-price coverage (default 90%);
+9. emits the same authorized-import CSV contract used by `--ma-breadth-file`.
+
+The output is then passed through the existing canonical parser/validation:
+
+```bash
+python scripts/refresh_data.py \
+  --ma-breadth-file .cache/ma-breadth-open/sp500-ma-breadth-open.csv
+```
+
+### Open-data coverage
+
+The membership history begins in 1996, but the open delisted-inclusive price file begins in 2000.
+
+Therefore self-computed breadth coverage can only begin once:
+- the price dataset has started;
+- the corresponding SMA horizon has matured;
+- enough point-in-time constituents have valid price history to meet the configured coverage threshold.
+
+The pipeline does **not** stamp an artificial 2000-01-03 start on all three horizons.
+
+### Post-2024 limitation
+
+The FINSABER file currently ends at 2024-12-31.
+
+So this open path is immediately useful for historical research including the 2000, 2008, 2020 and 2022 episodes, but it does not by itself produce 2025/2026 breadth.
+
+Current/recent 2025/2026 values still require an authorized current breadth provider/export or a separately documented recent-price supplement. That recent supplement must preserve point-in-time membership and must not silently change the price convention.
+
+### Quality rule
+
+The open-data path is considered:
+
+```text
+membership_mode = point_in_time
+price_adjustment = adjusted_close
+```
+
+but it is still a community/open-data reconstruction. It must not be described as the official S&P Dow Jones Indices breadth series.
+
+Cross-provider validation against S5FI/SPXA50R remains part of QA.
