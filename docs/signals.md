@@ -163,3 +163,37 @@ Changing a threshold requires:
 4. checking whether the new threshold materially changes historical interpretation.
 
 Thresholds must not be tuned solely to make known crises look visually perfect.
+
+
+## Moving-average breadth conditions
+
+### S&P 500 50DMA participation unusually weak
+
+Input:
+- `sp500_above_50dma_pct`
+
+Active when the latest 50DMA participation reading is at or below its **strict-past 10th percentile**.
+
+This does **not** use the supplied chart's 25% line as the sole signal. The 25%/15% bands remain optional custom heuristics for visualization and event study.
+
+### S&P 500 200DMA participation unusually weak
+
+Input:
+- `sp500_above_200dma_pct`
+
+Active when the latest long-term participation reading is at or below its **strict-past 10th percentile**.
+
+The 50DMA and 200DMA conditions are independent. One being active does not create a crisis label.
+
+### Survivorship constraint
+
+Canonical historical backfills require the imported moving-average breadth source to be documented as point-in-time constituent-aware.
+
+If the source is marked `current_constituents_retroactive`, it may be displayed as an experiment but is not accepted as a canonical historical moving-average breadth backfill.
+
+### Missing-data behavior
+
+If either moving-average breadth metric is absent, stale, or errored:
+- that condition is `unknown`;
+- existing Deleveraging Watch conditions remain independently evaluable;
+- unknown is never counted as inactive/safe.
