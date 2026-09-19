@@ -2,6 +2,8 @@ const CATALOG_URL = "./data/generated/catalog.json";
 const EVENTS_URL = "./data/events.json";
 const SIGNALS_URL = "./data/generated/signals.json";
 const REFRESH_REPORT_URL = "./data/generated/refresh-report.json";
+const MA_BREADTH_CONFIG_URL = "./data/config/ma-breadth.json";
+const MA_BREADTH_STUDY_URL = "./data/generated/ma-breadth-event-study.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
 const state = {
@@ -11,6 +13,8 @@ const state = {
   signals: null,
   refreshReport: null,
   refreshErrors: new Map(),
+  maBreadthConfig: null,
+  maBreadthStudy: null,
 };
 
 const pillarLabels = {
@@ -349,6 +353,157 @@ function renderMetrics() {
       if (event.key === "Enter" || event.key === " ") open();
     });
   });
+}
+
+function maBreadthMetrics() {
+  return {
+    20: state.metrics.get("sp500_above_20dma_pct"),
+    50: state.metrics.get("sp500_above_50dma_pct"),
+    200: state.metrics.get("sp500_above_200dma_pct"),
+  };
+}
+
+function renderTrendParticipation() {
+  const summaryEl = $("#ma-summary");
+  const chartEl = $("#ma-chart");
+  const metrics = maBreadthMetrics();
+  const loaded = Object.entries(metrics).filter(([, metric]) => metric);
+
+  if (!loaded.length) {
+    summaryEl.innerHTML =
+      '<div class="empty-state compact">20/50/200DMA breadth snapshots not loaded yet.</div>';
+    chartEl.innerHTML =
+      '<div class="empty-state compact">Import an authorized S&P 500 moving-average breadth file to populate this view.</div>';
+    return;
+  }
+
+  summaryEl.innerHTML = [20, 50, 200]
+    .map((horizon) => {
+      const metric = metrics[horizon];
+      if (!metric) {
+        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>not loaded</small></div>`;
+      }
+      const pct = rollingPercentile(metric);
+      return `<button class="trend-stat" type="button" data-ma-metric="${metric.metric.id}">
+        <span>${horizon}DMA</span>
+        <strong>${formatValue(metric.latest?.value, "percent")}</strong>
+        <small>${pct == null ? "percentile —" : `${pct.toFixed(0)}th rolling pct`} · ${escapeHtml(metric.latest?.as_of || "—")}</small>
+      </button>`;
+    })
+    .join("");
+
+  summaryEl.querySelectorAll("[data-ma-metric]").forEach((button) => {
+    button.addEventListener("click", () => openMetric(button.dataset.maMetric));
+  });
+
+  renderTrendParticipationChart();
+}
+
+function renderTrendParticipationChart() {
+  const element = $("#ma-chart");
+  const metrics = maBreadthMetrics();
+  const lines = [20, 50, 200]
+    .map((horizon) => ({
+      horizon,
+      metric: metrics[horizon],
+      observations: (metrics[horizon]?.observations || []).filter((o) => o.value != null),
+    }))
+    .filter((line) => line.observations.length > 1);
+
+  if (!lines.length) {
+    element.innerHTML =
+      '<div class="empty-state compact">Not enough moving-average breadth history.</div>';
+    return;
+  }
+
+  const width = 1000;
+  const height = 360;
+  const left = 58;
+  const right = 74;
+  const top = 24;
+  const bottom = 42;
+  const allDates = lines.flatMap((line) => line.observations.map((o) => Date.parse(o.date)));
+  const firstTs = Math.min(...allDates);
+  const lastTs = Math.max(...allDates);
+  const span = Math.max(lastTs - firstTs, 1);
+  const innerW = width - left - right;
+  const innerH = height - top - bottom;
+  const x = (dateValue) => left + ((Date.parse(dateValue) - firstTs) / span) * innerW;
+  const y = (value) => top + ((100 - value) / 100) * innerH;
+
+  const grids = [0, 25, 50, 75, 100]
+    .map((value) => {
+      const yy = y(value);
+      return `<line class="gridline" x1="${left}" y1="${yy}" x2="${width - right}" y2="${yy}"/>
+        <text x="${left - 9}" y="${yy + 4}" text-anchor="end" fill="currentColor" opacity=".55" font-size="11">${value}%</text>`;
+    })
+    .join("");
+
+  const classes = { 20: "ma-line-20", 50: "ma-line-50", 200: "ma-line-200" };
+  const paths = lines
+    .map((line) => {
+      const d = line.observations
+        .map((obs, index) => `${index ? "L" : "M"} ${x(obs.date).toFixed(1)} ${y(Number(obs.value)).toFixed(1)}`)
+        .join(" ");
+      return `<path class="${classes[line.horizon]}" d="${d}"><title>S&P 500 % above ${line.horizon}DMA</title></path>`;
+    })
+    .join("");
+
+  let bands = "";
+  if ($("#ma-bands-toggle")?.checked) {
+    const config = state.maBreadthConfig?.custom_heuristics?.supplied_chart;
+    if (config) {
+      const values = [
+        ["Euphoria", config.euphoria_above],
+        ["Greed", config.greed_above],
+        ["Fear", config.fear_below],
+        ["Capitulation", config.capitulation_below],
+      ];
+      bands = values
+        .filter(([, value]) => Number.isFinite(Number(value)))
+        .map(([label, value]) => {
+          const yy = y(Number(value));
+          return `<line class="ma-heuristic-line" x1="${left}" y1="${yy}" x2="${width - right}" y2="${yy}"/>
+            <text x="${width - right - 5}" y="${yy - 5}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(label)} ${value}% · custom</text>`;
+        })
+        .join("");
+    }
+  }
+
+  let spxPath = "";
+  let spxAxis = "";
+  if ($("#ma-spx-toggle")?.checked) {
+    const spx = state.metrics.get("sp500_index");
+    const obs = (spx?.observations || [])
+      .filter((o) => o.value != null)
+      .filter((o) => Date.parse(o.date) >= firstTs && Date.parse(o.date) <= lastTs);
+    if (obs.length > 1) {
+      const values = obs.map((o) => Number(o.value));
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+      const ySpx = (value) => top + ((max - value) / (max - min)) * innerH;
+      const d = obs
+        .map((item, index) => `${index ? "L" : "M"} ${x(item.date).toFixed(1)} ${ySpx(Number(item.value)).toFixed(1)}`)
+        .join(" ");
+      spxPath = `<path class="ma-spx-line" d="${d}"><title>S&P 500 index overlay</title></path>`;
+      spxAxis = `<text x="${width - 5}" y="${top + 10}" text-anchor="end" fill="currentColor" opacity=".5" font-size="10">SPX ${formatValue(max, "index")}</text>
+        <text x="${width - 5}" y="${height - bottom}" text-anchor="end" fill="currentColor" opacity=".5" font-size="10">SPX ${formatValue(min, "index")}</text>`;
+    }
+  }
+
+  element.innerHTML = `<svg class="history-svg ma-breadth-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="S&P 500 moving-average breadth">
+    ${grids}
+    ${bands}
+    ${paths}
+    ${spxPath}
+    ${spxAxis}
+    <text x="${left}" y="${height - 12}" fill="currentColor" opacity=".55" font-size="11">${new Date(firstTs).toISOString().slice(0, 10)}</text>
+    <text x="${width - right}" y="${height - 12}" text-anchor="end" fill="currentColor" opacity=".55" font-size="11">${new Date(lastTs).toISOString().slice(0, 10)}</text>
+  </svg>`;
 }
 
 function renderRegime() {
@@ -738,6 +893,14 @@ function relatedBreadthStats(metric) {
     add("mrm_mcclellan_volume_oscillator", "McClellan oscillator");
     add("mrm_mcclellan_volume_summation", "Volume summation");
   } else if ([
+    "sp500_above_20dma_pct",
+    "sp500_above_50dma_pct",
+    "sp500_above_200dma_pct",
+  ].includes(id)) {
+    add("sp500_above_20dma_pct", "% > 20DMA");
+    add("sp500_above_50dma_pct", "% > 50DMA");
+    add("sp500_above_200dma_pct", "% > 200DMA");
+  } else if ([
     "nyse_advancing_issues",
     "nyse_declining_issues",
     "nyse_advance_decline_diff",
@@ -978,11 +1141,13 @@ async function loadData() {
   state.metrics.clear();
 
   try {
-    const [catalogResp, eventsResp, signalsResp, refreshResp] = await Promise.all([
+    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(EVENTS_URL, { cache: "no-store" }),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
       fetch(REFRESH_REPORT_URL, { cache: "no-store" }).catch(() => null),
+      fetch(MA_BREADTH_CONFIG_URL, { cache: "no-store" }).catch(() => null),
+      fetch(MA_BREADTH_STUDY_URL, { cache: "no-store" }).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
 
@@ -992,6 +1157,8 @@ async function loadData() {
       : [];
     state.signals = signalsResp?.ok ? await signalsResp.json() : null;
     state.refreshReport = refreshResp?.ok ? await refreshResp.json() : null;
+    state.maBreadthConfig = maConfigResp?.ok ? await maConfigResp.json() : null;
+    state.maBreadthStudy = maStudyResp?.ok ? await maStudyResp.json() : null;
     state.refreshErrors.clear();
     for (const result of state.refreshReport?.results || []) {
       if (result.status === "error" && result.metric) {
@@ -1027,6 +1194,7 @@ async function loadData() {
   }
 
   renderMetrics();
+  renderTrendParticipation();
   renderRegime();
   renderCoverage();
   renderSignals();
@@ -1036,4 +1204,6 @@ async function loadData() {
 
 initTheme();
 $("#refresh-view").addEventListener("click", loadData);
+$("#ma-bands-toggle")?.addEventListener("change", renderTrendParticipationChart);
+$("#ma-spx-toggle")?.addEventListener("change", renderTrendParticipationChart);
 loadData();
