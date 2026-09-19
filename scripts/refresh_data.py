@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
-from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
+from pipeline.ma_breadth import assert_history_not_truncated, audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.ma_breadth_study import build_event_study as build_ma_breadth_event_study
 from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
@@ -117,13 +117,7 @@ def refresh_ma_breadth(input_path: Path, output_dir: Path):
             try:
                 previous = json.loads(dest.read_text(encoding="utf-8"))
                 validate_metric(previous)
-                previous_start = previous["coverage"]["history_start"]
-                new_start = metric["coverage"]["history_start"]
-                if previous_start and new_start and new_start > previous_start:
-                    raise ValueError(
-                        f"{metric_id} history truncated: previous start "
-                        f"{previous_start}, new start {new_start}"
-                    )
+                assert_history_not_truncated(previous, metric)
             except ValueError:
                 raise
             except Exception:
