@@ -397,6 +397,65 @@ function renderTrendParticipation() {
   });
 
   renderTrendParticipationChart();
+  renderMaBreadthStudy();
+}
+
+function renderMaBreadthStudy() {
+  const statusEl = $("#ma-study-status");
+  const summaryEl = $("#ma-study-summary");
+  const study = state.maBreadthStudy;
+
+  if (!statusEl || !summaryEl) return;
+
+  if (!study) {
+    statusEl.textContent = "Study snapshot not loaded";
+    summaryEl.innerHTML =
+      '<div class="empty-state compact">Build the study after loading point-in-time 50DMA breadth and SPX price history.</div>';
+    return;
+  }
+
+  if (study.status !== "ready") {
+    statusEl.textContent = study.status.replaceAll("_", " ");
+    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || "Event study is not canonical for this source.")}</div>`;
+    return;
+  }
+
+  statusEl.textContent =
+    `${study.events?.length || 0} events · cooldown ${study.cooldown_sessions} sessions`;
+
+  const preferred = (study.summaries || []).filter(
+    (row) =>
+      row.direction === "down" &&
+      [15, 25].includes(Number(row.threshold)) &&
+      ["1M", "3M"].includes(row.horizon),
+  );
+
+  if (!preferred.length) {
+    summaryEl.innerHTML =
+      '<div class="empty-state compact">No completed forward-return windows yet.</div>';
+    return;
+  }
+
+  summaryEl.innerHTML = preferred
+    .map((row) => {
+      const medianText =
+        row.median_return_pct == null
+          ? "—"
+          : `${row.median_return_pct >= 0 ? "+" : ""}${row.median_return_pct.toFixed(2)}%`;
+      const hitText =
+        row.positive_hit_rate_pct == null
+          ? "—"
+          : `${row.positive_hit_rate_pct.toFixed(0)}%`;
+      const maeText =
+        row.median_max_adverse_excursion_pct == null
+          ? "—"
+          : `${row.median_max_adverse_excursion_pct.toFixed(2)}%`;
+      return `<div class="ma-study-card">
+        <strong>Cross &lt; ${row.threshold}% · ${row.horizon}</strong>
+        <span>n=${row.sample_count} · median ${medianText} · positive ${hitText} · median MAE ${maeText}</span>
+      </div>`;
+    })
+    .join("");
 }
 
 function renderTrendParticipationChart() {
