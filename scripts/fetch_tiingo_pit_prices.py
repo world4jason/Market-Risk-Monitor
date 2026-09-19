@@ -18,6 +18,10 @@ from pipeline.ma_breadth_self_compute import parse_historical_membership_csv
 
 
 TIINGO_BASE = "https://api.tiingo.com/tiingo/daily"
+DEFAULT_MEMBERSHIP_URL = (
+    "https://raw.githubusercontent.com/chinobing/"
+    "historical_sp500_constituents/main/sp_500_historical_components.csv"
+)
 
 
 def fetch_text(url: str, token: str, timeout: int = 45) -> str:
@@ -107,11 +111,16 @@ def main() -> None:
             "by point-in-time S&P 500 moving-average breadth computation."
         )
     )
-    parser.add_argument(
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument(
         "--membership-file",
         type=Path,
-        required=True,
-        help="Historical date,tickers membership CSV.",
+        help="Local historical date,tickers membership CSV.",
+    )
+    source.add_argument(
+        "--membership-url",
+        default=DEFAULT_MEMBERSHIP_URL,
+        help="Historical membership URL; defaults to the open chinobing dataset.",
     )
     parser.add_argument("--start-date", required=True)
     parser.add_argument("--end-date", required=True)
@@ -149,7 +158,23 @@ def main() -> None:
             "never commit it to this repository."
         )
 
-    membership_text = args.membership_file.read_text(encoding="utf-8-sig")
+    if args.membership_file:
+        membership_text = args.membership_file.read_text(encoding="utf-8-sig")
+        membership_source = str(args.membership_file)
+    else:
+        req = Request(
+            args.membership_url,
+            headers={
+                "User-Agent": (
+                    "Market-Risk-Monitor/0.2 "
+                    "(https://github.com/world4jason/Market-Risk-Monitor)"
+                )
+            },
+        )
+        with urlopen(req, timeout=60) as response:
+            membership_text = response.read().decode("utf-8-sig")
+        membership_source = args.membership_url
+
     membership = parse_historical_membership_csv(membership_text)
     membership = [
         row
@@ -175,7 +200,7 @@ def main() -> None:
         "source": "https://www.tiingo.com/documentation/end-of-day",
         "start_date": args.start_date,
         "end_date": args.end_date,
-        "membership_file": str(args.membership_file),
+        "membership_source": membership_source,
         "requested_tickers": len(tickers),
         "downloaded": {},
         "failed": {},
@@ -259,8 +284,12 @@ def main() -> None:
     )
     print(
         "Next: python scripts/build_ma_breadth_self_compute.py "
-        f"--membership-file {args.membership_file} "
-        f"--price-dir {args.output_dir} "
+        (
+            f"--membership-file {args.membership_file} "
+            if args.membership_file
+            else f"--membership-url {args.membership_url} "
+        )
+        + f"--price-dir {args.output_dir} "
         f"--start-date {args.start_date} --end-date {args.end_date}"
     )
 
