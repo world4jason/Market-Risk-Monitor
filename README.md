@@ -74,6 +74,31 @@ Refresh only selected FRED metrics:
 python scripts/refresh_data.py --fred --fred-id nfci --fred-id vix
 ```
 
+Import an authorized S&P 500 moving-average breadth export:
+
+```bash
+python scripts/refresh_data.py \
+  --ma-breadth-file /path/to/sp500-ma-breadth.csv
+```
+
+Required contract and survivorship rules:
+
+- `docs/moving-average-breadth-sources.md`
+- `docs/moving-average-breadth-methodology.md`
+
+Build/rebuild the <25% / <15% 50DMA threshold event study after the breadth and SPX price snapshots exist:
+
+```bash
+python scripts/build_ma_breadth_study.py
+```
+
+Cross-check one local 50DMA observation against an external reference fixture/export:
+
+```bash
+python scripts/check_ma_breadth_reference.py \
+  --reference /path/to/reference.json
+```
+
 Import an official FINRA margin-statistics file already downloaded locally:
 
 ```bash
@@ -181,3 +206,19 @@ In progress:
 - complete production dashboard data population
 - execute the deterministic QA suite against real generated snapshots
 - final Pages publication
+
+
+## Moving-Average Breadth
+
+The Trend Participation module supports:
+
+- S&P 500 % above 20DMA
+- S&P 500 % above 50DMA
+- S&P 500 % above 200DMA
+- optional custom 15/25/75/85 heuristic overlays
+- SPX overlay when the S&P 500 price metric is available
+- strict-past / rolling percentile history
+- threshold-crossing event study for 25% and 15%
+- independent Deleveraging Watch conditions
+
+Historical event-study/backfill use requires point-in-time constituent-aware breadth. A current-constituent retroactive reconstruction is blocked from canonical historical analysis.
