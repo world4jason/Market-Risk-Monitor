@@ -52,6 +52,39 @@
       </div>
     </section>
 
+    <section class="section-block" aria-labelledby="trend-participation-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">BREADTH / PARTICIPATION</p>
+          <h2 id="trend-participation-title">Trend Participation</h2>
+        </div>
+        <div class="history-controls">
+          <label class="toggle-control">
+            <input id="ma-bands-toggle" type="checkbox">
+            <span>Custom heuristic bands</span>
+          </label>
+          <label class="toggle-control">
+            <input id="ma-spx-toggle" type="checkbox">
+            <span>SPX overlay</span>
+          </label>
+        </div>
+      </div>
+      <div class="panel trend-panel">
+        <div id="ma-summary" class="trend-summary">
+          <div class="empty-state compact">20/50/200DMA breadth snapshots not loaded yet.</div>
+        </div>
+        <div id="ma-chart" class="chart-frame">
+          <div class="empty-state compact">Trend Participation history will appear here.</div>
+        </div>
+        <div class="trend-legend">
+          <span><i class="line-swatch line-20"></i>20DMA</span>
+          <span><i class="line-swatch line-50"></i>50DMA</span>
+          <span><i class="line-swatch line-200"></i>200DMA</span>
+          <span class="meta">Heuristic bands are optional and non-canonical.</span>
+        </div>
+      </div>
+    </section>
+
     <section class="section-block" aria-labelledby="signals-title">
       <div class="section-heading">
         <div>
