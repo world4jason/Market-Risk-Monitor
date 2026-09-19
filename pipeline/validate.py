@@ -249,6 +249,39 @@ def validate_ma_breadth_audit(payload: dict) -> None:
         if first and last and first > last:
             raise ValidationError(f"ma-breadth-audit[{horizon}]: first > last")
 
+    dates = []
+    for obs in payload.get("observations", []):
+        _date(obs["date"], field="ma-breadth-audit.observation.date")
+        dates.append(obs["date"])
+        for horizon in ("20", "50", "200"):
+            item = obs.get(horizon, {})
+            pct = item.get("pct")
+            eligible = item.get("eligible")
+            above = item.get("above")
+            missing_price = item.get("missing_price")
+            if pct is not None and not 0 <= float(pct) <= 100:
+                raise ValidationError(
+                    f"ma-breadth-audit[{obs['date']}][{horizon}]: pct outside [0,100]"
+                )
+            for name, value in (
+                ("eligible", eligible),
+                ("above", above),
+                ("missing_price", missing_price),
+            ):
+                if value is not None and int(value) < 0:
+                    raise ValidationError(
+                        f"ma-breadth-audit[{obs['date']}][{horizon}]: negative {name}"
+                    )
+            if eligible is not None and above is not None and int(above) > int(eligible):
+                raise ValidationError(
+                    f"ma-breadth-audit[{obs['date']}][{horizon}]: above > eligible"
+                )
+
+    if dates != sorted(dates):
+        raise ValidationError("ma-breadth-audit: dates not monotonically ascending")
+    if len(dates) != len(set(dates)):
+        raise ValidationError("ma-breadth-audit: duplicate dates")
+
 
 def validate_ma_breadth_study(payload: dict) -> None:
     if payload.get("schema_version") != "1.0.0":
