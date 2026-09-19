@@ -124,6 +124,13 @@
             "unknown",
             "derived_only"
           ]
+        },
+        "market_scope": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Market/universe scope such as NYSE when materially relevant."
         }
       }
     },
