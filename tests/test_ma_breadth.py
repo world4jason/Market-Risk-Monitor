@@ -107,6 +107,24 @@ class MovingAverageBreadthTests(unittest.TestCase):
         with self.assertRaises(MovingAverageBreadthError):
             assert_history_not_truncated(previous, newer)
 
+    def test_latest_cross_provider_reference(self):
+        import json
+        ref = json.loads(
+            (Path(__file__).parent / "fixtures" / "ma_breadth_reference_latest.json").read_text()
+        )
+        imported = parse_ma_breadth_csv(
+            """date,market_scope,provider,above_50dma_pct,membership_mode
+2026-09-18,S&P 500,Investing-EOD-crosscheck,27.83,provider_point_in_time
+"""
+        )
+        metric = build_ma_breadth_metrics(imported)["sp500_above_50dma_pct"]
+        check = cross_check_reference(
+            metric["latest"]["value"],
+            ref["reference_value"],
+            tolerance_pp=ref["tolerance_pp"],
+        )
+        self.assertTrue(check["within_tolerance"])
+
     def test_fixed_external_reference_tolerance(self):
         import json
         ref = json.loads(
