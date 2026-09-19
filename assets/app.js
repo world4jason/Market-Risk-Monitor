@@ -139,7 +139,15 @@ function defaultRollingWindow(metric) {
   return 40;
 }
 
+function historicalPercentileAllowed(metric) {
+  return !(
+    String(metric?.metric?.id || "").startsWith("sp500_above_") &&
+    metric?.source?.point_in_time_membership === false
+  );
+}
+
 function rollingPercentile(metric) {
+  if (!historicalPercentileAllowed(metric)) return null;
   const obs = (metric.observations || []).filter((o) => o.value != null);
   if (obs.length < 3) return null;
 
@@ -165,6 +173,13 @@ function recentChange(metric) {
 
 function strictPastPercentileSeries(metric, { rolling = false } = {}) {
   const raw = metric.observations || [];
+  if (!historicalPercentileAllowed(metric)) {
+    return raw.map((obs) => ({
+      date: obs.date,
+      value: null,
+      status: "insufficient_data",
+    }));
+  }
   const config = baselineConfig(
     metric,
     rolling ? "rolling_percentile" : "full_history_percentile",
