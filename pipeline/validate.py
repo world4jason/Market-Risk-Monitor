@@ -58,6 +58,12 @@ def validate_metric(metric: dict) -> None:
                 raise ValidationError(
                     f"S&P 500 moving-average breadth scope must be 'S&P 500', got {scope!r}"
                 )
+            for obs in metric.get("observations", []):
+                value = obs.get("value")
+                if value is not None and not 0 <= float(value) <= 100:
+                    raise ValidationError(
+                        f"{metric_id}: moving-average breadth outside [0,100] at {obs.get('date')}"
+                    )
         elif metric_id.startswith("nyse_") or metric_id.startswith("mrm_mcclellan_"):
             if scope != "NYSE":
                 raise ValidationError(
@@ -215,3 +221,60 @@ def validate_refresh_report(payload: dict) -> None:
             raise ValidationError("refresh-report: result metric missing")
         if result["status"] == "error" and not result.get("error"):
             raise ValidationError("refresh-report: error result missing error message")
+
+
+def validate_ma_breadth_audit(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("ma-breadth-audit: unsupported schema_version")
+    if payload.get("market_scope") != "S&P 500":
+        raise ValidationError("ma-breadth-audit: market_scope must be S&P 500")
+    if not payload.get("provider"):
+        raise ValidationError("ma-breadth-audit: provider missing")
+    point_in_time = payload.get("point_in_time_membership")
+    if point_in_time not in {True, False, None}:
+        raise ValidationError("ma-breadth-audit: invalid point_in_time_membership")
+    horizons = payload.get("horizons", {})
+    for horizon in ("20", "50", "200"):
+        if horizon not in horizons:
+            raise ValidationError(f"ma-breadth-audit: missing horizon {horizon}")
+        item = horizons[horizon]
+        if int(item.get("observations", 0)) < 0:
+            raise ValidationError(f"ma-breadth-audit: negative observations for {horizon}")
+        first = item.get("first")
+        last = item.get("last")
+        if first:
+            _date(first, field=f"ma-breadth-audit[{horizon}].first")
+        if last:
+            _date(last, field=f"ma-breadth-audit[{horizon}].last")
+        if first and last and first > last:
+            raise ValidationError(f"ma-breadth-audit[{horizon}]: first > last")
+
+
+def validate_ma_breadth_study(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("ma-breadth-study: unsupported schema_version")
+    if payload.get("status") not in {"ready", "blocked_non_point_in_time"}:
+        raise ValidationError(
+            f"ma-breadth-study: invalid status {payload.get('status')!r}"
+        )
+    if payload.get("breadth_metric") != "sp500_above_50dma_pct":
+        raise ValidationError("ma-breadth-study: unexpected breadth metric")
+    if payload.get("status") == "blocked_non_point_in_time":
+        if payload.get("events"):
+            raise ValidationError("ma-breadth-study: blocked study must not contain events")
+        return
+
+    for event in payload.get("events", []):
+        _date(event["date"], field="ma-breadth-study.event.date")
+        value = float(event["breadth_value"])
+        if not 0 <= value <= 100:
+            raise ValidationError("ma-breadth-study: event breadth outside [0,100]")
+        if event.get("direction") not in {"down", "up"}:
+            raise ValidationError("ma-breadth-study: invalid event direction")
+        if float(event.get("threshold")) not in {15.0, 25.0}:
+            raise ValidationError("ma-breadth-study: unexpected threshold")
+    for row in payload.get("summaries", []):
+        if int(row.get("sample_count", 0)) < 0:
+            raise ValidationError("ma-breadth-study: negative sample count")
+        if row.get("horizon") not in {"1W", "1M", "3M", "6M"}:
+            raise ValidationError("ma-breadth-study: unexpected horizon")
