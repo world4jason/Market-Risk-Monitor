@@ -89,6 +89,11 @@ def main() -> None:
         default=ROOT / ".cache" / "market-risk-monitor",
     )
     parser.add_argument("--skip-public", action="store_true")
+    parser.add_argument(
+        "--skip-tradermonty-ma-breadth",
+        action="store_true",
+        help="Skip the public no-key TraderMonty 50/200DMA convenience source.",
+    )
     parser.add_argument("--skip-finra", action="store_true")
     parser.add_argument("--skip-shiller", action="store_true")
     args = parser.parse_args()
@@ -98,6 +103,10 @@ def main() -> None:
 
     if not args.skip_public:
         refresh_args.append("--public")
+        selected_any = True
+
+    if not args.skip_tradermonty_ma_breadth:
+        refresh_args.append("--tradermonty-ma-breadth")
         selected_any = True
 
     if not args.skip_finra:
@@ -145,6 +154,11 @@ def main() -> None:
     run([sys.executable, str(ROOT / "scripts" / "site_smoke.py")])
 
     print("\nBootstrap complete. Review data/generated/refresh-report.json before committing.")
+    print(
+        "Note: TraderMonty MA-breadth history is marked current-constituent "
+        "retroactive. MRM uses it for raw current/recent context only; "
+        "canonical percentiles/event studies require point-in-time membership."
+    )
 
 
 if __name__ == "__main__":
