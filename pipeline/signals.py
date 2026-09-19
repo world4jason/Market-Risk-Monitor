@@ -169,6 +169,20 @@ def evaluate_rule(
             "reason": f"metric freshness={metric.get('freshness', {}).get('state')}",
         }
 
+    if (
+        respect_publication_lag
+        and str(metric_id).startswith("sp500_above_")
+        and metric.get("source", {}).get("point_in_time_membership") is not True
+    ):
+        return {
+            "type": rule_type,
+            "status": "unknown",
+            "metric": metric_id,
+            "label": rule.get("label"),
+            "value": None,
+            "reason": "historical MA breadth requires point-in-time constituent membership",
+        }
+
     observations = _available_observations(
         metric,
         evaluation_date,
