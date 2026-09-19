@@ -403,25 +403,30 @@ function renderTrendParticipation() {
 function renderMaBreadthStudy() {
   const statusEl = $("#ma-study-status");
   const summaryEl = $("#ma-study-summary");
+  const bodyEl = $("#ma-study-body");
   const study = state.maBreadthStudy;
 
-  if (!statusEl || !summaryEl) return;
+  if (!statusEl || !summaryEl || !bodyEl) return;
 
   if (!study) {
     statusEl.textContent = "Study snapshot not loaded";
     summaryEl.innerHTML =
       '<div class="empty-state compact">Build the study after loading point-in-time 50DMA breadth and SPX price history.</div>';
+    bodyEl.innerHTML =
+      '<tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>';
     return;
   }
 
   if (study.status !== "ready") {
     statusEl.textContent = study.status.replaceAll("_", " ");
     summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || "Event study is not canonical for this source.")}</div>`;
+    bodyEl.innerHTML =
+      '<tr><td colspan="9" class="empty-cell">Canonical episode table unavailable for this source.</td></tr>';
     return;
   }
 
   statusEl.textContent =
-    `${study.events?.length || 0} events · cooldown ${study.cooldown_sessions} sessions`;
+    `${study.events?.length || 0} events · cooldown ${study.cooldown_sessions} sessions · descriptive only`;
 
   const preferred = (study.summaries || []).filter(
     (row) =>
@@ -430,32 +435,51 @@ function renderMaBreadthStudy() {
       ["1M", "3M"].includes(row.horizon),
   );
 
-  if (!preferred.length) {
-    summaryEl.innerHTML =
-      '<div class="empty-state compact">No completed forward-return windows yet.</div>';
-    return;
-  }
+  summaryEl.innerHTML = preferred.length
+    ? preferred
+        .map((row) => {
+          const medianText =
+            row.median_return_pct == null
+              ? "—"
+              : `${row.median_return_pct >= 0 ? "+" : ""}${row.median_return_pct.toFixed(2)}%`;
+          const hitText =
+            row.positive_hit_rate_pct == null
+              ? "—"
+              : `${row.positive_hit_rate_pct.toFixed(0)}%`;
+          const maeText =
+            row.median_max_adverse_excursion_pct == null
+              ? "—"
+              : `${row.median_max_adverse_excursion_pct.toFixed(2)}%`;
+          return `<div class="ma-study-card">
+            <strong>Cross &lt; ${row.threshold}% · ${row.horizon}</strong>
+            <span>n=${row.sample_count} · median ${medianText} · positive ${hitText} · median MAE ${maeText}</span>
+          </div>`;
+        })
+        .join("")
+    : '<div class="empty-state compact">No completed forward-return windows yet.</div>';
 
-  summaryEl.innerHTML = preferred
-    .map((row) => {
-      const medianText =
-        row.median_return_pct == null
-          ? "—"
-          : `${row.median_return_pct >= 0 ? "+" : ""}${row.median_return_pct.toFixed(2)}%`;
-      const hitText =
-        row.positive_hit_rate_pct == null
-          ? "—"
-          : `${row.positive_hit_rate_pct.toFixed(0)}%`;
-      const maeText =
-        row.median_max_adverse_excursion_pct == null
-          ? "—"
-          : `${row.median_max_adverse_excursion_pct.toFixed(2)}%`;
-      return `<div class="ma-study-card">
-        <strong>Cross &lt; ${row.threshold}% · ${row.horizon}</strong>
-        <span>n=${row.sample_count} · median ${medianText} · positive ${hitText} · median MAE ${maeText}</span>
-      </div>`;
-    })
-    .join("");
+  const formatReturn = (value) =>
+    value == null ? "—" : `${value >= 0 ? "+" : ""}${Number(value).toFixed(2)}%`;
+
+  const events = [...(study.events || [])].sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
+
+  bodyEl.innerHTML = events.length
+    ? events
+        .map((event) => `<tr>
+          <td>${escapeHtml(event.date)}</td>
+          <td>${escapeHtml(event.direction)} ${Number(event.threshold).toFixed(0)}%</td>
+          <td>${Number(event.breadth_value).toFixed(2)}%</td>
+          <td>${formatValue(event.price, "index")}</td>
+          <td>${formatReturn(event.forward_returns_pct?.["1W"])}</td>
+          <td>${formatReturn(event.forward_returns_pct?.["1M"])}</td>
+          <td>${formatReturn(event.forward_returns_pct?.["3M"])}</td>
+          <td>${formatReturn(event.forward_returns_pct?.["6M"])}</td>
+          <td>${event.sessions_to_63d_low == null ? "—" : `${event.sessions_to_63d_low} sessions`}</td>
+        </tr>`)
+        .join("")
+    : '<tr><td colspan="9" class="empty-cell">No threshold-study episodes available.</td></tr>';
 }
 
 function renderTrendParticipationChart() {
