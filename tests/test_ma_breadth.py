@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pipeline.ma_breadth import (
     MovingAverageBreadthError,
+    assert_history_not_truncated,
     audit_rows,
     build_ma_breadth_metrics,
     cross_check_reference,
@@ -56,6 +57,22 @@ class MovingAverageBreadthTests(unittest.TestCase):
         with self.assertRaises(MovingAverageBreadthError):
             parse_ma_breadth_csv(text)
 
+    def test_non_monotonic_dates_rejected(self):
+        text = """date,market_scope,provider,above_50dma_pct
+2026-01-05,S&P 500,test,30
+2026-01-02,S&P 500,test,25
+"""
+        with self.assertRaises(MovingAverageBreadthError):
+            parse_ma_breadth_csv(text)
+
+    def test_duplicate_dates_rejected(self):
+        text = """date,market_scope,provider,above_50dma_pct
+2026-01-02,S&P 500,test,30
+2026-01-02,S&P 500,test,25
+"""
+        with self.assertRaises(MovingAverageBreadthError):
+            parse_ma_breadth_csv(text)
+
     def test_wrong_scope_rejected(self):
         text = """date,market_scope,provider,above_50dma_pct
 2026-01-02,NYSE,test,25
@@ -78,6 +95,17 @@ class MovingAverageBreadthTests(unittest.TestCase):
         rows = parse_ma_breadth_csv(text)
         metric = build_ma_breadth_metrics(rows)["sp500_above_50dma_pct"]
         self.assertFalse(metric["source"]["point_in_time_membership"])
+
+    def test_history_truncation_guard(self):
+        rows = parse_ma_breadth_csv(FIXTURE.read_text())
+        metrics = build_ma_breadth_metrics(rows)
+        previous = metrics["sp500_above_50dma_pct"]
+        newer = dict(previous)
+        newer["metric"] = dict(previous["metric"])
+        newer["coverage"] = dict(previous["coverage"])
+        newer["coverage"]["history_start"] = "2025-06-01"
+        with self.assertRaises(MovingAverageBreadthError):
+            assert_history_not_truncated(previous, newer)
 
     def test_fixed_external_reference_tolerance(self):
         import json
