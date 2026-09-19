@@ -114,6 +114,7 @@ def parse_ma_breadth_csv(
 
     rows = []
     seen_dates = set()
+    previous_date = None
     scopes = set()
     providers = set()
     membership_modes = set()
@@ -133,7 +134,12 @@ def parse_ma_breadth_csv(
         iso_date = parsed_date.isoformat()
         if iso_date in seen_dates:
             raise MovingAverageBreadthError(f"duplicate date: {iso_date}")
+        if previous_date is not None and iso_date < previous_date:
+            raise MovingAverageBreadthError(
+                f"dates must be monotonically ascending: {iso_date} follows {previous_date}"
+            )
         seen_dates.add(iso_date)
+        previous_date = iso_date
 
         scope = _text(raw.get("market_scope"))
         provider = _text(raw.get("provider"))
@@ -504,3 +510,20 @@ def cross_check_reference(
         "tolerance_pp": tolerance_pp,
         "within_tolerance": abs(difference) <= tolerance_pp,
     }
+
+
+def assert_history_not_truncated(previous_metric: dict, new_metric: dict) -> None:
+    previous_id = previous_metric.get("metric", {}).get("id")
+    new_id = new_metric.get("metric", {}).get("id")
+    if previous_id != new_id:
+        raise MovingAverageBreadthError(
+            f"cannot compare coverage for different metrics: {previous_id!r} vs {new_id!r}"
+        )
+
+    previous_start = previous_metric.get("coverage", {}).get("history_start")
+    new_start = new_metric.get("coverage", {}).get("history_start")
+    if previous_start and new_start and new_start > previous_start:
+        raise MovingAverageBreadthError(
+            f"{new_id} history truncated: previous start {previous_start}, "
+            f"new start {new_start}"
+        )
