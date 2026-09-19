@@ -109,6 +109,30 @@
         "min_observations": 252,
         "label": "McClellan Volume Summation strict-past percentile ≤ 10"
       }
+    },
+    {
+      "id": "sp500_50dma_breadth_weak",
+      "name": "S&P 500 50DMA participation unusually weak",
+      "description": "S&P 500 percentage above 50DMA is at or below its strict-past 10th percentile.",
+      "rules": {
+        "type": "percentile_below",
+        "metric": "sp500_above_50dma_pct",
+        "threshold": 10,
+        "min_observations": 252,
+        "label": "S&P 500 % > 50DMA strict-past percentile ≤ 10"
+      }
+    },
+    {
+      "id": "sp500_200dma_breadth_weak",
+      "name": "S&P 500 200DMA participation unusually weak",
+      "description": "S&P 500 percentage above 200DMA is at or below its strict-past 10th percentile.",
+      "rules": {
+        "type": "percentile_below",
+        "metric": "sp500_above_200dma_pct",
+        "threshold": 10,
+        "min_observations": 252,
+        "label": "S&P 500 % > 200DMA strict-past percentile ≤ 10"
+      }
     }
   ]
 }
