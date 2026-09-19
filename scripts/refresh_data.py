@@ -14,6 +14,7 @@ from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
 from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
+from pipeline.ma_breadth_study import build_event_study as build_ma_breadth_event_study
 from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
@@ -106,9 +107,29 @@ def refresh_ma_breadth(input_path: Path, output_dir: Path):
     rows = parse_ma_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
     metrics = build_ma_breadth_metrics(rows)
     report = []
+
+    # Source-agnostic coverage guard: once a valid historical snapshot exists,
+    # a later import may extend history but may not silently truncate it.
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
+        if dest.exists():
+            try:
+                previous = json.loads(dest.read_text(encoding="utf-8"))
+                validate_metric(previous)
+                previous_start = previous["coverage"]["history_start"]
+                new_start = metric["coverage"]["history_start"]
+                if previous_start and new_start and new_start > previous_start:
+                    raise ValueError(
+                        f"{metric_id} history truncated: previous start "
+                        f"{previous_start}, new start {new_start}"
+                    )
+            except ValueError:
+                raise
+            except Exception:
+                # An invalid previous artifact must not block replacement by a valid one.
+                pass
+
         atomic_json(dest, metric)
         report.append({
             "metric": metric_id,
@@ -202,6 +223,22 @@ def build_signals(output_dir: Path):
     config_path = ROOT / "data" / "config" / "signals.json"
     config = json.loads(config_path.read_text(encoding="utf-8"))
     return build_signal_snapshot(load_generated_metrics(output_dir), config)
+
+
+def maybe_build_ma_breadth_study(output_dir: Path):
+    breadth_path = output_dir / "sp500_above_50dma_pct.json"
+    price_path = output_dir / "sp500_index.json"
+    if not breadth_path.exists() or not price_path.exists():
+        return None
+
+    breadth = json.loads(breadth_path.read_text(encoding="utf-8"))
+    price = json.loads(price_path.read_text(encoding="utf-8"))
+    validate_metric(breadth)
+    validate_metric(price)
+    config = json.loads(
+        (ROOT / "data" / "config" / "ma-breadth.json").read_text(encoding="utf-8")
+    )
+    return build_ma_breadth_event_study(breadth, price, config)
 
 
 EXPECTED_STARTS = {
@@ -365,6 +402,9 @@ def main():
         report.extend(refresh_shiller(args.shiller_file, args.output_dir))
 
     atomic_json(args.output_dir / "signals.json", build_signals(args.output_dir))
+    ma_study = maybe_build_ma_breadth_study(args.output_dir)
+    if ma_study is not None:
+        atomic_json(args.output_dir / "ma-breadth-event-study.json", ma_study)
     atomic_json(args.output_dir / "coverage.json", build_coverage(args.output_dir))
     atomic_json(args.output_dir / "catalog.json", build_catalog(args.output_dir))
     atomic_json(
