@@ -449,3 +449,30 @@ def write_ma_breadth_metrics(
     tmp.replace(audit_dest)
     written.append(audit_dest)
     return written
+
+
+def cross_check_reference(
+    local_value: float,
+    reference_value: float,
+    *,
+    tolerance_pp: float = 0.5,
+) -> dict:
+    local_value = float(local_value)
+    reference_value = float(reference_value)
+    tolerance_pp = float(tolerance_pp)
+    if not 0 <= local_value <= 100:
+        raise MovingAverageBreadthError("local moving-average breadth must be within [0,100]")
+    if not 0 <= reference_value <= 100:
+        raise MovingAverageBreadthError("reference moving-average breadth must be within [0,100]")
+    if tolerance_pp < 0:
+        raise MovingAverageBreadthError("tolerance_pp must be non-negative")
+
+    difference = local_value - reference_value
+    return {
+        "local_value": local_value,
+        "reference_value": reference_value,
+        "difference_pp": difference,
+        "absolute_difference_pp": abs(difference),
+        "tolerance_pp": tolerance_pp,
+        "within_tolerance": abs(difference) <= tolerance_pp,
+    }
