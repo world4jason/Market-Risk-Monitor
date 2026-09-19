@@ -137,6 +137,31 @@
         }
       ],
       "expected_history_start": "1854-12-01"
+    },
+    {
+      "id": "sp500_index",
+      "name": "S&P 500 Index",
+      "description": "Daily S&P 500 index close distributed through FRED; used as market-price context and event-study return series where coverage permits.",
+      "pillar": "market",
+      "units": "index",
+      "frequency": "daily",
+      "polarity": "contextual",
+      "dataset": "S&P 500",
+      "series_id": "SP500",
+      "max_age_days": 5,
+      "expected_observation_lag_days": 1,
+      "redistribution": "restricted",
+      "license_note": "FRED notes S&P Dow Jones Indices copyright and limits daily history availability; use for local analysis and preserve attribution.",
+      "baselines": [
+        {
+          "id": "none",
+          "type": "none",
+          "window_observations": null,
+          "min_observations": 1,
+          "point_in_time": true,
+          "notes": "Market-price context; no risk percentile by default."
+        }
+      ]
     }
   ]
 }
