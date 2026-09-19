@@ -41,10 +41,13 @@ https://www.barchart.com/stocks/quotes/%24S5FI/price-history
 
 Barchart identifies `$S5FI` as **S&P 500 Stocks Above 50-Day Average**.
 
+As a fixed validation reference observed during implementation, Barchart reported **45.52 on 2026-09-01**. This value is stored only as a small QA fixture/reference, not as a replacement historical dataset.
+
 Its public historical page states:
 - site visitors can view recent daily history;
 - members may access longer downloadable history;
-- Historical Data Download / API products provide deeper history, with availability depending on product/symbol.
+- Historical Data Download / API products provide deeper history, with availability depending on product/symbol;
+- Barchart's price-history documentation says site/member daily history can extend to two years in the regular view, while its Historical Data product can provide daily data back to 01/01/2000 and lower-frequency history farther back, depending on symbol.
 
 Pros:
 - exact S5FI-style series;
