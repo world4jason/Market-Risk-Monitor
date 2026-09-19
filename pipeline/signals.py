@@ -170,6 +170,23 @@ def evaluate_rule(
         }
 
     if (
+        str(metric_id).startswith("sp500_above_")
+        and rule_type in {"percentile_above", "percentile_below"}
+        and metric.get("source", {}).get("point_in_time_membership") is not True
+    ):
+        return {
+            "type": rule_type,
+            "status": "unknown",
+            "metric": metric_id,
+            "label": rule.get("label"),
+            "value": None,
+            "reason": (
+                "MA-breadth percentile baseline requires point-in-time "
+                "constituent membership"
+            ),
+        }
+
+    if (
         respect_publication_lag
         and str(metric_id).startswith("sp500_above_")
         and metric.get("source", {}).get("point_in_time_membership") is not True
