@@ -219,3 +219,83 @@ The validation record must retain date, provider, reference value, local value, 
 - Authorized local imports may be used to generate local snapshots.
 - Public-repo fixtures use synthetic data only.
 - TradingView/Barchart/StockCharts pages are references, not scraping targets.
+
+
+## 5. TraderMonty public breadth CSV — automated 50DMA / 200DMA convenience source
+
+Project:
+https://github.com/tradermonty/market-breadth-analysis
+
+Public detail CSV:
+https://tradermonty.github.io/market-breadth-analysis/market_breadth_data.csv
+
+The project README documents:
+- S&P 500 breadth calculation;
+- both 200-day and 50-day moving-average breadth;
+- a stable public CSV published through GitHub Pages;
+- roughly 10 years / ~2,500 daily rows in the current analyzer workflow;
+- no API key required to consume the published CSV.
+
+MRM now provides:
+
+```bash
+python scripts/refresh_data.py --tradermonty-ma-breadth
+```
+
+Mapping:
+- `Breadth_50_Index_Raw * 100` → `sp500_above_50dma_pct`
+- `Breadth_Index_Raw * 100` → `sp500_above_200dma_pct`
+
+### Critical survivorship limitation
+
+TraderMonty's current implementation fetches the **current S&P 500 constituent list** from FMP and then retrieves historical prices for those symbols before computing historical breadth.
+
+Therefore MRM marks the imported source:
+
+```text
+membership_mode = current_constituents_retroactive
+point_in_time_membership = false
+```
+
+Consequences:
+- useful for current/recent monitoring and independent comparison;
+- **not canonical for historical threshold studies**;
+- **not allowed in historical Deleveraging Watch backfill**;
+- never allowed to overwrite an existing point-in-time canonical MA-breadth snapshot.
+
+This makes the public CSV useful without hiding its survivorship bias.
+
+## 6. Open point-in-time membership source for self-computation
+
+Project:
+https://github.com/chinobing/historical_sp500_constituents
+
+The repository publishes:
+- `sp_500_historical_components.csv`
+- daily S&P 500 historical constituent snapshots from 1996-01-02 to present
+- MIT-licensed repository code/data files
+
+MRM supports this format directly through:
+
+```bash
+python scripts/build_ma_breadth_self_compute.py \
+  --price-dir /path/to/authorized/per-ticker-prices
+```
+
+The script:
+1. fetches the open historical membership CSV by default (or accepts a local file);
+2. hashes the exact membership file for reproducibility;
+3. loads user-authorized per-ticker price CSVs;
+4. computes 20/50/200-day moving averages using point-in-time membership;
+5. records eligible / above / missing-price counts per date;
+6. rejects the run if missing-price coverage exceeds the configured tolerance.
+
+This path solves the **membership survivorship** problem. It does not solve historical price licensing automatically; the user remains responsible for providing price files they are entitled to use.
+
+## Current S5FI cross-check
+
+Independent public pages agree on recent S5FI closes:
+- Investing.com: 2026-09-18 close = 27.83
+- EODData: 2026-09-18 close = 27.83
+
+This is useful as a current-value cross-provider sanity check, while long-history licensing remains separate.
