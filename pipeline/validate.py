@@ -50,6 +50,13 @@ def validate_metric(metric: dict) -> None:
     if metric["freshness"]["state"] not in ALLOWED_STATES:
         raise ValidationError("Invalid freshness state")
 
+    if metric["metric"].get("pillar") == "breadth":
+        scope = metric["source"].get("market_scope")
+        if scope != "NYSE":
+            raise ValidationError(
+                f"breadth metric market_scope must be 'NYSE', got {scope!r}"
+            )
+
     dates = []
     for obs in metric["observations"]:
         _date(obs["date"], field="observation date")
