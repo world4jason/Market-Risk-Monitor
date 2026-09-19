@@ -50,6 +50,14 @@ Run deterministic tests:
 python -m unittest discover -s tests -v
 ```
 
+Refresh the public no-key TraderMonty 50DMA/200DMA breadth convenience source:
+
+```bash
+python scripts/refresh_data.py --tradermonty-ma-breadth
+```
+
+This source is useful for current/recent monitoring, but its implementation uses the current S&P 500 constituent list for historical price backfill. MRM therefore marks it `current_constituents_retroactive`: raw levels are shown, while historical percentiles/signals/event studies remain non-canonical/blocked.
+
 Refresh network-accessible public sources (configured FRED series + official Cboe VIX):
 
 ```bash
@@ -73,6 +81,16 @@ Refresh only selected FRED metrics:
 ```bash
 python scripts/refresh_data.py --fred --fred-id nfci --fred-id vix
 ```
+
+Self-compute point-in-time 20/50/200DMA breadth from the open historical S&P 500 membership file plus user-authorized per-ticker prices:
+
+```bash
+python scripts/build_ma_breadth_self_compute.py \
+  --price-dir /path/to/ticker-price-csvs \
+  --price-adjustment adjusted_close
+```
+
+By default this uses the MIT-licensed `chinobing/historical_sp500_constituents` membership snapshots (1996-present), hashes the exact membership file for reproducibility, and fails if missing price coverage exceeds the configured tolerance.
 
 Import an authorized S&P 500 moving-average breadth export:
 
