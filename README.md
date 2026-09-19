@@ -82,6 +82,18 @@ Refresh only selected FRED metrics:
 python scripts/refresh_data.py --fred --fred-id nfci --fred-id vix
 ```
 
+Optional: fetch user-authorized Tiingo EOD prices into a resumable local cache:
+
+```bash
+export TIINGO_API_TOKEN=...
+python scripts/fetch_tiingo_pit_prices.py \
+  --start-date 2022-01-01 \
+  --end-date 2026-09-18 \
+  --output-dir .cache/tiingo-sp500-prices
+```
+
+The downloader uses the open historical membership source by default, caches one CSV per ticker, resumes safely, records ticker aliases/failures in a manifest, and never commits the token. Tiingo's license is internal-use by default, so these raw price files stay local and are ignored by the repository.
+
 Self-compute point-in-time 20/50/200DMA breadth from the open historical S&P 500 membership file plus user-authorized per-ticker prices:
 
 ```bash
