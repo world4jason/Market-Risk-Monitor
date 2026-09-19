@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
+from pipeline.ma_breadth import audit_rows as audit_ma_breadth_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
 from pipeline.signals import build_signal_snapshot
@@ -100,6 +101,25 @@ def refresh_breadth(input_path: Path, output_dir: Path):
     return report
 
 
+def refresh_ma_breadth(input_path: Path, output_dir: Path):
+    rows = parse_ma_breadth_csv(input_path.read_text(encoding="utf-8-sig"))
+    metrics = build_ma_breadth_metrics(rows)
+    report = []
+    for metric_id, metric in metrics.items():
+        validate_metric(metric)
+        dest = output_dir / f"{metric_id}.json"
+        atomic_json(dest, metric)
+        report.append({
+            "metric": metric_id,
+            "status": "updated",
+            "path": str(dest.relative_to(ROOT)),
+        })
+
+    audit_dest = output_dir / "ma-breadth-audit.json"
+    atomic_json(audit_dest, audit_ma_breadth_rows(rows))
+    return report
+
+
 def refresh_finra(input_path: Path, output_dir: Path):
     if input_path.suffix.lower() == ".csv":
         rows = parse_finra_csv(input_path.read_text(encoding="utf-8-sig"))
@@ -147,7 +167,7 @@ def refresh_shiller(input_path: Path, output_dir: Path):
 def load_generated_metrics(output_dir: Path) -> dict[str, dict]:
     metrics = {}
     for path in sorted(output_dir.glob("*.json")):
-        if path.name in {"catalog.json", "refresh-report.json", "signals.json", "coverage.json"}:
+        if path.name in {"catalog.json", "refresh-report.json", "signals.json", "coverage.json", "ma-breadth-audit.json"}:
             continue
         try:
             metric = json.loads(path.read_text(encoding="utf-8"))
@@ -213,7 +233,7 @@ def build_coverage(output_dir: Path):
 def build_catalog(output_dir: Path):
     metrics = []
     for path in sorted(output_dir.glob("*.json")):
-        if path.name in {"catalog.json", "refresh-report.json", "signals.json"}:
+        if path.name in {"catalog.json", "refresh-report.json", "signals.json", "coverage.json", "ma-breadth-audit.json"}:
             continue
         try:
             metric = json.loads(path.read_text())
@@ -267,6 +287,11 @@ def main():
         help="Path to an authorized NYSE breadth CSV export using docs/breadth-sources.md contract.",
     )
     parser.add_argument(
+        "--ma-breadth-file",
+        type=Path,
+        help="Path to authorized S&P 500 20/50/200DMA breadth CSV using docs/moving-average-breadth-sources.md contract.",
+    )
+    parser.add_argument(
         "--finra-file",
         type=Path,
         help="Path to official FINRA margin-statistics CSV/XLSX downloaded from FINRA.",
@@ -282,8 +307,8 @@ def main():
     run_fred = args.fred or args.public
     run_vix = args.cboe_vix or args.public
 
-    if not any([run_fred, run_vix, args.breadth_file, args.finra_file, args.shiller_file]):
-        parser.error("choose --public, --fred, --cboe-vix, --breadth-file, --finra-file and/or --shiller-file")
+    if not any([run_fred, run_vix, args.breadth_file, args.ma_breadth_file, args.finra_file, args.shiller_file]):
+        parser.error("choose --public, --fred, --cboe-vix, --breadth-file, --ma-breadth-file, --finra-file and/or --shiller-file")
 
     report = []
 
@@ -301,6 +326,9 @@ def main():
 
     if args.breadth_file:
         report.extend(refresh_breadth(args.breadth_file, args.output_dir))
+
+    if args.ma_breadth_file:
+        report.extend(refresh_ma_breadth(args.ma_breadth_file, args.output_dir))
 
     if args.finra_file:
         report.extend(refresh_finra(args.finra_file, args.output_dir))
