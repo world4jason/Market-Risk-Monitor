@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pipeline.taiwan_twse import (
     build_taiex_metrics,
     build_taiwan_breadth_metrics,
+    merge_metric_history,
     merge_taiex_rows,
     parse_fmtqik_json,
     parse_mi_index_market_summary_json,
@@ -145,6 +146,29 @@ class TaiwanTwseTests(unittest.TestCase):
 """
         with self.assertRaises(ValueError):
             parse_taiwan_breadth_csv(text)
+
+    def test_metric_history_merge_preserves_start(self):
+        old_rows = [
+            {"date": "2020-01-02", "close": 12000.0},
+            {"date": "2020-01-03", "close": 12100.0},
+        ]
+        new_rows = [
+            {"date": "2026-09-18", "close": 47180.75},
+        ]
+        old_metric = build_taiex_metrics(
+            old_rows,
+            datetime(2020, 1, 4, tzinfo=timezone.utc),
+        )["tw_taiex"]
+        new_metric = build_taiex_metrics(
+            new_rows,
+            datetime(2026, 9, 19, tzinfo=timezone.utc),
+        )["tw_taiex"]
+        merged = merge_metric_history(old_metric, new_metric)
+        self.assertEqual(merged["coverage"]["history_start"], "2020-01-02")
+        self.assertEqual(merged["coverage"]["history_end"], "2026-09-18")
+        self.assertEqual(merged["latest"]["value"], 47180.75)
+        self.assertEqual(len(merged["observations"]), 3)
+        validate_metric(merged)
 
 
 if __name__ == "__main__":
