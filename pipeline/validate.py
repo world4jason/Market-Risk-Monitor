@@ -438,3 +438,87 @@ def validate_rate_regime(payload: dict) -> None:
     current = payload.get("current")
     if history and current != history[-1]:
         raise ValidationError("rate-regime: current must equal last history row")
+
+
+def validate_taiwan_trend_breadth_audit(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: unsupported schema_version"
+        )
+    if payload.get("market_scope") != "TWSE listed common stocks":
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: wrong market_scope"
+        )
+    if not payload.get("provider"):
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: provider missing"
+        )
+    pit = payload.get("point_in_time_membership")
+    if pit not in {True, False, None}:
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: invalid point_in_time_membership"
+        )
+
+    start = payload.get("history_start")
+    end = payload.get("history_end")
+    if start:
+        _date(start, field="taiwan-trend-breadth-audit.history_start")
+    if end:
+        _date(end, field="taiwan-trend-breadth-audit.history_end")
+    if start and end and start > end:
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: history_start > history_end"
+        )
+
+    dates = []
+    for row in payload.get("observations", []):
+        obs_date = row.get("date")
+        _date(obs_date, field="taiwan-trend-breadth-audit.date")
+        dates.append(obs_date)
+        total = int(row.get("total_members", 0))
+        if total < 0:
+            raise ValidationError(
+                "taiwan-trend-breadth-audit: negative total_members"
+            )
+        for horizon in (20, 50, 200):
+            eligible = int(row.get(f"eligible_{horizon}d", 0))
+            above = int(row.get(f"above_{horizon}d_count", 0))
+            missing = int(row.get(f"missing_{horizon}d", 0))
+            pct = row.get(f"above_{horizon}dma_pct")
+            if min(eligible, above, missing) < 0:
+                raise ValidationError(
+                    f"taiwan-trend-breadth-audit: negative {horizon}d count"
+                )
+            if above > eligible:
+                raise ValidationError(
+                    f"taiwan-trend-breadth-audit: above > eligible for {horizon}d"
+                )
+            if eligible + missing != total:
+                raise ValidationError(
+                    f"taiwan-trend-breadth-audit: eligible+missing != total for {horizon}d"
+                )
+            if pct is not None and not 0 <= float(pct) <= 100:
+                raise ValidationError(
+                    f"taiwan-trend-breadth-audit: pct outside [0,100] for {horizon}d"
+                )
+
+        highs = row.get("new_52w_highs")
+        lows = row.get("new_52w_lows")
+        eligible52 = int(row.get("eligible_52w", 0))
+        if highs is not None and int(highs) > eligible52:
+            raise ValidationError(
+                "taiwan-trend-breadth-audit: new highs > eligible"
+            )
+        if lows is not None and int(lows) > eligible52:
+            raise ValidationError(
+                "taiwan-trend-breadth-audit: new lows > eligible"
+            )
+
+    if dates != sorted(dates):
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: dates not monotonic"
+        )
+    if len(dates) != len(set(dates)):
+        raise ValidationError(
+            "taiwan-trend-breadth-audit: duplicate dates"
+        )
