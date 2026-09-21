@@ -5,6 +5,7 @@ const REFRESH_REPORT_URL = "./data/generated/refresh-report.json";
 const MA_BREADTH_CONFIG_URL = "./data/config/ma-breadth.json";
 const MA_BREADTH_STUDY_URL = "./data/generated/ma-breadth-event-study.json";
 const TAIWAN_MACRO_REGIME_URL = "./data/generated/taiwan-macro-regime.json";
+const TAIWAN_EVENTS_URL = "./data/taiwan-events.json";
 const TAIWAN_CBC_RATE_REGIME_URL = "./data/generated/taiwan-cbc-rate-regime.json";
 const FED_RATE_REGIME_URL = "./data/generated/fed-rate-regime.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
@@ -19,6 +20,7 @@ const state = {
   maBreadthConfig: null,
   maBreadthStudy: null,
   taiwanMacroRegime: null,
+  taiwanEvents: [],
   taiwanCbcRateRegime: null,
   fedRateRegime: null,
 };
@@ -486,6 +488,8 @@ function renderTaiwanMarket() {
       '<div class="empty-state compact">TAIEX snapshot not loaded.</div>';
     status.textContent = "TAIEX unavailable";
   }
+
+  renderTaiwanEventSelector();
 }
 
 function maBreadthMetrics() {
@@ -1079,6 +1083,175 @@ function renderEvents(metric) {
 }
 
 
+function renderTaiwanEventSelector() {
+  const select = $("#tw-event-metric");
+  if (!select) return;
+
+  const metrics = [...state.metrics.values()]
+    .filter(
+      (metric) =>
+        isTaiwanMetric(metric) &&
+        (metric.observations || []).filter((o) => o.value != null).length > 1,
+    )
+    .sort((a, b) => a.metric.name.localeCompare(b.metric.name));
+
+  if (!metrics.length) {
+    select.innerHTML = '<option value="">No Taiwan history</option>';
+    renderTaiwanEvents(null);
+    return;
+  }
+
+  const previous = select.value;
+  select.innerHTML = metrics
+    .map(
+      (metric) =>
+        `<option value="${escapeHtml(metric.metric.id)}">${escapeHtml(metric.metric.name)}</option>`,
+    )
+    .join("");
+
+  if (previous && metrics.some((m) => m.metric.id === previous)) {
+    select.value = previous;
+  } else if (metrics.some((m) => m.metric.id === "tw_taiex")) {
+    select.value = "tw_taiex";
+  }
+
+  select.onchange = () =>
+    renderTaiwanEvents(state.metrics.get(select.value) || null);
+  renderTaiwanEvents(state.metrics.get(select.value) || null);
+}
+
+function renderTaiwanEvents(metric) {
+  const list = $("#tw-event-list");
+  const el = $("#tw-event-chart");
+  if (!list || !el) return;
+
+  if (!metric || !state.taiwanEvents.length) {
+    list.innerHTML = "";
+    el.innerHTML =
+      '<div class="empty-state compact">Taiwan event definitions or metric history unavailable.</div>';
+    return;
+  }
+
+  const obs = (metric.observations || []).filter((o) => o.value != null);
+  if (obs.length < 2) {
+    list.innerHTML = "";
+    el.innerHTML =
+      '<div class="empty-state compact">Not enough Taiwan history for event comparison.</div>';
+    return;
+  }
+
+  const coverageStart = Date.parse(metric.coverage.history_start);
+  const colors = [
+    "#5dc2aa",
+    "#e7b75f",
+    "#ff8278",
+    "#7c9cff",
+    "#b58cff",
+    "#63b3ed",
+    "#d98bc6",
+    "#8fbf62",
+  ];
+
+  list.innerHTML = state.taiwanEvents
+    .map((event, index) => {
+      const anchorDate = event.anchor_date || metric.latest.as_of;
+      const unavailable =
+        !anchorDate || Date.parse(anchorDate) < coverageStart;
+      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}"><i class="event-dot" style="background:${colors[index % colors.length]}"></i>${escapeHtml(event.name)}</span>`;
+    })
+    .join("");
+
+  const lines = [];
+  state.taiwanEvents.forEach((event, index) => {
+    const anchor = event.anchor_date || metric.latest.as_of;
+    if (!anchor || Date.parse(anchor) < coverageStart) return;
+
+    const anchorIdx = observationOnOrBeforeIndex(obs, anchor);
+    if (anchorIdx < 0) return;
+    const anchorValue = Number(obs[anchorIdx].value);
+    if (!Number.isFinite(anchorValue) || anchorValue === 0) return;
+
+    const anchorDate = new Date(`${obs[anchorIdx].date}T00:00:00Z`);
+    const pre = Number(event.window?.pre_months ?? 12);
+    const post = Number(event.window?.post_months ?? 24);
+    const points = [];
+
+    for (const item of obs) {
+      const offset = monthOffset(
+        anchorDate,
+        new Date(`${item.date}T00:00:00Z`),
+      );
+      if (offset < -pre || offset > post) continue;
+      points.push({
+        offset,
+        value: (Number(item.value) / anchorValue) * 100,
+      });
+    }
+
+    if (points.length > 1) {
+      lines.push({
+        name: event.name,
+        points,
+        pre,
+        post,
+        color: colors[index % colors.length],
+      });
+    }
+  });
+
+  if (!lines.length) {
+    el.innerHTML =
+      '<div class="empty-state compact">This Taiwan metric has no usable coverage for the configured events.</div>';
+    return;
+  }
+
+  const width = 720;
+  const height = 250;
+  const left = 42;
+  const right = 16;
+  const top = 18;
+  const bottom = 34;
+  const minOffset = Math.min(...lines.map((line) => -line.pre));
+  const maxOffset = Math.max(...lines.map((line) => line.post));
+  const values = lines.flatMap((line) => line.points.map((point) => point.value));
+  let min = Math.min(...values);
+  let max = Math.max(...values);
+  if (min === max) {
+    min -= 1;
+    max += 1;
+  }
+
+  const x = (offset) =>
+    left +
+    ((offset - minOffset) / Math.max(maxOffset - minOffset, 1)) *
+      (width - left - right);
+  const y = (value) =>
+    top + ((max - value) / (max - min)) * (height - top - bottom);
+
+  const paths = lines
+    .map((line) => {
+      const d = [...line.points]
+        .sort((a, b) => a.offset - b.offset)
+        .map(
+          (point, index) =>
+            `${index ? "L" : "M"} ${x(point.offset).toFixed(1)} ${y(point.value).toFixed(1)}`,
+        )
+        .join(" ");
+      return `<path d="${d}" fill="none" stroke="${line.color}" stroke-width="2" vector-effect="non-scaling-stroke"><title>${escapeHtml(line.name)}</title></path>`;
+    })
+    .join("");
+
+  el.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Taiwan historical event comparison">
+    <line class="gridline" x1="${left}" y1="${y(100)}" x2="${width - right}" y2="${y(100)}"/>
+    <line class="gridline" x1="${x(0)}" y1="${top}" x2="${x(0)}" y2="${height - bottom}"/>
+    ${paths}
+    <text x="${left}" y="${height - 10}" fill="currentColor" opacity=".55" font-size="10">T${minOffset}m</text>
+    <text x="${x(0)}" y="${height - 10}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="10">Anchor</text>
+    <text x="${width - right}" y="${height - 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">T+${maxOffset}m</text>
+  </svg>`;
+}
+
+
 function relatedBreadthStats(metric) {
   const id = metric.metric.id;
   const stats = [];
@@ -1368,7 +1541,7 @@ async function loadData() {
   state.metrics.clear();
 
   try {
-    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp, twCbcRateResp, fedRateResp] = await Promise.all([
+    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp, twEventsResp, twCbcRateResp, fedRateResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(EVENTS_URL, { cache: "no-store" }),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
@@ -1376,6 +1549,7 @@ async function loadData() {
       fetch(MA_BREADTH_CONFIG_URL, { cache: "no-store" }).catch(() => null),
       fetch(MA_BREADTH_STUDY_URL, { cache: "no-store" }).catch(() => null),
       fetch(TAIWAN_MACRO_REGIME_URL, { cache: "no-store" }).catch(() => null),
+      fetch(TAIWAN_EVENTS_URL, { cache: "no-store" }).catch(() => null),
       fetch(TAIWAN_CBC_RATE_REGIME_URL, { cache: "no-store" }).catch(() => null),
       fetch(FED_RATE_REGIME_URL, { cache: "no-store" }).catch(() => null),
     ]);
@@ -1390,6 +1564,7 @@ async function loadData() {
     state.maBreadthConfig = maConfigResp?.ok ? await maConfigResp.json() : null;
     state.maBreadthStudy = maStudyResp?.ok ? await maStudyResp.json() : null;
     state.taiwanMacroRegime = twMacroResp?.ok ? await twMacroResp.json() : null;
+    state.taiwanEvents = twEventsResp?.ok ? (await twEventsResp.json()).events || [] : [];
     state.taiwanCbcRateRegime = twCbcRateResp?.ok ? await twCbcRateResp.json() : null;
     state.fedRateRegime = fedRateResp?.ok ? await fedRateResp.json() : null;
     state.refreshErrors.clear();
