@@ -135,7 +135,7 @@ def main():
         "cache_dir": str(args.cache_dir),
     }
     atomic_json(
-        args.output_dir / "taiwan-taiex-backfill-report.json",
+        args.cache_dir / "backfill-report.json",
         report,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))
