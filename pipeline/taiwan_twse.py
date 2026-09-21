@@ -103,6 +103,10 @@ def fetch_taiex_month(year: int, month: int, timeout: int = 30) -> str:
     return _fetch_text(f"{TWSE_TAIEX_MONTH_URL}?{params}", timeout=timeout)
 
 
+def fetch_twtazu_current(timeout: int = 30) -> str:
+    return _fetch_text(TWSE_UPDOWN_CSV_URL, timeout=timeout)
+
+
 def fetch_market_breadth_day(
     day: str,
     timeout: int = 30,
