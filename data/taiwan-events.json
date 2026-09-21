@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "id": "asian_financial_crisis",
+      "name": "Asian Financial Crisis",
+      "anchor_date": "1997-07-02",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "Regional crisis anchor: Thai baht devaluation. This is a shock anchor, not a claimed TAIEX bottom."
+    },
+    {
+      "id": "dotcom_2000",
+      "name": "Dot-com unwind",
+      "anchor_date": "2000-03-10",
+      "window": {
+        "pre_months": 12,
+        "post_months": 30
+      },
+      "notes": "Global technology-bubble peak period anchor; not selected as a Taiwan bottom."
+    },
+    {
+      "id": "gfc_2008",
+      "name": "Global Financial Crisis",
+      "anchor_date": "2008-09-15",
+      "window": {
+        "pre_months": 18,
+        "post_months": 30
+      },
+      "notes": "Lehman bankruptcy shock anchor."
+    },
+    {
+      "id": "euro_2011",
+      "name": "Euro debt / 2011 risk shock",
+      "anchor_date": "2011-08-05",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "2011 global risk-off shock anchor."
+    },
+    {
+      "id": "china_2015",
+      "name": "China devaluation / growth scare",
+      "anchor_date": "2015-08-11",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "China currency/deceleration shock anchor."
+    },
+    {
+      "id": "covid_2020",
+      "name": "COVID global shock",
+      "anchor_date": "2020-03-11",
+      "window": {
+        "pre_months": 12,
+        "post_months": 18
+      },
+      "notes": "WHO pandemic declaration date; not selected as a TAIEX bottom."
+    },
+    {
+      "id": "tightening_2022",
+      "name": "2022 global tightening",
+      "anchor_date": "2022-03-16",
+      "window": {
+        "pre_months": 12,
+        "post_months": 24
+      },
+      "notes": "First Fed hike of the 2022 tightening cycle."
+    },
+    {
+      "id": "current",
+      "name": "Current cycle",
+      "anchor_date": null,
+      "window": {
+        "pre_months": 12,
+        "post_months": 0
+      },
+      "notes": "Resolves to the latest valid observation per Taiwan metric."
+    }
+  ]
+}
