@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "regimes": {
+    "easing_max_6m_bp": -25,
+    "stable_abs_6m_bp": 24.999,
+    "aggressive_tightening_min_6m_bp": 100,
+    "aggressive_single_step_bp": 50
+  }
+}
