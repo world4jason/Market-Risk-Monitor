@@ -47,6 +47,13 @@ h3 { margin-bottom: 4px; font-size: 1rem; }
 .history-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .panel { background: color-mix(in srgb, var(--panel) 96%, transparent); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .hero-panel { padding: 24px; }
+.taiwan-section { margin-top: 0; }
+.taiwan-panel { padding: 20px; border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.taiwan-panel .regime-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 16px; }
+.taiwan-metric-grid { margin-top: 4px; }
+.market-divider { width: min(1280px, calc(100% - 32px)); margin: 30px auto 18px; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .7rem; letter-spacing: .14em; font-weight: 800; }
+.market-divider::before, .market-divider::after { content: ""; height: 1px; background: var(--line); flex: 1; }
+
 .section-block { margin-top: 24px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
 .disclaimer { margin: 18px 0 0; color: var(--muted); font-size: .78rem; }
@@ -154,6 +161,7 @@ tbody tr:last-child td { border-bottom: none; }
 footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); font-size: .78rem; }
 @media (max-width: 980px) {
   .regime-grid { grid-template-columns: repeat(2, 1fr); }
+  .taiwan-panel .regime-grid { grid-template-columns: repeat(2, 1fr); }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .history-layout { grid-template-columns: 1fr; }
   .signal-grid { grid-template-columns: repeat(2, 1fr); }
@@ -163,7 +171,7 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
 @media (max-width: 640px) {
   .site-header { align-items: flex-start; padding-top: 26px; }
   .header-actions { flex-direction: column-reverse; align-items: flex-end; }
-  .metric-grid, .regime-grid, .signal-grid, .trend-summary, .ma-study-grid { grid-template-columns: 1fr; }
+  .metric-grid, .regime-grid, .signal-grid, .trend-summary, .ma-study-grid, .taiwan-panel .regime-grid { grid-template-columns: 1fr; }
   .section-heading { align-items: flex-start; }
   .history-controls { width: 100%; justify-content: stretch; }
   .history-controls .select-control { flex: 1 1 100%; min-width: 0; }
