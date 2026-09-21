@@ -153,8 +153,16 @@ function defaultRollingWindow(metric) {
 }
 
 function historicalPercentileAllowed(metric) {
+  const id = String(metric?.metric?.id || "");
+  const membershipSensitive =
+    id.startsWith("sp500_above_") ||
+    id.startsWith("tw_above_") ||
+    id.startsWith("tw_new_52w_") ||
+    id === "tw_net_new_52w_highs" ||
+    id === "tw_high_low_pct";
+
   return !(
-    String(metric?.metric?.id || "").startsWith("sp500_above_") &&
+    membershipSensitive &&
     metric?.source?.point_in_time_membership === false
   );
 }
@@ -1085,7 +1093,8 @@ function renderEvents(metric) {
 
 function renderTaiwanEventSelector() {
   const select = $("#tw-event-metric");
-  if (!select) return;
+  const mode = $("#tw-event-mode");
+  if (!select || !mode) return;
 
   const metrics = [...state.metrics.values()]
     .filter(
@@ -1097,7 +1106,7 @@ function renderTaiwanEventSelector() {
 
   if (!metrics.length) {
     select.innerHTML = '<option value="">No Taiwan history</option>';
-    renderTaiwanEvents(null);
+    renderTaiwanEvents(null, mode.value);
     return;
   }
 
@@ -1115,12 +1124,17 @@ function renderTaiwanEventSelector() {
     select.value = "tw_taiex";
   }
 
-  select.onchange = () =>
-    renderTaiwanEvents(state.metrics.get(select.value) || null);
-  renderTaiwanEvents(state.metrics.get(select.value) || null);
+  const rerender = () =>
+    renderTaiwanEvents(
+      state.metrics.get(select.value) || null,
+      mode.value,
+    );
+  select.onchange = rerender;
+  mode.onchange = rerender;
+  rerender();
 }
 
-function renderTaiwanEvents(metric) {
+function renderTaiwanEvents(metric, mode = "normalized") {
   const list = $("#tw-event-list");
   const el = $("#tw-event-chart");
   if (!list || !el) return;
@@ -1132,11 +1146,30 @@ function renderTaiwanEvents(metric) {
     return;
   }
 
-  const obs = (metric.observations || []).filter((o) => o.value != null);
+  if (!historicalPercentileAllowed(metric) && mode !== "raw") {
+    list.innerHTML = "";
+    el.innerHTML =
+      '<div class="empty-state compact">This membership-sensitive Taiwan breadth series is non-point-in-time, so canonical historical normalization/percentiles are disabled.</div>';
+    return;
+  }
+
+  let eventMetric = metric;
+  if (mode === "pit_percentile") {
+    eventMetric = {
+      ...metric,
+      metric: {
+        ...metric.metric,
+        units: "percentile",
+      },
+      observations: strictPastPercentileSeries(metric),
+    };
+  }
+
+  const obs = (eventMetric.observations || []).filter((o) => o.value != null);
   if (obs.length < 2) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Not enough Taiwan history for event comparison.</div>';
+      '<div class="empty-state compact">Not enough Taiwan history for this comparison mode.</div>';
     return;
   }
 
@@ -1168,8 +1201,10 @@ function renderTaiwanEvents(metric) {
 
     const anchorIdx = observationOnOrBeforeIndex(obs, anchor);
     if (anchorIdx < 0) return;
+
     const anchorValue = Number(obs[anchorIdx].value);
-    if (!Number.isFinite(anchorValue) || anchorValue === 0) return;
+    if (!Number.isFinite(anchorValue)) return;
+    if (mode === "normalized" && anchorValue === 0) return;
 
     const anchorDate = new Date(`${obs[anchorIdx].date}T00:00:00Z`);
     const pre = Number(event.window?.pre_months ?? 12);
@@ -1182,9 +1217,14 @@ function renderTaiwanEvents(metric) {
         new Date(`${item.date}T00:00:00Z`),
       );
       if (offset < -pre || offset > post) continue;
+
+      const raw = Number(item.value);
       points.push({
         offset,
-        value: (Number(item.value) / anchorValue) * 100,
+        value:
+          mode === "normalized"
+            ? (raw / anchorValue) * 100
+            : raw,
       });
     }
 
@@ -1207,7 +1247,7 @@ function renderTaiwanEvents(metric) {
 
   const width = 720;
   const height = 250;
-  const left = 42;
+  const left = 52;
   const right = 16;
   const top = 18;
   const bottom = 34;
@@ -1241,10 +1281,24 @@ function renderTaiwanEvents(metric) {
     })
     .join("");
 
+  const referenceValue = mode === "normalized" ? 100 : null;
+  const referenceLine =
+    referenceValue != null && referenceValue >= min && referenceValue <= max
+      ? `<line class="gridline" x1="${left}" y1="${y(referenceValue)}" x2="${width - right}" y2="${y(referenceValue)}"/>`
+      : "";
+
+  const unit =
+    mode === "normalized"
+      ? "index=100"
+      : mode === "pit_percentile"
+        ? "percentile"
+        : eventMetric.metric.units;
+
   el.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Taiwan historical event comparison">
-    <line class="gridline" x1="${left}" y1="${y(100)}" x2="${width - right}" y2="${y(100)}"/>
+    ${referenceLine}
     <line class="gridline" x1="${x(0)}" y1="${top}" x2="${x(0)}" y2="${height - bottom}"/>
     ${paths}
+    <text x="${left - 5}" y="${top + 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="9">${escapeHtml(unit)}</text>
     <text x="${left}" y="${height - 10}" fill="currentColor" opacity=".55" font-size="10">T${minOffset}m</text>
     <text x="${x(0)}" y="${height - 10}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="10">Anchor</text>
     <text x="${width - right}" y="${height - 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">T+${maxOffset}m</text>
