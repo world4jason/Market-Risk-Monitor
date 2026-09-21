@@ -380,7 +380,8 @@
               "observed",
               "missing",
               "estimated",
-              "revised"
+              "revised",
+              "insufficient_data"
             ]
           }
         }

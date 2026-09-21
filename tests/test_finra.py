@@ -71,6 +71,23 @@ Feb-10,430,90,80
         for metric in metrics.values():
             validate_metric(metric)
 
+    def test_derived_pct_change_uses_contract_observation_statuses(self):
+        rows = parse_finra_csv(FIXTURE.read_text())
+        metrics = build_finra_metrics(rows, datetime(2026, 3, 20, tzinfo=timezone.utc))
+        mom = metrics["finra_margin_debt_mom_pct"]
+
+        # The first month has no prior month to compare against. That is
+        # "insufficient_data", not a missing source observation, and it must be
+        # expressed in the canonical observation vocabulary rather than the
+        # methodology-transform one.
+        self.assertIsNone(mom["observations"][0]["value"])
+        self.assertEqual(mom["observations"][0]["status"], "insufficient_data")
+        self.assertEqual(mom["observations"][1]["status"], "observed")
+        self.assertNotIn(
+            "ok",
+            {obs["status"] for obs in mom["observations"]},
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
