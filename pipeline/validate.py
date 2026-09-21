@@ -311,3 +311,88 @@ def validate_ma_breadth_study(payload: dict) -> None:
             raise ValidationError("ma-breadth-study: negative sample count")
         if row.get("horizon") not in {"1W", "1M", "3M", "6M"}:
             raise ValidationError("ma-breadth-study: unexpected horizon")
+
+
+def validate_taiwan_macro_regime(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("taiwan-macro-regime: unsupported schema_version")
+    history = payload.get("history")
+    if not isinstance(history, list):
+        raise ValidationError("taiwan-macro-regime: history must be a list")
+
+    allowed = {
+        "expansion",
+        "deceleration",
+        "recovery",
+        "contraction",
+        "unknown",
+    }
+    dates = []
+    for row in history:
+        _date(row["date"], field="taiwan-macro-regime.date")
+        dates.append(row["date"])
+        if row.get("regime") not in allowed:
+            raise ValidationError(
+                f"taiwan-macro-regime: invalid regime {row.get('regime')!r}"
+            )
+        confidence = float(row.get("confidence", 0))
+        if not 0 <= confidence <= 1:
+            raise ValidationError(
+                "taiwan-macro-regime: confidence outside [0,1]"
+            )
+        available_on = row.get("available_on")
+        if available_on:
+            _date(
+                available_on,
+                field="taiwan-macro-regime.available_on",
+            )
+
+    if dates != sorted(dates):
+        raise ValidationError(
+            "taiwan-macro-regime: dates not monotonically ascending"
+        )
+    if len(dates) != len(set(dates)):
+        raise ValidationError("taiwan-macro-regime: duplicate dates")
+
+    current = payload.get("current")
+    if current is not None:
+        if current.get("regime") == "unknown":
+            raise ValidationError(
+                "taiwan-macro-regime: current should be latest known regime"
+            )
+
+
+def validate_taiwan_macro_audit(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("taiwan-macro-audit: unsupported schema_version")
+    rows = payload.get("rows")
+    if not isinstance(rows, list):
+        raise ValidationError("taiwan-macro-audit: rows must be a list")
+
+    keys = set()
+    for row in rows:
+        series_id = row.get("series_id")
+        obs_date = row.get("date")
+        release_date = row.get("release_date")
+        if not series_id or not obs_date or not release_date:
+            raise ValidationError(
+                "taiwan-macro-audit: series/date/release_date required"
+            )
+        _date(obs_date, field="taiwan-macro-audit.date")
+        _date(release_date, field="taiwan-macro-audit.release_date")
+        key = (series_id, obs_date)
+        if key in keys:
+            raise ValidationError(
+                f"taiwan-macro-audit: duplicate {series_id} {obs_date}"
+            )
+        keys.add(key)
+        try:
+            value = float(row["value"])
+        except Exception as exc:
+            raise ValidationError(
+                "taiwan-macro-audit: invalid value"
+            ) from exc
+        if not isfinite(value):
+            raise ValidationError(
+                "taiwan-macro-audit: non-finite value"
+            )
