@@ -29,6 +29,18 @@ from pipeline.tradermonty_ma_breadth import (
     build_tradermonty_metrics,
     fetch_tradermonty_csv,
 )
+from pipeline.taiwan_twse import (
+    build_taiex_metrics,
+    build_taiwan_breadth_metrics,
+    fetch_fmtqik_current,
+    fetch_market_breadth_day,
+    fetch_taiex_month,
+    merge_taiex_rows,
+    parse_fmtqik_json,
+    parse_mi_index_market_summary_json,
+    parse_taiex_month_json,
+    parse_taiwan_breadth_csv,
+)
 from pipeline.validate import validate_metric
 
 
@@ -239,6 +251,94 @@ def refresh_tradermonty_ma_breadth(output_dir: Path) -> list[dict]:
             }
         )
     return report
+
+
+def _write_metric_group(
+    metrics: dict[str, dict],
+    output_dir: Path,
+) -> list[dict]:
+    report = []
+    for metric_id, metric in metrics.items():
+        validate_metric(metric)
+        dest = output_dir / f"{metric_id}.json"
+        atomic_json(dest, metric)
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
+    return report
+
+
+def refresh_twse_current(output_dir: Path) -> list[dict]:
+    report = []
+    try:
+        fmt_rows = parse_fmtqik_json(fetch_fmtqik_current())
+        if not fmt_rows:
+            raise ValueError("TWSE FMTQIK returned no rows")
+        latest = fmt_rows[-1]["date"]
+        latest_dt = datetime.fromisoformat(latest)
+        month_rows = parse_taiex_month_json(
+            fetch_taiex_month(latest_dt.year, latest_dt.month)
+        )
+        taiex_rows = merge_taiex_rows(month_rows, fmt_rows)
+        report.extend(
+            _write_metric_group(
+                build_taiex_metrics(taiex_rows),
+                output_dir,
+            )
+        )
+    except Exception as exc:
+        report.append(
+            {
+                "metric": "tw_taiex",
+                "status": "error",
+                "error": str(exc),
+                "preserved_previous": (
+                    output_dir / "tw_taiex.json"
+                ).exists(),
+            }
+        )
+        return report
+
+    try:
+        latest = fmt_rows[-1]["date"]
+        breadth_row = parse_mi_index_market_summary_json(
+            fetch_market_breadth_day(latest)
+        )
+        report.extend(
+            _write_metric_group(
+                build_taiwan_breadth_metrics([breadth_row]),
+                output_dir,
+            )
+        )
+    except Exception as exc:
+        report.append(
+            {
+                "metric": "tw_advance_decline_diff",
+                "status": "error",
+                "error": str(exc),
+                "preserved_previous": (
+                    output_dir / "tw_advance_decline_diff.json"
+                ).exists(),
+            }
+        )
+    return report
+
+
+def refresh_twse_breadth_file(
+    input_path: Path,
+    output_dir: Path,
+) -> list[dict]:
+    rows = parse_taiwan_breadth_csv(
+        input_path.read_text(encoding="utf-8-sig")
+    )
+    return _write_metric_group(
+        build_taiwan_breadth_metrics(rows),
+        output_dir,
+    )
 
 
 def refresh_finra(input_path: Path, output_dir: Path) -> list[dict]:
@@ -463,6 +563,21 @@ def main() -> None:
         help="Refresh all network-accessible public sources (FRED + Cboe VIX).",
     )
     parser.add_argument(
+        "--twse-current",
+        action="store_true",
+        help=(
+            "Refresh current Taiwan TAIEX and official TWSE stock advance/decline breadth."
+        ),
+    )
+    parser.add_argument(
+        "--twse-breadth-file",
+        type=Path,
+        help=(
+            "Normalized historical Taiwan breadth CSV: "
+            "date,advancing,declining,unchanged,limit_up,limit_down,unmatched."
+        ),
+    )
+    parser.add_argument(
         "--tradermonty-ma-breadth",
         action="store_true",
         help=(
@@ -513,6 +628,8 @@ def main() -> None:
         [
             run_fred,
             run_vix,
+            args.twse_current,
+            args.twse_breadth_file,
             args.tradermonty_ma_breadth,
             args.breadth_file,
             args.ma_breadth_file,
@@ -521,8 +638,8 @@ def main() -> None:
         ]
     ):
         parser.error(
-            "choose --public, --fred, --cboe-vix, "
-            "--tradermonty-ma-breadth, --breadth-file, "
+            "choose --public, --fred, --cboe-vix, --twse-current, "
+            "--twse-breadth-file, --tradermonty-ma-breadth, --breadth-file, "
             "--ma-breadth-file, --finra-file and/or --shiller-file"
         )
 
@@ -539,6 +656,17 @@ def main() -> None:
 
     if run_vix:
         report.extend(refresh_cboe_vix(args.output_dir))
+
+    if args.twse_current:
+        report.extend(refresh_twse_current(args.output_dir))
+
+    if args.twse_breadth_file:
+        report.extend(
+            refresh_twse_breadth_file(
+                args.twse_breadth_file,
+                args.output_dir,
+            )
+        )
 
     if args.tradermonty_ma_breadth:
         report.extend(
