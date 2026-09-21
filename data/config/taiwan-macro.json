@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "ndc_monitoring_bands": [
+    {
+      "min": 38,
+      "max": 45,
+      "label": "red",
+      "description": "booming"
+    },
+    {
+      "min": 32,
+      "max": 37,
+      "label": "yellow-red",
+      "description": "transitional-hot"
+    },
+    {
+      "min": 23,
+      "max": 31,
+      "label": "green",
+      "description": "stable"
+    },
+    {
+      "min": 17,
+      "max": 22,
+      "label": "yellow-blue",
+      "description": "transitional-cool"
+    },
+    {
+      "min": 9,
+      "max": 16,
+      "label": "blue",
+      "description": "sluggish"
+    }
+  ],
+  "mrm_regime": {
+    "min_known_components": 2,
+    "momentum_periods": 3,
+    "components": {
+      "tw_manufacturing_pmi": {
+        "type": "level",
+        "threshold": 50,
+        "higher_is_positive": true
+      },
+      "tw_ndc_leading_index": {
+        "type": "delta",
+        "periods": 3,
+        "threshold": 0,
+        "higher_is_positive": true
+      },
+      "tw_ndc_coincident_index": {
+        "type": "delta",
+        "periods": 3,
+        "threshold": 0,
+        "higher_is_positive": true
+      },
+      "tw_manufacturing_production": {
+        "type": "return",
+        "periods": 3,
+        "threshold": 0,
+        "higher_is_positive": true
+      }
+    },
+    "labels": {
+      "positive_rising": "expansion",
+      "positive_falling": "deceleration",
+      "negative_rising": "recovery",
+      "negative_falling": "contraction"
+    }
+  }
+}
