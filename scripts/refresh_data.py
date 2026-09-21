@@ -23,6 +23,13 @@ from pipeline.ma_breadth import (
 from pipeline.ma_breadth_study import (
     build_event_study as build_ma_breadth_event_study,
 )
+from pipeline.rate_velocity import (
+    build_rate_metrics,
+    build_rate_regime_artifact,
+    cbc_rows_to_rate_rows,
+    combine_fed_target_metrics,
+    parse_cbc_rate_csv,
+)
 from pipeline.shiller import build_shiller_metrics, parse_shiller_xls
 from pipeline.signals import build_signal_snapshot
 from pipeline.tradermonty_ma_breadth import (
@@ -59,6 +66,8 @@ SPECIAL_ARTIFACTS = {
     "ma-breadth-event-study.json",
     "taiwan-macro-regime.json",
     "taiwan-macro-audit.json",
+    "taiwan-cbc-rate-regime.json",
+    "fed-rate-regime.json",
 }
 
 
@@ -376,6 +385,83 @@ def refresh_taiwan_macro_file(
     return report
 
 
+def refresh_cbc_rate_file(
+    input_path: Path,
+    output_dir: Path,
+) -> list[dict]:
+    rows = parse_cbc_rate_csv(
+        input_path.read_text(encoding="utf-8-sig")
+    )
+    rate_rows = cbc_rows_to_rate_rows(rows)
+    metrics = build_rate_metrics(
+        rate_rows,
+        prefix="tw_cbc",
+        name_prefix="Taiwan CBC Discount Rate",
+        provider="Central Bank of the Republic of China (Taiwan)",
+        source_url="https://www.cbc.gov.tw/en/lp-695-2.html",
+        market_scope="Taiwan",
+    )
+    report = _write_metric_group(metrics, output_dir)
+    config = json.loads(
+        (ROOT / "data" / "config" / "rates.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    atomic_json(
+        output_dir / "taiwan-cbc-rate-regime.json",
+        build_rate_regime_artifact(
+            rate_rows,
+            config,
+            name="Taiwan CBC Rate Regime",
+        ),
+    )
+    return report
+
+
+def maybe_build_fed_rate_outputs(output_dir: Path) -> list[dict]:
+    legacy_path = output_dir / "fed_target_legacy.json"
+    upper_path = output_dir / "fed_target_upper.json"
+    if not legacy_path.exists() and not upper_path.exists():
+        return []
+
+    legacy = None
+    upper = None
+    if legacy_path.exists():
+        legacy = json.loads(legacy_path.read_text(encoding="utf-8"))
+        validate_metric(legacy)
+    if upper_path.exists():
+        upper = json.loads(upper_path.read_text(encoding="utf-8"))
+        validate_metric(upper)
+
+    rate_rows = combine_fed_target_metrics(legacy, upper)
+    if not rate_rows:
+        return []
+
+    metrics = build_rate_metrics(
+        rate_rows,
+        prefix="us_fed_policy",
+        name_prefix="Fed Policy Rate",
+        provider="Board of Governors / FOMC via FRED",
+        source_url="https://fred.stlouisfed.org/series/DFEDTARU",
+        market_scope="United States",
+    )
+    report = _write_metric_group(metrics, output_dir)
+    config = json.loads(
+        (ROOT / "data" / "config" / "rates.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    atomic_json(
+        output_dir / "fed-rate-regime.json",
+        build_rate_regime_artifact(
+            rate_rows,
+            config,
+            name="Fed Policy Rate Regime",
+        ),
+    )
+    return report
+
+
 def refresh_finra(input_path: Path, output_dir: Path) -> list[dict]:
     if input_path.suffix.lower() == ".csv":
         rows = parse_finra_csv(
@@ -644,6 +730,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--cbc-rate-file",
+        type=Path,
+        help=(
+            "Normalized CBC policy-rate history CSV: "
+            "date,discount_rate,collateral_rate,short_term_rate,source_url."
+        ),
+    )
+    parser.add_argument(
         "--finra-file",
         type=Path,
         help=(
@@ -674,6 +768,7 @@ def main() -> None:
             args.twse_current,
             args.twse_breadth_file,
             args.taiwan_macro_file,
+            args.cbc_rate_file,
             args.tradermonty_ma_breadth,
             args.breadth_file,
             args.ma_breadth_file,
@@ -683,7 +778,7 @@ def main() -> None:
     ):
         parser.error(
             "choose --public, --fred, --cboe-vix, --twse-current, "
-            "--twse-breadth-file, --taiwan-macro-file, "
+            "--twse-breadth-file, --taiwan-macro-file, --cbc-rate-file, "
             "--tradermonty-ma-breadth, --breadth-file, "
             "--ma-breadth-file, --finra-file and/or --shiller-file"
         )
@@ -721,6 +816,14 @@ def main() -> None:
             )
         )
 
+    if args.cbc_rate_file:
+        report.extend(
+            refresh_cbc_rate_file(
+                args.cbc_rate_file,
+                args.output_dir,
+            )
+        )
+
     if args.tradermonty_ma_breadth:
         report.extend(
             refresh_tradermonty_ma_breadth(args.output_dir)
@@ -745,6 +848,9 @@ def main() -> None:
         report.extend(
             refresh_shiller(args.shiller_file, args.output_dir)
         )
+
+    # Derived Fed policy velocity is rebuilt whenever raw target series exist.
+    report.extend(maybe_build_fed_rate_outputs(args.output_dir))
 
     atomic_json(
         args.output_dir / "signals.json",
