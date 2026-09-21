@@ -19,6 +19,8 @@ from pipeline.validate import (
     validate_metric,
     validate_refresh_report,
     validate_signal_snapshot,
+    validate_taiwan_macro_audit,
+    validate_taiwan_macro_regime,
 )
 
 
@@ -38,6 +40,8 @@ SPECIAL_VALIDATORS = {
     "signals.json": validate_signal_snapshot,
     "ma-breadth-audit.json": validate_ma_breadth_audit,
     "ma-breadth-event-study.json": validate_ma_breadth_study,
+    "taiwan-macro-regime.json": validate_taiwan_macro_regime,
+    "taiwan-macro-audit.json": validate_taiwan_macro_audit,
 }
 
 
