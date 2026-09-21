@@ -3,6 +3,7 @@ import unittest
 from datetime import datetime, timezone
 
 from pipeline.taiwan_twse import (
+    TaiwanTwseError,
     build_taiex_metrics,
     build_taiwan_breadth_metrics,
     merge_metric_history,
@@ -119,6 +120,70 @@ class TaiwanTwseTests(unittest.TestCase):
         self.assertEqual(row["declining"], 251)
         self.assertEqual(row["limit_up"], 32)
         self.assertEqual(row["unmatched"], 1)
+
+    def test_parse_mi_index_current_tables_shape(self):
+        # TWSE now returns a `tables` list instead of flat data1..data9 keys.
+        # The breadth table is NOT at a stable index -- here it is tables[1]
+        # and tables[2] is empty, mirroring the live 2026-09-18 response where
+        # it sat at index 7 with index 8 empty. Matching on the field
+        # signature is what keeps this from silently reading the wrong table.
+        payload = {
+            "stat": "OK",
+            "date": "20260918",
+            "type": "MS",
+            "tables": [
+                {
+                    "title": "115年09月18日 大盤統計資訊",
+                    "fields": ["成交統計", "成交金額(元)", "成交股數(股)", "成交筆數"],
+                    "data": [
+                        ["1.一般股票", "1,060,401,174,750", "5,860,392,347", "3,610,593"],
+                        ["4.ETF", "72,666,060,556", "3,152,113,663", "950,024"],
+                    ],
+                },
+                {
+                    "title": "漲跌證券數合計",
+                    "fields": ["類型", "整體市場", "股票"],
+                    "data": [
+                        ["上漲(漲停)", "9,531(119)", "748(32)"],
+                        ["下跌(跌停)", "4,331(55)", "251(0)"],
+                        ["持平", "968", "78"],
+                        ["未成交", "16,946", "1"],
+                        ["無比價", "3,432", "0"],
+                    ],
+                },
+                {},
+            ],
+        }
+        row = parse_mi_index_market_summary_json(
+            json.dumps(payload, ensure_ascii=False)
+        )
+        self.assertEqual(row["date"], "2026-09-18")
+        # Stocks column, not the 9,531 / 4,331 overall-market column.
+        self.assertEqual(row["advancing"], 748)
+        self.assertEqual(row["declining"], 251)
+        self.assertEqual(row["limit_up"], 32)
+        self.assertEqual(row["limit_down"], 0)
+        self.assertEqual(row["unchanged"], 78)
+        self.assertEqual(row["unmatched"], 1)
+
+    def test_mi_index_missing_breadth_table_is_rejected(self):
+        payload = {
+            "stat": "OK",
+            "date": "20260918",
+            "type": "MS",
+            "tables": [
+                {
+                    "title": "115年09月18日 大盤統計資訊",
+                    "fields": ["成交統計", "成交金額(元)"],
+                    "data": [["1.一般股票", "1,060,401,174,750"]],
+                },
+                {},
+            ],
+        }
+        with self.assertRaises(TaiwanTwseError):
+            parse_mi_index_market_summary_json(
+                json.dumps(payload, ensure_ascii=False)
+            )
 
     def test_2022_weak_breadth_fixture_and_current_positive_fixture(self):
         text = """date,advancing,declining,unchanged,limit_up,limit_down,unmatched
