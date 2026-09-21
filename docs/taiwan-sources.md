@@ -105,6 +105,56 @@ PMI interpretation:
 
 CIER content is publicly viewable but redistribution rights are not assumed. The repository therefore stores parser/config logic and small fixtures; a full historical snapshot is committed only if rights are verified.
 
+### Adapter
+
+`pipeline/cier_pmi.py` parses the official page; `scripts/bootstrap_cier_pmi.py`
+writes it into the normalized macro CSV contract below.
+
+```bash
+python scripts/bootstrap_cier_pmi.py
+python scripts/refresh_data.py --taiwan-macro-file .cache/taiwan-macro/cier-pmi.csv
+```
+
+The PMI table is selected by its own header columns (`月份` + `臺灣製造業PMI`),
+never by position: it is a JetEngine dynamic-table widget and the page carries
+other tables, so a layout change must fail loudly rather than feed some other
+table's numbers into a macro series.
+
+### Rolling window, not a history
+
+**The official table exposes only the last 12 months.** It is a rolling window,
+and deeper history would require an undocumented `admin-ajax.php` endpoint —
+exactly the unstable surface this document warns about.
+
+Coverage therefore *accumulates forward*: each run merges the current window
+into the stored CSV. Run it regularly, or months fall out of the window before
+they are ever captured. Do not add `tw_manufacturing_pmi` to the expected
+history starts in `scripts/refresh_data.py` until enough months have
+accumulated, or the truncation guard will fire on a series that is simply young.
+
+### Release dates
+
+The page carries no publication date. The adapter records `release_date` as the
+date the values were **verified publicly available** — the fetch date — not an
+inferred publication date.
+
+This is deliberate. Guessing an earlier publication date would let no-look-ahead
+analysis read a value before it can be shown to have existed. An observed upper
+bound is late rather than early, which is the safe direction.
+
+On merge, a month re-observed with an unchanged value keeps its **earliest**
+recorded release date. A month whose value has changed is a revision: the
+revised figure demonstrably was not available at the earlier date, so it takes
+the newer release date with it.
+
+### Sector series
+
+The adapter parses all six sector columns (化學暨生技醫療, 電子暨光學,
+食品暨紡織, 基礎原物料, 交通工具, 電力暨機械設備) and reports them, but emits
+only `tw_manufacturing_pmi` to the contract. The sectors have no canonical
+metric ids; minting ids here would put series into the contract that nothing
+else defines.
+
 ## 4. Industrial/manufacturing production — MOEA
 
 Official:
