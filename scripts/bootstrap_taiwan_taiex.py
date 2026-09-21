@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 from pipeline.taiwan_twse import (
     build_taiex_metrics,
     fetch_taiex_month,
+    merge_metric_history,
     merge_taiex_rows,
     parse_taiex_month_json,
 )
@@ -122,6 +123,11 @@ def main():
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = args.output_dir / f"{metric_id}.json"
+        if dest.exists():
+            previous = json.loads(dest.read_text(encoding="utf-8"))
+            validate_metric(previous)
+            metric = merge_metric_history(previous, metric)
+            validate_metric(metric)
         atomic_json(dest, metric)
         written.append(str(dest.relative_to(ROOT)))
 
