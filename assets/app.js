@@ -5,6 +5,8 @@ const REFRESH_REPORT_URL = "./data/generated/refresh-report.json";
 const MA_BREADTH_CONFIG_URL = "./data/config/ma-breadth.json";
 const MA_BREADTH_STUDY_URL = "./data/generated/ma-breadth-event-study.json";
 const TAIWAN_MACRO_REGIME_URL = "./data/generated/taiwan-macro-regime.json";
+const TAIWAN_CBC_RATE_REGIME_URL = "./data/generated/taiwan-cbc-rate-regime.json";
+const FED_RATE_REGIME_URL = "./data/generated/fed-rate-regime.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
 const state = {
@@ -17,6 +19,8 @@ const state = {
   maBreadthConfig: null,
   maBreadthStudy: null,
   taiwanMacroRegime: null,
+  taiwanCbcRateRegime: null,
+  fedRateRegime: null,
 };
 
 const pillarLabels = {
@@ -77,6 +81,7 @@ function formatValue(value, units) {
   if (units === "percentile") return `${v.toFixed(0)}th`;
   if (units === "ratio") return `${v.toFixed(2)}×`;
   if (units === "binary") return v ? "Yes" : "No";
+  if (units === "basis points") return `${v >= 0 ? "+" : ""}${v.toFixed(1)} bp`;
   if (Math.abs(v) >= 1000) {
     return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
   }
@@ -438,8 +443,12 @@ function renderTaiwanMarket() {
     ),
     statusCell(
       "Rates",
-      rateMetrics.length ? "Inputs loaded" : "Unknown",
-      rateMetrics.length ? `${rateMetrics.length} CBC rate metrics` : "CBC rate history pending",
+      state.taiwanCbcRateRegime?.current?.regime
+        ? String(state.taiwanCbcRateRegime.current.regime)
+        : (rateMetrics.length ? "Inputs loaded" : "Unknown"),
+      state.taiwanCbcRateRegime?.current
+        ? `CBC ${formatValue(state.taiwanCbcRateRegime.current.rate, "percent")} · 6M ${formatValue(state.taiwanCbcRateRegime.current.change_6m_bp, "basis points")} · Fed ${state.fedRateRegime?.current?.regime || "unknown"}`
+        : (rateMetrics.length ? `${rateMetrics.length} CBC rate metrics` : "CBC rate history pending"),
     ),
   ].join("");
 
@@ -452,6 +461,8 @@ function renderTaiwanMarket() {
     "tw_market_trade_value",
     "tw_manufacturing_pmi",
     "tw_ndc_monitoring_score",
+    "tw_cbc_rate",
+    "tw_cbc_change_6m_bp",
   ];
   const preferred = preferredIds
     .map((id) => state.metrics.get(id))
@@ -1357,7 +1368,7 @@ async function loadData() {
   state.metrics.clear();
 
   try {
-    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp] = await Promise.all([
+    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp, twCbcRateResp, fedRateResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(EVENTS_URL, { cache: "no-store" }),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
@@ -1365,6 +1376,8 @@ async function loadData() {
       fetch(MA_BREADTH_CONFIG_URL, { cache: "no-store" }).catch(() => null),
       fetch(MA_BREADTH_STUDY_URL, { cache: "no-store" }).catch(() => null),
       fetch(TAIWAN_MACRO_REGIME_URL, { cache: "no-store" }).catch(() => null),
+      fetch(TAIWAN_CBC_RATE_REGIME_URL, { cache: "no-store" }).catch(() => null),
+      fetch(FED_RATE_REGIME_URL, { cache: "no-store" }).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
 
@@ -1377,6 +1390,8 @@ async function loadData() {
     state.maBreadthConfig = maConfigResp?.ok ? await maConfigResp.json() : null;
     state.maBreadthStudy = maStudyResp?.ok ? await maStudyResp.json() : null;
     state.taiwanMacroRegime = twMacroResp?.ok ? await twMacroResp.json() : null;
+    state.taiwanCbcRateRegime = twCbcRateResp?.ok ? await twCbcRateResp.json() : null;
+    state.fedRateRegime = fedRateResp?.ok ? await fedRateResp.json() : null;
     state.refreshErrors.clear();
     for (const result of state.refreshReport?.results || []) {
       if (result.status === "error" && result.metric) {
