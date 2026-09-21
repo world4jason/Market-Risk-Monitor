@@ -294,3 +294,93 @@ python scripts/validate_data.py
 ```
 
 The hybrid path uses Yahoo Finance through yfinance only as an optional local recent-price supplement. yfinance documents the underlying Yahoo Finance API data as intended for personal use; review Yahoo's terms before redistributing any resulting recent data. Raw recent files remain under `.cache/` and are not committed.
+
+
+## Taiwan Market Regime
+
+The dashboard now has a separate Taiwan market section built from transparent official/public inputs rather than attempting to clone proprietary MM/Breadth formulas.
+
+### Current TAIEX + official TWSE advance/decline
+
+```bash
+python scripts/refresh_data.py --twse-current
+```
+
+### Backfill official TAIEX history
+
+```bash
+python scripts/bootstrap_taiwan_taiex.py --start 1997-01
+```
+
+Monthly TWSE responses are cached under `.cache/taiwan-taiex/`. Current refreshes merge into the backfill instead of truncating it.
+
+### Collect forward point-in-time TWSE common-stock panel
+
+```bash
+python scripts/collect_taiwan_stock_snapshot.py
+```
+
+After sufficient sessions accumulate, compute transparent trend/extreme breadth:
+
+```bash
+python scripts/build_taiwan_trend_breadth.py \
+  --panel-file .cache/taiwan-stocks/twse-common-stock-panel.csv
+```
+
+This produces:
+- % TWSE common stocks above 20/50/200DMA
+- new 52-week highs/lows
+- net new highs
+- normalized High-Low %
+
+### Import official/public Taiwan macro releases
+
+Normalized contract:
+
+```text
+date,provider,series_id,value,unit,release_date,source_url
+```
+
+Then:
+
+```bash
+python scripts/refresh_data.py \
+  --taiwan-macro-file /path/to/taiwan-macro.csv
+```
+
+The MRM Taiwan macro regime is documented in `docs/taiwan-macro-methodology.md` and is explicitly **not** a reconstruction of MacroMicro/MM.
+
+### CBC + Fed rate velocity
+
+Fetch official CBC change-date history:
+
+```bash
+python scripts/bootstrap_cbc_rates.py
+python scripts/refresh_data.py \
+  --cbc-rate-file .cache/taiwan-rates/cbc-rates.csv
+```
+
+Fed target-rate velocity is rebuilt from the configured FRED legacy target + modern target-range-upper series during a normal FRED/public refresh:
+
+```bash
+python scripts/refresh_data.py --public
+```
+
+Rate methodology: `docs/rate-velocity-methodology.md`.
+
+### Taiwan historical event comparison
+
+Taiwan event anchors live in `data/taiwan-events.json`.
+
+The UI supports:
+- raw levels
+- strict-past historical percentiles
+- event-normalized paths
+
+Membership-sensitive breadth generated from non-point-in-time constituent lists is blocked from canonical historical percentile/event analysis.
+
+### Taiwan references
+
+- `docs/taiwan-sources.md`
+- `docs/taiwan-macro-methodology.md`
+- `docs/rate-velocity-methodology.md`
