@@ -396,3 +396,45 @@ def validate_taiwan_macro_audit(payload: dict) -> None:
             raise ValidationError(
                 "taiwan-macro-audit: non-finite value"
             )
+
+
+def validate_rate_regime(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("rate-regime: unsupported schema_version")
+    allowed = {
+        "easing",
+        "stable",
+        "gradual_tightening",
+        "aggressive_tightening",
+        "unknown",
+    }
+    history = payload.get("history")
+    if not isinstance(history, list):
+        raise ValidationError("rate-regime: history must be a list")
+    dates = []
+    for row in history:
+        _date(row["date"], field="rate-regime.date")
+        dates.append(row["date"])
+        if row.get("regime") not in allowed:
+            raise ValidationError(
+                f"rate-regime: invalid regime {row.get('regime')!r}"
+            )
+        for field in (
+            "rate",
+            "step_bp",
+            "change_3m_bp",
+            "change_6m_bp",
+            "change_12m_bp",
+        ):
+            value = row.get(field)
+            if value is not None and not isfinite(float(value)):
+                raise ValidationError(
+                    f"rate-regime: non-finite {field} at {row['date']}"
+                )
+    if dates != sorted(dates):
+        raise ValidationError("rate-regime: dates not monotonically ascending")
+    if len(dates) != len(set(dates)):
+        raise ValidationError("rate-regime: duplicate dates")
+    current = payload.get("current")
+    if history and current != history[-1]:
+        raise ValidationError("rate-regime: current must equal last history row")
