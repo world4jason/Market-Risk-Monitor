@@ -791,3 +791,45 @@ def write_metrics(
         tmp.replace(dest)
         paths.append(dest)
     return paths
+
+
+def merge_metric_history(previous: dict, incoming: dict) -> dict:
+    """
+    Merge two canonical snapshots for the same Taiwan metric.
+
+    Incoming observations win on duplicate dates. This lets a current TWSE
+    refresh extend an archived history without truncating the historical start.
+    """
+    previous_id = previous.get("metric", {}).get("id")
+    incoming_id = incoming.get("metric", {}).get("id")
+    if previous_id != incoming_id:
+        raise TaiwanTwseError(
+            f"cannot merge different metrics {previous_id!r} vs {incoming_id!r}"
+        )
+
+    by_date = {}
+    for obs in previous.get("observations", []):
+        by_date[obs["date"]] = dict(obs)
+    for obs in incoming.get("observations", []):
+        by_date[obs["date"]] = dict(obs)
+
+    observations = [by_date[d] for d in sorted(by_date)]
+    merged = json.loads(json.dumps(incoming))
+    merged["observations"] = observations
+    merged["coverage"]["history_start"] = (
+        observations[0]["date"] if observations else None
+    )
+    merged["coverage"]["history_end"] = (
+        observations[-1]["date"] if observations else None
+    )
+
+    present = [o for o in observations if o.get("value") is not None]
+    if present:
+        latest = present[-1]
+        merged["latest"]["as_of"] = latest["date"]
+        merged["latest"]["value"] = latest["value"]
+    else:
+        merged["latest"]["as_of"] = None
+        merged["latest"]["value"] = None
+
+    return merged
