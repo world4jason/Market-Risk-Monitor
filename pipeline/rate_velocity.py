@@ -68,6 +68,13 @@ def combine_fed_target_metrics(
     legacy: dict | None,
     upper: dict | None,
 ) -> list[dict]:
+    """
+    Merge legacy single-target and modern upper-bound series, then compress
+    the daily FRED observations into effective-date change points.
+
+    This makes step_bp represent an actual FOMC target change rather than a
+    stream of zero changes on non-meeting days.
+    """
     by_date = {}
     if legacy:
         for obs in legacy.get("observations", []):
@@ -78,10 +85,15 @@ def combine_fed_target_metrics(
             if obs.get("value") is not None:
                 # Modern target-range upper bound takes precedence.
                 by_date[obs["date"]] = float(obs["value"])
-    return [
-        {"date": d, "value": by_date[d]}
-        for d in sorted(by_date)
-    ]
+
+    output = []
+    previous = None
+    for obs_date in sorted(by_date):
+        value = by_date[obs_date]
+        if previous is None or value != previous:
+            output.append({"date": obs_date, "value": value})
+            previous = value
+    return output
 
 
 def _months_before(d: date, months: int) -> date:
