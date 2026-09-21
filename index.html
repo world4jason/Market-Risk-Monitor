@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
   <title>Market Risk Monitor</title>
-  <meta name="description" content="Explainable U.S. market leverage and stress dashboard with historical context.">
+  <meta name="description" content="Explainable U.S. and Taiwan market risk, breadth, macro, and historical context dashboard.">
   <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">US MARKET STRESS &amp; LEVERAGE</p>
+      <p class="eyebrow">MULTI-MARKET STRESS &amp; BREADTH</p>
       <h1>Market Risk Monitor</h1>
       <p class="subtitle">Current conditions, provenance, and historical context — without a hidden BUY/SELL score.</p>
     </div>
@@ -22,6 +22,37 @@
   </header>
 
   <main>
+    <section class="section-block taiwan-section" aria-labelledby="taiwan-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">TAIWAN MARKET</p>
+          <h2 id="taiwan-title">Taiwan Market Regime</h2>
+        </div>
+        <span class="badge badge-neutral">Official-source first</span>
+      </div>
+      <div class="panel taiwan-panel">
+        <div id="tw-state-grid" class="regime-grid">
+          <div class="empty-state compact">Taiwan snapshots not loaded yet.</div>
+        </div>
+        <div id="tw-metric-grid" class="metric-grid taiwan-metric-grid"></div>
+        <div class="signal-history-header">
+          <div>
+            <p class="eyebrow">TAIEX</p>
+            <h3>Price &amp; participation context</h3>
+          </div>
+          <span id="tw-history-status" class="meta">Coverage unavailable</span>
+        </div>
+        <div id="tw-taiex-chart" class="chart-frame">
+          <div class="empty-state compact">TAIEX history will appear here.</div>
+        </div>
+        <p class="disclaimer">Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and the supplied chart's proprietary Breadth 1/2/3 formulas are not reproduced or guessed.</p>
+      </div>
+    </section>
+
+    <div class="market-divider">
+      <span>U.S. MARKET</span>
+    </div>
+
     <section class="panel hero-panel" aria-labelledby="regime-title">
       <div class="section-heading">
         <div>
@@ -229,6 +260,7 @@
     <span>Market Risk Monitor</span>
     <a href="./docs/methodology.md">Methodology</a>
     <a href="./docs/data-sources.md">Data sources</a>
+    <a href="./docs/taiwan-sources.md">Taiwan sources</a>
     <a href="https://github.com/world4jason/Market-Risk-Monitor">GitHub</a>
   </footer>
 
