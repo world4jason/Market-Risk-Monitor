@@ -471,6 +471,8 @@ function renderTaiwanMarket() {
     "tw_market_trade_value",
     "tw_manufacturing_pmi",
     "tw_ndc_monitoring_score",
+    "tw_above_50dma_pct",
+    "tw_high_low_pct",
     "tw_cbc_rate",
     "tw_cbc_change_6m_bp",
   ];
@@ -1350,6 +1352,24 @@ function relatedBreadthStats(metric) {
     add("sp500_above_20dma_pct", "% > 20DMA");
     add("sp500_above_50dma_pct", "% > 50DMA");
     add("sp500_above_200dma_pct", "% > 200DMA");
+  } else if ([
+    "tw_above_20dma_pct",
+    "tw_above_50dma_pct",
+    "tw_above_200dma_pct",
+  ].includes(id)) {
+    add("tw_above_20dma_pct", "TWSE % > 20DMA");
+    add("tw_above_50dma_pct", "TWSE % > 50DMA");
+    add("tw_above_200dma_pct", "TWSE % > 200DMA");
+  } else if ([
+    "tw_new_52w_highs",
+    "tw_new_52w_lows",
+    "tw_net_new_52w_highs",
+    "tw_high_low_pct",
+  ].includes(id)) {
+    add("tw_new_52w_highs", "TWSE 52W highs");
+    add("tw_new_52w_lows", "TWSE 52W lows");
+    add("tw_net_new_52w_highs", "TWSE net highs");
+    add("tw_high_low_pct", "TWSE High-Low %");
   } else if ([
     "nyse_advancing_issues",
     "nyse_declining_issues",
