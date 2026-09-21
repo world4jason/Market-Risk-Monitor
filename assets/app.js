@@ -4,6 +4,7 @@ const SIGNALS_URL = "./data/generated/signals.json";
 const REFRESH_REPORT_URL = "./data/generated/refresh-report.json";
 const MA_BREADTH_CONFIG_URL = "./data/config/ma-breadth.json";
 const MA_BREADTH_STUDY_URL = "./data/generated/ma-breadth-event-study.json";
+const TAIWAN_MACRO_REGIME_URL = "./data/generated/taiwan-macro-regime.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
 const state = {
@@ -15,6 +16,7 @@ const state = {
   refreshErrors: new Map(),
   maBreadthConfig: null,
   maBreadthStudy: null,
+  taiwanMacroRegime: null,
 };
 
 const pillarLabels = {
@@ -405,6 +407,7 @@ function renderTaiwanMarket() {
     ["tw_ndc_", "tw_manufacturing_pmi", "tw_industrial_", "tw_manufacturing_production"]
       .some((prefix) => m.metric.id.startsWith(prefix)),
   );
+  const macroCurrent = state.taiwanMacroRegime?.current || null;
   const rateMetrics = metrics.filter((m) =>
     m.metric.id.startsWith("tw_cbc_"),
   );
@@ -428,8 +431,10 @@ function renderTaiwanMarket() {
     ),
     statusCell(
       "Macro cycle",
-      macroMetrics.length ? "Inputs loaded" : "Unknown",
-      macroMetrics.length ? `${macroMetrics.length} public macro metrics` : "NDC / PMI / production pending",
+      macroCurrent ? String(macroCurrent.regime || "Unknown") : "Unknown",
+      macroCurrent
+        ? `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`
+        : (macroMetrics.length ? `${macroMetrics.length} public macro metrics` : "NDC / PMI / production pending"),
     ),
     statusCell(
       "Rates",
@@ -445,6 +450,8 @@ function renderTaiwanMarket() {
     "tw_advancing_stocks",
     "tw_declining_stocks",
     "tw_market_trade_value",
+    "tw_manufacturing_pmi",
+    "tw_ndc_monitoring_score",
   ];
   const preferred = preferredIds
     .map((id) => state.metrics.get(id))
@@ -1350,13 +1357,14 @@ async function loadData() {
   state.metrics.clear();
 
   try {
-    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp] = await Promise.all([
+    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(EVENTS_URL, { cache: "no-store" }),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
       fetch(REFRESH_REPORT_URL, { cache: "no-store" }).catch(() => null),
       fetch(MA_BREADTH_CONFIG_URL, { cache: "no-store" }).catch(() => null),
       fetch(MA_BREADTH_STUDY_URL, { cache: "no-store" }).catch(() => null),
+      fetch(TAIWAN_MACRO_REGIME_URL, { cache: "no-store" }).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
 
@@ -1368,6 +1376,7 @@ async function loadData() {
     state.refreshReport = refreshResp?.ok ? await refreshResp.json() : null;
     state.maBreadthConfig = maConfigResp?.ok ? await maConfigResp.json() : null;
     state.maBreadthStudy = maStudyResp?.ok ? await maStudyResp.json() : null;
+    state.taiwanMacroRegime = twMacroResp?.ok ? await twMacroResp.json() : null;
     state.refreshErrors.clear();
     for (const result of state.refreshReport?.results || []) {
       if (result.status === "error" && result.metric) {
