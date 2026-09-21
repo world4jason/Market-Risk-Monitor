@@ -162,6 +162,58 @@
           "notes": "Market-price context; no risk percentile by default."
         }
       ]
+    },
+    {
+      "id": "fed_target_legacy",
+      "name": "Federal Funds Target Rate (Legacy)",
+      "description": "FOMC federal funds target rate through 2008-12-15, distributed by FRED.",
+      "pillar": "context",
+      "units": "percent",
+      "frequency": "daily",
+      "polarity": "contextual",
+      "dataset": "Federal Funds Target Rate (DISCONTINUED)",
+      "series_id": "DFEDTAR",
+      "max_age_days": 10000,
+      "expected_observation_lag_days": 1,
+      "redistribution": "unknown",
+      "license_note": "Board of Governors/FOMC target-rate series distributed by FRED; preserve citation.",
+      "baselines": [
+        {
+          "id": "none",
+          "type": "none",
+          "window_observations": null,
+          "min_observations": 1,
+          "point_in_time": true,
+          "notes": "Rate context; no percentile baseline."
+        }
+      ],
+      "expected_history_start": "1982-09-27"
+    },
+    {
+      "id": "fed_target_upper",
+      "name": "Federal Funds Target Range Upper Limit",
+      "description": "Upper limit of the FOMC federal funds target range since 2008-12-16.",
+      "pillar": "context",
+      "units": "percent",
+      "frequency": "daily",
+      "polarity": "contextual",
+      "dataset": "Federal Funds Target Range - Upper Limit",
+      "series_id": "DFEDTARU",
+      "max_age_days": 5,
+      "expected_observation_lag_days": 1,
+      "redistribution": "unknown",
+      "license_note": "Board of Governors/FOMC target-range upper bound distributed by FRED; preserve citation.",
+      "baselines": [
+        {
+          "id": "none",
+          "type": "none",
+          "window_observations": null,
+          "min_observations": 1,
+          "point_in_time": true,
+          "notes": "Rate context; no percentile baseline."
+        }
+      ],
+      "expected_history_start": "2008-12-16"
     }
   ]
 }
