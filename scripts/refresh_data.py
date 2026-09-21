@@ -48,6 +48,7 @@ from pipeline.taiwan_twse import (
     fetch_fmtqik_current,
     fetch_market_breadth_day,
     fetch_taiex_month,
+    merge_metric_history,
     merge_taiex_rows,
     parse_fmtqik_json,
     parse_mi_index_market_summary_json,
@@ -273,11 +274,25 @@ def refresh_tradermonty_ma_breadth(output_dir: Path) -> list[dict]:
 def _write_metric_group(
     metrics: dict[str, dict],
     output_dir: Path,
+    *,
+    merge_existing: bool = False,
 ) -> list[dict]:
     report = []
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
+
+        if merge_existing and dest.exists():
+            try:
+                previous = json.loads(dest.read_text(encoding="utf-8"))
+                validate_metric(previous)
+                metric = merge_metric_history(previous, metric)
+                validate_metric(metric)
+            except Exception as exc:
+                raise ValueError(
+                    f"failed to merge existing {metric_id} history: {exc}"
+                ) from exc
+
         atomic_json(dest, metric)
         report.append(
             {
@@ -305,6 +320,7 @@ def refresh_twse_current(output_dir: Path) -> list[dict]:
             _write_metric_group(
                 build_taiex_metrics(taiex_rows),
                 output_dir,
+                merge_existing=True,
             )
         )
     except Exception as exc:
@@ -329,6 +345,7 @@ def refresh_twse_current(output_dir: Path) -> list[dict]:
             _write_metric_group(
                 build_taiwan_breadth_metrics([breadth_row]),
                 output_dir,
+                merge_existing=True,
             )
         )
     except Exception as exc:
@@ -355,6 +372,7 @@ def refresh_twse_breadth_file(
     return _write_metric_group(
         build_taiwan_breadth_metrics(rows),
         output_dir,
+        merge_existing=True,
     )
 
 
