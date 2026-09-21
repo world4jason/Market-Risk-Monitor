@@ -50,9 +50,16 @@
             <p class="eyebrow">TAIWAN EVENT WINDOWS</p>
             <h3>Historical regime comparison</h3>
           </div>
-          <select id="tw-event-metric" class="select-control" aria-label="Taiwan event comparison metric">
-            <option value="tw_taiex">TAIEX</option>
-          </select>
+          <div class="history-controls">
+            <select id="tw-event-metric" class="select-control" aria-label="Taiwan event comparison metric">
+              <option value="tw_taiex">TAIEX</option>
+            </select>
+            <select id="tw-event-mode" class="select-control" aria-label="Taiwan event comparison mode">
+              <option value="normalized">Event-normalized</option>
+              <option value="raw">Raw level</option>
+              <option value="pit_percentile">Point-in-time percentile</option>
+            </select>
+          </div>
         </div>
         <div id="tw-event-list" class="event-list"></div>
         <div id="tw-event-chart" class="chart-frame short">
