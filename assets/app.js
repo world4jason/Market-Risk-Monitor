@@ -50,6 +50,10 @@ function $(selector) {
   return document.querySelector(selector);
 }
 
+function isTaiwanMetric(metric) {
+  return String(metric?.metric?.id || "").startsWith("tw_");
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -347,7 +351,7 @@ function metricCard(metric) {
 function renderMetrics() {
   const grid = $("#metric-grid");
   const metrics = [...state.metrics.values()]
-    .filter((m) => m.metric.pillar !== "context")
+    .filter((m) => m.metric.pillar !== "context" && !isTaiwanMetric(m))
     .sort(
       (a, b) =>
         pillarOrder.indexOf(a.metric.pillar) -
@@ -368,6 +372,102 @@ function renderMetrics() {
       if (event.key === "Enter" || event.key === " ") open();
     });
   });
+}
+
+function renderTaiwanMarket() {
+  const grid = $("#tw-metric-grid");
+  const stateGrid = $("#tw-state-grid");
+  const chart = $("#tw-taiex-chart");
+  const status = $("#tw-history-status");
+  if (!grid || !stateGrid || !chart || !status) return;
+
+  const metrics = [...state.metrics.values()]
+    .filter(isTaiwanMetric)
+    .sort(
+      (a, b) =>
+        pillarOrder.indexOf(a.metric.pillar) -
+        pillarOrder.indexOf(b.metric.pillar),
+    );
+
+  if (!metrics.length) {
+    stateGrid.innerHTML =
+      '<div class="empty-state compact">Taiwan snapshots not loaded yet.</div>';
+    grid.innerHTML = "";
+    chart.innerHTML =
+      '<div class="empty-state compact">Run <code>python scripts/refresh_data.py --twse-current</code> to populate current TAIEX and TWSE breadth.</div>';
+    status.textContent = "Coverage unavailable";
+    return;
+  }
+
+  const taiex = state.metrics.get("tw_taiex");
+  const adPct = state.metrics.get("tw_advance_decline_pct");
+  const macroMetrics = metrics.filter((m) =>
+    ["tw_ndc_", "tw_manufacturing_pmi", "tw_industrial_", "tw_manufacturing_production"]
+      .some((prefix) => m.metric.id.startsWith(prefix)),
+  );
+  const rateMetrics = metrics.filter((m) =>
+    m.metric.id.startsWith("tw_cbc_"),
+  );
+
+  const statusCell = (label, value, note) => `<div class="regime-cell">
+    <p class="eyebrow">${escapeHtml(label)}</p>
+    <div class="regime-value">${escapeHtml(value)}</div>
+    <div class="regime-note">${escapeHtml(note)}</div>
+  </div>`;
+
+  stateGrid.innerHTML = [
+    statusCell(
+      "Price",
+      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : "Unknown",
+      taiex ? `TAIEX · ${taiex.latest?.as_of || "—"}` : "TAIEX not loaded",
+    ),
+    statusCell(
+      "Breadth",
+      adPct ? formatValue(adPct.latest?.value, "percent") : "Unknown",
+      adPct ? "A-D % · TWSE listed stocks" : "Official A/D not loaded",
+    ),
+    statusCell(
+      "Macro cycle",
+      macroMetrics.length ? "Inputs loaded" : "Unknown",
+      macroMetrics.length ? `${macroMetrics.length} public macro metrics` : "NDC / PMI / production pending",
+    ),
+    statusCell(
+      "Rates",
+      rateMetrics.length ? "Inputs loaded" : "Unknown",
+      rateMetrics.length ? `${rateMetrics.length} CBC rate metrics` : "CBC rate history pending",
+    ),
+  ].join("");
+
+  const preferredIds = [
+    "tw_taiex",
+    "tw_advance_decline_pct",
+    "tw_advance_decline_diff",
+    "tw_advancing_stocks",
+    "tw_declining_stocks",
+    "tw_market_trade_value",
+  ];
+  const preferred = preferredIds
+    .map((id) => state.metrics.get(id))
+    .filter(Boolean);
+
+  grid.innerHTML = preferred.map(metricCard).join("");
+  grid.querySelectorAll(".metric-card").forEach((card) => {
+    const open = () => openMetric(card.dataset.metricId);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") open();
+    });
+  });
+
+  if (taiex) {
+    fullChart(taiex, chart);
+    status.textContent =
+      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${taiex.observations.length.toLocaleString()} observations`;
+  } else {
+    chart.innerHTML =
+      '<div class="empty-state compact">TAIEX snapshot not loaded.</div>';
+    status.textContent = "TAIEX unavailable";
+  }
 }
 
 function maBreadthMetrics() {
@@ -611,7 +711,7 @@ function renderTrendParticipationChart() {
 function renderRegime() {
   const grid = $("#regime-grid");
   const metrics = [...state.metrics.values()].filter(
-    (m) => m.metric.pillar !== "context",
+    (m) => m.metric.pillar !== "context" && !isTaiwanMetric(m),
   );
 
   if (!metrics.length) {
@@ -772,7 +872,10 @@ function renderHistorySelector() {
   const select = $("#history-metric");
   const mode = $("#history-mode");
   const metrics = [...state.metrics.values()].filter(
-    (m) => (m.observations || []).length > 1 && m.metric.pillar !== "context",
+    (m) =>
+      (m.observations || []).length > 1 &&
+      m.metric.pillar !== "context" &&
+      !isTaiwanMetric(m),
   );
 
   if (!metrics.length) {
@@ -1299,6 +1402,7 @@ async function loadData() {
     $("#data-generated").textContent = "Snapshot load failed";
   }
 
+  renderTaiwanMarket();
   renderMetrics();
   renderTrendParticipation();
   renderRegime();
