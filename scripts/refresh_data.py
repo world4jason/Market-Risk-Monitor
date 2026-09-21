@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -42,6 +43,7 @@ from pipeline.taiwan_macro import (
     build_macro_regime,
     parse_taiwan_macro_csv,
 )
+from pipeline.taiwan_trend_breadth import compute_from_panel as compute_taiwan_trend_breadth
 from pipeline.taiwan_twse import (
     build_taiex_metrics,
     build_taiwan_breadth_metrics,
@@ -69,6 +71,7 @@ SPECIAL_ARTIFACTS = {
     "taiwan-macro-audit.json",
     "taiwan-cbc-rate-regime.json",
     "fed-rate-regime.json",
+    "taiwan-trend-breadth-audit.json",
 }
 
 
@@ -480,6 +483,51 @@ def maybe_build_fed_rate_outputs(output_dir: Path) -> list[dict]:
     return report
 
 
+def refresh_taiwan_trend_panel(
+    input_path: Path,
+    output_dir: Path,
+) -> list[dict]:
+    report = []
+    with tempfile.TemporaryDirectory(prefix="mrm-tw-trend-") as temp:
+        temp_out = Path(temp) / "out"
+        result = compute_taiwan_trend_breadth(
+            input_path,
+            temp_out,
+        )
+
+        for metric_id in result["metrics"]:
+            src = temp_out / f"{metric_id}.json"
+            metric = json.loads(src.read_text(encoding="utf-8"))
+            validate_metric(metric)
+            dest = output_dir / src.name
+
+            if dest.exists():
+                previous = json.loads(dest.read_text(encoding="utf-8"))
+                validate_metric(previous)
+                assert_history_not_truncated(previous, metric)
+
+            atomic_json(dest, metric)
+            report.append(
+                {
+                    "metric": metric_id,
+                    "status": "updated",
+                    "path": str(dest.relative_to(ROOT)),
+                }
+            )
+
+        audit = json.loads(
+            (temp_out / "taiwan-trend-breadth-audit.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        atomic_json(
+            output_dir / "taiwan-trend-breadth-audit.json",
+            audit,
+        )
+
+    return report
+
+
 def refresh_finra(input_path: Path, output_dir: Path) -> list[dict]:
     if input_path.suffix.lower() == ".csv":
         rows = parse_finra_csv(
@@ -717,6 +765,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--taiwan-trend-panel",
+        type=Path,
+        help=(
+            "Point-in-time TWSE common-stock daily panel for 20/50/200DMA "
+            "and 52-week high/low breadth."
+        ),
+    )
+    parser.add_argument(
         "--taiwan-macro-file",
         type=Path,
         help=(
@@ -785,6 +841,7 @@ def main() -> None:
             run_vix,
             args.twse_current,
             args.twse_breadth_file,
+            args.taiwan_trend_panel,
             args.taiwan_macro_file,
             args.cbc_rate_file,
             args.tradermonty_ma_breadth,
@@ -796,7 +853,7 @@ def main() -> None:
     ):
         parser.error(
             "choose --public, --fred, --cboe-vix, --twse-current, "
-            "--twse-breadth-file, --taiwan-macro-file, --cbc-rate-file, "
+            "--twse-breadth-file, --taiwan-trend-panel, --taiwan-macro-file, --cbc-rate-file, "
             "--tradermonty-ma-breadth, --breadth-file, "
             "--ma-breadth-file, --finra-file and/or --shiller-file"
         )
@@ -822,6 +879,14 @@ def main() -> None:
         report.extend(
             refresh_twse_breadth_file(
                 args.twse_breadth_file,
+                args.output_dir,
+            )
+        )
+
+    if args.taiwan_trend_panel:
+        report.extend(
+            refresh_taiwan_trend_panel(
+                args.taiwan_trend_panel,
                 args.output_dir,
             )
         )
