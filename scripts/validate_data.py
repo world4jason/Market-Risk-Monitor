@@ -22,6 +22,7 @@ from pipeline.validate import (
     validate_signal_snapshot,
     validate_taiwan_macro_audit,
     validate_taiwan_macro_regime,
+    validate_taiwan_trend_breadth_audit,
 )
 
 
@@ -45,6 +46,7 @@ SPECIAL_VALIDATORS = {
     "taiwan-macro-audit.json": validate_taiwan_macro_audit,
     "taiwan-cbc-rate-regime.json": validate_rate_regime,
     "fed-rate-regime.json": validate_rate_regime,
+    "taiwan-trend-breadth-audit.json": validate_taiwan_trend_breadth_audit,
 }
 
 
