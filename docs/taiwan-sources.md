@@ -171,3 +171,107 @@ The supplied chart is treated as an architecture reference:
 - "TAIEX" → official TWSE TAIEX
 
 No undocumented formula is guessed or presented as the author's exact indicator.
+
+
+## Taiwan trend / extreme breadth panel
+
+The reproducible Taiwan Breadth 2/3 replacement is built from **TWSE-listed common stocks only**.
+
+### Forward point-in-time collection
+
+Official current sources:
+- `/exchangeReport/STOCK_DAY_ALL` — current daily listed-security OHLC/trading rows
+- `/opendata/t187ap03_L` — listed-company master
+
+The collector intersects the current trading rows with the listed-company master. This excludes ETFs, ETNs, warrants and other non-company securities without relying on ticker-length heuristics.
+
+Run:
+
+```bash
+python scripts/collect_taiwan_stock_snapshot.py
+```
+
+This appends the current official snapshot to:
+
+`.cache/taiwan-stocks/twse-common-stock-panel.csv`
+
+Re-running the same trade date replaces that date rather than creating duplicate rows.
+
+Each row carries:
+
+```text
+date
+symbol
+high
+low
+close
+market_scope = TWSE listed common stocks
+provider
+membership_mode = official_daily_snapshot
+price_adjustment = unadjusted_close
+```
+
+Because each day's listed-company master is collected at that date, forward-collected history is point-in-time by construction.
+
+### Historical import contract
+
+For an authorized/bulk historical panel:
+
+```csv
+date,symbol,high,low,close,market_scope,provider,membership_mode,price_adjustment
+2022-01-03,2330,688,680,684,TWSE listed common stocks,authorized-history,point_in_time,unadjusted_close
+```
+
+The historical panel must be sorted by `date,symbol`.
+
+If historical rows were created using today's surviving constituents, they must be labeled:
+
+`membership_mode = current_constituents_retroactive`
+
+Such series may be viewed as experiments but are blocked from canonical historical percentiles/event interpretation.
+
+### Public-history limit
+
+TWSE's public individual-stock daily trading page states history is available from **2010-01-04**. This gives a practical public-price starting point, but reconstructing a historically accurate common-stock universe also requires listing/delisting history.
+
+TWSE Data E-Shop offers list/delist and ex-right/dividend datasets for deeper institutional use. Redistribution rules for paid E-Shop data must be respected.
+
+### Corporate actions
+
+The free current/daily panel uses `unadjusted_close`.
+
+This is explicit because ex-right/ex-dividend and capital changes can create mechanical price discontinuities. TWSE separately publishes ex-right/ex-dividend reference data, with public ex-right price data from 2003-05-05 and paid historical/reference products.
+
+Therefore:
+- current/forward MA breadth is transparent but unadjusted;
+- a future adjusted historical reconstruction must declare its adjustment formula/source;
+- the pipeline never silently labels raw close as adjusted close.
+
+### Derived metrics
+
+`pipeline/taiwan_trend_breadth.py` produces:
+
+- `tw_above_20dma_pct`
+- `tw_above_50dma_pct`
+- `tw_above_200dma_pct`
+- `tw_new_52w_highs`
+- `tw_new_52w_lows`
+- `tw_net_new_52w_highs`
+- `tw_high_low_pct`
+
+Moving averages:
+- include the current close;
+- require the full 20/50/200 valid-session window for each stock;
+- missing/newly listed stocks remain explicit missing members.
+
+52-week highs/lows:
+- require 252 valid symbol observations;
+- new high = current daily high >= previous 251-session maximum;
+- new low = current daily low <= previous 251-session minimum.
+
+Build:
+
+```bash
+python scripts/build_taiwan_trend_breadth.py \
+  --panel-file .cache/taiwan-stocks/twse-common-stock-panel.csv
+```
