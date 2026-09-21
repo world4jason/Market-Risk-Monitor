@@ -33,21 +33,26 @@ class MovingAverageBreadthStudyTests(unittest.TestCase):
         ] + [f"2025-05-{i:02d}" for i in range(1, 29)]
         self.dates = self.dates[:130]
 
+        # One 25% episode that contains one deeper 15% episode. Levels between
+        # the crossings stay inside the 15-25 band so that each intended event
+        # is the only crossing of its own threshold at that point.
         breadth_values = []
         for i, d in enumerate(self.dates):
             value = 40.0
             if i == 10:
                 value = 24.0  # down-cross 25
-            elif 11 <= i < 18:
+            elif 11 <= i < 40:
                 value = 20.0
-            elif i == 18:
-                value = 26.0  # up-cross 25
             elif i == 40:
                 value = 14.0  # down-cross 15
             elif 41 <= i < 50:
                 value = 12.0
             elif i == 50:
                 value = 16.0  # up-cross 15
+            elif 51 <= i < 71:
+                value = 20.0
+            elif i == 71:
+                value = 26.0  # up-cross 25
             breadth_values.append((d, value))
 
         prices = [(d, 100.0 + i) for i, d in enumerate(self.dates)]
@@ -85,6 +90,37 @@ class MovingAverageBreadthStudyTests(unittest.TestCase):
         self.assertIn((15.0, "down"), pairs)
         self.assertIn((15.0, "up"), pairs)
         self.assertEqual(len(result["events"]), 4)
+
+    def test_daily_chop_around_threshold_is_deduplicated(self):
+        # Breadth oscillates across 25 every single session for 30 sessions.
+        # That is one choppy oversold stretch, not 30 independent signals.
+        chop_values = []
+        raw_crossings = 0
+        previous = None
+        for i, d in enumerate(self.dates):
+            if 10 <= i < 40:
+                value = 24.0 if i % 2 == 0 else 26.0
+            else:
+                value = 40.0
+            if previous is not None and (
+                (previous >= 25.0 > value) or (previous <= 25.0 < value)
+            ):
+                raw_crossings += 1
+            previous = value
+            chop_values.append((d, value))
+        self.assertEqual(raw_crossings, 30)
+
+        result = build_event_study(
+            metric("sp500_above_50dma_pct", chop_values),
+            self.price,
+            self.config,
+        )
+
+        # cooldown_sessions=20, so the 30-session stretch yields two episodes,
+        # each allowed one opposite-side recross.
+        self.assertEqual(len(result["events"]), 4)
+        indexes = [self.dates.index(event["date"]) for event in result["events"]]
+        self.assertEqual(sorted(indexes), [10, 11, 30, 31])
 
     def test_non_point_in_time_membership_blocks_canonical_study(self):
         blocked = metric(
