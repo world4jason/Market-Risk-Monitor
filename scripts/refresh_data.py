@@ -29,6 +29,12 @@ from pipeline.tradermonty_ma_breadth import (
     build_tradermonty_metrics,
     fetch_tradermonty_csv,
 )
+from pipeline.taiwan_macro import (
+    build_macro_audit,
+    build_macro_metrics,
+    build_macro_regime,
+    parse_taiwan_macro_csv,
+)
 from pipeline.taiwan_twse import (
     build_taiex_metrics,
     build_taiwan_breadth_metrics,
@@ -51,6 +57,8 @@ SPECIAL_ARTIFACTS = {
     "coverage.json",
     "ma-breadth-audit.json",
     "ma-breadth-event-study.json",
+    "taiwan-macro-regime.json",
+    "taiwan-macro-audit.json",
 }
 
 
@@ -341,6 +349,33 @@ def refresh_twse_breadth_file(
     )
 
 
+def refresh_taiwan_macro_file(
+    input_path: Path,
+    output_dir: Path,
+) -> list[dict]:
+    rows = parse_taiwan_macro_csv(
+        input_path.read_text(encoding="utf-8-sig")
+    )
+    report = _write_metric_group(
+        build_macro_metrics(rows),
+        output_dir,
+    )
+    config = json.loads(
+        (ROOT / "data" / "config" / "taiwan-macro.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    atomic_json(
+        output_dir / "taiwan-macro-regime.json",
+        build_macro_regime(rows, config),
+    )
+    atomic_json(
+        output_dir / "taiwan-macro-audit.json",
+        build_macro_audit(rows),
+    )
+    return report
+
+
 def refresh_finra(input_path: Path, output_dir: Path) -> list[dict]:
     if input_path.suffix.lower() == ".csv":
         rows = parse_finra_csv(
@@ -578,6 +613,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--taiwan-macro-file",
+        type=Path,
+        help=(
+            "Normalized Taiwan official/public macro CSV using "
+            "docs/taiwan-sources.md contract."
+        ),
+    )
+    parser.add_argument(
         "--tradermonty-ma-breadth",
         action="store_true",
         help=(
@@ -630,6 +673,7 @@ def main() -> None:
             run_vix,
             args.twse_current,
             args.twse_breadth_file,
+            args.taiwan_macro_file,
             args.tradermonty_ma_breadth,
             args.breadth_file,
             args.ma_breadth_file,
@@ -639,7 +683,8 @@ def main() -> None:
     ):
         parser.error(
             "choose --public, --fred, --cboe-vix, --twse-current, "
-            "--twse-breadth-file, --tradermonty-ma-breadth, --breadth-file, "
+            "--twse-breadth-file, --taiwan-macro-file, "
+            "--tradermonty-ma-breadth, --breadth-file, "
             "--ma-breadth-file, --finra-file and/or --shiller-file"
         )
 
@@ -664,6 +709,14 @@ def main() -> None:
         report.extend(
             refresh_twse_breadth_file(
                 args.twse_breadth_file,
+                args.output_dir,
+            )
+        )
+
+    if args.taiwan_macro_file:
+        report.extend(
+            refresh_taiwan_macro_file(
+                args.taiwan_macro_file,
                 args.output_dir,
             )
         )
