@@ -652,6 +652,18 @@ EXPECTED_STARTS = {
     "shiller_price": "1871-01-01",
     "shiller_cape": "1871-01-01",
     "shiller_real_tr_price": "1871-01-01",
+    # TWSE MI_5MINS_HIST refuses any query before 1999-01-05, so that is the
+    # real floor for official TAIEX daily OHLC, not the exchange's own age.
+    "tw_taiex": "1999-01-05",
+    "tw_taiex_open": "1999-01-05",
+    "tw_taiex_high": "1999-01-05",
+    "tw_taiex_low": "1999-01-05",
+    # Earliest change date on CBC's official discount-rate history page.
+    "tw_cbc_rate": "2000-12-29",
+    "tw_cbc_step_bp": "2000-12-29",
+    "tw_cbc_change_3m_bp": "2000-12-29",
+    "tw_cbc_change_6m_bp": "2000-12-29",
+    "tw_cbc_change_12m_bp": "2000-12-29",
 }
 
 
