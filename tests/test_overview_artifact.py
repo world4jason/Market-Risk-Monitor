@@ -136,6 +136,25 @@ class OverviewArtifactTests(unittest.TestCase):
         overview = build_overview({metric["metric"]["id"]: metric})
         self.assertIsNone(overview["metrics"][0]["summary"]["rolling_percentile"])
 
+    def test_checked_in_overview_is_materially_smaller_than_full_histories(self) -> None:
+        root = __import__("pathlib").Path(__file__).resolve().parents[1]
+        overview_path = root / "data" / "generated" / "overview.json"
+        catalog = __import__("json").loads(
+            (root / "data" / "generated" / "catalog.json").read_text(encoding="utf-8")
+        )
+        full_bytes = sum(
+            (root / "data" / "generated" / item["path"].removeprefix("./")).stat().st_size
+            for item in catalog["metrics"]
+        )
+        overview_bytes = overview_path.stat().st_size
+
+        self.assertGreater(full_bytes, 0)
+        self.assertLess(
+            overview_bytes,
+            full_bytes * 0.10,
+            f"overview is {overview_bytes} bytes vs {full_bytes} bytes of full histories",
+        )
+
     def test_validator_rejects_full_history_inside_overview(self) -> None:
         metric = metric_fixture()
         overview = build_overview({"fixture": metric})
