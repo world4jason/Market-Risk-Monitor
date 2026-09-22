@@ -3723,6 +3723,1831 @@
           }
         ]
       }
+    },
+    {
+      "metric": {
+        "id": "tw_cbc_change_12m_bp",
+        "name": "Taiwan CBC Discount Rate 12M cumulative change",
+        "description": "Policy-rate level/change velocity.",
+        "pillar": "context",
+        "units": "basis points",
+        "frequency": "irregular",
+        "polarity": "higher_is_riskier",
+        "comparison": "none"
+      },
+      "source": {
+        "provider": "Central Bank of the Republic of China (Taiwan)",
+        "dataset": "Policy rate history",
+        "series_id": "tw_cbc_change_12m_bp",
+        "url": "https://www.cbc.gov.tw/en/lp-695-2.html",
+        "license_note": "Official/first-party or FRED-distributed policy-rate source; retain attribution.",
+        "redistribution": "unknown",
+        "market_scope": "Taiwan",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2000-12-29",
+        "history_end": "2024-03-22",
+        "timezone": "UTC",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 2000,
+        "age_days": 914,
+        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "reason": "Irregular change-date series; old effective date can still be current."
+      },
+      "latest": {
+        "as_of": "2024-03-22",
+        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "value": 25,
+        "revision_tag": null
+      },
+      "baselines": [],
+      "summary": {
+        "observation_count": 42,
+        "rolling_percentile": 40,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2006-12-29",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2007-03-30",
+            "value": 62.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-06-22",
+            "value": 75,
+            "status": "observed"
+          },
+          {
+            "date": "2007-09-21",
+            "value": 75,
+            "status": "observed"
+          },
+          {
+            "date": "2007-12-21",
+            "value": 75,
+            "status": "observed"
+          },
+          {
+            "date": "2008-03-28",
+            "value": 75,
+            "status": "observed"
+          },
+          {
+            "date": "2008-06-27",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2008-09-26",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-09",
+            "value": 0,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-30",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-10",
+            "value": -50,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-12",
+            "value": -125,
+            "status": "observed"
+          },
+          {
+            "date": "2009-01-08",
+            "value": -187.5,
+            "status": "observed"
+          },
+          {
+            "date": "2009-02-19",
+            "value": -212.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-06-25",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-10-01",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2010-12-31",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2011-04-01",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2011-07-01",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2015-09-25",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2015-12-18",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2016-03-25",
+            "value": -37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2016-07-01",
+            "value": -50,
+            "status": "observed"
+          },
+          {
+            "date": "2020-03-20",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-03-18",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-06-17",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-09-23",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2022-12-16",
+            "value": 62.5,
+            "status": "observed"
+          },
+          {
+            "date": "2023-03-24",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2024-03-22",
+            "value": 25,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_cbc_change_3m_bp",
+        "name": "Taiwan CBC Discount Rate 3M cumulative change",
+        "description": "Policy-rate level/change velocity.",
+        "pillar": "context",
+        "units": "basis points",
+        "frequency": "irregular",
+        "polarity": "higher_is_riskier",
+        "comparison": "none"
+      },
+      "source": {
+        "provider": "Central Bank of the Republic of China (Taiwan)",
+        "dataset": "Policy rate history",
+        "series_id": "tw_cbc_change_3m_bp",
+        "url": "https://www.cbc.gov.tw/en/lp-695-2.html",
+        "license_note": "Official/first-party or FRED-distributed policy-rate source; retain attribution.",
+        "redistribution": "unknown",
+        "market_scope": "Taiwan",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2000-12-29",
+        "history_end": "2024-03-22",
+        "timezone": "UTC",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 2000,
+        "age_days": 914,
+        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "reason": "Irregular change-date series; old effective date can still be current."
+      },
+      "latest": {
+        "as_of": "2024-03-22",
+        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "value": 12.5,
+        "revision_tag": null
+      },
+      "baselines": [],
+      "summary": {
+        "observation_count": 51,
+        "rolling_percentile": 52.5,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2006-12-29",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-03-30",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-06-22",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-09-21",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-12-21",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-03-28",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-06-27",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-09-26",
+            "value": 0,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-09",
+            "value": -37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-30",
+            "value": -62.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-10",
+            "value": -87.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-12",
+            "value": -162.5,
+            "status": "observed"
+          },
+          {
+            "date": "2009-01-08",
+            "value": -200,
+            "status": "observed"
+          },
+          {
+            "date": "2009-02-19",
+            "value": -150,
+            "status": "observed"
+          },
+          {
+            "date": "2010-06-25",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-10-01",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-12-31",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2011-04-01",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2011-07-01",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2015-09-25",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2015-12-18",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2016-03-25",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2016-07-01",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2020-03-20",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-03-18",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-06-17",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-09-23",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-12-16",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2023-03-24",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2024-03-22",
+            "value": 12.5,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_cbc_change_6m_bp",
+        "name": "Taiwan CBC Discount Rate 6M cumulative change",
+        "description": "Policy-rate level/change velocity.",
+        "pillar": "context",
+        "units": "basis points",
+        "frequency": "irregular",
+        "polarity": "higher_is_riskier",
+        "comparison": "none"
+      },
+      "source": {
+        "provider": "Central Bank of the Republic of China (Taiwan)",
+        "dataset": "Policy rate history",
+        "series_id": "tw_cbc_change_6m_bp",
+        "url": "https://www.cbc.gov.tw/en/lp-695-2.html",
+        "license_note": "Official/first-party or FRED-distributed policy-rate source; retain attribution.",
+        "redistribution": "unknown",
+        "market_scope": "Taiwan",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2000-12-29",
+        "history_end": "2024-03-22",
+        "timezone": "UTC",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 2000,
+        "age_days": 914,
+        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "reason": "Irregular change-date series; old effective date can still be current."
+      },
+      "latest": {
+        "as_of": "2024-03-22",
+        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "value": 12.5,
+        "revision_tag": null
+      },
+      "baselines": [],
+      "summary": {
+        "observation_count": 48,
+        "rolling_percentile": 35,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2006-12-29",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-03-30",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2007-06-22",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2007-09-21",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2007-12-21",
+            "value": 50,
+            "status": "observed"
+          },
+          {
+            "date": "2008-03-28",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-06-27",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-09-26",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-09",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-30",
+            "value": -50,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-10",
+            "value": -75,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-12",
+            "value": -150,
+            "status": "observed"
+          },
+          {
+            "date": "2009-01-08",
+            "value": -212.5,
+            "status": "observed"
+          },
+          {
+            "date": "2009-02-19",
+            "value": -237.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-06-25",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-10-01",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2010-12-31",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2011-04-01",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2011-07-01",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2015-09-25",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2015-12-18",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2016-03-25",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2016-07-01",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2020-03-20",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-03-18",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-06-17",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-09-23",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-12-16",
+            "value": 37.5,
+            "status": "observed"
+          },
+          {
+            "date": "2023-03-24",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2024-03-22",
+            "value": 12.5,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_cbc_rate",
+        "name": "Taiwan CBC Discount Rate Rate",
+        "description": "Policy-rate level/change velocity.",
+        "pillar": "context",
+        "units": "percent",
+        "frequency": "irregular",
+        "polarity": "contextual",
+        "comparison": "basis_points"
+      },
+      "source": {
+        "provider": "Central Bank of the Republic of China (Taiwan)",
+        "dataset": "Policy rate history",
+        "series_id": "tw_cbc_rate",
+        "url": "https://www.cbc.gov.tw/en/lp-695-2.html",
+        "license_note": "Official/first-party or FRED-distributed policy-rate source; retain attribution.",
+        "redistribution": "unknown",
+        "market_scope": "Taiwan",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2000-12-29",
+        "history_end": "2024-03-22",
+        "timezone": "UTC",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 2000,
+        "age_days": 914,
+        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "reason": "Irregular change-date series; old effective date can still be current."
+      },
+      "latest": {
+        "as_of": "2024-03-22",
+        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "value": 2,
+        "revision_tag": null
+      },
+      "baselines": [],
+      "summary": {
+        "observation_count": 54,
+        "rolling_percentile": 57.5,
+        "recent_change": {
+          "value": 12.5,
+          "comparison": "basis_points"
+        },
+        "preview_observations": [
+          {
+            "date": "2006-12-29",
+            "value": 2.75,
+            "status": "observed"
+          },
+          {
+            "date": "2007-03-30",
+            "value": 2.875,
+            "status": "observed"
+          },
+          {
+            "date": "2007-06-22",
+            "value": 3.125,
+            "status": "observed"
+          },
+          {
+            "date": "2007-09-21",
+            "value": 3.25,
+            "status": "observed"
+          },
+          {
+            "date": "2007-12-21",
+            "value": 3.375,
+            "status": "observed"
+          },
+          {
+            "date": "2008-03-28",
+            "value": 3.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-06-27",
+            "value": 3.625,
+            "status": "observed"
+          },
+          {
+            "date": "2008-09-26",
+            "value": 3.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-09",
+            "value": 3.25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-30",
+            "value": 3,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-10",
+            "value": 2.75,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-12",
+            "value": 2,
+            "status": "observed"
+          },
+          {
+            "date": "2009-01-08",
+            "value": 1.5,
+            "status": "observed"
+          },
+          {
+            "date": "2009-02-19",
+            "value": 1.25,
+            "status": "observed"
+          },
+          {
+            "date": "2010-06-25",
+            "value": 1.375,
+            "status": "observed"
+          },
+          {
+            "date": "2010-10-01",
+            "value": 1.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-12-31",
+            "value": 1.625,
+            "status": "observed"
+          },
+          {
+            "date": "2011-04-01",
+            "value": 1.75,
+            "status": "observed"
+          },
+          {
+            "date": "2011-07-01",
+            "value": 1.875,
+            "status": "observed"
+          },
+          {
+            "date": "2015-09-25",
+            "value": 1.75,
+            "status": "observed"
+          },
+          {
+            "date": "2015-12-18",
+            "value": 1.625,
+            "status": "observed"
+          },
+          {
+            "date": "2016-03-25",
+            "value": 1.5,
+            "status": "observed"
+          },
+          {
+            "date": "2016-07-01",
+            "value": 1.375,
+            "status": "observed"
+          },
+          {
+            "date": "2020-03-20",
+            "value": 1.125,
+            "status": "observed"
+          },
+          {
+            "date": "2022-03-18",
+            "value": 1.375,
+            "status": "observed"
+          },
+          {
+            "date": "2022-06-17",
+            "value": 1.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-09-23",
+            "value": 1.625,
+            "status": "observed"
+          },
+          {
+            "date": "2022-12-16",
+            "value": 1.75,
+            "status": "observed"
+          },
+          {
+            "date": "2023-03-24",
+            "value": 1.875,
+            "status": "observed"
+          },
+          {
+            "date": "2024-03-22",
+            "value": 2,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_cbc_step_bp",
+        "name": "Taiwan CBC Discount Rate Step",
+        "description": "Policy-rate level/change velocity.",
+        "pillar": "context",
+        "units": "basis points",
+        "frequency": "irregular",
+        "polarity": "higher_is_riskier",
+        "comparison": "none"
+      },
+      "source": {
+        "provider": "Central Bank of the Republic of China (Taiwan)",
+        "dataset": "Policy rate history",
+        "series_id": "tw_cbc_step_bp",
+        "url": "https://www.cbc.gov.tw/en/lp-695-2.html",
+        "license_note": "Official/first-party or FRED-distributed policy-rate source; retain attribution.",
+        "redistribution": "unknown",
+        "market_scope": "Taiwan",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2000-12-29",
+        "history_end": "2024-03-22",
+        "timezone": "UTC",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 2000,
+        "age_days": 914,
+        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "reason": "Irregular change-date series; old effective date can still be current."
+      },
+      "latest": {
+        "as_of": "2024-03-22",
+        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "value": 12.5,
+        "revision_tag": null
+      },
+      "baselines": [],
+      "summary": {
+        "observation_count": 53,
+        "rolling_percentile": 63.75,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2006-12-29",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-03-30",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-06-22",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2007-09-21",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2007-12-21",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-03-28",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-06-27",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-09-26",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-09",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-10-30",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-10",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-12",
+            "value": -75,
+            "status": "observed"
+          },
+          {
+            "date": "2009-01-08",
+            "value": -50,
+            "status": "observed"
+          },
+          {
+            "date": "2009-02-19",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2010-06-25",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-10-01",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2010-12-31",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2011-04-01",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2011-07-01",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2015-09-25",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2015-12-18",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2016-03-25",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2016-07-01",
+            "value": -12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2020-03-20",
+            "value": -25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-03-18",
+            "value": 25,
+            "status": "observed"
+          },
+          {
+            "date": "2022-06-17",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-09-23",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2022-12-16",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2023-03-24",
+            "value": 12.5,
+            "status": "observed"
+          },
+          {
+            "date": "2024-03-22",
+            "value": 12.5,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_declining_stocks",
+        "name": "TWSE Declining Stocks",
+        "description": "Number of TWSE-listed stocks closing below the prior close.",
+        "pillar": "breadth",
+        "units": "count",
+        "frequency": "daily",
+        "polarity": "higher_is_riskier",
+        "comparison": "absolute"
+      },
+      "source": {
+        "provider": "Taiwan Stock Exchange (TWSE)",
+        "dataset": "TWSE official market data",
+        "series_id": null,
+        "url": "https://dts.twse.com.tw/opendata/twtazu_od.csv",
+        "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+        "redistribution": "unknown",
+        "market_scope": "TWSE listed stocks",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2026-09-21",
+        "history_end": "2026-09-21",
+        "timezone": "Asia/Taipei",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 5,
+        "age_days": 1,
+        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-21",
+        "fetched_at": "2026-09-22T10:54:31.187834Z",
+        "value": 498,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 60,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-1260d",
+          "type": "rolling_percentile",
+          "window_observations": 1260,
+          "min_observations": 252,
+          "point_in_time": true,
+          "notes": "Approximate trailing five trading years."
+        }
+      ],
+      "summary": {
+        "observation_count": 1,
+        "rolling_percentile": null,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2026-09-21",
+            "value": 498,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_market_trade_value",
+        "name": "TWSE Market Trade Value",
+        "description": "TWSE daily aggregate market trade value.",
+        "pillar": "market",
+        "units": "TWD",
+        "frequency": "daily",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "Taiwan Stock Exchange (TWSE)",
+        "dataset": "TWSE official market data",
+        "series_id": null,
+        "url": "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+        "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+        "redistribution": "unknown",
+        "market_scope": "TWSE listed stocks",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2026-09-01",
+        "history_end": "2026-09-22",
+        "timezone": "Asia/Taipei",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 5,
+        "age_days": 1,
+        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-21",
+        "fetched_at": "2026-09-22T10:54:30.867967Z",
+        "value": 866817533778,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 60,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-1260d",
+          "type": "rolling_percentile",
+          "window_observations": 1260,
+          "min_observations": 252,
+          "point_in_time": true,
+          "notes": "Approximate trailing five trading years."
+        }
+      ],
+      "summary": {
+        "observation_count": 15,
+        "rolling_percentile": null,
+        "recent_change": {
+          "value": -24.11792806555203,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2026-09-01",
+            "value": 1187571567117,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 976499979054,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 993261606190,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 858244966564,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-07",
+            "value": 997944843239,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 922658079092,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 815976678108,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 750742811639,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 762245189934,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 665316266033,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 634706804618,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 675969528562,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 866619179411,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 1142321910407,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 866817533778,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_market_trade_volume",
+        "name": "TWSE Market Trade Volume",
+        "description": "TWSE daily aggregate market trade volume.",
+        "pillar": "market",
+        "units": "shares",
+        "frequency": "daily",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "Taiwan Stock Exchange (TWSE)",
+        "dataset": "TWSE official market data",
+        "series_id": null,
+        "url": "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+        "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+        "redistribution": "unknown",
+        "market_scope": "TWSE listed stocks",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "2026-09-01",
+        "history_end": "2026-09-22",
+        "timezone": "Asia/Taipei",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 5,
+        "age_days": 1,
+        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-21",
+        "fetched_at": "2026-09-22T10:54:30.867967Z",
+        "value": 10478763517,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 60,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-1260d",
+          "type": "rolling_percentile",
+          "window_observations": 1260,
+          "min_observations": 252,
+          "point_in_time": true,
+          "notes": "Approximate trailing five trading years."
+        }
+      ],
+      "summary": {
+        "observation_count": 15,
+        "rolling_percentile": null,
+        "recent_change": {
+          "value": -13.05488315579948,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2026-09-01",
+            "value": 13000849196,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 10824863832,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 11201667577,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 9267046831,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-07",
+            "value": 11024654794,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 9521469130,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 9258080220,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 8675764818,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 10111607761,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 8822022033,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 8228715551,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 8352607880,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 10710347398,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 12052158761,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 10478763517,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_taiex",
+        "name": "TAIEX",
+        "description": "Taiwan Stock Exchange Capitalization Weighted Stock Index close.",
+        "pillar": "market",
+        "units": "index",
+        "frequency": "daily",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "Taiwan Stock Exchange (TWSE)",
+        "dataset": "TWSE official market data",
+        "series_id": null,
+        "url": "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+        "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+        "redistribution": "unknown",
+        "market_scope": "TWSE listed stocks",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "1999-01-05",
+        "history_end": "2026-09-22",
+        "timezone": "Asia/Taipei",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 5,
+        "age_days": 0,
+        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-22",
+        "fetched_at": "2026-09-22T10:54:30.867967Z",
+        "value": 47800.17,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 60,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-1260d",
+          "type": "rolling_percentile",
+          "window_observations": 1260,
+          "min_observations": 252,
+          "point_in_time": true,
+          "notes": "Approximate trailing five trading years."
+        }
+      ],
+      "summary": {
+        "observation_count": 6869,
+        "rolling_percentile": 100,
+        "recent_change": {
+          "value": 0.17043582786171463,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2026-08-12",
+            "value": 45518.07,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-13",
+            "value": 46021.48,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-14",
+            "value": 45811.01,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-17",
+            "value": 45857.27,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-18",
+            "value": 45308.68,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-19",
+            "value": 44719.35,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-20",
+            "value": 44933.74,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-21",
+            "value": 45224.29,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-24",
+            "value": 44762.32,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-25",
+            "value": 45169.46,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 45832.62,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-27",
+            "value": 45975.22,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-28",
+            "value": 46331.45,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 46128.47,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 46948.72,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 46164.72,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 45857.66,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 46551.13,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-07",
+            "value": 47326.27,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 47105.78,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 47183.36,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 46940.49,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 46184.85,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 45862.52,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 45511.49,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 45848.9,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 46288,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 47180.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 47718.84,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 47800.17,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "tw_taiex_high",
+        "name": "TAIEX High",
+        "description": "TAIEX daily high index.",
+        "pillar": "market",
+        "units": "index",
+        "frequency": "daily",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "Taiwan Stock Exchange (TWSE)",
+        "dataset": "TWSE official market data",
+        "series_id": null,
+        "url": "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+        "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+        "redistribution": "unknown",
+        "market_scope": "TWSE listed stocks",
+        "membership_mode": null,
+        "membership_snapshot": null,
+        "price_adjustment": null,
+        "point_in_time_membership": null
+      },
+      "coverage": {
+        "history_start": "1999-01-05",
+        "history_end": "2026-09-22",
+        "timezone": "Asia/Taipei",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 5,
+        "age_days": 0,
+        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-22",
+        "fetched_at": "2026-09-22T10:54:30.867967Z",
+        "value": 48601.53,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 60,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-1260d",
+          "type": "rolling_percentile",
+          "window_observations": 1260,
+          "min_observations": 252,
+          "point_in_time": true,
+          "notes": "Approximate trailing five trading years."
+        }
+      ],
+      "summary": {
+        "observation_count": 6869,
+        "rolling_percentile": 100,
+        "recent_change": {
+          "value": 1.7812199875269386,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2026-08-12",
+            "value": 45529.48,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-13",
+            "value": 46216.41,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-14",
+            "value": 46402.6,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-17",
+            "value": 46189.3,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-18",
+            "value": 46064.09,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-19",
+            "value": 45071.34,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-20",
+            "value": 45160.05,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-21",
+            "value": 45254.84,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-24",
+            "value": 45362.3,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-25",
+            "value": 45169.46,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 45878.39,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-27",
+            "value": 46401.78,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-28",
+            "value": 46574.52,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 46224.69,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 46948.72,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 46946.6,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 46517.45,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 46620.96,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-07",
+            "value": 47429.58,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 47578.24,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 47548.26,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 47130.96,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 46651.21,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 46050.24,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 46009.85,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 46077.82,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 46874.84,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 47180.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 47750.98,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 48601.53,
+            "status": "observed"
+          }
+        ]
+      }
     }
   ]
 }
