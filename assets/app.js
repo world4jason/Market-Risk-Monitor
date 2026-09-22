@@ -1258,6 +1258,25 @@ function renderMaBreadthStudy() {
 function renderTrendParticipationChart() {
   const element = $("#ma-chart");
   const metrics = maBreadthMetrics();
+  const summaryOnly = Object.values(metrics).filter(
+    (metric) => metric && !Array.isArray(metric.observations),
+  );
+  if (summaryOnly.length) {
+    element.innerHTML =
+      '<div class="empty-state compact"><strong>Trend Participation history is available on demand.</strong><button id="ma-load-history" class="text-button" type="button">Load breadth history</button></div>';
+    $("#ma-load-history")?.addEventListener("click", async (event) => {
+      event.currentTarget.disabled = true;
+      event.currentTarget.textContent = "Loading…";
+      const ids = summaryOnly.map((metric) => metric.metric.id);
+      const results = await Promise.allSettled(ids.map(ensureMetricLoaded));
+      const failed = results.filter((result) => result.status === "rejected").length;
+      if (failed) {
+        console.warn("moving-average breadth history load failed", failed);
+      }
+      renderTrendParticipationChart();
+    });
+    return;
+  }
   const lines = [20, 50, 200]
     .map((horizon) => ({
       horizon,
