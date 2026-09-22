@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from pipeline.artifacts import write_json_artifact as atomic_json
 from pipeline.ma_breadth_study import build_event_study
 from pipeline.validate import validate_metric
 
@@ -17,13 +18,6 @@ def load_metric(path: Path) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     validate_metric(payload)
     return payload
-
-
-def atomic_json(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    tmp.replace(path)
 
 
 def main() -> None:

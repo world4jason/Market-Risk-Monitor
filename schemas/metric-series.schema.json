@@ -35,7 +35,8 @@
         "pillar",
         "units",
         "frequency",
-        "polarity"
+        "polarity",
+        "comparison"
       ],
       "properties": {
         "id": {
@@ -80,6 +81,16 @@
             "lower_is_riskier",
             "contextual",
             "neutral"
+          ]
+        },
+        "comparison": {
+          "description": "Declared period-to-period comparison semantics; see docs/presentation-contract.md.",
+          "enum": [
+            "absolute",
+            "percent_change",
+            "percentage_points",
+            "basis_points",
+            "none"
           ]
         }
       }

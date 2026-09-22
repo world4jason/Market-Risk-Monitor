@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from pipeline.artifacts import write_json_artifact as atomic_json
 from pipeline.ma_breadth import audit_rows, build_ma_breadth_metrics, parse_ma_breadth_csv
 from pipeline.ma_breadth_self_compute import (
     compute_point_in_time_breadth,
@@ -40,13 +41,6 @@ def fetch_text(url: str, timeout: int = 60) -> str:
     )
     with urlopen(req, timeout=timeout) as response:
         return response.read().decode("utf-8-sig")
-
-
-def atomic_json(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    tmp.replace(path)
 
 
 def main() -> None:

@@ -8,6 +8,8 @@ from collections import deque
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from .artifacts import write_json_artifact
+
 
 class TaiwanTrendBreadthError(ValueError):
     pass
@@ -569,22 +571,10 @@ def compute_from_panel(
         output_dir.mkdir(parents=True, exist_ok=True)
         metrics = build_metrics(daily, meta)
         for metric_id, metric in metrics.items():
-            dest = output_dir / f"{metric_id}.json"
-            tmp = dest.with_suffix(".json.tmp")
-            tmp.write_text(
-                json.dumps(metric, indent=2, ensure_ascii=False) + "\n",
-                encoding="utf-8",
-            )
-            tmp.replace(dest)
+            write_json_artifact(output_dir / f"{metric_id}.json", metric)
 
         audit_path = output_dir / "taiwan-trend-breadth-audit.json"
-        tmp = audit_path.with_suffix(".json.tmp")
-        tmp.write_text(
-            json.dumps(build_audit(daily, meta), indent=2, ensure_ascii=False)
-            + "\n",
-            encoding="utf-8",
-        )
-        tmp.replace(audit_path)
+        write_json_artifact(audit_path, build_audit(daily, meta))
 
         return {
             **meta,
