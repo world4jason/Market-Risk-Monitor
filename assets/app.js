@@ -703,9 +703,7 @@ function metricCard(metric) {
   const cText = formatChange(change);
   const context = beginnerContext[metric.metric.id];
   const title = context?.plain_name || metric.metric.name;
-  const contextOnly = metric.metric.polarity === "contextual" && pct != null
-    ? " · context only"
-    : "";
+  const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
   return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" tabindex="0">
     <div class="metric-card-top">
@@ -2010,7 +2008,7 @@ function openMetric(id) {
     : "Snapshot fetched";
   $("#dialog-source").innerHTML =
     `${metricContextGuide(metric)}
-     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)}${metric.metric.polarity === "contextual" ? " This rank is context only; it is not a risk direction." : ""}</p>`}
+     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)}${percentileContextSuffix(metric) ? " This rank is context only; it is not a risk direction." : ""}</p>`}
      <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
      ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
 
