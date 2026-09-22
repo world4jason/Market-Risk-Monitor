@@ -161,6 +161,7 @@ class UiContractTests(unittest.TestCase):
         self.assertIn(".mode-nav { display: none; }", mobile_css)
         self.assertIn(".decision-summary", mobile_css)
         self.assertIn("grid-template-columns: 1fr;", mobile_css)
+        self.assertIn(".history-layout .section-heading { flex-direction: column; }", mobile_css)
 
     def test_every_lead_metric_has_every_required_beginner_field(self) -> None:
         required_metrics = (
