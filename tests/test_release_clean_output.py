@@ -108,6 +108,196 @@ class FredAllowlistGatingTests(unittest.TestCase):
         self.assertFalse(self.module.should_run_fred(self.Args()))
 
 
+class GroupedSourceFailureTests(unittest.TestCase):
+    """
+    A single fetch can produce several metrics.
+
+    When a grouped source fails it names one representative metric in the
+    report, so --clean-output must be told the whole group it speaks for.
+    Inferring the preserved set from that one name would prune the siblings the
+    failed refresh was meant to preserve, breaking the contract in docs/qa.md
+    that a failed refresh never deletes a prior real metric file.
+    """
+
+    def setUp(self):
+        self.module = load_refresh_module()
+        self.module.WRITTEN_ARTIFACTS.clear()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def seed_group(self, metric_ids):
+        for metric_id in metric_ids:
+            (self.out / f"{metric_id}.json").write_text(
+                json.dumps(metric_artifact(metric_id)), encoding="utf-8"
+            )
+
+    def test_failed_taiex_refresh_keeps_every_sibling_snapshot(self):
+        group = self.module.TAIEX_GROUP_METRIC_IDS
+        self.seed_group(group)
+        # Something unrelated did succeed this run.
+        self.module.atomic_json(self.out / "vix.json", metric_artifact("vix"))
+
+        report = [
+            {
+                "metric": "tw_taiex",
+                "status": "error",
+                "error": "TWSE fetch failed",
+                "preserved_previous": True,
+                "preserved_metric_ids": group,
+            }
+        ]
+
+        removed = self.module.prune_unwritten_artifacts(
+            self.out,
+            preserved_metric_ids=self.module.preserved_ids_from_report(report),
+        )
+
+        self.assertEqual(removed, [])
+        for metric_id in group:
+            self.assertTrue(
+                (self.out / f"{metric_id}.json").exists(),
+                f"{metric_id} was pruned despite a preserved failure",
+            )
+
+    def test_failed_breadth_refresh_keeps_every_sibling_snapshot(self):
+        group = self.module.TAIWAN_BREADTH_GROUP_METRIC_IDS
+        self.seed_group(group)
+
+        report = [
+            {
+                "metric": "tw_advance_decline_diff",
+                "status": "error",
+                "error": "MI_INDEX fetch failed",
+                "preserved_previous": True,
+                "preserved_metric_ids": group,
+            }
+        ]
+
+        removed = self.module.prune_unwritten_artifacts(
+            self.out,
+            preserved_metric_ids=self.module.preserved_ids_from_report(report),
+        )
+
+        self.assertEqual(removed, [])
+        self.assertEqual(len(list(self.out.glob("*.json"))), len(group))
+
+    def test_inferring_the_group_from_the_reported_name_would_lose_siblings(self):
+        # Guards the regression directly: with only the representative id
+        # preserved, the siblings are pruned.
+        group = self.module.TAIEX_GROUP_METRIC_IDS
+        self.seed_group(group)
+
+        removed = self.module.prune_unwritten_artifacts(
+            self.out,
+            preserved_metric_ids={"tw_taiex"},
+        )
+
+        self.assertNotIn("tw_taiex.json", removed)
+        self.assertEqual(len(removed), len(group) - 1)
+
+    def test_an_entry_without_a_declared_group_speaks_only_for_itself(self):
+        report = [
+            {
+                "metric": "vix",
+                "status": "error",
+                "error": "Cboe fetch failed",
+                "preserved_previous": True,
+            }
+        ]
+        self.assertEqual(
+            self.module.preserved_ids_from_report(report),
+            {"vix"},
+        )
+
+    def test_a_failure_that_preserved_nothing_contributes_nothing(self):
+        report = [
+            {
+                "metric": "vix",
+                "status": "error",
+                "error": "Cboe fetch failed",
+                "preserved_previous": False,
+            },
+            {"metric": "nfci", "status": "updated"},
+        ]
+        self.assertEqual(self.module.preserved_ids_from_report(report), set())
+
+    def test_a_real_twse_outage_preserves_both_groups(self):
+        # Drives refresh_twse_current() itself rather than a hand-written
+        # report. That distinction matters: a hand-written report hid the fact
+        # that a TAIEX failure returns early, so the breadth group was never
+        # attempted, never reported, and therefore never preserved -- a failure
+        # in one group silently deleted the other group's snapshots.
+        group = (
+            self.module.TAIEX_GROUP_METRIC_IDS
+            + self.module.TAIWAN_BREADTH_GROUP_METRIC_IDS
+        )
+        self.seed_group(group)
+
+        def outage(*args, **kwargs):
+            raise RuntimeError("simulated TWSE outage")
+
+        self.module.fetch_fmtqik_current = outage
+        self.module.fetch_market_breadth_day = outage
+
+        report = self.module.refresh_twse_current(self.out)
+
+        self.assertTrue(all(item["status"] == "error" for item in report))
+        self.assertEqual(
+            {item["metric"] for item in report},
+            {"tw_taiex", "tw_advance_decline_diff"},
+            "both groups must report, so both can be preserved",
+        )
+
+        removed = self.module.prune_unwritten_artifacts(
+            self.out,
+            preserved_metric_ids=self.module.preserved_ids_from_report(report),
+        )
+
+        self.assertEqual(removed, [])
+        self.assertEqual(
+            sorted(p.stem for p in self.out.glob("*.json")),
+            sorted(group),
+        )
+
+    def test_group_constants_match_what_the_builders_produce(self):
+        # The constants exist so a failed fetch can declare its group without
+        # the builder's output. This asserts they cannot drift apart.
+        from datetime import datetime, timezone
+
+        from pipeline.taiwan_twse import (
+            build_taiex_metrics,
+            build_taiwan_breadth_metrics,
+        )
+
+        fetched_at = datetime(2026, 1, 3, tzinfo=timezone.utc)
+        taiex = build_taiex_metrics(
+            [
+                {"date": "2026-01-01", "close": 1.0, "open": 1.0, "high": 1.0,
+                 "low": 1.0, "trade_value": 1.0, "trade_volume": 1},
+                {"date": "2026-01-02", "close": 2.0, "open": 2.0, "high": 2.0,
+                 "low": 2.0, "trade_value": 2.0, "trade_volume": 2},
+            ],
+            fetched_at,
+        )
+        breadth = build_taiwan_breadth_metrics(
+            [
+                {"date": "2026-01-01", "advancing": 1, "declining": 1,
+                 "unchanged": 1, "limit_up": 0, "limit_down": 0, "unmatched": 0},
+                {"date": "2026-01-02", "advancing": 2, "declining": 1,
+                 "unchanged": 1, "limit_up": 0, "limit_down": 0, "unmatched": 0},
+            ],
+            fetched_at,
+        )
+
+        self.assertEqual(
+            sorted(self.module.TAIEX_GROUP_METRIC_IDS), sorted(taiex)
+        )
+        self.assertEqual(
+            sorted(self.module.TAIWAN_BREADTH_GROUP_METRIC_IDS), sorted(breadth)
+        )
+
+
 class CleanOutputTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()

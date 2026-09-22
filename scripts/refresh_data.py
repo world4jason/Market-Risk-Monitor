@@ -94,6 +94,50 @@ def atomic_json(path: Path, payload: dict) -> None:
     WRITTEN_ARTIFACTS.add(path.resolve())
 
 
+# A single fetch can produce several metrics. When one fails, the report names
+# one representative metric, so the preserved set has to be declared explicitly
+# rather than inferred from that name -- otherwise --clean-output prunes the
+# siblings that the failed refresh was supposed to preserve.
+#
+# tests/test_release_clean_output.py asserts these match what the builders
+# actually produce, so they cannot drift.
+TAIEX_GROUP_METRIC_IDS = [
+    "tw_market_trade_value",
+    "tw_market_trade_volume",
+    "tw_taiex",
+    "tw_taiex_high",
+    "tw_taiex_low",
+    "tw_taiex_open",
+]
+
+TAIWAN_BREADTH_GROUP_METRIC_IDS = [
+    "tw_advance_decline_diff",
+    "tw_advance_decline_line",
+    "tw_advance_decline_pct",
+    "tw_advancing_stocks",
+    "tw_declining_stocks",
+    "tw_unchanged_stocks",
+]
+
+
+def preserved_ids_from_report(report: list[dict]) -> set[str]:
+    """
+    Metric ids a failed source deliberately kept a previous snapshot for.
+
+    An entry may declare the whole group it speaks for; otherwise it speaks
+    only for itself.
+    """
+    preserved: set[str] = set()
+    for item in report:
+        if item.get("status") != "error" or not item.get("preserved_previous"):
+            continue
+        preserved.update(
+            item.get("preserved_metric_ids") or [item.get("metric")]
+        )
+    preserved.discard(None)
+    return preserved
+
+
 def should_run_fred(args) -> bool:
     """
     --fred-id is an allowlist, not merely a filter.
@@ -385,9 +429,30 @@ def refresh_twse_current(output_dir: Path) -> list[dict]:
                 "metric": "tw_taiex",
                 "status": "error",
                 "error": str(exc),
-                "preserved_previous": (
-                    output_dir / "tw_taiex.json"
-                ).exists(),
+                "preserved_previous": any(
+                    (output_dir / f"{metric_id}.json").exists()
+                    for metric_id in TAIEX_GROUP_METRIC_IDS
+                ),
+                "preserved_metric_ids": TAIEX_GROUP_METRIC_IDS,
+            }
+        )
+        # Breadth needs the latest session date from the TAIEX fetch, so it
+        # cannot run. Say so: a dependent group that was never attempted must
+        # still declare its previous snapshots as preserved, or --clean-output
+        # deletes them on the strength of a failure elsewhere.
+        report.append(
+            {
+                "metric": "tw_advance_decline_diff",
+                "status": "error",
+                "error": (
+                    "not attempted: TWSE breadth needs the latest session date "
+                    f"from the TAIEX fetch, which failed ({exc})"
+                ),
+                "preserved_previous": any(
+                    (output_dir / f"{metric_id}.json").exists()
+                    for metric_id in TAIWAN_BREADTH_GROUP_METRIC_IDS
+                ),
+                "preserved_metric_ids": TAIWAN_BREADTH_GROUP_METRIC_IDS,
             }
         )
         return report
@@ -410,9 +475,11 @@ def refresh_twse_current(output_dir: Path) -> list[dict]:
                 "metric": "tw_advance_decline_diff",
                 "status": "error",
                 "error": str(exc),
-                "preserved_previous": (
-                    output_dir / "tw_advance_decline_diff.json"
-                ).exists(),
+                "preserved_previous": any(
+                    (output_dir / f"{metric_id}.json").exists()
+                    for metric_id in TAIWAN_BREADTH_GROUP_METRIC_IDS
+                ),
+                "preserved_metric_ids": TAIWAN_BREADTH_GROUP_METRIC_IDS,
             }
         )
     return report
@@ -1012,14 +1079,9 @@ def main() -> None:
     # otherwise be baked into them.
     removed_artifacts = []
     if args.clean_output:
-        preserved = {
-            item["metric"]
-            for item in report
-            if item.get("status") == "error" and item.get("preserved_previous")
-        }
         removed_artifacts = prune_unwritten_artifacts(
             args.output_dir,
-            preserved_metric_ids=preserved,
+            preserved_metric_ids=preserved_ids_from_report(report),
         )
 
     # Derived Fed policy velocity is rebuilt whenever raw target series exist.
