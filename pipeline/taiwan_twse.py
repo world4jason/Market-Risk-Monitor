@@ -242,6 +242,7 @@ def _parse_count_and_limit(value) -> tuple[int | None, int | None]:
 # The last column is 股票 (Stocks); the middle one is 整體市場 (all securities,
 # including warrants and ETFs) and must never be used for stock breadth.
 _MI_INDEX_STOCKS_FIELD = "股票"
+_MI_INDEX_OVERALL_FIELD = "整體市場"
 _MI_INDEX_BREADTH_TITLE = "漲跌證券數"
 _MI_INDEX_LEGACY_STOCKS_COLUMN = 2
 
@@ -257,8 +258,13 @@ def _mi_index_breadth_rows(payload: dict) -> tuple[list, int]:
     while index 8 is empty, so reading a fixed position silently picks up the
     wrong table or none at all.
 
-    Match on the table's own field signature instead, and derive the Stocks
-    column from `fields` rather than assuming its position.
+    Match on the table's own signature instead, and derive the Stocks column
+    from `fields` rather than assuming its position.
+
+    A bare "股票" field is not sufficient on its own: any future table that
+    happens to carry a stock column would match it first. A table qualifies
+    only if its title names the breadth table, or its fields carry the
+    overall-market/Stocks pair that only the breadth table has.
     """
     tables = payload.get("tables")
     if isinstance(tables, list):
@@ -267,15 +273,21 @@ def _mi_index_breadth_rows(payload: dict) -> tuple[list, int]:
                 continue
             fields = table.get("fields") or []
             title = str(table.get("title") or "")
-            if _MI_INDEX_STOCKS_FIELD in fields:
-                return table.get("data") or [], fields.index(
-                    _MI_INDEX_STOCKS_FIELD
-                )
-            if _MI_INDEX_BREADTH_TITLE in title:
-                return (
-                    table.get("data") or [],
-                    _MI_INDEX_LEGACY_STOCKS_COLUMN,
-                )
+
+            titled = _MI_INDEX_BREADTH_TITLE in title
+            paired = (
+                _MI_INDEX_STOCKS_FIELD in fields
+                and _MI_INDEX_OVERALL_FIELD in fields
+            )
+            if not (titled or paired):
+                continue
+
+            column = (
+                fields.index(_MI_INDEX_STOCKS_FIELD)
+                if _MI_INDEX_STOCKS_FIELD in fields
+                else _MI_INDEX_LEGACY_STOCKS_COLUMN
+            )
+            return table.get("data") or [], column
 
     legacy = payload.get("data8") or payload.get("data") or []
     return legacy, _MI_INDEX_LEGACY_STOCKS_COLUMN

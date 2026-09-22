@@ -166,6 +166,44 @@ class TaiwanTwseTests(unittest.TestCase):
         self.assertEqual(row["unchanged"], 78)
         self.assertEqual(row["unmatched"], 1)
 
+    def test_unrelated_table_with_a_stock_column_is_not_mistaken_for_breadth(self):
+        # A bare 股票 field is not enough to identify the breadth table; only
+        # the breadth title or the overall-market/Stocks pair qualifies.
+        payload = {
+            "stat": "OK",
+            "date": "20260918",
+            "type": "MS",
+            "tables": [
+                {
+                    "title": "某個未來新增的統計表",
+                    "fields": ["類型", "股票"],
+                    "data": [
+                        ["上漲(漲停)", "1(0)"],
+                        ["下跌(跌停)", "2(0)"],
+                        ["持平", "3"],
+                        ["未成交", "4"],
+                        ["無比價", "5"],
+                    ],
+                },
+                {
+                    "title": "漲跌證券數合計",
+                    "fields": ["類型", "整體市場", "股票"],
+                    "data": [
+                        ["上漲(漲停)", "9,531(119)", "748(32)"],
+                        ["下跌(跌停)", "4,331(55)", "251(0)"],
+                        ["持平", "968", "78"],
+                        ["未成交", "16,946", "1"],
+                        ["無比價", "3,432", "0"],
+                    ],
+                },
+            ],
+        }
+        row = parse_mi_index_market_summary_json(
+            json.dumps(payload, ensure_ascii=False)
+        )
+        self.assertEqual(row["advancing"], 748)
+        self.assertEqual(row["declining"], 251)
+
     def test_mi_index_missing_breadth_table_is_rejected(self):
         payload = {
             "stat": "OK",
