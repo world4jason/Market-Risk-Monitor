@@ -1079,9 +1079,27 @@ function renderTaiwanMarket() {
   });
 
   if (taiex) {
-    fullChart(taiex, chart);
+    const observationCount = usableObservationCount(taiex);
     status.textContent =
-      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${taiex.observations.length.toLocaleString()} observations · ${taiexFreshness}`;
+      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${observationCount.toLocaleString()} observations · ${taiexFreshness}`;
+    if (Array.isArray(taiex.observations)) {
+      fullChart(taiex, chart);
+    } else {
+      chart.innerHTML =
+        '<div class="empty-state compact"><strong>TAIEX history is available on demand.</strong><button id="tw-load-history" class="text-button" type="button">Load TAIEX history</button></div>';
+      $("#tw-load-history")?.addEventListener("click", async (event) => {
+        event.currentTarget.disabled = true;
+        event.currentTarget.textContent = "Loading…";
+        try {
+          await ensureMetricLoaded("tw_taiex");
+          renderTaiwanMarket();
+        } catch (error) {
+          console.warn("TAIEX history load failed", error);
+          chart.innerHTML =
+            '<div class="empty-state compact">TAIEX history could not be loaded. Current summary data remains available.</div>';
+        }
+      });
+    }
   } else {
     chart.innerHTML =
       '<div class="empty-state compact">TAIEX snapshot is unavailable in the current release.</div>';
@@ -1508,7 +1526,7 @@ function renderHistorySelector() {
   const mode = $("#history-mode");
   const metrics = [...state.metrics.values()].filter(
     (m) =>
-      (m.observations || []).length > 1 &&
+      usableObservationCount(m) > 1 &&
       m.metric.pillar !== "context" &&
       !isTaiwanMetric(m),
   );
@@ -1520,22 +1538,38 @@ function renderHistorySelector() {
     return;
   }
 
-  select.innerHTML = metrics
-    .map(
+  select.innerHTML = [
+    '<option value="">Select a metric to load history</option>',
+    ...metrics.map(
       (m) =>
         `<option value="${escapeHtml(m.metric.id)}">${escapeHtml(m.metric.name)}</option>`,
-    )
-    .join("");
+    ),
+  ].join("");
 
-  const rerender = () => renderHistory(select.value, mode.value);
+  const rerender = async () => {
+    if (!select.value) {
+      $("#history-chart").innerHTML =
+        '<div class="empty-state compact">Select a metric to load its full history.</div>';
+      return;
+    }
+    await renderHistory(select.value, mode.value);
+  };
   select.onchange = rerender;
   mode.onchange = rerender;
-  renderHistory(select.value, mode.value);
+  $("#history-chart").innerHTML =
+    '<div class="empty-state compact">Select a metric to load its full history.</div>';
 }
 
-function renderHistory(id, mode = "absolute") {
-  const metric = state.metrics.get(id);
-  if (!metric) return;
+async function renderHistory(id, mode = "absolute") {
+  let metric;
+  try {
+    metric = await ensureMetricLoaded(id);
+  } catch (error) {
+    console.warn("history load failed", id, error);
+    $("#history-chart").innerHTML =
+      '<div class="empty-state compact">This metric history could not be loaded.</div>';
+    return;
+  }
 
   const view = historyView(metric, mode);
   fullChart(view, $("#history-chart"));
@@ -1705,7 +1739,7 @@ function renderTaiwanEventSelector() {
     .filter(
       (metric) =>
         isTaiwanMetric(metric) &&
-        (metric.observations || []).filter((o) => o.value != null).length > 1,
+        usableObservationCount(metric) > 1,
     )
     .sort((a, b) => a.metric.name.localeCompare(b.metric.name));
 
@@ -1715,28 +1749,39 @@ function renderTaiwanEventSelector() {
     return;
   }
 
-  const previous = select.value;
-  select.innerHTML = metrics
-    .map(
+  const previous = select.dataset.initialized === "true" ? select.value : "";
+  select.innerHTML = [
+    '<option value="">Select a Taiwan metric</option>',
+    ...metrics.map(
       (metric) =>
         `<option value="${escapeHtml(metric.metric.id)}">${escapeHtml(metric.metric.name)}</option>`,
-    )
-    .join("");
-
+    ),
+  ].join("");
+  select.dataset.initialized = "true";
   if (previous && metrics.some((m) => m.metric.id === previous)) {
     select.value = previous;
-  } else if (metrics.some((m) => m.metric.id === "tw_taiex")) {
-    select.value = "tw_taiex";
   }
 
-  const rerender = () =>
-    renderTaiwanEvents(
-      state.metrics.get(select.value) || null,
-      mode.value,
-    );
+  const rerender = async () => {
+    if (!select.value) {
+      renderTaiwanEvents(null, mode.value);
+      return;
+    }
+    try {
+      const metric = await ensureMetricLoaded(select.value);
+      renderTaiwanEvents(metric, mode.value);
+    } catch (error) {
+      console.warn("Taiwan history load failed", select.value, error);
+      $("#tw-event-list").innerHTML = "";
+      $("#tw-event-chart").innerHTML =
+        '<div class="empty-state compact">This Taiwan metric history could not be loaded.</div>';
+    }
+  };
   select.onchange = rerender;
   mode.onchange = rerender;
-  rerender();
+
+  if (previous && select.value) rerender();
+  else renderTaiwanEvents(null, mode.value);
 }
 
 function renderTaiwanEvents(metric, mode = "normalized") {
@@ -2277,23 +2322,31 @@ function initTheme() {
 
 async function loadData() {
   state.metrics.clear();
+  state.metricLoads.clear();
 
   try {
-    const [catalogResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp, twEventsResp, twCbcRateResp, fedRateResp] = await Promise.all([
+    const [catalogResp, overviewResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp, twEventsResp, twCbcRateResp, fedRateResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
-      fetch(EVENTS_URL, { cache: "no-store" }),
+      fetch(OVERVIEW_URL, { cache: "no-store" }),
+      fetch(EVENTS_URL),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
       fetch(REFRESH_REPORT_URL, { cache: "no-store" }).catch(() => null),
-      fetch(MA_BREADTH_CONFIG_URL, { cache: "no-store" }).catch(() => null),
-      fetch(MA_BREADTH_STUDY_URL, { cache: "no-store" }).catch(() => null),
-      fetch(TAIWAN_MACRO_REGIME_URL, { cache: "no-store" }).catch(() => null),
-      fetch(TAIWAN_EVENTS_URL, { cache: "no-store" }).catch(() => null),
-      fetch(TAIWAN_CBC_RATE_REGIME_URL, { cache: "no-store" }).catch(() => null),
-      fetch(FED_RATE_REGIME_URL, { cache: "no-store" }).catch(() => null),
+      fetch(MA_BREADTH_CONFIG_URL).catch(() => null),
+      fetch(MA_BREADTH_STUDY_URL).catch(() => null),
+      fetch(TAIWAN_MACRO_REGIME_URL).catch(() => null),
+      fetch(TAIWAN_EVENTS_URL).catch(() => null),
+      fetch(TAIWAN_CBC_RATE_REGIME_URL).catch(() => null),
+      fetch(FED_RATE_REGIME_URL).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
+    if (!overviewResp.ok) throw new Error(`overview HTTP ${overviewResp.status}`);
 
     state.catalog = await catalogResp.json();
+    const overview = await overviewResp.json();
+    for (const metric of overview.metrics || []) {
+      state.metrics.set(metric.metric.id, metric);
+    }
+
     state.events = eventsResp.ok
       ? (await eventsResp.json()).events || []
       : [];
@@ -2312,28 +2365,9 @@ async function loadData() {
       }
     }
 
-    $("#data-generated").textContent = state.catalog.generated_at
-      ? `Generated ${state.catalog.generated_at}`
-      : "No production refresh committed";
-
-    const entries = state.catalog.metrics || [];
-    const results = await Promise.all(
-      entries.map(async (entry) => {
-        try {
-          const url = new URL(entry.path.replace(/^\.\//, ""), METRIC_BASE);
-          const resp = await fetch(url, { cache: "no-store" });
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-          return await resp.json();
-        } catch (error) {
-          console.warn("metric load failed", entry.id, error);
-          return null;
-        }
-      }),
-    );
-
-    results
-      .filter(Boolean)
-      .forEach((metric) => state.metrics.set(metric.metric.id, metric));
+    $("#data-generated").textContent = overview.generated_at
+      ? `Overview generated ${overview.generated_at}`
+      : "Overview snapshot loaded";
   } catch (error) {
     console.error(error);
     $("#data-generated").textContent = "Snapshot load failed";
