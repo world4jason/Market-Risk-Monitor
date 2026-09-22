@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from pipeline.artifacts import write_json_artifact as atomic_json
 from pipeline.taiwan_twse import (
     build_taiex_metrics,
     fetch_taiex_month,
@@ -31,16 +32,6 @@ def month_iter(start: str, end: str):
         if cursor_m == 13:
             cursor_y += 1
             cursor_m = 1
-
-
-def atomic_json(path: Path, payload: dict):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-    tmp.replace(path)
 
 
 def main():

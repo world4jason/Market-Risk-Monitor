@@ -24,7 +24,7 @@ from pipeline.ma_breadth import (
 from pipeline.ma_breadth_study import (
     build_event_study as build_ma_breadth_event_study,
 )
-from pipeline.presentation import apply_presentation
+from pipeline.artifacts import write_json_artifact
 from pipeline.rate_velocity import (
     build_rate_metrics,
     build_rate_regime_artifact,
@@ -83,14 +83,9 @@ WRITTEN_ARTIFACTS: set[Path] = set()
 
 
 def atomic_json(path: Path, payload: dict) -> None:
-    # Declare comparison semantics at the single point every artifact is
-    # written, rather than in each builder where it would drift. Non-metric
-    # payloads pass through untouched.
-    payload = apply_presentation(payload)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    tmp.replace(path)
+    # pipeline.artifacts is the shared finalize/write path; this only adds the
+    # ledger the release prune needs.
+    write_json_artifact(path, payload)
     WRITTEN_ARTIFACTS.add(path.resolve())
 
 
