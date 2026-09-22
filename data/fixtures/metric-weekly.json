@@ -7,6 +7,7 @@
     "description": "Illustrative weekly contract fixture only.",
     "pillar": "financial_stress",
     "units": "index",
+    "comparison": "absolute",
     "frequency": "weekly",
     "polarity": "higher_is_riskier"
   },

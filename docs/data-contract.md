@@ -191,3 +191,31 @@ All are explicitly marked `environment: "fixture"` and must never be served as p
 Current schema version: `1.0.0`.
 
 Breaking contract changes require a schema-version bump. Additive source metadata can be introduced only if the schema and fixtures are updated together.
+
+### Before the first production release
+
+Making a previously absent field required is a breaking change by that rule.
+`metric.comparison` became required while every artifact still declared
+`schema_version: 1.0.0`, which is a contradiction worth naming rather than
+leaving implicit.
+
+No production data-backed release has yet been published under `1.0.0`.
+**Until that first release, this project treats `1.0.0` as a pre-release
+contract and does not guarantee compatibility across finalization changes.**
+After v0.1 publishes, breaking changes require a schema-version bump.
+
+This is a policy, not a claim about who is reading the repository. The repo is
+public, so we cannot assert that nothing consumes the contract; we can only
+state that nothing has been promised about it yet.
+
+The condition attached to that allowance is the part that matters: a
+finalization change must update the schema, `pipeline/validate.py`, every
+producer, and **all canonical fixtures and examples in the same change**.
+`metric.comparison` initially did not, and `data/fixtures/metric-*.json` were
+left violating the repository's own schema.
+
+`tests/test_artifact_writer.py` now validates every metric-shaped JSON in the
+repository outside `data/generated/` against the same JSON Schema
+`scripts/validate_data.py` applies, so an example cannot be left behind again.
+
+Once v0.1 is published this allowance ends, and the normal bump rule applies.

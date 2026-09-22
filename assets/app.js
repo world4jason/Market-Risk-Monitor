@@ -183,13 +183,56 @@ function rollingPercentile(metric) {
   return percentileRank(Number(obs.at(-1).value), baseline);
 }
 
+// Period-to-period change, in the comparison the artifact declares.
+//
+// A relative percent change is wrong for several metric classes: a policy rate
+// going 1.75% -> 2.00% is +25 bp, not +14.29%, and an index centred on zero has
+// no stable relative change at all. The artifact carries metric.comparison; see
+// docs/presentation-contract.md.
 function recentChange(metric) {
+  const comparison = metric.metric?.comparison || "absolute";
+  if (comparison === "none") return null;
+
   const obs = (metric.observations || []).filter((o) => o.value != null);
   if (obs.length < 2) return null;
   const prior = Number(obs.at(-2).value);
   const current = Number(obs.at(-1).value);
-  if (prior === 0) return null;
-  return ((current / prior) - 1) * 100;
+  if (!Number.isFinite(prior) || !Number.isFinite(current)) return null;
+
+  const delta = current - prior;
+  switch (comparison) {
+    case "percent_change":
+      if (prior === 0) return null;
+      return { value: ((current / prior) - 1) * 100, comparison };
+    case "basis_points":
+      return { value: delta * 100, comparison };
+    case "percentage_points":
+    case "absolute":
+      return { value: delta, comparison };
+    default:
+      return null;
+  }
+}
+
+// Single formatter shared by metric cards and the detail dialog.
+function formatChange(change) {
+  if (change == null) return "—";
+  const { value, comparison } = change;
+  if (!Number.isFinite(value)) return "—";
+  const sign = value >= 0 ? "+" : "";
+
+  if (comparison === "percent_change") return `${sign}${value.toFixed(2)}%`;
+  if (comparison === "basis_points") return `${sign}${value.toFixed(1)} bp`;
+  if (comparison === "percentage_points") return `${sign}${value.toFixed(2)} pp`;
+
+  // Absolute deltas span weekly NFCI moves of 0.004 and advance-decline counts
+  // in the hundreds. A fixed 2 decimals renders the former as "-0", so scale
+  // the precision to the magnitude and never report a non-zero change as zero.
+  const abs = Math.abs(value);
+  if (value === 0) return "0";
+  if (abs < 0.005) return `${sign}${Number(value.toPrecision(2))}`;
+  const digits = abs >= 1000 ? 0 : abs >= 1 ? 2 : 3;
+  return `${sign}${value.toLocaleString(undefined, { maximumFractionDigits: digits })}`;
 }
 
 function strictPastPercentileSeries(metric, { rolling = false } = {}) {
@@ -340,8 +383,7 @@ function metricCard(metric) {
   const pct = rollingPercentile(metric);
   const change = recentChange(metric);
   const pText = pct == null ? "—" : `${pct.toFixed(0)}th`;
-  const cText =
-    change == null ? "—" : `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+  const cText = formatChange(change);
 
   return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" tabindex="0">
     <div class="metric-card-top">
@@ -768,18 +810,21 @@ function renderRegime() {
       const stale = metricsForPillar.filter(
         (m) => effectiveFreshness(m).state !== "fresh",
       ).length;
-      const percentiles = metricsForPillar
-        .map(rollingPercentile)
-        .filter((v) => v != null)
-        .sort((a, b) => a - b);
-      const median = percentiles.length
-        ? percentiles[Math.floor(percentiles.length / 2)]
-        : null;
+      // No median of the pillar's percentiles.
+      //
+      // Percentiles are comparable as ranks but not as economics: a high
+      // volatility percentile means more stress, a high breadth percentile
+      // means stronger participation, and a high valuation percentile is
+      // context rather than either. A median across them reads as a pillar
+      // risk score, which is exactly the hidden composite this project
+      // refuses to publish. Each metric's own percentile stays visible on its
+      // own card, where its direction is legible.
+      const fresh = metricsForPillar.length - stale;
 
       return `<div class="regime-cell">
         <p class="eyebrow">${escapeHtml(pillarLabels[pillar] || pillar)}</p>
-        <div class="regime-value">${stale ? `${stale} stale / missing` : "Data current"}</div>
-        <div class="regime-note">${median == null ? "Historical context available" : `Median ${median.toFixed(0)}th pct`} · ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"}</div>
+        <div class="regime-value">${stale ? `${stale} not current` : "Data current"}</div>
+        <div class="regime-note">${fresh} of ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"} current</div>
       </div>`;
     })
     .join("");
@@ -1399,7 +1444,7 @@ function openMetric(id) {
   const related = relatedBreadthStats(metric);
   const baseStats = [
     { value: formatValue(metric.latest.value, metric.metric.units), label: "Current value" },
-    { value: change == null ? "—" : `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`, label: "Last observation" },
+    { value: formatChange(change), label: "Last observation" },
     { value: pct == null ? "—" : `${pct.toFixed(0)}th`, label: "Rolling percentile" },
     { value: escapeHtml(metric.latest.as_of || "—"), label: "Source observation" },
   ];
