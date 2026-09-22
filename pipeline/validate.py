@@ -240,6 +240,62 @@ def validate_catalog(payload: dict) -> None:
         raise ValidationError("catalog: duplicate metric id")
 
 
+def validate_overview(payload: dict) -> None:
+    if payload.get("schema_version") != "1.0.0":
+        raise ValidationError("overview: unsupported schema_version")
+    _datetime(payload["generated_at"], field="overview.generated_at")
+
+    ids = []
+    for row in payload.get("metrics", []):
+        metric = row.get("metric") or {}
+        metric_id = metric.get("id")
+        if not metric_id:
+            raise ValidationError("overview: metric id missing")
+        ids.append(metric_id)
+
+        if "observations" in row:
+            raise ValidationError(f"overview[{metric_id}]: full observations are forbidden")
+
+        freshness = (row.get("freshness") or {}).get("state")
+        if freshness not in ALLOWED_STATES:
+            raise ValidationError(f"overview[{metric_id}]: invalid freshness state")
+
+        comparison = metric.get("comparison")
+        if comparison not in ALLOWED_COMPARISONS:
+            raise ValidationError(f"overview[{metric_id}]: invalid comparison")
+
+        summary = row.get("summary") or {}
+        observation_count = summary.get("observation_count")
+        if not isinstance(observation_count, int) or observation_count < 0:
+            raise ValidationError(f"overview[{metric_id}]: invalid observation_count")
+
+        percentile = summary.get("rolling_percentile")
+        if percentile is not None:
+            if not isfinite(float(percentile)) or not 0 <= float(percentile) <= 100:
+                raise ValidationError(f"overview[{metric_id}]: invalid rolling_percentile")
+
+        change = summary.get("recent_change")
+        if change is not None:
+            if change.get("comparison") not in ALLOWED_COMPARISONS - {"none"}:
+                raise ValidationError(f"overview[{metric_id}]: invalid recent_change comparison")
+            value = change.get("value")
+            if value is None or not isfinite(float(value)):
+                raise ValidationError(f"overview[{metric_id}]: invalid recent_change value")
+
+        preview = summary.get("preview_observations", [])
+        if len(preview) > 30:
+            raise ValidationError(f"overview[{metric_id}]: preview exceeds 30 observations")
+        for item in preview:
+            _date(item["date"], field=f"overview[{metric_id}].preview.date")
+            if item.get("value") is not None and not isfinite(float(item["value"])):
+                raise ValidationError(f"overview[{metric_id}]: non-finite preview value")
+            if item.get("status") not in ALLOWED_OBSERVATION_STATUSES:
+                raise ValidationError(f"overview[{metric_id}]: invalid preview status")
+
+    if len(ids) != len(set(ids)):
+        raise ValidationError("overview: duplicate metric id")
+
+
 def validate_refresh_report(payload: dict) -> None:
     _datetime(payload["generated_at"], field="refresh-report.generated_at")
     for result in payload.get("results", []):
