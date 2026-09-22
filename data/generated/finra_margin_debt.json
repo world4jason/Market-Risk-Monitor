@@ -1,0 +1,1846 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "production",
+  "metric": {
+    "id": "finra_margin_debt",
+    "name": "FINRA Margin Debt",
+    "description": "FINRA monthly margin-statistics series.",
+    "pillar": "leverage",
+    "units": "USD millions",
+    "frequency": "monthly",
+    "polarity": "contextual"
+  },
+  "source": {
+    "provider": "FINRA",
+    "dataset": "Margin Statistics",
+    "series_id": null,
+    "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+    "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+    "redistribution": "unknown"
+  },
+  "coverage": {
+    "history_start": "1997-01-31",
+    "history_end": "2026-08-31",
+    "timezone": "America/New_York",
+    "expected_observation_lag_days": 25
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 70,
+    "age_days": 22,
+    "evaluated_at": "2026-09-22T05:42:46.308213Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "finra-raw-v2"
+  },
+  "baselines": [
+    {
+      "id": "expanding-pit",
+      "type": "full_history_percentile",
+      "window_observations": null,
+      "min_observations": 36,
+      "point_in_time": true,
+      "notes": "Strict-past expanding baseline."
+    },
+    {
+      "id": "rolling-120m",
+      "type": "rolling_percentile",
+      "window_observations": 120,
+      "min_observations": 36,
+      "point_in_time": true,
+      "notes": "Trailing ten-year monthly baseline."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-08-31",
+    "fetched_at": "2026-09-22T05:42:46.308213Z",
+    "value": 1453832.0,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "1997-01-31",
+      "value": 103337.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-02-28",
+      "value": 103886.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-03-31",
+      "value": 104835.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-04-30",
+      "value": 102842.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-05-30",
+      "value": 111097.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-06-30",
+      "value": 118843.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-07-31",
+      "value": 121090.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-08-29",
+      "value": 124404.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-09-30",
+      "value": 131962.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-10-31",
+      "value": 134491.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-11-28",
+      "value": 132741.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-12-31",
+      "value": 131560.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-01-30",
+      "value": 132912.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-02-27",
+      "value": 141328.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-03-31",
+      "value": 146536.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-04-30",
+      "value": 146589.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-05-29",
+      "value": 150293.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-06-30",
+      "value": 154357.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-07-31",
+      "value": 160980.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-08-31",
+      "value": 155879.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-09-30",
+      "value": 144541.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-10-30",
+      "value": 138399.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-11-30",
+      "value": 148697.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-12-31",
+      "value": 148674.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-01-29",
+      "value": 162322.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-02-26",
+      "value": 162909.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-03-31",
+      "value": 166212.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-04-30",
+      "value": 184329.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-05-31",
+      "value": 189950.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-06-30",
+      "value": 187695.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-07-30",
+      "value": 189503.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-08-31",
+      "value": 187616.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-09-30",
+      "value": 189741.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-10-29",
+      "value": 194259.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-11-30",
+      "value": 218304.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-12-31",
+      "value": 241967.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-01-31",
+      "value": 260409.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-02-29",
+      "value": 284206.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-03-31",
+      "value": 299933.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-04-28",
+      "value": 268716.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-05-31",
+      "value": 256862.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-06-30",
+      "value": 264471.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-07-31",
+      "value": 263729.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-08-31",
+      "value": 265166.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-09-29",
+      "value": 270208.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-10-31",
+      "value": 250965.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-11-30",
+      "value": 237913.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-12-29",
+      "value": 210385.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-01-31",
+      "value": 208687.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-02-28",
+      "value": 198887.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-03-30",
+      "value": 174797.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-04-30",
+      "value": 176096.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-05-31",
+      "value": 183041.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-06-29",
+      "value": 179585.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-07-31",
+      "value": 173680.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-08-31",
+      "value": 169316.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-09-28",
+      "value": 157931.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-10-31",
+      "value": 152367.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-11-30",
+      "value": 159440.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-12-31",
+      "value": 160473.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-01-31",
+      "value": 160906.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-02-28",
+      "value": 154931.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-03-29",
+      "value": 160089.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-04-30",
+      "value": 159072.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-05-31",
+      "value": 157802.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-06-28",
+      "value": 153972.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-07-31",
+      "value": 143905.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-08-30",
+      "value": 139146.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-09-30",
+      "value": 136107.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-10-31",
+      "value": 138647.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-11-29",
+      "value": 139472.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-12-31",
+      "value": 139451.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-01-31",
+      "value": 141391.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-02-28",
+      "value": 140516.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-03-31",
+      "value": 144267.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-04-30",
+      "value": 143237.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-05-30",
+      "value": 153725.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-06-30",
+      "value": 168281.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-07-31",
+      "value": 174427.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-08-29",
+      "value": 167200.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-09-30",
+      "value": 171194.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-10-31",
+      "value": 175428.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-11-28",
+      "value": 182587.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-12-31",
+      "value": 181459.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-01-30",
+      "value": 189429.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-02-27",
+      "value": 190448.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-03-31",
+      "value": 191451.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-04-30",
+      "value": 198778.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-05-31",
+      "value": 193843.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-06-30",
+      "value": 193993.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-07-30",
+      "value": 187844.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-08-31",
+      "value": 187828.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-09-30",
+      "value": 193668.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-10-29",
+      "value": 197999.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-11-30",
+      "value": 211012.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-12-31",
+      "value": 217573.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-01-31",
+      "value": 220122.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-02-28",
+      "value": 223155.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-03-31",
+      "value": 226876.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-04-29",
+      "value": 217447.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-05-31",
+      "value": 219404.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-06-30",
+      "value": 224153.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-07-29",
+      "value": 233585.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-08-31",
+      "value": 231400.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-09-30",
+      "value": 244669.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-10-31",
+      "value": 239868.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-11-30",
+      "value": 242904.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-12-30",
+      "value": 244098.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-01-31",
+      "value": 255795.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-02-28",
+      "value": 249609.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-03-31",
+      "value": 259370.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-04-28",
+      "value": 265164.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-05-31",
+      "value": 255608.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-06-30",
+      "value": 251495.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-07-31",
+      "value": 256016.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-08-31",
+      "value": 249368.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-09-29",
+      "value": 261769.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-10-31",
+      "value": 267710.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-11-30",
+      "value": 294899.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-12-29",
+      "value": 303288.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-01-31",
+      "value": 311506.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-02-28",
+      "value": 321171.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-03-30",
+      "value": 317737.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-04-30",
+      "value": 342084.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-05-31",
+      "value": 382312.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-06-29",
+      "value": 408444.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-07-31",
+      "value": 416403.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-08-31",
+      "value": 362475.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-09-28",
+      "value": 359104.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-10-31",
+      "value": 376979.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-11-30",
+      "value": 379593.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-12-31",
+      "value": 355292.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-01-31",
+      "value": 365592.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-02-29",
+      "value": 377088.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-03-31",
+      "value": 349419.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-04-30",
+      "value": 332303.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-05-30",
+      "value": 341610.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-06-30",
+      "value": 346892.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-07-31",
+      "value": 343297.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-08-29",
+      "value": 324814.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-09-30",
+      "value": 345745.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-10-31",
+      "value": 277568.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-11-28",
+      "value": 227334.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-12-31",
+      "value": 210185.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-01-30",
+      "value": 205007.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-02-27",
+      "value": 199655.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-03-31",
+      "value": 203967.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-04-30",
+      "value": 208010.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-05-29",
+      "value": 214401.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-06-30",
+      "value": 217140.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-07-31",
+      "value": 228734.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-08-31",
+      "value": 236251.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-09-30",
+      "value": 254107.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-10-30",
+      "value": 265404.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-11-30",
+      "value": 250988.0,
+      "status": "observed"
+    },
+    {
+      "date": "2009-12-31",
+      "value": 262399.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-01-29",
+      "value": 266455.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-02-26",
+      "value": 263657.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-03-31",
+      "value": 277798.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-04-30",
+      "value": 295550.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-05-31",
+      "value": 268566.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-06-30",
+      "value": 263202.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-07-30",
+      "value": 267468.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-08-31",
+      "value": 268371.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-09-30",
+      "value": 288540.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-10-29",
+      "value": 303428.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-11-30",
+      "value": 309340.0,
+      "status": "observed"
+    },
+    {
+      "date": "2010-12-31",
+      "value": 313678.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-01-31",
+      "value": 326868.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-02-28",
+      "value": 348979.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-03-31",
+      "value": 355413.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-04-29",
+      "value": 360883.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-05-31",
+      "value": 355736.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-06-30",
+      "value": 345273.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-07-29",
+      "value": 344572.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-08-31",
+      "value": 308866.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-09-30",
+      "value": 298277.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-10-31",
+      "value": 317028.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-11-30",
+      "value": 303930.0,
+      "status": "observed"
+    },
+    {
+      "date": "2011-12-30",
+      "value": 301616.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-01-31",
+      "value": 309844.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-02-29",
+      "value": 323021.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-03-30",
+      "value": 330815.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-04-30",
+      "value": 335154.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-05-31",
+      "value": 315147.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-06-29",
+      "value": 320952.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-07-31",
+      "value": 313525.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-08-31",
+      "value": 320395.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-09-28",
+      "value": 339159.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-10-31",
+      "value": 342325.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-11-30",
+      "value": 351441.0,
+      "status": "observed"
+    },
+    {
+      "date": "2012-12-31",
+      "value": 355009.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-01-31",
+      "value": 388123.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-02-28",
+      "value": 390351.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-03-29",
+      "value": 403933.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-04-30",
+      "value": 408677.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-05-31",
+      "value": 401606.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-06-28",
+      "value": 407681.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-07-31",
+      "value": 412101.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-08-30",
+      "value": 414442.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-09-30",
+      "value": 432852.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-10-31",
+      "value": 445022.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-11-29",
+      "value": 456378.0,
+      "status": "observed"
+    },
+    {
+      "date": "2013-12-31",
+      "value": 478502.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-01-31",
+      "value": 487549.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-02-28",
+      "value": 502093.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-03-31",
+      "value": 487932.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-04-30",
+      "value": 475195.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-05-30",
+      "value": 475362.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-06-30",
+      "value": 502270.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-07-31",
+      "value": 498671.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-08-29",
+      "value": 501000.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-09-30",
+      "value": 503901.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-10-31",
+      "value": 492888.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-11-28",
+      "value": 496341.0,
+      "status": "observed"
+    },
+    {
+      "date": "2014-12-31",
+      "value": 495756.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-01-30",
+      "value": 485872.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-02-27",
+      "value": 504923.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-03-31",
+      "value": 518055.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-04-30",
+      "value": 549964.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-05-29",
+      "value": 541671.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-06-30",
+      "value": 547957.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-07-31",
+      "value": 530744.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-08-31",
+      "value": 515960.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-09-30",
+      "value": 497279.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-10-30",
+      "value": 513941.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-11-30",
+      "value": 515410.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-12-31",
+      "value": 503444.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-01-29",
+      "value": 487200.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-02-29",
+      "value": 474156.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-03-31",
+      "value": 483909.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-04-29",
+      "value": 495178.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-05-31",
+      "value": 489867.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-06-30",
+      "value": 487636.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-07-29",
+      "value": 513221.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-08-31",
+      "value": 510157.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-09-30",
+      "value": 540615.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-10-31",
+      "value": 523760.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-11-30",
+      "value": 539972.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-12-30",
+      "value": 529372.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-01-31",
+      "value": 553557.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-02-28",
+      "value": 568637.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-03-31",
+      "value": 577674.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-04-28",
+      "value": 590797.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-05-31",
+      "value": 582764.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-06-30",
+      "value": 584258.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-07-31",
+      "value": 594414.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-08-31",
+      "value": 596567.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-09-29",
+      "value": 606334.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-10-31",
+      "value": 607838.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-11-30",
+      "value": 627422.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-12-29",
+      "value": 642798.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-01-31",
+      "value": 665716.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-02-28",
+      "value": 645064.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-03-30",
+      "value": 645235.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-04-30",
+      "value": 652303.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-05-31",
+      "value": 668940.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-06-29",
+      "value": 646931.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-07-31",
+      "value": 652790.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-08-31",
+      "value": 652395.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-09-28",
+      "value": 648126.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-10-31",
+      "value": 607645.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-11-30",
+      "value": 592593.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-12-31",
+      "value": 554285.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-01-31",
+      "value": 568433.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-02-28",
+      "value": 581205.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-03-29",
+      "value": 574013.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-04-30",
+      "value": 588721.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-05-31",
+      "value": 568751.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-06-28",
+      "value": 596304.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-07-31",
+      "value": 602139.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-08-30",
+      "value": 564894.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-09-30",
+      "value": 555910.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-10-31",
+      "value": 554604.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-11-29",
+      "value": 563482.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-12-31",
+      "value": 579221.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-01-31",
+      "value": 561812.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-02-28",
+      "value": 545127.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-03-31",
+      "value": 479291.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-04-30",
+      "value": 524696.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-05-29",
+      "value": 552543.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-06-30",
+      "value": 584676.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-07-31",
+      "value": 613830.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-08-31",
+      "value": 645547.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-09-30",
+      "value": 654324.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-10-30",
+      "value": 659313.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-11-30",
+      "value": 722118.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-12-31",
+      "value": 778037.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-01-29",
+      "value": 798605.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-02-26",
+      "value": 813680.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-03-31",
+      "value": 822551.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-04-30",
+      "value": 847186.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-05-31",
+      "value": 861626.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-06-30",
+      "value": 882103.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-07-30",
+      "value": 844324.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-08-31",
+      "value": 911545.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-09-30",
+      "value": 903117.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-10-29",
+      "value": 935862.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-11-30",
+      "value": 918598.0,
+      "status": "observed"
+    },
+    {
+      "date": "2021-12-31",
+      "value": 910021.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-01-31",
+      "value": 829637.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-02-28",
+      "value": 835255.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-03-31",
+      "value": 799660.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-04-29",
+      "value": 772940.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-05-31",
+      "value": 752944.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-06-30",
+      "value": 683445.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-07-29",
+      "value": 696781.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-08-31",
+      "value": 687787.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-09-30",
+      "value": 664009.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-10-31",
+      "value": 649618.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-11-30",
+      "value": 643783.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-12-30",
+      "value": 606659.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-01-31",
+      "value": 641228.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-02-28",
+      "value": 624379.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-03-31",
+      "value": 645429.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-04-28",
+      "value": 631949.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-05-31",
+      "value": 644170.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-06-30",
+      "value": 681228.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-07-31",
+      "value": 709834.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-08-31",
+      "value": 689185.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-09-29",
+      "value": 680846.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-10-31",
+      "value": 635276.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-11-30",
+      "value": 660887.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-12-29",
+      "value": 700774.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-01-31",
+      "value": 701975.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-02-29",
+      "value": 742963.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-03-29",
+      "value": 784136.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-04-30",
+      "value": 775464.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-05-31",
+      "value": 809431.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-06-28",
+      "value": 809322.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-07-31",
+      "value": 810835.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-08-30",
+      "value": 797162.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-09-30",
+      "value": 813211.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-10-31",
+      "value": 815369.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-11-29",
+      "value": 890852.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-12-31",
+      "value": 899168.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-01-31",
+      "value": 937253.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-02-28",
+      "value": 918144.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-03-31",
+      "value": 880316.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-04-30",
+      "value": 850558.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-05-30",
+      "value": 920960.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-06-30",
+      "value": 1007961.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-07-31",
+      "value": 1022548.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-08-29",
+      "value": 1059723.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-09-30",
+      "value": 1126494.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-10-31",
+      "value": 1183654.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-11-28",
+      "value": 1214321.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-12-31",
+      "value": 1225597.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-01-30",
+      "value": 1279042.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-02-27",
+      "value": 1253192.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-03-31",
+      "value": 1220922.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-04-30",
+      "value": 1304281.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-05-29",
+      "value": 1415557.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-06-30",
+      "value": 1502072.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-07-31",
+      "value": 1417225.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-08-31",
+      "value": 1453832.0,
+      "status": "observed"
+    }
+  ]
+}
