@@ -24,6 +24,7 @@ from pipeline.ma_breadth import (
 from pipeline.ma_breadth_study import (
     build_event_study as build_ma_breadth_event_study,
 )
+from pipeline.overview import build_overview
 from pipeline.artifacts import write_json_artifact
 from pipeline.rate_velocity import (
     build_rate_metrics,
@@ -66,6 +67,7 @@ SPECIAL_ARTIFACTS = {
     "refresh-report.json",
     "signals.json",
     "coverage.json",
+    "overview.json",
     "ma-breadth-audit.json",
     "ma-breadth-event-study.json",
     "taiwan-macro-regime.json",
@@ -1101,6 +1103,10 @@ def main() -> None:
     atomic_json(
         args.output_dir / "catalog.json",
         build_catalog(args.output_dir),
+    )
+    atomic_json(
+        args.output_dir / "overview.json",
+        build_overview(load_generated_metrics(args.output_dir)),
     )
     atomic_json(
         args.output_dir / "refresh-report.json",
