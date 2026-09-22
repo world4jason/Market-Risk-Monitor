@@ -24,6 +24,7 @@ from pipeline.ma_breadth import (
 from pipeline.ma_breadth_study import (
     build_event_study as build_ma_breadth_event_study,
 )
+from pipeline.presentation import apply_presentation
 from pipeline.rate_velocity import (
     build_rate_metrics,
     build_rate_regime_artifact,
@@ -76,6 +77,10 @@ SPECIAL_ARTIFACTS = {
 
 
 def atomic_json(path: Path, payload: dict) -> None:
+    # Declare comparison semantics at the single point every artifact is
+    # written, rather than in each builder where it would drift. Non-metric
+    # payloads pass through untouched.
+    payload = apply_presentation(payload)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -844,7 +849,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    run_fred = args.fred or args.public
+    # --fred-id is an allowlist, not just a filter. Requiring a separate
+    # --fred alongside it meant a command built entirely out of --fred-id
+    # silently refreshed no FRED series at all, while any previously generated
+    # ones stayed on disk and were picked up by the catalog -- so an allowlist
+    # intended to exclude a restricted series would appear to work and not.
+    run_fred = args.fred or args.public or bool(args.fred_id)
     run_vix = args.cboe_vix or args.public
 
     if not any(

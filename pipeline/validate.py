@@ -18,6 +18,14 @@ ALLOWED_OBSERVATION_STATUSES = {
 }
 ALLOWED_SIGNAL_STATES = {"active", "inactive", "unknown"}
 ALLOWED_REFRESH_STATES = {"updated", "error"}
+# Mirrors metric.comparison in schemas/metric-series.schema.json.
+ALLOWED_COMPARISONS = {
+    "absolute",
+    "percent_change",
+    "percentage_points",
+    "basis_points",
+    "none",
+}
 
 
 class ValidationError(ValueError):
@@ -60,6 +68,12 @@ def validate_metric(metric: dict) -> None:
         raise ValidationError("Invalid environment")
     if metric["freshness"]["state"] not in ALLOWED_STATES:
         raise ValidationError("Invalid freshness state")
+
+    # Optional in-flight, but a declared value must be one we know how to
+    # render. Generated artifacts are required to carry it by the JSON schema.
+    comparison = metric["metric"].get("comparison")
+    if comparison is not None and comparison not in ALLOWED_COMPARISONS:
+        raise ValidationError(f"Invalid metric comparison {comparison!r}")
 
     if metric["metric"].get("pillar") == "breadth":
         scope = metric["source"].get("market_scope")

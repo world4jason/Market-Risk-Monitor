@@ -21,6 +21,17 @@ class RefreshCliStructureTests(unittest.TestCase):
         ]
         self.assertEqual(len(definitions), 1)
 
+    def test_fred_id_allowlist_activates_the_fred_refresh(self):
+        # A command built only out of --fred-id must actually refresh FRED.
+        # When it did not, the allowlist silently refreshed nothing while
+        # previously generated series stayed on disk and were still catalogued,
+        # so an allowlist meant to exclude a restricted series looked like it
+        # had worked.
+        self.assertIn(
+            "run_fred = args.fred or args.public or bool(args.fred_id)",
+            self.source,
+        )
+
     def test_ma_breadth_cli_option_declared_once(self):
         self.assertEqual(self.source.count('"--ma-breadth-file"'), 1)
 
