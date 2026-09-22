@@ -62,6 +62,18 @@ cannot be read off the units: `RATE_LEVEL_METRIC_IDS` and
 `ZERO_CENTRED_INDEX_METRIC_IDS`. Add to them when a new series of either kind
 lands.
 
+**The two sets do not carry the same risk.** A rate missing from
+`RATE_LEVEL_METRIC_IDS` falls through to `percentage_points`, which is the same
+dimension — the unit shown is less conventional, the meaning is still right. An
+index missing from `ZERO_CENTRED_INDEX_METRIC_IDS` falls through to
+`percent_change`, and a series that crosses zero can then produce a genuinely
+absurd sign and magnitude. Check that set first when adding an index-valued
+metric, and prefer `absolute` when unsure whether a series can go negative.
+
+Both sets are hardcoded, which will not scale. Converging them into a registry
+or config is follow-up work; the current release universe is small enough that
+the tests cover it.
+
 ### Missing or zero priors
 
 A metric with fewer than two non-null observations has no change. A
