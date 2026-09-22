@@ -11,6 +11,7 @@ only invalid once the release tries to validate it.
 These tests drive real producers and validate their output against the full
 JSON Schema, which is what scripts/validate_data.py applies.
 """
+import copy
 import csv
 import json
 import tempfile
@@ -21,6 +22,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 
 from pipeline.artifacts import write_json_artifact
+from pipeline.presentation import comparison_for
 from pipeline.taiwan_trend_breadth import MARKET_SCOPE, compute_from_panel
 
 
@@ -204,6 +206,42 @@ class ContractFixtureTests(unittest.TestCase):
             if obs["value"] is not None
         ]
         self.assertLess(min(values), 0, "fixture no longer crosses/sits below zero")
+        self.assertEqual(payload["metric"]["comparison"], "absolute")
+
+    def test_derived_fixtures_agree_with_the_production_derivation(self):
+        # The claim was that fixture comparisons are derived rather than hand
+        # picked. That only holds if it is enforced: otherwise a later change
+        # to comparison_for() leaves the contract examples quietly drifted from
+        # what producers actually emit.
+        for name in ["metric-daily.json", "metric-monthly.json"]:
+            payload = json.loads(
+                (ROOT / "data" / "fixtures" / name).read_text(encoding="utf-8")
+            )
+            declared = payload["metric"]["comparison"]
+            stripped = copy.deepcopy(payload)
+            del stripped["metric"]["comparison"]
+            self.assertEqual(
+                declared,
+                comparison_for(stripped),
+                f"{name} no longer matches the production derivation",
+            )
+
+    def test_the_weekly_fixture_is_an_intentional_override(self):
+        # Deliberately exempt from the rule above. nfci_fixture is a
+        # zero-centred series whose id is not, and should not be, in
+        # ZERO_CENTRED_INDEX_METRIC_IDS, so the derivation gets it wrong and
+        # the fixture overrides it. Asserting the disagreement keeps the
+        # exemption honest: if the derivation ever learns to handle this case,
+        # this test fails and the override can be removed.
+        payload = json.loads(
+            (ROOT / "data" / "fixtures" / "metric-weekly.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        stripped = copy.deepcopy(payload)
+        del stripped["metric"]["comparison"]
+
+        self.assertEqual(comparison_for(stripped), "percent_change")
         self.assertEqual(payload["metric"]["comparison"], "absolute")
 
     def test_a_declared_comparison_survives_the_writer(self):

@@ -199,10 +199,14 @@ Making a previously absent field required is a breaking change by that rule.
 `schema_version: 1.0.0`, which is a contradiction worth naming rather than
 leaving implicit.
 
-**Until the first data-backed release is published, `1.0.0` is still being
-finalized and such a change does not bump the version.** Nothing consumes the
-contract yet, so there is no compatibility to break — the alternative would be
-shipping `1.3.0` before `1.0.0` was ever released.
+No production data-backed release has yet been published under `1.0.0`.
+**Until that first release, this project treats `1.0.0` as a pre-release
+contract and does not guarantee compatibility across finalization changes.**
+After v0.1 publishes, breaking changes require a schema-version bump.
+
+This is a policy, not a claim about who is reading the repository. The repo is
+public, so we cannot assert that nothing consumes the contract; we can only
+state that nothing has been promised about it yet.
 
 The condition attached to that allowance is the part that matters: a
 finalization change must update the schema, `pipeline/validate.py`, every
