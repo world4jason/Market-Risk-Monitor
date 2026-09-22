@@ -91,8 +91,12 @@ Point-in-time percentile and signal-history logic use only observations that are
 
 ## Manual release checklist
 
+The release command itself is in [release.md](./release.md). It is not
+`scripts/bootstrap_sources.py`, and it requires `--clean-output`.
+
 Before publishing a data refresh:
 
+- [ ] generated with the command in [release.md](./release.md), including `--clean-output`
 - [ ] `python -m unittest discover -s tests -v`
 - [ ] `python scripts/validate_data.py`
 - [ ] inspect `data/generated/refresh-report.json`
@@ -101,3 +105,5 @@ Before publishing a data refresh:
 - [ ] confirm latest `as_of` is plausible for the source frequency
 - [ ] confirm source/provenance URLs remain canonical
 - [ ] confirm Deleveraging Watch unknown count is explained by real missing/stale data
+- [ ] confirm no artifact declares `redistribution: "restricted"` (see [release.md](./release.md))
+- [ ] confirm `refresh-report.json` `removed_artifacts` contains nothing unexpected
