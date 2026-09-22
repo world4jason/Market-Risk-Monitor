@@ -17,6 +17,7 @@ from pipeline.validate import (
     validate_ma_breadth_audit,
     validate_ma_breadth_study,
     validate_metric,
+    validate_overview,
     validate_refresh_report,
     validate_rate_regime,
     validate_signal_snapshot,
@@ -38,6 +39,7 @@ METRIC_SCHEMA_VALIDATOR = Draft202012Validator(
 SPECIAL_VALIDATORS = {
     "catalog.json": validate_catalog,
     "coverage.json": validate_coverage_report,
+    "overview.json": validate_overview,
     "refresh-report.json": validate_refresh_report,
     "signals.json": validate_signal_snapshot,
     "ma-breadth-audit.json": validate_ma_breadth_audit,
