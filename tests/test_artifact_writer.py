@@ -144,6 +144,81 @@ class SharedWriterTests(unittest.TestCase):
         self.assertEqual(offenders, [])
 
 
+class ContractFixtureTests(unittest.TestCase):
+    """
+    docs/data-contract.md points at these files as the contract examples, so
+    they have to satisfy the contract. When metric.comparison became required
+    they did not, and the repository's own examples violated its own schema.
+    """
+
+    def fixtures(self):
+        paths = sorted((ROOT / "data" / "fixtures").glob("metric-*.json"))
+        self.assertTrue(paths, "no contract fixtures found")
+        return paths
+
+    def test_every_contract_fixture_passes_the_release_validator(self):
+        for path in self.fixtures():
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            assert_schema_valid(self, payload, path.name)
+
+    def test_no_metric_shaped_json_in_the_repo_violates_the_schema(self):
+        # Broader than the three fixtures: any example, fixture or checked-in
+        # artifact outside data/generated must satisfy the same contract, so a
+        # future one cannot be added and quietly left behind.
+        skip_parts = {".venv", ".cache", ".git", "node_modules"}
+        checked = 0
+        for path in sorted(ROOT.rglob("*.json")):
+            relative = path.relative_to(ROOT)
+            if set(relative.parts) & skip_parts:
+                continue
+            if relative.parts[:2] == ("data", "generated"):
+                continue
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                continue
+            if not (
+                isinstance(payload, dict)
+                and isinstance(payload.get("metric"), dict)
+                and "observations" in payload
+            ):
+                continue
+            assert_schema_valid(self, payload, relative.as_posix())
+            checked += 1
+        self.assertGreaterEqual(checked, 3)
+
+    def test_the_zero_centred_fixture_declares_an_absolute_comparison(self):
+        # nfci_fixture holds negative values, so a relative change has no
+        # stable sign. Its id is deliberately not in
+        # ZERO_CENTRED_INDEX_METRIC_IDS -- fixture ids do not belong in
+        # production config -- so the fixture declares the comparison itself.
+        # This guards against someone "correcting" it to match the derivation.
+        payload = json.loads(
+            (ROOT / "data" / "fixtures" / "metric-weekly.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        values = [
+            obs["value"]
+            for obs in payload["observations"]
+            if obs["value"] is not None
+        ]
+        self.assertLess(min(values), 0, "fixture no longer crosses/sits below zero")
+        self.assertEqual(payload["metric"]["comparison"], "absolute")
+
+    def test_a_declared_comparison_survives_the_writer(self):
+        payload = json.loads(
+            (ROOT / "data" / "fixtures" / "metric-weekly.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            dest = Path(temp) / "metric-weekly.json"
+            write_json_artifact(dest, payload)
+            written = json.loads(dest.read_text(encoding="utf-8"))
+        self.assertEqual(written["metric"]["comparison"], "absolute")
+
+
 class DirectProducerSchemaTests(unittest.TestCase):
     def write_panel(self, path):
         start = date(2020, 1, 1)
