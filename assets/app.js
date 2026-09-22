@@ -423,6 +423,10 @@ function renderTaiwanMarket() {
       .some((prefix) => m.metric.id.startsWith(prefix)),
   );
   const macroCurrent = state.taiwanMacroRegime?.current || null;
+  const macroLastKnown = state.taiwanMacroRegime?.latest_known || null;
+  const macroLastKnownNote = macroLastKnown
+    ? `last known ${macroLastKnown.regime} ${macroLastKnown.date}`
+    : "no known regime yet";
   const rateMetrics = metrics.filter((m) =>
     m.metric.id.startsWith("tw_cbc_"),
   );
@@ -448,7 +452,11 @@ function renderTaiwanMarket() {
       "Macro cycle",
       macroCurrent ? String(macroCurrent.regime || "Unknown") : "Unknown",
       macroCurrent
-        ? `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`
+        ? (macroCurrent.score === null || macroCurrent.score === undefined
+            // Never print a score for a period that has none: Number(null)
+            // would render a fabricated "0.00" for an unknown regime.
+            ? `${macroCurrent.known_components}/${macroCurrent.total_components} inputs · ${macroLastKnownNote}`
+            : `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`)
         : (macroMetrics.length ? `${macroMetrics.length} public macro metrics` : "NDC / PMI / production pending"),
     ),
     statusCell(

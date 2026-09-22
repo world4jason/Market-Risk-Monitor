@@ -128,7 +128,39 @@ class TaiwanMacroTests(unittest.TestCase):
 """
         rows = parse_taiwan_macro_csv(text)
         regime = build_macro_regime(rows, CONFIG)
-        self.assertIsNone(regime["current"])
+        self.assertIsNone(regime["current"]["score"])
+        self.assertEqual(regime["current"]["regime"], "unknown")
+        self.assertIsNone(regime["latest_known"])
+
+    def test_current_does_not_carry_forward_a_stale_known_regime(self):
+        # A month with a full component set followed by a month where only PMI
+        # arrived. The dashboard reads `current` directly, so returning the
+        # older month's regime would present a stale benign reading as the
+        # present state.
+        rows = parse_taiwan_macro_csv(csv_fixture())
+        stale = [
+            row
+            for row in rows
+            if not (
+                row["date"] == "2026-07-01"
+                and row["series_id"] != "tw_manufacturing_pmi"
+            )
+        ]
+
+        regime = build_macro_regime(stale, CONFIG)
+
+        current = regime["current"]
+        self.assertEqual(current["date"], "2026-07-01")
+        self.assertEqual(current["regime"], "unknown")
+        self.assertIsNone(current["score"])
+        self.assertLess(current["known_components"], 2)
+
+        # The earlier reading is still available, but clearly labelled as the
+        # last known one rather than as the current state.
+        latest_known = regime["latest_known"]
+        self.assertIsNotNone(latest_known)
+        self.assertLess(latest_known["date"], current["date"])
+        self.assertNotEqual(latest_known["regime"], "unknown")
 
 
 if __name__ == "__main__":

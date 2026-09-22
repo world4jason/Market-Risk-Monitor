@@ -404,7 +404,18 @@ def build_macro_regime(
             else None
         )
 
-    current = next(
+    # `current` is the latest period, even when that period is unknown.
+    #
+    # Walking back to the last non-unknown row would present a stale reading as
+    # the present state: a month whose components have not all arrived yet
+    # would keep showing the previous month's regime, and the dashboard reads
+    # this field directly. Missing inputs must surface as unknown, never as a
+    # benign carry-forward.
+    current = provisional[-1] if provisional else None
+
+    # The previous known reading is still useful context, so keep it -- but
+    # under a name that says what it is.
+    latest_known = next(
         (
             row
             for row in reversed(provisional)
@@ -426,6 +437,7 @@ def build_macro_regime(
             "release_dates_retained": True,
         },
         "current": current,
+        "latest_known": latest_known,
         "history": provisional,
     }
 

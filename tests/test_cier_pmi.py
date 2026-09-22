@@ -102,6 +102,25 @@ class CierPmiParseTests(unittest.TestCase):
         with self.assertRaises(CierPmiError):
             parse_cier_pmi_html(table("2026/08|—|65.2％"))
 
+    def test_truncated_row_is_rejected_not_silently_dropped(self):
+        # Silently skipping the row would hand back 1 month where the source
+        # served 2, and the bootstrap would still report success.
+        with self.assertRaises(CierPmiError):
+            parse_cier_pmi_html(table("2026/08|62.5％|65.2％", "2026/07"))
+
+    def test_malformed_month_is_rejected_not_silently_dropped(self):
+        with self.assertRaises(CierPmiError):
+            parse_cier_pmi_html(
+                table("2026/08|62.5％|65.2％", "2026-07|61.5％|65.5％")
+            )
+
+    def test_blank_spacer_row_is_ignored(self):
+        # An all-empty row is layout, not mangled data.
+        rows = parse_cier_pmi_html(
+            table("2026/08|62.5％|65.2％", "||", "2026/07|61.5％|65.5％")
+        )
+        self.assertEqual([row["date"] for row in rows], ["2026-07-01", "2026-08-01"])
+
 
 class CierPmiMacroContractTests(unittest.TestCase):
     def setUp(self):

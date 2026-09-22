@@ -354,11 +354,35 @@ def validate_taiwan_macro_regime(payload: dict) -> None:
     if len(dates) != len(set(dates)):
         raise ValidationError("taiwan-macro-regime: duplicate dates")
 
+    # `current` must be the latest period, unknown included. The previous rule
+    # required it to be the latest *known* regime, which is the carry-forward
+    # this contract exists to prevent: a period whose inputs have not arrived
+    # would keep presenting the preceding regime as the present state.
     current = payload.get("current")
     if current is not None:
-        if current.get("regime") == "unknown":
+        if not history:
             raise ValidationError(
-                "taiwan-macro-regime: current should be latest known regime"
+                "taiwan-macro-regime: current present with empty history"
+            )
+        if current.get("date") != history[-1]["date"]:
+            raise ValidationError(
+                "taiwan-macro-regime: current must be the latest history row "
+                f"({history[-1]['date']}), got {current.get('date')!r}"
+            )
+    elif history:
+        raise ValidationError(
+            "taiwan-macro-regime: current missing while history is non-empty"
+        )
+
+    latest_known = payload.get("latest_known")
+    if latest_known is not None:
+        if latest_known.get("regime") == "unknown":
+            raise ValidationError(
+                "taiwan-macro-regime: latest_known must not be unknown"
+            )
+        if latest_known.get("date") > history[-1]["date"]:
+            raise ValidationError(
+                "taiwan-macro-regime: latest_known is newer than history"
             )
 
 

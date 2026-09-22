@@ -122,13 +122,27 @@ def parse_cier_pmi_html(text: str) -> list[dict]:
 
     rows: list[dict] = []
     seen: set[str] = set()
+    required_columns = max(month_index, headline_index) + 1
     for line_no, cells in enumerate(body, start=2):
-        if len(cells) <= max(month_index, headline_index):
+        # An all-empty row is layout, not data.
+        if not any(cell.strip() for cell in cells):
             continue
+
+        # Everything else in the body must parse. Skipping a mangled row would
+        # hand back fewer months than the source served while the bootstrap
+        # still reported success -- a silently half-populated series is worse
+        # than a failed run.
+        if len(cells) < required_columns:
+            raise CierPmiError(
+                f"row {line_no}: expected at least {required_columns} columns, "
+                f"got {len(cells)}"
+            )
         month_text = cells[month_index].strip()
         match = _MONTH_PATTERN.match(month_text)
         if not match:
-            continue
+            raise CierPmiError(
+                f"row {line_no}: unrecognized month {month_text!r}"
+            )
 
         year, month = int(match.group(1)), int(match.group(2))
         try:
