@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
+from pathlib import Path
 
 from pipeline.overview import build_overview, recent_change, rolling_percentile
 from pipeline.validate import ValidationError, validate_overview
@@ -17,14 +19,6 @@ def metric_fixture(
     point_in_time_membership: bool | None = None,
 ) -> dict:
     values = values or [float(i) for i in range(1, 41)]
-    observations = [
-        {
-            "date": f"2023-{((i - 1) % 12) + 1:02d}-{min(((i - 1) // 12) + 1, 28):02d}",
-            "value": value,
-            "status": "observed",
-        }
-        for i, value in enumerate(values, start=1)
-    ]
     # Keep the dates strictly increasing for the test fixture.
     observations = [
         {
@@ -137,9 +131,9 @@ class OverviewArtifactTests(unittest.TestCase):
         self.assertIsNone(overview["metrics"][0]["summary"]["rolling_percentile"])
 
     def test_checked_in_overview_is_materially_smaller_than_full_histories(self) -> None:
-        root = __import__("pathlib").Path(__file__).resolve().parents[1]
+        root = Path(__file__).resolve().parents[1]
         overview_path = root / "data" / "generated" / "overview.json"
-        catalog = __import__("json").loads(
+        catalog = json.loads(
             (root / "data" / "generated" / "catalog.json").read_text(encoding="utf-8")
         )
         full_bytes = sum(
