@@ -407,3 +407,7 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
   .decision-row span { margin: 0; font-size: .62rem; }
   .decision-row strong { font-size: .74rem; }
 }
+
+@media (max-width: 640px) {
+  .history-layout .section-heading { flex-direction: column; }
+}
