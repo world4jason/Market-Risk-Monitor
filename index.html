@@ -36,6 +36,28 @@
         </div>
         <p class="meta">Plain-language summary · lead evidence only · details remain auditable</p>
       </div>
+      <div class="decision-summary" aria-label="At-a-glance market status">
+        <a class="decision-row" href="#us-detail">
+          <span>Financial stress</span>
+          <strong id="decision-stress-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#us-detail">
+          <span>Leverage</span>
+          <strong id="decision-leverage-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#signals-detail">
+          <span>Deleveraging</span>
+          <strong id="decision-deleveraging-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#taiwan-detail">
+          <span>Taiwan</span>
+          <strong id="decision-taiwan-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#research">
+          <span>Evidence</span>
+          <strong id="decision-coverage-state">Loading…</strong>
+        </a>
+      </div>
       <div class="overview-grid">
         <article class="panel overview-card" data-overview-card="stress">
           <p class="eyebrow">FINANCIAL STRESS</p>
@@ -100,13 +122,13 @@
       </div>
     </section>
 
-    <section id="trend-participation-section" class="section-block optional-module" aria-labelledby="trend-participation-title">
+    <section id="trend-participation-section" class="section-block optional-module compact-optional" aria-labelledby="trend-participation-title">
       <div class="section-heading">
         <div>
           <p class="eyebrow">BREADTH / PARTICIPATION</p>
           <h2 id="trend-participation-title">Trend Participation</h2>
         </div>
-        <div id="trend-controls" class="history-controls">
+        <div id="trend-controls" class="history-controls" hidden>
           <label class="toggle-control">
             <input id="ma-bands-toggle" type="checkbox">
             <span>Custom heuristic bands</span>
@@ -119,18 +141,18 @@
       </div>
       <div id="trend-panel" class="panel trend-panel">
         <div id="ma-summary" class="trend-summary">
-          <div class="empty-state compact">Checking public Trend Participation coverage…</div>
+          <div class="optional-state"><strong>Trend Participation — unavailable in the public release</strong><span>Point-in-time S&amp;P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>
         </div>
-        <div id="ma-chart" class="chart-frame">
+        <div id="ma-chart" class="chart-frame" hidden>
           <div class="empty-state compact">Trend Participation history will appear here when published.</div>
         </div>
-        <div id="trend-legend" class="trend-legend">
+        <div id="trend-legend" class="trend-legend" hidden>
           <span><i class="line-swatch line-20"></i>20DMA</span>
           <span><i class="line-swatch line-50"></i>50DMA</span>
           <span><i class="line-swatch line-200"></i>200DMA</span>
           <span class="meta">Heuristic bands are optional and non-canonical.</span>
         </div>
-        <div id="ma-study-block">
+        <div id="ma-study-block" hidden>
           <div class="signal-history-header">
             <div>
               <p class="eyebrow">THRESHOLD STUDY</p>
