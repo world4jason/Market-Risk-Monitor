@@ -105,9 +105,9 @@ const beginnerContext = {
     what_it_measures: "The balance of advancing versus declining TWSE-listed stocks, normalized by the number of stocks that moved.",
     why_it_matters: "It shows whether a day's market move is broad or concentrated.",
     how_to_read: "Positive means more stocks advanced than declined that session; negative means more declined than advanced.",
-    higher_lower_or_contextual: "Lower is weaker participation, but one session is only a snapshot.",
+    higher_lower_or_contextual: "Lower means weaker participation for that session; trend interpretation depends on sufficient history.",
     important_reference_level: "0% = equal advancing and declining counts.",
-    important_caveat: "The current public release has only one breadth session, so it cannot yet support a trend or percentile conclusion."
+    important_caveat: "A single daily breadth reading is only a participation snapshot. Trend and percentile conclusions require sufficient published history."
   },
   tw_cbc_rate: {
     plain_name: "Taiwan CBC policy rate",
@@ -334,6 +334,7 @@ function metricContextGuide(metric) {
   const reference = context.important_reference_level
     ? `<dt>Reference</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
     : "";
+  const caveat = dynamicMetricCaveat(metric) || context.important_caveat;
   return `<div class="context-guide">
     <h3>${escapeHtml(context.plain_name)}</h3>
     <p>${escapeHtml(context.what_it_measures)}</p>
@@ -342,7 +343,7 @@ function metricContextGuide(metric) {
       <dt>How to read</dt><dd>${escapeHtml(context.how_to_read)}</dd>
       <dt>Direction</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
       ${reference}
-      <dt>Caveat</dt><dd>${escapeHtml(context.important_caveat)}</dd>
+      <dt>Caveat</dt><dd>${escapeHtml(caveat)}</dd>
     </dl>
   </div>`;
 }
@@ -351,16 +352,120 @@ function signalCondition(id) {
   return (state.signals?.current?.conditions || []).find((condition) => condition.id === id) || null;
 }
 
+
+function usableObservationCount(metric) {
+  return (metric?.observations || []).filter((observation) => observation.value != null).length;
+}
+
+function percentileContextSuffix(metric) {
+  return metric?.metric?.polarity === "contextual" ? " · context only" : "";
+}
+
+function overviewPercentileText(metric, presentation = percentilePresentation(metric)) {
+  if (!metric || presentation.value === "—") return "";
+  return `${presentation.value} ${presentation.label}${percentileContextSuffix(metric)}`;
+}
+
+function ruleLeaves(rule, out = []) {
+  if (!rule) return out;
+  if (rule.children) {
+    rule.children.forEach((child) => ruleLeaves(child, out));
+    return out;
+  }
+  out.push(rule);
+  return out;
+}
+
+function findRuleLeaf(condition, predicate) {
+  return ruleLeaves(condition?.rules).find(predicate) || null;
+}
+
+function marginMomentumEvidence(condition) {
+  const trigger = findRuleLeaf(
+    condition,
+    (rule) =>
+      rule.type === "delta_periods_below" &&
+      rule.metric === "finra_margin_debt_yoy_pct" &&
+      rule.status === "active",
+  );
+  const value = Number(trigger?.value);
+  const periods = Number(trigger?.periods);
+  if (!Number.isFinite(value) || !Number.isFinite(periods)) return null;
+  return `YoY growth slowed ${Math.abs(value).toFixed(1)} pp over ${periods} monthly observations`;
+}
+
+function taiwanBreadthState(metric) {
+  if (!metric) return { state: "missing", observations: 0, freshness: "missing" };
+  const observations = usableObservationCount(metric);
+  if (observations === 0) {
+    return {
+      state: "missing",
+      observations,
+      freshness: effectiveFreshness(metric).state,
+    };
+  }
+  const freshness = effectiveFreshness(metric).state;
+  if (freshness !== "fresh") {
+    return { state: "not_current", observations, freshness };
+  }
+  if (observations === 1) {
+    return { state: "snapshot_only", observations, freshness };
+  }
+  if (rollingPercentile(metric) == null) {
+    return { state: "history_building", observations, freshness };
+  }
+  return { state: "context_available", observations, freshness };
+}
+
+function dynamicMetricCaveat(metric) {
+  if (metric?.metric?.id !== "tw_advance_decline_pct") return null;
+  const breadth = taiwanBreadthState(metric);
+  if (breadth.state === "missing") {
+    return "No usable public breadth sessions are currently available.";
+  }
+  if (breadth.state === "snapshot_only") {
+    return "Only 1 published breadth session is available. This is a one-session participation snapshot, not a trend or percentile conclusion.";
+  }
+  if (breadth.state === "history_building") {
+    return `${breadth.observations} published breadth sessions are available. Multi-session history is accumulating, but the configured historical percentile still lacks sufficient observations.`;
+  }
+  if (breadth.state === "not_current") {
+    return `Published breadth history exists, but its current freshness state is ${breadth.freshness}; current trend interpretation needs caution.`;
+  }
+  return null;
+}
+
+function formatRuleDetail(detail) {
+  const parts = [`${detail.label}: ${detail.status}`];
+  if (Number.isFinite(Number(detail.value))) {
+    const value = Number(detail.value);
+    const unit =
+      detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"
+        ? " pp"
+        : "";
+    parts.push(`observed ${value.toFixed(2)}${unit}`);
+  }
+  if (detail.asOf) parts.push(`as of ${detail.asOf}`);
+  const line = escapeHtml(parts.join(" · "));
+  return detail.reason
+    ? `${line}<br><span class="signal-rule-reason">${escapeHtml(detail.reason)}</span>`
+    : line;
+}
+
+
 function setOverviewCard(kind, headline, evidence, note, displayState = "normal") {
   const card = document.querySelector(`[data-overview-card="${kind}"]`);
-  const stateEl = $(`#overview-${kind === "coverage" ? "evidence" : kind}-state`);
-  const evidenceEl = $(`#overview-${kind === "coverage" ? "evidence" : kind}-evidence`);
-  const noteEl = $(`#overview-${kind === "coverage" ? "evidence" : kind}-note`);
+  const stateId = kind === "coverage" ? "evidence" : kind;
+  const stateEl = $(`#overview-${stateId}-state`);
+  const evidenceEl = $(`#overview-${stateId}-evidence`);
+  const noteEl = $(`#overview-${stateId}-note`);
+  const decisionEl = $(`#decision-${kind}-state`);
   if (!card || !stateEl || !evidenceEl || !noteEl) return;
   card.dataset.state = displayState;
   stateEl.textContent = headline;
   evidenceEl.innerHTML = evidence;
   noteEl.textContent = note;
+  if (decisionEl) decisionEl.textContent = headline;
 }
 
 
@@ -636,18 +741,19 @@ function renderOverview() {
 
   const financialCondition = signalCondition("financial_conditions_tight");
   const vixStress = signalCondition("vix_stress");
-  const stressStatuses = [financialCondition, vixStress]
+  const expectedStressConditions = [financialCondition, vixStress];
+  const stressStatuses = expectedStressConditions
     .filter(Boolean)
     .map((condition) => effectiveConditionStatus(condition));
-  const stressUnknown = stressStatuses.some((status) => status === "unknown");
+  const stressUnknown =
+    expectedStressConditions.some((condition) => !condition) ||
+    stressStatuses.some((status) => status === "unknown");
   const stressActive = stressStatuses.some((status) => status === "active");
   const stressHeadline = stressUnknown
     ? "U.S. stress evidence is incomplete"
     : stressActive
       ? "One or more current U.S. stress checks are elevated"
-      : stressStatuses.length
-        ? "Current U.S. stress checks are not broadly elevated"
-        : "U.S. stress checks are unavailable";
+      : "Current U.S. stress checks are not broadly elevated";
 
   const stressEvidence = [];
   if (nfci) {
@@ -655,19 +761,22 @@ function renderOverview() {
   }
   if (vix) {
     const p = percentilePresentation(vix);
-    stressEvidence.push(`<strong>VIX ${formatValue(vix.latest?.value, vix.metric.units)}</strong> · ${escapeHtml(p.value)} ${escapeHtml(p.label)}.`);
+    stressEvidence.push(`<strong>VIX ${formatValue(vix.latest?.value, vix.metric.units)}</strong> · ${escapeHtml(overviewPercentileText(vix, p))}.`);
   }
   setOverviewCard(
     "stress",
     stressHeadline,
     stressEvidence.join("<br>") || "Current NFCI/VIX evidence is unavailable.",
-    "These measures describe current conditions; VIX and NFCI do not forecast market direction by themselves.",
-    stressUnknown ? "attention" : (stressStatuses.length ? "normal" : "missing")
+    stressUnknown
+      ? "At least one expected stress check is missing, unknown, stale, or errored; the overview does not convert partial evidence into a reassuring conclusion."
+      : "These measures describe current conditions; VIX and NFCI do not forecast market direction by themselves.",
+    stressUnknown ? "attention" : "normal"
   );
 
   const marginPct = margin ? percentilePresentation(margin) : null;
   const marginSignal = signalCondition("margin_debt_rollover");
   const marginStatus = marginSignal ? effectiveConditionStatus(marginSignal) : "unknown";
+  const momentumEvidence = marginMomentumEvidence(marginSignal);
   const yoy = Number(marginYoy?.latest?.value);
   const leverageHeadline = margin && marginYoy
     ? (marginStatus === "active" && Number.isFinite(yoy) && yoy > 0
@@ -676,16 +785,22 @@ function renderOverview() {
     : "Leverage evidence is incomplete";
   const leverageEvidence = [];
   if (margin) {
-    leverageEvidence.push(`<strong>${formatValue(margin.latest?.value, margin.metric.units)}</strong>${marginPct ? ` · ${escapeHtml(marginPct.value)} ${escapeHtml(marginPct.label)}` : ""}.`);
+    const percentileText = marginPct ? overviewPercentileText(margin, marginPct) : "";
+    leverageEvidence.push(`<strong>${formatValue(margin.latest?.value, margin.metric.units)}</strong>${percentileText ? ` · ${escapeHtml(percentileText)}` : ""}.`);
   }
   if (marginYoy) {
-    leverageEvidence.push(`<strong>YoY growth ${formatValue(marginYoy.latest?.value, "percent")}</strong>${marginStatus === "active" && yoy > 0 ? " · the active check is about decelerating growth, not a falling debt level." : "."}`);
+    leverageEvidence.push(`<strong>YoY growth ${formatValue(marginYoy.latest?.value, "percent")}</strong>.`);
+  }
+  if (momentumEvidence) {
+    leverageEvidence.push(`<strong>${escapeHtml(momentumEvidence)}</strong> · this is the active rollover evidence.`);
   }
   setOverviewCard(
     "leverage",
     leverageHeadline,
     leverageEvidence.join("<br>") || "FINRA margin data is unavailable.",
-    "Level, year-over-year growth, and momentum are separate facts; no one of them is a BUY/SELL signal.",
+    marginStatus === "active" && Number.isFinite(yoy) && yoy > 0
+      ? "The level is not described as falling: the active condition is the deceleration in YoY growth."
+      : "Level, year-over-year growth, and momentum are separate facts; no one of them is a BUY/SELL signal.",
     margin && marginYoy ? (marginStatus === "active" ? "attention" : "normal") : "missing"
   );
 
@@ -701,7 +816,7 @@ function renderOverview() {
     .filter((c) => c.displayStatus === "active")
     .map((c) => signalBeginnerContext[c.id]?.plain_name || c.name);
   const deleveragingHeadline = total
-    ? `${active} active check${active === 1 ? "" : "s"} among ${known} known; ${unknown} of ${total} unavailable/unknown`
+    ? `${active} active / ${known} known / ${unknown} unknown`
     : "Deleveraging checks are unavailable";
   const deleveragingEvidence = total
     ? `Known evidence: <strong>${known}/${total}</strong> · Active: <strong>${active}</strong> · Unknown: <strong>${unknown}</strong>${activeNames.length ? `.<br>Active now: ${escapeHtml(activeNames.join(", "))}.` : "."}`
@@ -716,32 +831,64 @@ function renderOverview() {
     total ? (unknown ? "attention" : "normal") : "missing"
   );
 
-  const breadthObs = (twBreadth?.observations || []).filter((o) => o.value != null).length;
+  const taiexFreshness = effectiveFreshness(taiex).state;
+  const breadth = taiwanBreadthState(twBreadth);
   const taiexChange = taiex ? formatChange(recentChange(taiex)) : "—";
-  const taiwanHeadline = taiex
-    ? (breadthObs < 2
-        ? "TAIEX is current; breadth trend is not established yet"
-        : "Taiwan price and participation evidence are available")
-    : "Taiwan core price evidence is unavailable";
+  let taiwanHeadline;
+  if (!taiex) {
+    taiwanHeadline = "TAIEX price evidence is unavailable";
+  } else if (taiexFreshness !== "fresh") {
+    taiwanHeadline = `TAIEX data is ${taiexFreshness}; current-price evidence needs attention`;
+  } else if (breadth.state === "missing") {
+    taiwanHeadline = "TAIEX is current; breadth is unavailable";
+  } else if (breadth.state === "not_current") {
+    taiwanHeadline = `TAIEX is current; breadth data is ${breadth.freshness}`;
+  } else if (breadth.state === "snapshot_only") {
+    taiwanHeadline = "TAIEX is current; breadth has one published session";
+  } else if (breadth.state === "history_building") {
+    taiwanHeadline = "TAIEX is current; breadth history is accumulating";
+  } else {
+    taiwanHeadline = "Taiwan price and participation context are available";
+  }
+
   const taiwanEvidence = [];
   if (taiex) {
-    taiwanEvidence.push(`<strong>TAIEX ${formatValue(taiex.latest?.value, taiex.metric.units)}</strong> · last observation ${escapeHtml(taiexChange)}.`);
+    const freshnessText = taiexFreshness === "fresh" ? "current" : taiexFreshness;
+    taiwanEvidence.push(`<strong>TAIEX ${formatValue(taiex.latest?.value, taiex.metric.units)}</strong> · last observation ${escapeHtml(taiexChange)} · ${escapeHtml(freshnessText)}.`);
   }
-  if (twBreadth) {
-    taiwanEvidence.push(`<strong>A/D ${formatValue(twBreadth.latest?.value, "percent")}</strong> · ${breadthObs} session${breadthObs === 1 ? "" : "s"} of public breadth history.`);
+  if (breadth.state === "missing") {
+    taiwanEvidence.push("TWSE A/D breadth is not available in the current published snapshot.");
+  } else if (twBreadth) {
+    taiwanEvidence.push(`<strong>A/D ${formatValue(twBreadth.latest?.value, "percent")}</strong> · ${breadth.observations} published session${breadth.observations === 1 ? "" : "s"} · ${escapeHtml(breadth.freshness)}.`);
   }
   if (cbc) {
     const verified = String(cbc.latest?.fetched_at || "").slice(0, 10) || "unknown";
     taiwanEvidence.push(`CBC rate <strong>${formatValue(cbc.latest?.value, "percent")}</strong> · effective since ${escapeHtml(cbc.latest?.as_of || "unknown")} · source verified ${escapeHtml(verified)}.`);
   }
+
+  let taiwanNote = "Price, participation, and policy context are shown separately.";
+  if (breadth.state === "snapshot_only") {
+    taiwanNote = "The breadth reading is a one-session participation snapshot; no breadth trend or percentile conclusion is supported yet.";
+  } else if (breadth.state === "history_building") {
+    taiwanNote = `${breadth.observations} breadth sessions are published, but the configured historical percentile still lacks sufficient observations.`;
+  } else if (breadth.state === "missing") {
+    taiwanNote = "Missing breadth is different from insufficient history: no participation conclusion is shown.";
+  } else if (breadth.state === "not_current") {
+    taiwanNote = "Breadth history exists, but its freshness problem is surfaced rather than treated as current.";
+  }
+
+  const taiwanDisplayState =
+    !taiex || taiexFreshness === "missing" || taiexFreshness === "error"
+      ? "missing"
+      : (taiexFreshness !== "fresh" || ["missing", "not_current", "snapshot_only", "history_building"].includes(breadth.state))
+        ? "attention"
+        : "normal";
   setOverviewCard(
     "taiwan",
     taiwanHeadline,
     taiwanEvidence.join("<br>") || "Taiwan market evidence is unavailable.",
-    breadthObs < 2 && twBreadth
-      ? "The breadth reading is a one-session participation snapshot; no breadth trend or percentile conclusion is supported yet."
-      : "Price, participation, and policy context are shown separately.",
-    taiex ? (breadthObs < 2 ? "attention" : "normal") : "missing"
+    taiwanNote,
+    taiwanDisplayState
   );
 
   const metrics = [...state.metrics.values()];
@@ -752,14 +899,14 @@ function renderOverview() {
     const p = percentilePresentation(metric);
     if (p.value !== "—") {
       const label = beginnerContext[metric.metric.id]?.plain_name || metric.metric.name;
-      comparisonParts.push(`${escapeHtml(label)}: <strong>${escapeHtml(p.value)}</strong> ${escapeHtml(p.label)}`);
+      comparisonParts.push(`${escapeHtml(label)}: <strong>${escapeHtml(p.value)}</strong> ${escapeHtml(p.label)}${escapeHtml(percentileContextSuffix(metric))}`);
     }
   }
-  const coverageHeadline = notCurrent.length
-    ? `${notCurrent.length} loaded metric${notCurrent.length === 1 ? "" : "s"} need data-health attention`
-    : metrics.length
-      ? `${metrics.length} published metrics loaded; historical comparison remains metric-specific`
-      : "Evidence coverage is unavailable";
+  const coverageHeadline = total
+    ? `${unknown} of ${total} deleveraging checks unavailable; ${notCurrent.length} loaded metrics need health attention`
+    : (metrics.length
+        ? `${metrics.length} published metrics loaded; signal coverage unavailable`
+        : "Evidence coverage is unavailable");
   setOverviewCard(
     "coverage",
     coverageHeadline,
@@ -767,7 +914,7 @@ function renderOverview() {
     unknown
       ? `Research views retain full history and event windows. ${unknown} of ${total} Deleveraging Watch checks are currently unavailable.`
       : "Research views retain full history, event windows, source, coverage, and freshness.",
-    notCurrent.length ? "attention" : (metrics.length ? "normal" : "missing")
+    (notCurrent.length || unknown) ? "attention" : (metrics.length ? "normal" : "missing")
   );
 }
 
@@ -825,7 +972,8 @@ function renderTaiwanMarket() {
 
   const taiex = state.metrics.get("tw_taiex");
   const adPct = state.metrics.get("tw_advance_decline_pct");
-  const breadthObs = (adPct?.observations || []).filter((o) => o.value != null).length;
+  const taiexFreshness = effectiveFreshness(taiex).state;
+  const breadth = taiwanBreadthState(adPct);
   const macroMetrics = metrics.filter((m) =>
     ["tw_ndc_", "tw_manufacturing_pmi", "tw_industrial_", "tw_manufacturing_production"]
       .some((prefix) => m.metric.id.startsWith(prefix)),
@@ -841,21 +989,30 @@ function renderTaiwanMarket() {
     <div class="regime-note">${escapeHtml(note)}</div>
   </div>`;
 
+  let breadthValue = "Unavailable";
+  let breadthNote = "Official A/D breadth not published";
+  if (adPct && breadth.state !== "missing") {
+    breadthValue = formatValue(adPct.latest?.value, "percent");
+    if (breadth.state === "snapshot_only") {
+      breadthNote = "A-D snapshot · 1 session only · no trend inference";
+    } else if (breadth.state === "history_building") {
+      breadthNote = `A-D % · ${breadth.observations.toLocaleString()} sessions · history accumulating`;
+    } else if (breadth.state === "not_current") {
+      breadthNote = `A-D history exists · ${breadth.freshness}`;
+    } else {
+      breadthNote = `A-D % · ${breadth.observations.toLocaleString()} sessions`;
+    }
+  }
+
   stateGrid.innerHTML = [
     statusCell(
       "Price",
-      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : "Unknown",
-      taiex ? `TAIEX · ${taiex.latest?.as_of || "—"}` : "TAIEX not published",
+      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : "Unavailable",
+      taiex
+        ? `TAIEX · ${taiex.latest?.as_of || "—"} · ${taiexFreshness}`
+        : "TAIEX not published",
     ),
-    statusCell(
-      "Breadth",
-      adPct ? formatValue(adPct.latest?.value, "percent") : "Unknown",
-      adPct
-        ? (breadthObs < 2
-            ? `A-D snapshot · ${breadthObs} session only · no trend inference`
-            : `A-D % · ${breadthObs.toLocaleString()} sessions`)
-        : "Official A/D not published",
-    ),
+    statusCell("Breadth", breadthValue, breadthNote),
     statusCell(
       "Macro cycle",
       macroCurrent ? String(macroCurrent.regime || "Unknown") : "Not published",
@@ -906,7 +1063,7 @@ function renderTaiwanMarket() {
   if (taiex) {
     fullChart(taiex, chart);
     status.textContent =
-      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${taiex.observations.length.toLocaleString()} observations`;
+      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${taiex.observations.length.toLocaleString()} observations · ${taiexFreshness}`;
   } else {
     chart.innerHTML =
       '<div class="empty-state compact">TAIEX snapshot is unavailable in the current release.</div>';
@@ -1868,8 +2025,13 @@ function flattenRuleDetails(rule, out = []) {
     return out;
   }
   out.push({
+    type: rule.type || null,
+    metric: rule.metric || null,
     label: rule.label || rule.type || "rule",
     reason: rule.reason || "",
+    value: rule.value ?? null,
+    threshold: rule.threshold ?? null,
+    periods: rule.periods ?? null,
     asOf: rule.as_of || null,
     status: rule.status || "unknown",
   });
@@ -1929,12 +2091,7 @@ function renderSignals() {
     .map((condition) => {
       const beginner = signalBeginnerContext[condition.id] || {};
       const details = flattenRuleDetails(condition.rules);
-      const detailText = details
-        .map((detail) => {
-          const asOf = detail.asOf ? ` · as of ${detail.asOf}` : "";
-          return `${detail.label}: ${detail.status}${asOf}`;
-        })
-        .join("<br>");
+      const detailText = details.map(formatRuleDetail).join("<br>");
       const caveat = condition.displayStatus === "unknown"
         ? "Required public evidence is unavailable; this remains unknown rather than safe."
         : (beginner.caveat || "");
