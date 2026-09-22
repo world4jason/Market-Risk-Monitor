@@ -8,7 +8,7 @@ from calendar import monthrange
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from .methodology import period_pct_change
+from .methodology import period_pct_change, to_observations
 
 
 SOURCE_URL = "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics"
@@ -398,7 +398,7 @@ def _derived_pct(metric_id: str, name: str, source_metric: dict, periods: int, f
     }
     result["latest"]["as_of"] = latest["date"] if latest else None
     result["latest"]["value"] = latest["value"] if latest else None
-    result["observations"] = derived_obs
+    result["observations"] = to_observations(derived_obs)
     return result
 
 

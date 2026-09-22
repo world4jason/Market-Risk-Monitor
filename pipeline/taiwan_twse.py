@@ -238,6 +238,61 @@ def _parse_count_and_limit(value) -> tuple[int | None, int | None]:
     return count, limit
 
 
+#   ['上漲(漲停)', '9,531(119)', '748(32)']
+# The last column is 股票 (Stocks); the middle one is 整體市場 (all securities,
+# including warrants and ETFs) and must never be used for stock breadth.
+_MI_INDEX_STOCKS_FIELD = "股票"
+_MI_INDEX_OVERALL_FIELD = "整體市場"
+_MI_INDEX_BREADTH_TITLE = "漲跌證券數"
+_MI_INDEX_LEGACY_STOCKS_COLUMN = 2
+
+
+def _mi_index_breadth_rows(payload: dict) -> tuple[list, int]:
+    """
+    Locate the advance/decline table and the Stocks column inside it.
+
+    TWSE has served this endpoint in two shapes. The older one exposed flat
+    `data1`..`data9` keys, with breadth in `data8`. The current one returns a
+    `tables` list whose entries carry their own `title`/`fields`, and the
+    breadth table is not at a stable index -- on 2026-09-18 it sits at index 7
+    while index 8 is empty, so reading a fixed position silently picks up the
+    wrong table or none at all.
+
+    Match on the table's own signature instead, and derive the Stocks column
+    from `fields` rather than assuming its position.
+
+    A bare "股票" field is not sufficient on its own: any future table that
+    happens to carry a stock column would match it first. A table qualifies
+    only if its title names the breadth table, or its fields carry the
+    overall-market/Stocks pair that only the breadth table has.
+    """
+    tables = payload.get("tables")
+    if isinstance(tables, list):
+        for table in tables:
+            if not isinstance(table, dict):
+                continue
+            fields = table.get("fields") or []
+            title = str(table.get("title") or "")
+
+            titled = _MI_INDEX_BREADTH_TITLE in title
+            paired = (
+                _MI_INDEX_STOCKS_FIELD in fields
+                and _MI_INDEX_OVERALL_FIELD in fields
+            )
+            if not (titled or paired):
+                continue
+
+            column = (
+                fields.index(_MI_INDEX_STOCKS_FIELD)
+                if _MI_INDEX_STOCKS_FIELD in fields
+                else _MI_INDEX_LEGACY_STOCKS_COLUMN
+            )
+            return table.get("data") or [], column
+
+    legacy = payload.get("data8") or payload.get("data") or []
+    return legacy, _MI_INDEX_LEGACY_STOCKS_COLUMN
+
+
 def parse_mi_index_market_summary_json(text: str) -> dict:
     """
     Parse TWSE MI_INDEX type=MS.
@@ -254,15 +309,15 @@ def parse_mi_index_market_summary_json(text: str) -> dict:
         raise TaiwanTwseError(
             f"MI_INDEX response stat={payload.get('stat')!r}"
         )
-    rows = payload.get("data8") or payload.get("data") or []
+    rows, stocks_column = _mi_index_breadth_rows(payload)
     if len(rows) < 5:
         raise TaiwanTwseError("MI_INDEX market summary missing breadth rows")
 
     values = []
     for row in rows[:5]:
-        if len(row) < 3:
+        if len(row) <= stocks_column:
             raise TaiwanTwseError("MI_INDEX market-summary row too short")
-        values.append(row[2])  # Stocks column.
+        values.append(row[stocks_column])
 
     up, limit_up = _parse_count_and_limit(values[0])
     down, limit_down = _parse_count_and_limit(values[1])

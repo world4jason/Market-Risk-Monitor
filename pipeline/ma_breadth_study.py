@@ -25,11 +25,21 @@ def _threshold_events(
     """
     Detect threshold crossings without counting every choppy day as a new episode.
 
-    A same-direction crossing inside the cooldown is ignored, unless an opposite
-    crossing has been accepted in between. This matches the documented episode
-    rule and never uses future observations to decide whether today's crossing exists.
+    An episode is anchored on its opening crossing. Inside the cooldown window
+    that follows the anchor, at most one opposite-side recross is accepted (it
+    closes the episode); every further crossing in that window is ignored.
+    Once the cooldown has elapsed, the next crossing opens a new episode.
+
+    Anchoring the cooldown instead of chaining it off the previous event is what
+    keeps a value oscillating around the threshold from emitting one event per
+    session. Only past observations are used, so an event that exists at time T
+    never depends on future data.
     """
     events = []
+    anchor_index = None
+    anchor_direction = None
+    opposite_used = False
+
     for i in range(1, len(observations)):
         prev = observations[i - 1]["value"]
         cur = observations[i]["value"]
@@ -42,13 +52,14 @@ def _threshold_events(
         if direction is None:
             continue
 
-        if events:
-            previous = events[-1]
-            if (
-                previous["direction"] == direction
-                and i - previous["index"] < cooldown_sessions
-            ):
-                continue
+        if anchor_index is None or i - anchor_index >= cooldown_sessions:
+            anchor_index = i
+            anchor_direction = direction
+            opposite_used = False
+        elif direction != anchor_direction and not opposite_used:
+            opposite_used = True
+        else:
+            continue
 
         events.append({"index": i, "direction": direction})
     return events

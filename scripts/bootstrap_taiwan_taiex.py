@@ -50,8 +50,11 @@ def main():
     )
     parser.add_argument(
         "--start",
-        default="1997-01",
-        help="First month YYYY-MM. Default 1997-01.",
+        default="1999-01",
+        help=(
+            "First month YYYY-MM. Default 1999-01: TWSE MI_5MINS_HIST rejects "
+            "every query before 1999-01-05."
+        ),
     )
     parser.add_argument(
         "--end",

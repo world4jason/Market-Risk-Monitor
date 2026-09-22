@@ -1,7 +1,13 @@
 import copy
+import json
 import unittest
+from pathlib import Path
 
-from pipeline.validate import ValidationError, validate_metric
+from pipeline.validate import (
+    ALLOWED_OBSERVATION_STATUSES,
+    ValidationError,
+    validate_metric,
+)
 
 
 BASE = {
@@ -94,6 +100,33 @@ class ValidateTests(unittest.TestCase):
         payload["freshness"]["state"] = "safe"
         with self.assertRaises(ValidationError):
             validate_metric(payload)
+
+    def test_observation_statuses_match_the_canonical_contract(self):
+        for status in ALLOWED_OBSERVATION_STATUSES:
+            payload = copy.deepcopy(BASE)
+            payload["observations"][0]["status"] = status
+            validate_metric(payload)
+
+    def test_unknown_observation_status_rejected(self):
+        # "ok" is a methodology-transform status, not a contract status; a
+        # derived metric must translate before it is written to an artifact.
+        payload = copy.deepcopy(BASE)
+        payload["observations"][0]["status"] = "ok"
+        with self.assertRaises(ValidationError):
+            validate_metric(payload)
+
+    def test_observation_status_vocabulary_matches_json_schema(self):
+        schema = json.loads(
+            (
+                Path(__file__).resolve().parents[1]
+                / "schemas"
+                / "metric-series.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        schema_statuses = set(
+            schema["properties"]["observations"]["items"]["properties"]["status"]["enum"]
+        )
+        self.assertEqual(schema_statuses, set(ALLOWED_OBSERVATION_STATUSES))
 
 
 if __name__ == "__main__":

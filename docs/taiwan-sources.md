@@ -45,6 +45,18 @@ https://www.twse.com.tw/en/trading/historical/stock-day.html
 
 TWSE also exposes daily closing-price/monthly-average history back to **1999-01-05**, but the full daily OHLC/trading page starts in 2010.
 
+That 1999-01-05 floor is enforced by the endpoint itself. A monthly
+`MI_5MINS_HIST` query for any earlier month is refused:
+
+```text
+stat='Search date less then 1999/1/5, please retry!'
+```
+
+So `scripts/bootstrap_taiwan_taiex.py` defaults to `--start 1999-01`, and
+`tw_taiex*` expected history starts are pinned to `1999-01-05` in
+`scripts/refresh_data.py`. A verified full backfill yields **6868 daily
+observations, 1999-01-05 → 2026-09-21**.
+
 ### Canonical metric ids
 - `tw_taiex`
 - `tw_taiex_open`

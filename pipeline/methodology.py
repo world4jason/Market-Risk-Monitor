@@ -5,6 +5,37 @@ from statistics import median
 from typing import Iterable
 
 
+# Methodology transforms report their own status vocabulary. The canonical
+# observation contract uses a different one, so derived metrics must translate
+# before they are written into a metric artifact.
+TRANSFORM_TO_OBSERVATION_STATUS = {
+    "ok": "observed",
+    "missing": "missing",
+    "insufficient_data": "insufficient_data",
+}
+
+
+def observation_status(transform_status: str) -> str:
+    try:
+        return TRANSFORM_TO_OBSERVATION_STATUS[transform_status]
+    except KeyError as exc:
+        raise ValueError(
+            f"unknown transform status {transform_status!r}"
+        ) from exc
+
+
+def to_observations(transform_rows: list[dict]) -> list[dict]:
+    """Convert transform output rows into canonical contract observations."""
+    return [
+        {
+            "date": row["date"],
+            "value": row.get("value"),
+            "status": observation_status(row["status"]),
+        }
+        for row in transform_rows
+    ]
+
+
 def _values(values: Iterable[float | int | None]) -> list[float]:
     out = []
     for value in values:

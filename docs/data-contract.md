@@ -39,6 +39,36 @@ These states are semantically distinct.
 
 A stale or missing metric must never be silently treated as low risk.
 
+## Observation statuses
+
+`freshness.state` describes the metric. Each entry in `observations` carries its
+own `status`, drawn from a separate vocabulary:
+
+```text
+observed
+missing
+estimated
+revised
+insufficient_data
+```
+
+- `observed`: a real source value for that date.
+- `missing`: the source has no value for that date.
+- `estimated` / `revised`: provider-flagged provisional or restated values.
+- `insufficient_data`: the date exists, but the requested transform has too
+  little history to produce a value there — for example the first row of a
+  month-over-month or year-over-year change.
+
+Methodology transforms in `pipeline/methodology.py` report their own internal
+status vocabulary (`ok` / `missing` / `insufficient_data`). A derived metric must
+translate that into the contract vocabulary via
+`pipeline.methodology.to_observations()` before writing an artifact; `ok` is not
+a valid observation status.
+
+The enum lives in `schemas/metric-series.schema.json`, is mirrored by
+`pipeline.validate.ALLOWED_OBSERVATION_STATUSES`, and the two are asserted equal
+in `tests/test_validate.py`.
+
 ## Observation time vs fetch time
 
 `latest.as_of` is the date represented by the source observation.

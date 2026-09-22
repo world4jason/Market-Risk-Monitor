@@ -101,9 +101,23 @@ Default cooldown:
 20 trading sessions
 ```
 
-A second same-direction crossing within the cooldown is ignored unless the opposite-side recross occurred first.
+The cooldown window is anchored on the crossing that opened the episode, not on
+the previous crossing.
 
-This avoids counting a choppy multi-day oversold period as many independent signals.
+Inside that window:
+
+- at most one opposite-side recross is recorded, and it closes the episode;
+- every further crossing is ignored.
+
+Once the window has elapsed, the next crossing anchors a new episode.
+
+Anchoring is what makes this rule work. Chaining the cooldown off the previous
+crossing instead lets breadth oscillating across K emit one event per session,
+because each crossing is the opposite of the one before it — exactly the choppy
+multi-day oversold period this rule exists to collapse.
+
+Only past observations are used, so whether an event exists at time T never
+depends on future data.
 
 ## Forward-return windows
 

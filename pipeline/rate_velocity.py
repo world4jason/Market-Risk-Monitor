@@ -153,10 +153,21 @@ def rate_velocity_rows(observations: list[dict]) -> list[dict]:
 def rate_regime(row: dict, config: dict) -> str:
     six = row.get("change_6m_bp")
     step = row.get("step_bp")
+    cfg = config["regimes"]
+
     if six is None:
+        # The series can be too short for a 6M cumulative change while still
+        # containing an unambiguous outsized policy step. Falling through to
+        # "unknown" there would hide a decisive move such as a 75bp hike.
+        if step is None:
+            return "unknown"
+        aggressive_step = float(cfg["aggressive_single_step_bp"])
+        if step >= aggressive_step:
+            return "aggressive_tightening"
+        if step <= -aggressive_step:
+            return "easing"
         return "unknown"
 
-    cfg = config["regimes"]
     if six <= float(cfg["easing_max_6m_bp"]):
         return "easing"
     if (

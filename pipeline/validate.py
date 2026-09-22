@@ -5,6 +5,17 @@ from math import isfinite
 
 
 ALLOWED_STATES = {"fresh", "stale", "missing", "error", "insufficient_data"}
+# Must stay in sync with observations[].status in
+# schemas/metric-series.schema.json. Checking it here as well keeps the unit
+# suite honest: tests call validate_metric() directly and would otherwise only
+# see a contract break once scripts/validate_data.py ran on real artifacts.
+ALLOWED_OBSERVATION_STATUSES = {
+    "observed",
+    "missing",
+    "estimated",
+    "revised",
+    "insufficient_data",
+}
 ALLOWED_SIGNAL_STATES = {"active", "inactive", "unknown"}
 ALLOWED_REFRESH_STATES = {"updated", "error"}
 
@@ -76,6 +87,11 @@ def validate_metric(metric: dict) -> None:
     for obs in metric["observations"]:
         _date(obs["date"], field="observation date")
         dates.append(obs["date"])
+        status = obs.get("status")
+        if status not in ALLOWED_OBSERVATION_STATUSES:
+            raise ValidationError(
+                f"Invalid observation status {status!r} at {obs['date']}"
+            )
         value = obs.get("value")
         if value is not None and not isfinite(float(value)):
             raise ValidationError(f"Non-finite observation at {obs['date']}")
