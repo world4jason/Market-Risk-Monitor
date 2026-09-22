@@ -195,7 +195,7 @@ function formatValue(value, units) {
     return `$${v.toFixed(0)}M`;
   }
   if (units === "percent") return `${v.toFixed(Math.abs(v) >= 10 ? 1 : 2)}%`;
-  if (units === "percentile") return `${v.toFixed(0)}th`;
+  if (units === "percentile") return ordinal(v);
   if (units === "ratio") return `${v.toFixed(2)}×`;
   if (units === "binary") return v ? "Yes" : "No";
   if (units === "basis points") return `${v >= 0 ? "+" : ""}${v.toFixed(1)} bp`;
@@ -1853,6 +1853,7 @@ function openMetric(id) {
     : "Snapshot fetched";
   $("#dialog-source").innerHTML =
     `${metricContextGuide(metric)}
+     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)}${metric.metric.polarity === "contextual" ? " This rank is context only; it is not a risk direction." : ""}</p>`}
      <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
      ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
 
