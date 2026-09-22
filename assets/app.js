@@ -1,4 +1,5 @@
 const CATALOG_URL = "./data/generated/catalog.json";
+const OVERVIEW_URL = "./data/generated/overview.json";
 const EVENTS_URL = "./data/events.json";
 const SIGNALS_URL = "./data/generated/signals.json";
 const REFRESH_REPORT_URL = "./data/generated/refresh-report.json";
@@ -13,6 +14,7 @@ const METRIC_BASE = new URL("./data/generated/", window.location.href);
 const state = {
   catalog: null,
   metrics: new Map(),
+  metricLoads: new Map(),
   events: [],
   signals: null,
   refreshReport: null,
@@ -354,6 +356,9 @@ function signalCondition(id) {
 
 
 function usableObservationCount(metric) {
+  if (!Array.isArray(metric?.observations) && metric?.summary) {
+    return Number(metric.summary.observation_count || 0);
+  }
   return (metric?.observations || []).filter((observation) => observation.value != null).length;
 }
 
@@ -486,6 +491,11 @@ function historicalPercentileAllowed(metric) {
 
 function rollingPercentile(metric) {
   if (!historicalPercentileAllowed(metric)) return null;
+  if (!Array.isArray(metric?.observations) && metric?.summary) {
+    const value = metric.summary.rolling_percentile;
+    return value == null ? null : Number(value);
+  }
+
   const obs = (metric.observations || []).filter((o) => o.value != null);
   if (obs.length < 3) return null;
 
@@ -507,6 +517,13 @@ function rollingPercentile(metric) {
 // no stable relative change at all. The artifact carries metric.comparison; see
 // docs/presentation-contract.md.
 function recentChange(metric) {
+  if (!Array.isArray(metric?.observations) && metric?.summary) {
+    const change = metric.summary.recent_change;
+    return change
+      ? { value: Number(change.value), comparison: change.comparison }
+      : null;
+  }
+
   const comparison = metric.metric?.comparison || "absolute";
   if (comparison === "none") return null;
 
@@ -681,7 +698,10 @@ function svgPath(observations, width = 320, height = 64, pad = 4) {
 }
 
 function sparkline(metric) {
-  const obs = (metric.observations || [])
+  const source = Array.isArray(metric?.observations)
+    ? metric.observations
+    : (metric?.summary?.preview_observations || []);
+  const obs = source
     .filter((o) => o.value != null)
     .slice(-120);
   const path = svgPath(obs);
@@ -1969,14 +1989,60 @@ function relatedBreadthStats(metric) {
   return stats;
 }
 
-function openMetric(id) {
-  const metric = state.metrics.get(id);
-  if (!metric) return;
+async function ensureMetricLoaded(id) {
+  const existing = state.metrics.get(id);
+  if (Array.isArray(existing?.observations)) return existing;
 
+  if (state.metricLoads.has(id)) {
+    return state.metricLoads.get(id);
+  }
+
+  const entry = (state.catalog?.metrics || []).find((item) => item.id === id);
+  if (!entry) throw new Error(`metric ${id} is not present in the catalog`);
+
+  const promise = (async () => {
+    const url = new URL(entry.path.replace(/^\.\//, ""), METRIC_BASE);
+    const response = await fetch(url, { cache: "no-cache" });
+    if (!response.ok) throw new Error(`${id} HTTP ${response.status}`);
+    const metric = await response.json();
+    state.metrics.set(id, metric);
+    return metric;
+  })();
+
+  state.metricLoads.set(id, promise);
+  try {
+    return await promise;
+  } finally {
+    state.metricLoads.delete(id);
+  }
+}
+
+async function openMetric(id) {
+  const summary = state.metrics.get(id);
+  if (!summary) return;
+
+  const dialog = $("#metric-dialog");
   const context = beginnerContext[id];
   $("#dialog-pillar").textContent =
-    pillarLabels[metric.metric.pillar] || metric.metric.pillar;
-  $("#dialog-title").textContent = context?.plain_name || metric.metric.name;
+    pillarLabels[summary.metric.pillar] || summary.metric.pillar;
+  $("#dialog-title").textContent = context?.plain_name || summary.metric.name;
+  $("#dialog-summary").innerHTML =
+    '<div class="detail-stat"><strong>Loading…</strong><span>Full metric history</span></div>';
+  $("#dialog-chart").innerHTML =
+    '<div class="empty-state compact">Loading full metric history…</div>';
+  $("#dialog-source").innerHTML = "";
+  if (!dialog.open) dialog.showModal();
+
+  let metric;
+  try {
+    metric = await ensureMetricLoaded(id);
+  } catch (error) {
+    console.warn("metric detail load failed", id, error);
+    $("#dialog-chart").innerHTML =
+      '<div class="empty-state compact">Detailed history could not be loaded. The overview remains available.</div>';
+    $("#dialog-source").textContent = String(error?.message || error);
+    return;
+  }
 
   const pct = rollingPercentile(metric);
   const p = percentilePresentation(metric, pct);
@@ -2011,8 +2077,6 @@ function openMetric(id) {
      ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)}${percentileContextSuffix(metric) ? " This rank is context only; it is not a risk direction." : ""}</p>`}
      <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
      ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
-
-  $("#metric-dialog").showModal();
 }
 
 
