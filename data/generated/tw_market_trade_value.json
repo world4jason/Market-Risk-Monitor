@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "production",
+  "metric": {
+    "id": "tw_market_trade_value",
+    "name": "TWSE Market Trade Value",
+    "description": "TWSE daily aggregate market trade value.",
+    "pillar": "market",
+    "units": "TWD",
+    "frequency": "daily",
+    "polarity": "contextual",
+    "comparison": "percent_change"
+  },
+  "source": {
+    "provider": "Taiwan Stock Exchange (TWSE)",
+    "dataset": "TWSE official market data",
+    "series_id": null,
+    "url": "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+    "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+    "redistribution": "unknown",
+    "market_scope": "TWSE listed stocks",
+    "membership_mode": null,
+    "membership_snapshot": null,
+    "price_adjustment": null,
+    "point_in_time_membership": null
+  },
+  "coverage": {
+    "history_start": "2026-09-01",
+    "history_end": "2026-09-22",
+    "timezone": "Asia/Taipei",
+    "expected_observation_lag_days": 1
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 5,
+    "age_days": 1,
+    "evaluated_at": "2026-09-22T10:54:30.867967Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "twse-raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "expanding-pit",
+      "type": "full_history_percentile",
+      "window_observations": null,
+      "min_observations": 60,
+      "point_in_time": true,
+      "notes": "Strict-past expanding baseline."
+    },
+    {
+      "id": "rolling-1260d",
+      "type": "rolling_percentile",
+      "window_observations": 1260,
+      "min_observations": 252,
+      "point_in_time": true,
+      "notes": "Approximate trailing five trading years."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-09-21",
+    "fetched_at": "2026-09-22T10:54:30.867967Z",
+    "value": 866817533778.0,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2026-09-01",
+      "value": 1187571567117.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-02",
+      "value": 976499979054.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-03",
+      "value": 993261606190.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-04",
+      "value": 858244966564.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-07",
+      "value": 997944843239.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-08",
+      "value": 922658079092.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-09",
+      "value": 815976678108.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-10",
+      "value": 750742811639.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-11",
+      "value": 762245189934.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-14",
+      "value": 665316266033.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-15",
+      "value": 634706804618.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-16",
+      "value": 675969528562.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-17",
+      "value": 866619179411.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-18",
+      "value": 1142321910407.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-21",
+      "value": 866817533778.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-22",
+      "value": null,
+      "status": "missing"
+    }
+  ]
+}

@@ -1,0 +1,987 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "production",
+  "metric": {
+    "id": "us_fed_policy_change_3m_bp",
+    "name": "Fed Policy Rate 3M cumulative change",
+    "description": "Policy-rate level/change velocity.",
+    "pillar": "context",
+    "units": "basis points",
+    "frequency": "irregular",
+    "polarity": "higher_is_riskier",
+    "comparison": "none"
+  },
+  "source": {
+    "provider": "Board of Governors / FOMC via FRED",
+    "dataset": "Policy rate history",
+    "series_id": "us_fed_policy_change_3m_bp",
+    "url": "https://fred.stlouisfed.org/series/DFEDTARU",
+    "license_note": "Official/first-party or FRED-distributed policy-rate source; retain attribution.",
+    "redistribution": "unknown",
+    "market_scope": "United States",
+    "membership_mode": null,
+    "membership_snapshot": null,
+    "price_adjustment": null,
+    "point_in_time_membership": null
+  },
+  "coverage": {
+    "history_start": "1982-09-27",
+    "history_end": "2026-09-17",
+    "timezone": "UTC",
+    "expected_observation_lag_days": 1
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 2000,
+    "age_days": 5,
+    "evaluated_at": "2026-09-22T10:54:31.364172Z",
+    "reason": "Irregular change-date series; old effective date can still be current."
+  },
+  "lineage": {
+    "kind": "derived",
+    "inputs": [
+      "us_fed_policy_rate"
+    ],
+    "formula": "100 * (rate_t - last_rate_on_or_before(t-3m))",
+    "transform_version": "rate-velocity-v1"
+  },
+  "baselines": [],
+  "latest": {
+    "as_of": "2026-09-17",
+    "fetched_at": "2026-09-22T10:54:31.364172Z",
+    "value": 25.0,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "1982-09-27",
+      "value": null,
+      "status": "missing"
+    },
+    {
+      "date": "1982-10-01",
+      "value": null,
+      "status": "missing"
+    },
+    {
+      "date": "1982-10-07",
+      "value": null,
+      "status": "missing"
+    },
+    {
+      "date": "1982-11-19",
+      "value": null,
+      "status": "missing"
+    },
+    {
+      "date": "1982-12-14",
+      "value": null,
+      "status": "missing"
+    },
+    {
+      "date": "1983-03-31",
+      "value": 12.5,
+      "status": "observed"
+    },
+    {
+      "date": "1983-05-25",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1983-06-24",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1983-07-14",
+      "value": 62.5,
+      "status": "observed"
+    },
+    {
+      "date": "1983-07-20",
+      "value": 81.25,
+      "status": "observed"
+    },
+    {
+      "date": "1983-08-11",
+      "value": 93.75,
+      "status": "observed"
+    },
+    {
+      "date": "1983-08-17",
+      "value": 87.5,
+      "status": "observed"
+    },
+    {
+      "date": "1983-09-15",
+      "value": 62.5,
+      "status": "observed"
+    },
+    {
+      "date": "1984-03-29",
+      "value": 112.5,
+      "status": "observed"
+    },
+    {
+      "date": "1984-07-05",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-07-19",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-08-09",
+      "value": 100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-09-20",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-09-27",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-10-11",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-10-18",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-11-08",
+      "value": -175.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-11-23",
+      "value": -250.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-12-06",
+      "value": -275.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-12-19",
+      "value": -300.0,
+      "status": "observed"
+    },
+    {
+      "date": "1984-12-24",
+      "value": -312.5,
+      "status": "observed"
+    },
+    {
+      "date": "1985-01-24",
+      "value": -175.0,
+      "status": "observed"
+    },
+    {
+      "date": "1985-02-14",
+      "value": -112.5,
+      "status": "observed"
+    },
+    {
+      "date": "1985-03-28",
+      "value": 37.5,
+      "status": "observed"
+    },
+    {
+      "date": "1985-04-25",
+      "value": 0.0,
+      "status": "observed"
+    },
+    {
+      "date": "1985-05-20",
+      "value": -62.5,
+      "status": "observed"
+    },
+    {
+      "date": "1985-07-11",
+      "value": -81.25,
+      "status": "observed"
+    },
+    {
+      "date": "1985-07-25",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1985-08-21",
+      "value": 6.25,
+      "status": "observed"
+    },
+    {
+      "date": "1985-09-06",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1985-12-18",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1986-03-07",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1986-04-02",
+      "value": -43.75,
+      "status": "observed"
+    },
+    {
+      "date": "1986-04-21",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1986-05-22",
+      "value": -93.75,
+      "status": "observed"
+    },
+    {
+      "date": "1986-06-05",
+      "value": -87.5,
+      "status": "observed"
+    },
+    {
+      "date": "1986-07-11",
+      "value": -93.75,
+      "status": "observed"
+    },
+    {
+      "date": "1986-08-21",
+      "value": -87.5,
+      "status": "observed"
+    },
+    {
+      "date": "1987-01-05",
+      "value": 12.5,
+      "status": "observed"
+    },
+    {
+      "date": "1987-04-30",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1987-05-22",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1987-07-02",
+      "value": 62.5,
+      "status": "observed"
+    },
+    {
+      "date": "1987-08-27",
+      "value": 0.0,
+      "status": "observed"
+    },
+    {
+      "date": "1987-09-03",
+      "value": 12.5,
+      "status": "observed"
+    },
+    {
+      "date": "1987-09-04",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1987-09-24",
+      "value": 56.25,
+      "status": "observed"
+    },
+    {
+      "date": "1987-11-04",
+      "value": 18.75,
+      "status": "observed"
+    },
+    {
+      "date": "1988-01-28",
+      "value": -68.75,
+      "status": "observed"
+    },
+    {
+      "date": "1988-02-11",
+      "value": -31.25,
+      "status": "observed"
+    },
+    {
+      "date": "1988-03-30",
+      "value": -6.25,
+      "status": "observed"
+    },
+    {
+      "date": "1988-05-09",
+      "value": 37.5,
+      "status": "observed"
+    },
+    {
+      "date": "1988-05-25",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1988-06-22",
+      "value": 93.75,
+      "status": "observed"
+    },
+    {
+      "date": "1988-07-01",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1988-07-19",
+      "value": 93.75,
+      "status": "observed"
+    },
+    {
+      "date": "1988-08-08",
+      "value": 100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1988-08-09",
+      "value": 112.5,
+      "status": "observed"
+    },
+    {
+      "date": "1988-11-17",
+      "value": 18.75,
+      "status": "observed"
+    },
+    {
+      "date": "1988-11-22",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1988-12-15",
+      "value": 56.25,
+      "status": "observed"
+    },
+    {
+      "date": "1989-01-05",
+      "value": 87.5,
+      "status": "observed"
+    },
+    {
+      "date": "1989-02-09",
+      "value": 100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1989-02-14",
+      "value": 118.75,
+      "status": "observed"
+    },
+    {
+      "date": "1989-02-24",
+      "value": 137.5,
+      "status": "observed"
+    },
+    {
+      "date": "1989-05-17",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1989-06-06",
+      "value": -18.75,
+      "status": "observed"
+    },
+    {
+      "date": "1989-07-07",
+      "value": -43.75,
+      "status": "observed"
+    },
+    {
+      "date": "1989-07-27",
+      "value": -68.75,
+      "status": "observed"
+    },
+    {
+      "date": "1989-10-19",
+      "value": -56.25,
+      "status": "observed"
+    },
+    {
+      "date": "1989-11-06",
+      "value": -56.25,
+      "status": "observed"
+    },
+    {
+      "date": "1989-12-20",
+      "value": -81.25,
+      "status": "observed"
+    },
+    {
+      "date": "1990-07-13",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1990-10-29",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1990-11-14",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1990-12-07",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1990-12-19",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-01-09",
+      "value": -125.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-02-01",
+      "value": -150.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-03-08",
+      "value": -125.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-04-30",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-08-06",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-09-13",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-10-31",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-11-06",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-12-06",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1991-12-20",
+      "value": -125.0,
+      "status": "observed"
+    },
+    {
+      "date": "1992-04-09",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1992-07-02",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1992-09-04",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1994-02-04",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1994-03-22",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1994-04-18",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1994-05-17",
+      "value": 100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1994-08-16",
+      "value": 100.0,
+      "status": "observed"
+    },
+    {
+      "date": "1994-11-15",
+      "value": 125.0,
+      "status": "observed"
+    },
+    {
+      "date": "1995-02-01",
+      "value": 125.0,
+      "status": "observed"
+    },
+    {
+      "date": "1995-07-06",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1995-12-19",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1996-01-31",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1997-03-25",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-09-29",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-10-15",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1998-11-17",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-06-30",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-08-24",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "1999-11-16",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-02-02",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-03-21",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2000-05-16",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-01-03",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-01-31",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-03-20",
+      "value": -150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-04-18",
+      "value": -150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-05-15",
+      "value": -150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-06-27",
+      "value": -125.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-08-21",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-09-17",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-10-02",
+      "value": -125.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-11-06",
+      "value": -175.0,
+      "status": "observed"
+    },
+    {
+      "date": "2001-12-11",
+      "value": -175.0,
+      "status": "observed"
+    },
+    {
+      "date": "2002-11-06",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2003-06-25",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-06-30",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-08-10",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-09-21",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-11-10",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2004-12-14",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-02-02",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-03-22",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-05-03",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-06-30",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-08-09",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-09-20",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-11-01",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2005-12-13",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-01-31",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-03-28",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-05-10",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2006-06-29",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-09-18",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-10-31",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2007-12-11",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-01-22",
+      "value": -125.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-01-30",
+      "value": -175.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-03-18",
+      "value": -200.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-04-30",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-10-08",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-10-29",
+      "value": -100.0,
+      "status": "observed"
+    },
+    {
+      "date": "2008-12-16",
+      "value": -175.0,
+      "status": "observed"
+    },
+    {
+      "date": "2015-12-16",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2016-12-14",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-03-16",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-06-15",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2017-12-14",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-03-22",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-06-14",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-09-27",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2018-12-20",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-08-01",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-09-19",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2019-10-31",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-03-04",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2020-03-16",
+      "value": -150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-03-17",
+      "value": 25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-05-05",
+      "value": 75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-06-16",
+      "value": 150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-07-28",
+      "value": 200.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-09-22",
+      "value": 150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-11-03",
+      "value": 150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2022-12-15",
+      "value": 200.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-02-02",
+      "value": 150.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-03-23",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-05-04",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2023-07-27",
+      "value": 50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-09-19",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-11-08",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2024-12-19",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-09-18",
+      "value": -25.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-10-30",
+      "value": -50.0,
+      "status": "observed"
+    },
+    {
+      "date": "2025-12-11",
+      "value": -75.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-17",
+      "value": 25.0,
+      "status": "observed"
+    }
+  ]
+}

@@ -183,6 +183,38 @@ The root `.nojekyll` marker is committed. The deployed site is already publish-r
 
 Data refresh is intentionally separate from Pages publication. A successful refresh updates `data/generated/*.json`; after validation, those snapshots can be committed normally.
 
+### Producing a release snapshot
+
+A published snapshot is **not** produced by `scripts/bootstrap_sources.py`,
+which defaults to including the TraderMonty moving-average breadth source. It
+uses an explicit source allowlist and `--clean-output`:
+
+```bash
+python scripts/bootstrap_taiwan_taiex.py
+
+python scripts/refresh_data.py --clean-output \
+  --fred-id nfci --fred-id nfci_risk --fred-id nfci_credit \
+  --fred-id nfci_nonfinancial_leverage --fred-id us_recession \
+  --fred-id fed_target_legacy --fred-id fed_target_upper \
+  --cboe-vix \
+  --finra-file <margin-statistics.xlsx> \
+  --shiller-file <ie_data.xls> \
+  --twse-current \
+  --cbc-rate-file <cbc-rates.csv>
+
+python scripts/build_signals.py
+python scripts/validate_data.py
+python scripts/site_smoke.py
+```
+
+`--clean-output` is not optional. Without it a refresh is additive: an
+unselected source is skipped rather than cleared, and the catalog globs the
+whole output directory, so an artifact left by an earlier run with different
+flags is published again. That is how a `redistribution: "restricted"` series
+can survive an allowlist written to exclude it.
+
+Full procedure, exclusions and pre-publish checks: [docs/release.md](docs/release.md).
+
 ## Historical comparison
 
 Historical context is first-class.

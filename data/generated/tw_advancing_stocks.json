@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "production",
+  "metric": {
+    "id": "tw_advancing_stocks",
+    "name": "TWSE Advancing Stocks",
+    "description": "Number of TWSE-listed stocks closing above the prior close.",
+    "pillar": "breadth",
+    "units": "count",
+    "frequency": "daily",
+    "polarity": "contextual",
+    "comparison": "absolute"
+  },
+  "source": {
+    "provider": "Taiwan Stock Exchange (TWSE)",
+    "dataset": "TWSE official market data",
+    "series_id": null,
+    "url": "https://dts.twse.com.tw/opendata/twtazu_od.csv",
+    "license_note": "Official TWSE source. Government open-data items such as twtazu_od are published under Taiwan Government Data Open License v1.0; other web/OpenAPI data retain source attribution.",
+    "redistribution": "unknown",
+    "market_scope": "TWSE listed stocks",
+    "membership_mode": null,
+    "membership_snapshot": null,
+    "price_adjustment": null,
+    "point_in_time_membership": null
+  },
+  "coverage": {
+    "history_start": "2026-09-21",
+    "history_end": "2026-09-21",
+    "timezone": "Asia/Taipei",
+    "expected_observation_lag_days": 1
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 5,
+    "age_days": 1,
+    "evaluated_at": "2026-09-22T10:54:31.187834Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "twse-raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "expanding-pit",
+      "type": "full_history_percentile",
+      "window_observations": null,
+      "min_observations": 60,
+      "point_in_time": true,
+      "notes": "Strict-past expanding baseline."
+    },
+    {
+      "id": "rolling-1260d",
+      "type": "rolling_percentile",
+      "window_observations": 1260,
+      "min_observations": 252,
+      "point_in_time": true,
+      "notes": "Approximate trailing five trading years."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-09-21",
+    "fetched_at": "2026-09-22T10:54:31.187834Z",
+    "value": 484,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2026-09-21",
+      "value": 484,
+      "status": "observed"
+    }
+  ]
+}

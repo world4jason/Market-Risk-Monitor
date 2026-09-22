@@ -1,0 +1,206 @@
+{
+  "generated_at": "2026-09-22T10:54:33.228741Z",
+  "results": [
+    {
+      "metric": "nfci",
+      "status": "updated",
+      "path": "data/generated/nfci.json"
+    },
+    {
+      "metric": "nfci_risk",
+      "status": "updated",
+      "path": "data/generated/nfci_risk.json"
+    },
+    {
+      "metric": "nfci_credit",
+      "status": "updated",
+      "path": "data/generated/nfci_credit.json"
+    },
+    {
+      "metric": "nfci_nonfinancial_leverage",
+      "status": "updated",
+      "path": "data/generated/nfci_nonfinancial_leverage.json"
+    },
+    {
+      "metric": "us_recession",
+      "status": "updated",
+      "path": "data/generated/us_recession.json"
+    },
+    {
+      "metric": "fed_target_legacy",
+      "status": "updated",
+      "path": "data/generated/fed_target_legacy.json"
+    },
+    {
+      "metric": "fed_target_upper",
+      "status": "updated",
+      "path": "data/generated/fed_target_upper.json"
+    },
+    {
+      "metric": "vix",
+      "status": "updated",
+      "path": "data/generated/vix.json"
+    },
+    {
+      "metric": "tw_taiex",
+      "status": "updated",
+      "path": "data/generated/tw_taiex.json"
+    },
+    {
+      "metric": "tw_taiex_open",
+      "status": "updated",
+      "path": "data/generated/tw_taiex_open.json"
+    },
+    {
+      "metric": "tw_taiex_high",
+      "status": "updated",
+      "path": "data/generated/tw_taiex_high.json"
+    },
+    {
+      "metric": "tw_taiex_low",
+      "status": "updated",
+      "path": "data/generated/tw_taiex_low.json"
+    },
+    {
+      "metric": "tw_market_trade_value",
+      "status": "updated",
+      "path": "data/generated/tw_market_trade_value.json"
+    },
+    {
+      "metric": "tw_market_trade_volume",
+      "status": "updated",
+      "path": "data/generated/tw_market_trade_volume.json"
+    },
+    {
+      "metric": "tw_advancing_stocks",
+      "status": "updated",
+      "path": "data/generated/tw_advancing_stocks.json"
+    },
+    {
+      "metric": "tw_declining_stocks",
+      "status": "updated",
+      "path": "data/generated/tw_declining_stocks.json"
+    },
+    {
+      "metric": "tw_unchanged_stocks",
+      "status": "updated",
+      "path": "data/generated/tw_unchanged_stocks.json"
+    },
+    {
+      "metric": "tw_advance_decline_diff",
+      "status": "updated",
+      "path": "data/generated/tw_advance_decline_diff.json"
+    },
+    {
+      "metric": "tw_advance_decline_pct",
+      "status": "updated",
+      "path": "data/generated/tw_advance_decline_pct.json"
+    },
+    {
+      "metric": "tw_advance_decline_line",
+      "status": "updated",
+      "path": "data/generated/tw_advance_decline_line.json"
+    },
+    {
+      "metric": "tw_cbc_rate",
+      "status": "updated",
+      "path": "data/generated/tw_cbc_rate.json"
+    },
+    {
+      "metric": "tw_cbc_step_bp",
+      "status": "updated",
+      "path": "data/generated/tw_cbc_step_bp.json"
+    },
+    {
+      "metric": "tw_cbc_change_3m_bp",
+      "status": "updated",
+      "path": "data/generated/tw_cbc_change_3m_bp.json"
+    },
+    {
+      "metric": "tw_cbc_change_6m_bp",
+      "status": "updated",
+      "path": "data/generated/tw_cbc_change_6m_bp.json"
+    },
+    {
+      "metric": "tw_cbc_change_12m_bp",
+      "status": "updated",
+      "path": "data/generated/tw_cbc_change_12m_bp.json"
+    },
+    {
+      "metric": "finra_margin_debt",
+      "status": "updated",
+      "path": "data/generated/finra_margin_debt.json"
+    },
+    {
+      "metric": "finra_total_free_credit",
+      "status": "updated",
+      "path": "data/generated/finra_total_free_credit.json"
+    },
+    {
+      "metric": "finra_cash_free_credit",
+      "status": "updated",
+      "path": "data/generated/finra_cash_free_credit.json"
+    },
+    {
+      "metric": "finra_margin_free_credit",
+      "status": "updated",
+      "path": "data/generated/finra_margin_free_credit.json"
+    },
+    {
+      "metric": "finra_margin_debt_mom_pct",
+      "status": "updated",
+      "path": "data/generated/finra_margin_debt_mom_pct.json"
+    },
+    {
+      "metric": "finra_margin_debt_yoy_pct",
+      "status": "updated",
+      "path": "data/generated/finra_margin_debt_yoy_pct.json"
+    },
+    {
+      "metric": "margin_debt_to_free_credit",
+      "status": "updated",
+      "path": "data/generated/margin_debt_to_free_credit.json"
+    },
+    {
+      "metric": "shiller_price",
+      "status": "updated",
+      "path": "data/generated/shiller_price.json"
+    },
+    {
+      "metric": "shiller_cape",
+      "status": "updated",
+      "path": "data/generated/shiller_cape.json"
+    },
+    {
+      "metric": "shiller_real_tr_price",
+      "status": "updated",
+      "path": "data/generated/shiller_real_tr_price.json"
+    },
+    {
+      "metric": "us_fed_policy_rate",
+      "status": "updated",
+      "path": "data/generated/us_fed_policy_rate.json"
+    },
+    {
+      "metric": "us_fed_policy_step_bp",
+      "status": "updated",
+      "path": "data/generated/us_fed_policy_step_bp.json"
+    },
+    {
+      "metric": "us_fed_policy_change_3m_bp",
+      "status": "updated",
+      "path": "data/generated/us_fed_policy_change_3m_bp.json"
+    },
+    {
+      "metric": "us_fed_policy_change_6m_bp",
+      "status": "updated",
+      "path": "data/generated/us_fed_policy_change_6m_bp.json"
+    },
+    {
+      "metric": "us_fed_policy_change_12m_bp",
+      "status": "updated",
+      "path": "data/generated/us_fed_policy_change_12m_bp.json"
+    }
+  ],
+  "removed_artifacts": []
+}

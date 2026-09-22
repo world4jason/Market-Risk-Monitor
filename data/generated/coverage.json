@@ -1,0 +1,366 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-22T10:54:33.188519Z",
+  "metrics": [
+    {
+      "id": "fed_target_legacy",
+      "name": "Federal Funds Target Rate (Legacy)",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "1982-09-27",
+      "actual_history_end": "2008-12-15",
+      "observations": 9577,
+      "status": "ok"
+    },
+    {
+      "id": "fed_target_upper",
+      "name": "Federal Funds Target Range Upper Limit",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2008-12-16",
+      "actual_history_end": "2026-09-21",
+      "observations": 6489,
+      "status": "ok"
+    },
+    {
+      "id": "finra_cash_free_credit",
+      "name": "FINRA Cash Account Free Credit",
+      "latest_acceptable_history_start": "2010-02-28",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "finra_margin_debt",
+      "name": "FINRA Margin Debt",
+      "latest_acceptable_history_start": "1997-01-31",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "finra_margin_debt_mom_pct",
+      "name": "FINRA Margin Debt MoM",
+      "latest_acceptable_history_start": "1997-01-31",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "finra_margin_debt_yoy_pct",
+      "name": "FINRA Margin Debt YoY",
+      "latest_acceptable_history_start": "1997-01-31",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "finra_margin_free_credit",
+      "name": "FINRA Margin Account Free Credit",
+      "latest_acceptable_history_start": "2010-02-28",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "finra_total_free_credit",
+      "name": "FINRA Total Free Credit",
+      "latest_acceptable_history_start": "1997-01-31",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "margin_debt_to_free_credit",
+      "name": "Margin Debt / Total Free Credit",
+      "latest_acceptable_history_start": "1997-01-31",
+      "actual_history_start": "1997-01-31",
+      "actual_history_end": "2026-08-31",
+      "observations": 356,
+      "status": "ok"
+    },
+    {
+      "id": "nfci",
+      "name": "National Financial Conditions Index",
+      "latest_acceptable_history_start": "1971-01-08",
+      "actual_history_start": "1971-01-08",
+      "actual_history_end": "2026-09-11",
+      "observations": 2906,
+      "status": "ok"
+    },
+    {
+      "id": "nfci_credit",
+      "name": "NFCI Credit Subindex",
+      "latest_acceptable_history_start": "1971-01-08",
+      "actual_history_start": "1971-01-08",
+      "actual_history_end": "2026-09-11",
+      "observations": 2906,
+      "status": "ok"
+    },
+    {
+      "id": "nfci_nonfinancial_leverage",
+      "name": "NFCI Nonfinancial Leverage Subindex",
+      "latest_acceptable_history_start": "1971-01-08",
+      "actual_history_start": "1971-01-08",
+      "actual_history_end": "2026-09-11",
+      "observations": 2906,
+      "status": "ok"
+    },
+    {
+      "id": "nfci_risk",
+      "name": "NFCI Risk Subindex",
+      "latest_acceptable_history_start": "1971-01-08",
+      "actual_history_start": "1971-01-08",
+      "actual_history_end": "2026-09-11",
+      "observations": 2906,
+      "status": "ok"
+    },
+    {
+      "id": "shiller_cape",
+      "name": "Shiller CAPE",
+      "latest_acceptable_history_start": "1871-01-01",
+      "actual_history_start": "1871-01-01",
+      "actual_history_end": "2026-08-01",
+      "observations": 1868,
+      "status": "ok"
+    },
+    {
+      "id": "shiller_price",
+      "name": "Shiller U.S. Stock Price Index",
+      "latest_acceptable_history_start": "1871-01-01",
+      "actual_history_start": "1871-01-01",
+      "actual_history_end": "2026-08-01",
+      "observations": 1868,
+      "status": "ok"
+    },
+    {
+      "id": "shiller_real_tr_price",
+      "name": "Shiller Real Total Return Price",
+      "latest_acceptable_history_start": "1871-01-01",
+      "actual_history_start": "1871-01-01",
+      "actual_history_end": "2026-08-01",
+      "observations": 1868,
+      "status": "ok"
+    },
+    {
+      "id": "tw_advance_decline_diff",
+      "name": "TWSE Advance-Decline Difference",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-21",
+      "actual_history_end": "2026-09-21",
+      "observations": 1,
+      "status": "ok"
+    },
+    {
+      "id": "tw_advance_decline_line",
+      "name": "TWSE Advance-Decline Line",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-21",
+      "actual_history_end": "2026-09-21",
+      "observations": 1,
+      "status": "ok"
+    },
+    {
+      "id": "tw_advance_decline_pct",
+      "name": "TWSE Advance-Decline %",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-21",
+      "actual_history_end": "2026-09-21",
+      "observations": 1,
+      "status": "ok"
+    },
+    {
+      "id": "tw_advancing_stocks",
+      "name": "TWSE Advancing Stocks",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-21",
+      "actual_history_end": "2026-09-21",
+      "observations": 1,
+      "status": "ok"
+    },
+    {
+      "id": "tw_cbc_change_12m_bp",
+      "name": "Taiwan CBC Discount Rate 12M cumulative change",
+      "latest_acceptable_history_start": "2000-12-29",
+      "actual_history_start": "2000-12-29",
+      "actual_history_end": "2024-03-22",
+      "observations": 54,
+      "status": "ok"
+    },
+    {
+      "id": "tw_cbc_change_3m_bp",
+      "name": "Taiwan CBC Discount Rate 3M cumulative change",
+      "latest_acceptable_history_start": "2000-12-29",
+      "actual_history_start": "2000-12-29",
+      "actual_history_end": "2024-03-22",
+      "observations": 54,
+      "status": "ok"
+    },
+    {
+      "id": "tw_cbc_change_6m_bp",
+      "name": "Taiwan CBC Discount Rate 6M cumulative change",
+      "latest_acceptable_history_start": "2000-12-29",
+      "actual_history_start": "2000-12-29",
+      "actual_history_end": "2024-03-22",
+      "observations": 54,
+      "status": "ok"
+    },
+    {
+      "id": "tw_cbc_rate",
+      "name": "Taiwan CBC Discount Rate Rate",
+      "latest_acceptable_history_start": "2000-12-29",
+      "actual_history_start": "2000-12-29",
+      "actual_history_end": "2024-03-22",
+      "observations": 54,
+      "status": "ok"
+    },
+    {
+      "id": "tw_cbc_step_bp",
+      "name": "Taiwan CBC Discount Rate Step",
+      "latest_acceptable_history_start": "2000-12-29",
+      "actual_history_start": "2000-12-29",
+      "actual_history_end": "2024-03-22",
+      "observations": 54,
+      "status": "ok"
+    },
+    {
+      "id": "tw_declining_stocks",
+      "name": "TWSE Declining Stocks",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-21",
+      "actual_history_end": "2026-09-21",
+      "observations": 1,
+      "status": "ok"
+    },
+    {
+      "id": "tw_market_trade_value",
+      "name": "TWSE Market Trade Value",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-01",
+      "actual_history_end": "2026-09-22",
+      "observations": 16,
+      "status": "ok"
+    },
+    {
+      "id": "tw_market_trade_volume",
+      "name": "TWSE Market Trade Volume",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-01",
+      "actual_history_end": "2026-09-22",
+      "observations": 16,
+      "status": "ok"
+    },
+    {
+      "id": "tw_taiex",
+      "name": "TAIEX",
+      "latest_acceptable_history_start": "1999-01-05",
+      "actual_history_start": "1999-01-05",
+      "actual_history_end": "2026-09-22",
+      "observations": 6869,
+      "status": "ok"
+    },
+    {
+      "id": "tw_taiex_high",
+      "name": "TAIEX High",
+      "latest_acceptable_history_start": "1999-01-05",
+      "actual_history_start": "1999-01-05",
+      "actual_history_end": "2026-09-22",
+      "observations": 6869,
+      "status": "ok"
+    },
+    {
+      "id": "tw_taiex_low",
+      "name": "TAIEX Low",
+      "latest_acceptable_history_start": "1999-01-05",
+      "actual_history_start": "1999-01-05",
+      "actual_history_end": "2026-09-22",
+      "observations": 6869,
+      "status": "ok"
+    },
+    {
+      "id": "tw_taiex_open",
+      "name": "TAIEX Open",
+      "latest_acceptable_history_start": "1999-01-05",
+      "actual_history_start": "1999-01-05",
+      "actual_history_end": "2026-09-22",
+      "observations": 6869,
+      "status": "ok"
+    },
+    {
+      "id": "tw_unchanged_stocks",
+      "name": "TWSE Unchanged Stocks",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "2026-09-21",
+      "actual_history_end": "2026-09-21",
+      "observations": 1,
+      "status": "ok"
+    },
+    {
+      "id": "us_fed_policy_change_12m_bp",
+      "name": "Fed Policy Rate 12M cumulative change",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "1982-09-27",
+      "actual_history_end": "2026-09-17",
+      "observations": 186,
+      "status": "ok"
+    },
+    {
+      "id": "us_fed_policy_change_3m_bp",
+      "name": "Fed Policy Rate 3M cumulative change",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "1982-09-27",
+      "actual_history_end": "2026-09-17",
+      "observations": 186,
+      "status": "ok"
+    },
+    {
+      "id": "us_fed_policy_change_6m_bp",
+      "name": "Fed Policy Rate 6M cumulative change",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "1982-09-27",
+      "actual_history_end": "2026-09-17",
+      "observations": 186,
+      "status": "ok"
+    },
+    {
+      "id": "us_fed_policy_rate",
+      "name": "Fed Policy Rate Rate",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "1982-09-27",
+      "actual_history_end": "2026-09-17",
+      "observations": 186,
+      "status": "ok"
+    },
+    {
+      "id": "us_fed_policy_step_bp",
+      "name": "Fed Policy Rate Step",
+      "latest_acceptable_history_start": null,
+      "actual_history_start": "1982-09-27",
+      "actual_history_end": "2026-09-17",
+      "observations": 186,
+      "status": "ok"
+    },
+    {
+      "id": "us_recession",
+      "name": "NBER Recession Indicator",
+      "latest_acceptable_history_start": "1854-12-01",
+      "actual_history_start": "1854-12-01",
+      "actual_history_end": "2026-08-01",
+      "observations": 2061,
+      "status": "ok"
+    },
+    {
+      "id": "vix",
+      "name": "Cboe Volatility Index (VIX)",
+      "latest_acceptable_history_start": "1990-01-31",
+      "actual_history_start": "1990-01-02",
+      "actual_history_end": "2026-09-21",
+      "observations": 9277,
+      "status": "ok"
+    }
+  ]
+}
