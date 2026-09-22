@@ -13,7 +13,13 @@
     <div>
       <p class="eyebrow">MULTI-MARKET STRESS &amp; BREADTH</p>
       <h1>Market Risk Monitor</h1>
-      <p class="subtitle">Current conditions, provenance, and historical context — without a hidden BUY/SELL score.</p>
+      <p class="subtitle">Current conditions first, then the evidence, provenance, and historical research behind them. No hidden BUY/SELL score.</p>
+      <nav class="mode-nav" aria-label="Dashboard sections">
+        <a href="#overview">Overview</a>
+        <a href="#us-detail">U.S.</a>
+        <a href="#taiwan-detail">Taiwan</a>
+        <a href="#research">Research</a>
+      </nav>
     </div>
     <div class="header-actions">
       <span id="global-freshness" class="badge badge-neutral">Loading data…</span>
@@ -22,10 +28,171 @@
   </header>
 
   <main>
-    <section class="section-block taiwan-section" aria-labelledby="taiwan-title">
+    <section id="overview" class="section-block overview-section" aria-labelledby="overview-title">
+      <div class="section-heading overview-heading">
+        <div>
+          <p class="eyebrow">OVERVIEW</p>
+          <h2 id="overview-title">What the available evidence says now</h2>
+        </div>
+        <p class="meta">Plain-language summary · lead evidence only · details remain auditable</p>
+      </div>
+      <div class="decision-summary" aria-label="At-a-glance market status">
+        <a class="decision-row" href="#us-detail">
+          <span>Financial stress</span>
+          <strong id="decision-stress-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#us-detail">
+          <span>Leverage</span>
+          <strong id="decision-leverage-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#signals-detail">
+          <span>Deleveraging</span>
+          <strong id="decision-deleveraging-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#taiwan-detail">
+          <span>Taiwan</span>
+          <strong id="decision-taiwan-state">Loading…</strong>
+        </a>
+        <a class="decision-row" href="#research">
+          <span>Evidence</span>
+          <strong id="decision-coverage-state">Loading…</strong>
+        </a>
+      </div>
+      <div class="overview-grid">
+        <article class="panel overview-card" data-overview-card="stress">
+          <p class="eyebrow">FINANCIAL STRESS</p>
+          <h3 id="overview-stress-state">Loading current stress evidence…</h3>
+          <p id="overview-stress-evidence" class="overview-evidence">NFCI and VIX evidence will appear here.</p>
+          <p id="overview-stress-note" class="overview-note">No conclusion is produced without the underlying observations.</p>
+          <a class="drill-link" href="#us-detail">See U.S. details ↓</a>
+        </article>
+
+        <article class="panel overview-card" data-overview-card="leverage">
+          <p class="eyebrow">LEVERAGE / RISK APPETITE</p>
+          <h3 id="overview-leverage-state">Loading leverage evidence…</h3>
+          <p id="overview-leverage-evidence" class="overview-evidence">FINRA level, growth, and historical context will appear here.</p>
+          <p id="overview-leverage-note" class="overview-note">Level, growth, and momentum are kept separate.</p>
+          <a class="drill-link" href="#us-detail">See leverage details ↓</a>
+        </article>
+
+        <article class="panel overview-card" data-overview-card="deleveraging">
+          <p class="eyebrow">DELEVERAGING EVIDENCE</p>
+          <h3 id="overview-deleveraging-state">Loading signal coverage…</h3>
+          <p id="overview-deleveraging-evidence" class="overview-evidence">Known, active, and unavailable checks will appear here.</p>
+          <p id="overview-deleveraging-note" class="overview-note">Unknown evidence is never interpreted as safe.</p>
+          <a class="drill-link" href="#signals-detail">Inspect every check ↓</a>
+        </article>
+
+        <article class="panel overview-card overview-card-wide" data-overview-card="taiwan">
+          <p class="eyebrow">TAIWAN MARKET</p>
+          <h3 id="overview-taiwan-state">Loading Taiwan market evidence…</h3>
+          <p id="overview-taiwan-evidence" class="overview-evidence">TAIEX, breadth coverage, and policy-rate context will appear here.</p>
+          <p id="overview-taiwan-note" class="overview-note">A one-session breadth snapshot is not treated as a trend.</p>
+          <a class="drill-link" href="#taiwan-detail">See Taiwan details ↓</a>
+        </article>
+
+        <article class="panel overview-card overview-card-wide" data-overview-card="coverage">
+          <p class="eyebrow">HISTORICAL CONTEXT &amp; EVIDENCE COVERAGE</p>
+          <h3 id="overview-evidence-state">Loading historical comparison coverage…</h3>
+          <p id="overview-evidence-evidence" class="overview-evidence">Metric-specific comparison windows and missing evidence will appear here.</p>
+          <p id="overview-evidence-note" class="overview-note">Historical ranks describe the comparison set; they are not a forecast by themselves.</p>
+          <a class="drill-link" href="#research">Open research views ↓</a>
+        </article>
+      </div>
+    </section>
+
+    <div class="market-divider" aria-hidden="true">
+      <span>U.S. MARKET</span>
+    </div>
+
+    <section id="us-detail" class="section-block" aria-labelledby="metrics-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">TAIWAN MARKET</p>
+          <p class="eyebrow">U.S. DETAIL</p>
+          <h2 id="metrics-title">Current U.S. metrics</h2>
+        </div>
+        <button id="refresh-view" class="text-button" type="button">Reload snapshot</button>
+      </div>
+      <p class="section-intro">Lead conclusions are summarized above. Open any metric for the definition, reading guide, caveat, history, source, and freshness.</p>
+      <div id="metric-grid" class="metric-grid">
+        <div class="panel empty-state">
+          <strong>Current U.S. snapshot is unavailable.</strong>
+          <span>Source and freshness details will appear when a published snapshot is available.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="trend-participation-section" class="section-block optional-module compact-optional" aria-labelledby="trend-participation-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">BREADTH / PARTICIPATION</p>
+          <h2 id="trend-participation-title">Trend Participation</h2>
+        </div>
+        <div id="trend-controls" class="history-controls" hidden>
+          <label class="toggle-control">
+            <input id="ma-bands-toggle" type="checkbox">
+            <span>Custom heuristic bands</span>
+          </label>
+          <label class="toggle-control">
+            <input id="ma-spx-toggle" type="checkbox">
+            <span>SPX overlay</span>
+          </label>
+        </div>
+      </div>
+      <div id="trend-panel" class="panel trend-panel">
+        <div id="ma-summary" class="trend-summary">
+          <div class="optional-state"><strong>Trend Participation — unavailable in the public release</strong><span>Point-in-time S&amp;P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>
+        </div>
+        <div id="ma-chart" class="chart-frame" hidden>
+          <div class="empty-state compact">Trend Participation history will appear here when published.</div>
+        </div>
+        <div id="trend-legend" class="trend-legend" hidden>
+          <span><i class="line-swatch line-20"></i>20DMA</span>
+          <span><i class="line-swatch line-50"></i>50DMA</span>
+          <span><i class="line-swatch line-200"></i>200DMA</span>
+          <span class="meta">Heuristic bands are optional and non-canonical.</span>
+        </div>
+        <div id="ma-study-block" hidden>
+          <div class="signal-history-header">
+            <div>
+              <p class="eyebrow">THRESHOLD STUDY</p>
+              <h3>&lt;25% / &lt;15% historical outcomes</h3>
+            </div>
+            <span id="ma-study-status" class="meta">Study snapshot not loaded</span>
+          </div>
+          <div id="ma-study-summary" class="ma-study-grid"></div>
+          <div class="table-wrap ma-study-table-wrap">
+            <table class="ma-study-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Cross</th>
+                  <th>Breadth</th>
+                  <th>SPX</th>
+                  <th>1W</th>
+                  <th>1M</th>
+                  <th>3M</th>
+                  <th>6M</th>
+                  <th>63d local low</th>
+                </tr>
+              </thead>
+              <tbody id="ma-study-body">
+                <tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="market-divider" aria-hidden="true">
+      <span>TAIWAN MARKET</span>
+    </div>
+
+    <section id="taiwan-detail" class="section-block taiwan-section" aria-labelledby="taiwan-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">TAIWAN DETAIL</p>
           <h2 id="taiwan-title">Taiwan Market Regime</h2>
         </div>
         <span class="badge badge-neutral">Official-source first</span>
@@ -65,106 +232,11 @@
         <div id="tw-event-chart" class="chart-frame short">
           <div class="empty-state compact">Taiwan event comparison will appear here.</div>
         </div>
-        <p class="disclaimer">Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and the supplied chart's proprietary Breadth 1/2/3 formulas are not reproduced or guessed.</p>
+        <p class="disclaimer">Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and proprietary Breadth 1/2/3 formulas are not reproduced or guessed.</p>
       </div>
     </section>
 
-    <div class="market-divider">
-      <span>U.S. MARKET</span>
-    </div>
-
-    <section class="panel hero-panel" aria-labelledby="regime-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">DATA HEALTH</p>
-          <h2 id="regime-title">Snapshot health by pillar</h2>
-        </div>
-        <p id="data-generated" class="meta">Snapshot not loaded</p>
-      </div>
-      <div id="regime-grid" class="regime-grid">
-        <div class="empty-state compact">Waiting for production snapshots.</div>
-      </div>
-      <p class="disclaimer">Freshness and coverage only. This panel reports whether each pillar's data is current, not how risky it is &mdash; there is no pillar-level risk score. Each metric's own historical percentile is shown on its own card.</p>
-    </section>
-
-    <section class="section-block" aria-labelledby="metrics-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CORE PILLARS</p>
-          <h2 id="metrics-title">Current metrics</h2>
-        </div>
-        <button id="refresh-view" class="text-button" type="button">Reload snapshot</button>
-      </div>
-      <div id="metric-grid" class="metric-grid">
-        <div class="panel empty-state">
-          <strong>No production snapshot loaded.</strong>
-          <span>Run the repository refresh command, validate the generated files, commit them, then this page will populate automatically.</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="section-block" aria-labelledby="trend-participation-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">BREADTH / PARTICIPATION</p>
-          <h2 id="trend-participation-title">Trend Participation</h2>
-        </div>
-        <div class="history-controls">
-          <label class="toggle-control">
-            <input id="ma-bands-toggle" type="checkbox">
-            <span>Custom heuristic bands</span>
-          </label>
-          <label class="toggle-control">
-            <input id="ma-spx-toggle" type="checkbox">
-            <span>SPX overlay</span>
-          </label>
-        </div>
-      </div>
-      <div class="panel trend-panel">
-        <div id="ma-summary" class="trend-summary">
-          <div class="empty-state compact">20/50/200DMA breadth snapshots not loaded yet.</div>
-        </div>
-        <div id="ma-chart" class="chart-frame">
-          <div class="empty-state compact">Trend Participation history will appear here.</div>
-        </div>
-        <div class="trend-legend">
-          <span><i class="line-swatch line-20"></i>20DMA</span>
-          <span><i class="line-swatch line-50"></i>50DMA</span>
-          <span><i class="line-swatch line-200"></i>200DMA</span>
-          <span class="meta">Heuristic bands are optional and non-canonical.</span>
-        </div>
-        <div class="signal-history-header">
-          <div>
-            <p class="eyebrow">THRESHOLD STUDY</p>
-            <h3>&lt;25% / &lt;15% historical outcomes</h3>
-          </div>
-          <span id="ma-study-status" class="meta">Study snapshot not loaded</span>
-        </div>
-        <div id="ma-study-summary" class="ma-study-grid"></div>
-        <div class="table-wrap ma-study-table-wrap">
-          <table class="ma-study-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Cross</th>
-                <th>Breadth</th>
-                <th>SPX</th>
-                <th>1W</th>
-                <th>1M</th>
-                <th>3M</th>
-                <th>6M</th>
-                <th>63d local low</th>
-              </tr>
-            </thead>
-            <tbody id="ma-study-body">
-              <tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="section-block" aria-labelledby="signals-title">
+    <section id="signals-detail" class="section-block" aria-labelledby="signals-title">
       <div class="section-heading">
         <div>
           <p class="eyebrow">CONCURRENT DETERIORATION</p>
@@ -174,7 +246,7 @@
       </div>
       <div class="panel signal-panel">
         <div id="signal-summary" class="signal-summary">
-          <div class="empty-state compact">Signal snapshot not built yet.</div>
+          <div class="empty-state compact">Signal snapshot not available.</div>
         </div>
         <div id="signal-grid" class="signal-grid"></div>
         <div class="signal-history-header">
@@ -191,11 +263,11 @@
       </div>
     </section>
 
-    <section class="section-block history-layout" aria-labelledby="history-title">
+    <section id="research" class="section-block history-layout" aria-labelledby="history-title">
       <div class="panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">古往今來</p>
+            <p class="eyebrow">RESEARCH HISTORY</p>
             <h2 id="history-title">Historical context</h2>
           </div>
           <div class="history-controls">
@@ -233,6 +305,22 @@
         <p class="meta">Event paths are indexed to 100 at each anchor. Missing pre-history stays unavailable rather than being backfilled with a proxy.</p>
       </div>
     </section>
+
+    <details id="data-health-details" class="section-block disclosure-block">
+      <summary>
+        <span>
+          <span class="eyebrow">DATA HEALTH</span>
+          <strong>Snapshot health by pillar</strong>
+        </span>
+        <span id="data-generated" class="meta">Snapshot not loaded</span>
+      </summary>
+      <div class="panel hero-panel">
+        <div id="regime-grid" class="regime-grid">
+          <div class="empty-state compact">Waiting for production snapshots.</div>
+        </div>
+        <p class="disclaimer">Freshness and coverage only. This reports whether each pillar's data is current, not how risky the market is; there is no pillar-level risk score.</p>
+      </div>
+    </details>
 
     <section class="section-block" aria-labelledby="coverage-title">
       <div class="section-heading">
