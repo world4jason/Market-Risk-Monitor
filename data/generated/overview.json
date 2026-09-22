@@ -1,0 +1,2154 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-22T10:54:31.276344Z",
+  "metrics": [
+    {
+      "metric": {
+        "id": "fed_target_legacy",
+        "name": "Federal Funds Target Rate (Legacy)",
+        "description": "FOMC federal funds target rate through 2008-12-15, distributed by FRED.",
+        "pillar": "context",
+        "units": "percent",
+        "frequency": "daily",
+        "polarity": "contextual",
+        "comparison": "basis_points"
+      },
+      "source": {
+        "provider": "Federal Reserve Bank of St. Louis (FRED)",
+        "dataset": "Federal Funds Target Rate (DISCONTINUED)",
+        "series_id": "DFEDTAR",
+        "url": "https://fred.stlouisfed.org/series/DFEDTAR",
+        "license_note": "Board of Governors/FOMC target-rate series distributed by FRED; preserve citation.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1982-09-27",
+        "history_end": "2008-12-15",
+        "timezone": "America/Chicago",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 10000,
+        "age_days": 6490,
+        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2008-12-15",
+        "fetched_at": "2026-09-22T10:54:24.252339Z",
+        "value": 1,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "none",
+          "type": "none",
+          "window_observations": null,
+          "min_observations": 1,
+          "point_in_time": true,
+          "notes": "Rate context; no percentile baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 9577,
+        "rolling_percentile": 8.293650793650794,
+        "recent_change": {
+          "value": 0,
+          "comparison": "basis_points"
+        },
+        "preview_observations": [
+          {
+            "date": "2008-11-16",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-17",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-18",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-19",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-20",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-21",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-22",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-23",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-24",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-25",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-26",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-27",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-28",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-29",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-11-30",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-01",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-02",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-03",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-04",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-05",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-06",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-07",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-08",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-09",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-10",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-11",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-12",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-13",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-14",
+            "value": 1,
+            "status": "observed"
+          },
+          {
+            "date": "2008-12-15",
+            "value": 1,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "fed_target_upper",
+        "name": "Federal Funds Target Range Upper Limit",
+        "description": "Upper limit of the FOMC federal funds target range since 2008-12-16.",
+        "pillar": "context",
+        "units": "percent",
+        "frequency": "daily",
+        "polarity": "contextual",
+        "comparison": "basis_points"
+      },
+      "source": {
+        "provider": "Federal Reserve Bank of St. Louis (FRED)",
+        "dataset": "Federal Funds Target Range - Upper Limit",
+        "series_id": "DFEDTARU",
+        "url": "https://fred.stlouisfed.org/series/DFEDTARU",
+        "license_note": "Board of Governors/FOMC target-range upper bound distributed by FRED; preserve citation.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "2008-12-16",
+        "history_end": "2026-09-21",
+        "timezone": "America/Chicago",
+        "expected_observation_lag_days": 1
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 5,
+        "age_days": 1,
+        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-21",
+        "fetched_at": "2026-09-22T10:54:24.252339Z",
+        "value": 4,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "none",
+          "type": "none",
+          "window_observations": null,
+          "min_observations": 1,
+          "point_in_time": true,
+          "notes": "Rate context; no percentile baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 6489,
+        "rolling_percentile": 56.58730158730159,
+        "recent_change": {
+          "value": 0,
+          "comparison": "basis_points"
+        },
+        "preview_observations": [
+          {
+            "date": "2026-08-23",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-24",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-25",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-26",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-27",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-28",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-29",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-30",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-02",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-03",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-04",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-05",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-06",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-07",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-08",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-09",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-10",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-11",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-12",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-13",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-14",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-15",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-16",
+            "value": 3.75,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-17",
+            "value": 4,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": 4,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-19",
+            "value": 4,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-20",
+            "value": 4,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-21",
+            "value": 4,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "finra_cash_free_credit",
+        "name": "FINRA Cash Account Free Credit",
+        "description": "Cash-account free credit; separate component available from Feb-2010 onward.",
+        "pillar": "leverage",
+        "units": "USD millions",
+        "frequency": "monthly",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 207641,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 199,
+        "rolling_percentile": 76.66666666666667,
+        "recent_change": {
+          "value": 1.223114872374853,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 166990,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": 161749,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 155256,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": 157240,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 154951,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": 148702,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 167901,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 173621,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 170052,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 181280,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 178301,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": 183278,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 189855,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 187958,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 187685,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 200573,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 194712,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 188221,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 204106,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 197923,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 202131,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 211720,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 203700,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 205060,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 221860,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 217836,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 206600,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 217441,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 205132,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 207641,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "finra_margin_debt",
+        "name": "FINRA Margin Debt",
+        "description": "FINRA monthly margin-statistics series.",
+        "pillar": "leverage",
+        "units": "USD millions",
+        "frequency": "monthly",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 1453832,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 356,
+        "rolling_percentile": 99.16666666666667,
+        "recent_change": {
+          "value": 2.5830055213533543,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 784136,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": 775464,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 809431,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": 809322,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 810835,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": 797162,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 813211,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 815369,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 890852,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 899168,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 937253,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": 918144,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 880316,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 850558,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 920960,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 1007961,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 1022548,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 1059723,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 1126494,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 1183654,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 1214321,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 1225597,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 1279042,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 1253192,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 1220922,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 1304281,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 1415557,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 1502072,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 1417225,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 1453832,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "finra_margin_debt_mom_pct",
+        "name": "FINRA Margin Debt MoM",
+        "description": "FINRA monthly margin-statistics series.",
+        "pillar": "leverage",
+        "units": "percent",
+        "frequency": "monthly",
+        "polarity": "contextual",
+        "comparison": "none"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 2.5830055213533543,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 355,
+        "rolling_percentile": 66.66666666666667,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 5.541729534310602,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": -1.1059306038748384,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 4.380216231830225,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": -0.013466249748284032,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 0.1869466046888535,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": -1.6862863591236232,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 2.0132670649127826,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 0.26536778277717055,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 9.257526346966838,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 0.9334883908887148,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 4.235582227125523,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": -2.0388304972083326,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": -4.120050885264181,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": -3.3803770464242433,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 8.277154526793007,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 9.446772932592085,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 1.4471790079179758,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 3.6355261562293517,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 6.300797472547082,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 5.074150417134926,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 2.5908753740535584,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 0.9285847811245862,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 4.360731953488783,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": -2.021043875025219,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": -2.575024417647098,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 6.827545084780184,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 8.531597102158205,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 6.11172845741994,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": -5.648663978823921,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 2.5830055213533543,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "finra_margin_debt_yoy_pct",
+        "name": "FINRA Margin Debt YoY",
+        "description": "FINRA monthly margin-statistics series.",
+        "pillar": "leverage",
+        "units": "percent",
+        "frequency": "monthly",
+        "polarity": "contextual",
+        "comparison": "none"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 37.18981280957383,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 344,
+        "rolling_percentile": 85.83333333333333,
+        "recent_change": null,
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 21.490667447542645,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": 22.709902223122434,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 25.654873713460734,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": 18.803396219767833,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 14.228819695872552,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": 15.667346213280897,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 19.44125396932639,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 28.34878068744924,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 34.79641754187932,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 28.31069645848734,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 33.516578225720295,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": 23.57869772788146,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 12.265729414285275,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 9.68375063187976,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 13.7786914511552,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 24.543877467806396,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 26.11049103701739,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 32.936968897162686,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 38.52419605735782,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 45.16789330965489,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 36.310071706635895,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 36.303449411011066,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 36.46710119892922,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 36.49187926948279,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 38.69133356658292,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 53.34415760006961,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 53.70450399583044,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 49.020845052536764,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 38.5974056963585,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 37.18981280957383,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "finra_margin_free_credit",
+        "name": "FINRA Margin Account Free Credit",
+        "description": "Margin-account free credit; separate component available from Feb-2010 onward.",
+        "pillar": "leverage",
+        "units": "USD millions",
+        "frequency": "monthly",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 217499,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 199,
+        "rolling_percentile": 89.16666666666667,
+        "recent_change": {
+          "value": 0.08927544235062257,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 151339,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": 149855,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 145072,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": 149714,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 150738,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": 152107,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 158358,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 164813,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 167223,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 175795,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 166346,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": 176051,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 176161,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 175824,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 176698,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 185584,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 186672,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 181563,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 194884,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 195376,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 194418,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 199762,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 196911,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 200047,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 205600,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 215445,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 217256,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 223412,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 217305,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 217499,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "finra_total_free_credit",
+        "name": "FINRA Total Free Credit",
+        "description": "Total FINRA free credit. Legacy combined series through Jan-2010; cash + margin-account free credit thereafter.",
+        "pillar": "leverage",
+        "units": "USD millions",
+        "frequency": "monthly",
+        "polarity": "contextual",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 425140,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 356,
+        "rolling_percentile": 83.33333333333333,
+        "recent_change": {
+          "value": 0.6398587244961895,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 318329,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": 311604,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 300328,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": 306954,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 305689,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": 300809,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 326259,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 338434,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 337275,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 357075,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 344647,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": 359329,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 366016,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 363782,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 364383,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 386157,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 381384,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 369784,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 398990,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 393299,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 396549,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 411482,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 400611,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 405107,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 427460,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 433281,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 423856,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 440853,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 422437,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 425140,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "margin_debt_to_free_credit",
+        "name": "Margin Debt / Total Free Credit",
+        "description": "Margin debt divided by total free credit. Uses the combined legacy free-credit series through Jan-2010 and cash+margin thereafter.",
+        "pillar": "leverage",
+        "units": "ratio",
+        "frequency": "monthly",
+        "polarity": "higher_is_riskier",
+        "comparison": "percent_change"
+      },
+      "source": {
+        "provider": "FINRA",
+        "dataset": "Margin Statistics",
+        "series_id": null,
+        "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+        "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1997-01-31",
+        "history_end": "2026-08-31",
+        "timezone": "America/New_York",
+        "expected_observation_lag_days": 25
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 70,
+        "age_days": 22,
+        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-08-31",
+        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "value": 3.419654701980524,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-120m",
+          "type": "rolling_percentile",
+          "window_observations": 120,
+          "min_observations": 36,
+          "point_in_time": true,
+          "notes": "Trailing ten-year monthly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 356,
+        "rolling_percentile": 100,
+        "recent_change": {
+          "value": 1.9307924528953802,
+          "comparison": "percent_change"
+        },
+        "preview_observations": [
+          {
+            "date": "2024-03-29",
+            "value": 2.463287981930644,
+            "status": "observed"
+          },
+          {
+            "date": "2024-04-30",
+            "value": 2.48862017175646,
+            "status": "observed"
+          },
+          {
+            "date": "2024-05-31",
+            "value": 2.6951566287525637,
+            "status": "observed"
+          },
+          {
+            "date": "2024-06-28",
+            "value": 2.6366230770734376,
+            "status": "observed"
+          },
+          {
+            "date": "2024-07-31",
+            "value": 2.6524834063378138,
+            "status": "observed"
+          },
+          {
+            "date": "2024-08-30",
+            "value": 2.6500603372904403,
+            "status": "observed"
+          },
+          {
+            "date": "2024-09-30",
+            "value": 2.4925320067798897,
+            "status": "observed"
+          },
+          {
+            "date": "2024-10-31",
+            "value": 2.409240797319418,
+            "status": "observed"
+          },
+          {
+            "date": "2024-11-29",
+            "value": 2.6413223630568528,
+            "status": "observed"
+          },
+          {
+            "date": "2024-12-31",
+            "value": 2.5181488482811734,
+            "status": "observed"
+          },
+          {
+            "date": "2025-01-31",
+            "value": 2.719457880091804,
+            "status": "observed"
+          },
+          {
+            "date": "2025-02-28",
+            "value": 2.55516253906587,
+            "status": "observed"
+          },
+          {
+            "date": "2025-03-31",
+            "value": 2.4051298303899284,
+            "status": "observed"
+          },
+          {
+            "date": "2025-04-30",
+            "value": 2.3380980917142686,
+            "status": "observed"
+          },
+          {
+            "date": "2025-05-30",
+            "value": 2.527450512235752,
+            "status": "observed"
+          },
+          {
+            "date": "2025-06-30",
+            "value": 2.6102362510585073,
+            "status": "observed"
+          },
+          {
+            "date": "2025-07-31",
+            "value": 2.681150756193233,
+            "status": "observed"
+          },
+          {
+            "date": "2025-08-29",
+            "value": 2.865789217489129,
+            "status": "observed"
+          },
+          {
+            "date": "2025-09-30",
+            "value": 2.823363994085065,
+            "status": "observed"
+          },
+          {
+            "date": "2025-10-31",
+            "value": 3.009552528737678,
+            "status": "observed"
+          },
+          {
+            "date": "2025-11-28",
+            "value": 3.0622218187411896,
+            "status": "observed"
+          },
+          {
+            "date": "2025-12-31",
+            "value": 2.9784948065772014,
+            "status": "observed"
+          },
+          {
+            "date": "2026-01-30",
+            "value": 3.192728107815312,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": 3.093483943748195,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-31",
+            "value": 2.856225143873111,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-30",
+            "value": 3.010242775473653,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": 3.339712072024461,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-30",
+            "value": 3.407194688478926,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": 3.3548789523644946,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-31",
+            "value": 3.419654701980524,
+            "status": "observed"
+          }
+        ]
+      }
+    },
+    {
+      "metric": {
+        "id": "nfci",
+        "name": "National Financial Conditions Index",
+        "description": "Chicago Fed broad financial-conditions index; positive values indicate tighter-than-average conditions.",
+        "pillar": "financial_stress",
+        "units": "index",
+        "frequency": "weekly",
+        "polarity": "higher_is_riskier",
+        "comparison": "absolute"
+      },
+      "source": {
+        "provider": "Federal Reserve Bank of St. Louis (FRED)",
+        "dataset": "Chicago Fed National Financial Conditions Index",
+        "series_id": "NFCI",
+        "url": "https://fred.stlouisfed.org/series/NFCI",
+        "license_note": "Distributed by FRED from the Federal Reserve Bank of Chicago; preserve citation and review source terms before republishing full history.",
+        "redistribution": "unknown"
+      },
+      "coverage": {
+        "history_start": "1971-01-08",
+        "history_end": "2026-09-11",
+        "timezone": "America/Chicago",
+        "expected_observation_lag_days": 7
+      },
+      "freshness": {
+        "state": "fresh",
+        "max_age_days": 14,
+        "age_days": 11,
+        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "reason": null
+      },
+      "latest": {
+        "as_of": "2026-09-11",
+        "fetched_at": "2026-09-22T10:54:24.252339Z",
+        "value": -0.56,
+        "revision_tag": null
+      },
+      "baselines": [
+        {
+          "id": "expanding-pit",
+          "type": "full_history_percentile",
+          "window_observations": null,
+          "min_observations": 52,
+          "point_in_time": true,
+          "notes": "Strict-past expanding baseline."
+        },
+        {
+          "id": "rolling-520w",
+          "type": "rolling_percentile",
+          "window_observations": 520,
+          "min_observations": 104,
+          "point_in_time": true,
+          "notes": "Trailing ten-year weekly baseline."
+        }
+      ],
+      "summary": {
+        "observation_count": 2906,
+        "rolling_percentile": 26.73076923076923,
+        "recent_change": {
+          "value": -0.0020000000000000018,
+          "comparison": "absolute"
+        },
+        "preview_observations": [
+          {
+            "date": "2026-02-20",
+            "value": -0.524,
+            "status": "observed"
+          },
+          {
+            "date": "2026-02-27",
+            "value": -0.506,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-06",
+            "value": -0.487,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-13",
+            "value": -0.472,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-20",
+            "value": -0.463,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-27",
+            "value": -0.459,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-03",
+            "value": -0.464,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-10",
+            "value": -0.474,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-17",
+            "value": -0.485,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-24",
+            "value": -0.495,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-01",
+            "value": -0.502,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-08",
+            "value": -0.507,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-15",
+            "value": -0.508,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-22",
+            "value": -0.507,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": -0.505,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-05",
+            "value": -0.505,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-12",
+            "value": -0.505,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-19",
+            "value": -0.507,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-26",
+            "value": -0.511,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-03",
+            "value": -0.516,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-10",
+            "value": -0.522,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-17",
+            "value": -0.527,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-24",
+            "value": -0.533,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-31",
+            "value": -0.537,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-07",
+            "value": -0.542,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-14",
+            "value": -0.547,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-21",
+            "value": -0.551,
+            "status": "observed"
+          },
+          {
+            "date": "2026-08-28",
+            "value": -0.555,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-04",
+            "value": -0.558,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-11",
+            "value": -0.56,
+            "status": "observed"
+          }
+        ]
+      }
+    }
+  ]
+}
