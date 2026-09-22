@@ -7,7 +7,11 @@ from pipeline.taiwan_macro import (
     monitoring_light,
     parse_taiwan_macro_csv,
 )
-from pipeline.validate import validate_metric
+from pipeline.validate import (
+    ValidationError,
+    validate_metric,
+    validate_taiwan_macro_regime,
+)
 
 
 CONFIG = {
@@ -161,6 +165,94 @@ class TaiwanMacroTests(unittest.TestCase):
         self.assertIsNotNone(latest_known)
         self.assertLess(latest_known["date"], current["date"])
         self.assertNotEqual(latest_known["regime"], "unknown")
+
+
+def regime_row(date_, regime, **extra):
+    row = {
+        "date": date_,
+        "score": None if regime == "unknown" else 0.5,
+        "known_components": 1 if regime == "unknown" else 4,
+        "total_components": 4,
+        "confidence": 0.25 if regime == "unknown" else 1.0,
+        "available_on": "2026-09-21",
+        "components": {},
+        "regime": regime,
+    }
+    row.update(extra)
+    return row
+
+
+def regime_payload(history, *, current=None, latest_known=None):
+    payload = {
+        "schema_version": "1.0.0",
+        "name": "MRM Taiwan Macro Regime",
+        "history": history,
+        "current": current if current is not None else (history[-1] if history else None),
+    }
+    payload["latest_known"] = latest_known
+    return payload
+
+
+class TaiwanMacroRegimeValidatorTests(unittest.TestCase):
+    def setUp(self):
+        self.history = [
+            regime_row("2026-05-01", "recovery"),
+            regime_row("2026-06-01", "expansion"),
+            regime_row("2026-07-01", "unknown"),
+        ]
+
+    def test_correct_latest_known_is_accepted(self):
+        validate_taiwan_macro_regime(
+            regime_payload(self.history, latest_known=self.history[1])
+        )
+
+    def test_latest_known_must_be_the_last_known_row_not_an_earlier_one(self):
+        # 2026-05 is a genuine known row, but 2026-06 is the last one. Accepting
+        # any older known row would let a stale regime be presented as the most
+        # recent reading.
+        with self.assertRaises(ValidationError):
+            validate_taiwan_macro_regime(
+                regime_payload(self.history, latest_known=self.history[0])
+            )
+
+    def test_latest_known_not_present_in_history_is_rejected(self):
+        fabricated = regime_row("2026-06-01", "expansion", score=0.9)
+        with self.assertRaises(ValidationError):
+            validate_taiwan_macro_regime(
+                regime_payload(self.history, latest_known=fabricated)
+            )
+
+    def test_latest_known_missing_while_a_known_row_exists_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            validate_taiwan_macro_regime(
+                regime_payload(self.history, latest_known=None)
+            )
+
+    def test_latest_known_must_be_null_when_no_row_is_known(self):
+        history = [regime_row("2026-07-01", "unknown")]
+        validate_taiwan_macro_regime(regime_payload(history, latest_known=None))
+
+        with self.assertRaises(ValidationError):
+            validate_taiwan_macro_regime(
+                regime_payload(
+                    history,
+                    latest_known=regime_row("2026-06-01", "expansion"),
+                )
+            )
+
+    def test_generated_regime_passes_its_own_validator(self):
+        rows = parse_taiwan_macro_csv(csv_fixture())
+        validate_taiwan_macro_regime(build_macro_regime(rows, CONFIG))
+
+        stale = [
+            row
+            for row in rows
+            if not (
+                row["date"] == "2026-07-01"
+                and row["series_id"] != "tw_manufacturing_pmi"
+            )
+        ]
+        validate_taiwan_macro_regime(build_macro_regime(stale, CONFIG))
 
 
 if __name__ == "__main__":

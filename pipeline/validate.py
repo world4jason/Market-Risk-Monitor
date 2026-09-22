@@ -374,16 +374,38 @@ def validate_taiwan_macro_regime(payload: dict) -> None:
             "taiwan-macro-regime: current missing while history is non-empty"
         )
 
+    # `latest_known` is derived, so validate it against history rather than
+    # spot-checking its shape. Merely rejecting "unknown" and future dates
+    # would still admit an arbitrary older known row -- or one that is not in
+    # history at all -- which is the same stale-reading problem in a new place.
+    expected_latest_known = next(
+        (row for row in reversed(history) if row.get("regime") != "unknown"),
+        None,
+    )
     latest_known = payload.get("latest_known")
-    if latest_known is not None:
-        if latest_known.get("regime") == "unknown":
+
+    if expected_latest_known is None:
+        if latest_known is not None:
             raise ValidationError(
-                "taiwan-macro-regime: latest_known must not be unknown"
+                "taiwan-macro-regime: latest_known must be null when no "
+                "history row is known"
             )
-        if latest_known.get("date") > history[-1]["date"]:
+    elif latest_known is None:
+        raise ValidationError(
+            "taiwan-macro-regime: latest_known missing while history has a "
+            f"known row ({expected_latest_known['date']})"
+        )
+    elif latest_known != expected_latest_known:
+        if latest_known.get("date") == expected_latest_known["date"]:
             raise ValidationError(
-                "taiwan-macro-regime: latest_known is newer than history"
+                "taiwan-macro-regime: latest_known does not match the history "
+                f"row it claims to be ({expected_latest_known['date']})"
             )
+        raise ValidationError(
+            "taiwan-macro-regime: latest_known must be the last non-unknown "
+            f"history row ({expected_latest_known['date']}), got "
+            f"{latest_known.get('date')!r}"
+        )
 
 
 def validate_taiwan_macro_audit(payload: dict) -> None:
