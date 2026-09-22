@@ -76,6 +76,12 @@ SPECIAL_ARTIFACTS = {
 }
 
 
+# Every artifact this process wrote. A refresh only ever adds or replaces
+# files, so without a ledger there is no way to tell an artifact produced by
+# this run from one left behind by an earlier run with different flags.
+WRITTEN_ARTIFACTS: set[Path] = set()
+
+
 def atomic_json(path: Path, payload: dict) -> None:
     # Declare comparison semantics at the single point every artifact is
     # written, rather than in each builder where it would drift. Non-metric
@@ -85,6 +91,48 @@ def atomic_json(path: Path, payload: dict) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     tmp.replace(path)
+    WRITTEN_ARTIFACTS.add(path.resolve())
+
+
+def should_run_fred(args) -> bool:
+    """
+    --fred-id is an allowlist, not merely a filter.
+
+    Requiring a separate --fred alongside it meant a command built entirely out
+    of --fred-id refreshed no FRED series at all, while previously generated
+    ones stayed on disk and were still catalogued -- so an allowlist written to
+    exclude a restricted series appeared to work while doing nothing.
+    """
+    return bool(args.fred or args.public or args.fred_id)
+
+
+def prune_unwritten_artifacts(
+    output_dir: Path,
+    *,
+    preserved_metric_ids: set[str],
+) -> list[str]:
+    """
+    Reduce the output directory to exactly what this run produced.
+
+    A refresh is otherwise additive: an unselected source is skipped, not
+    cleared, while build_catalog() and build_signals() glob the whole
+    directory. An artifact from an earlier run with different flags therefore
+    reappears in the catalog even though this run never asked for it -- which
+    is how a redistribution-restricted series survived an allowlist that was
+    written specifically to exclude it.
+
+    Artifacts a failed source deliberately preserved are kept, so this does not
+    quietly change the documented stale/error semantics.
+    """
+    removed = []
+    for path in sorted(output_dir.glob("*.json")):
+        if path.resolve() in WRITTEN_ARTIFACTS:
+            continue
+        if path.stem in preserved_metric_ids:
+            continue
+        path.unlink()
+        removed.append(path.name)
+    return removed
 
 
 def refresh_fred(
@@ -847,14 +895,19 @@ def main() -> None:
         type=Path,
         default=ROOT / "data" / "generated",
     )
+    parser.add_argument(
+        "--clean-output",
+        action="store_true",
+        help=(
+            "Reduce the output directory to exactly the artifacts this run "
+            "produces. Use for release builds: without it a refresh is "
+            "additive and artifacts from earlier runs with different flags "
+            "stay on disk and are still catalogued."
+        ),
+    )
     args = parser.parse_args()
 
-    # --fred-id is an allowlist, not just a filter. Requiring a separate
-    # --fred alongside it meant a command built entirely out of --fred-id
-    # silently refreshed no FRED series at all, while any previously generated
-    # ones stayed on disk and were picked up by the catalog -- so an allowlist
-    # intended to exclude a restricted series would appear to work and not.
-    run_fred = args.fred or args.public or bool(args.fred_id)
+    run_fred = should_run_fred(args)
     run_vix = args.cboe_vix or args.public
 
     if not any(
@@ -954,6 +1007,21 @@ def main() -> None:
             refresh_shiller(args.shiller_file, args.output_dir)
         )
 
+    # Prune before anything derived is built: signals, coverage and the
+    # catalog all glob the output directory, so a leftover artifact would
+    # otherwise be baked into them.
+    removed_artifacts = []
+    if args.clean_output:
+        preserved = {
+            item["metric"]
+            for item in report
+            if item.get("status") == "error" and item.get("preserved_previous")
+        }
+        removed_artifacts = prune_unwritten_artifacts(
+            args.output_dir,
+            preserved_metric_ids=preserved,
+        )
+
     # Derived Fed policy velocity is rebuilt whenever raw target series exist.
     report.extend(maybe_build_fed_rate_outputs(args.output_dir))
 
@@ -984,6 +1052,16 @@ def main() -> None:
             .isoformat()
             .replace("+00:00", "Z"),
             "results": report,
+            # Derived artifacts are rebuilt after the prune, so report only
+            # what is actually absent from the finished release.
+            "removed_artifacts": sorted(
+                name
+                for name in removed_artifacts
+                # The report itself is being written right now, so it is not
+                # on disk yet and would otherwise report its own removal.
+                if name != "refresh-report.json"
+                and not (args.output_dir / name).exists()
+            ),
         },
     )
 

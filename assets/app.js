@@ -823,7 +823,7 @@ function renderRegime() {
 
       return `<div class="regime-cell">
         <p class="eyebrow">${escapeHtml(pillarLabels[pillar] || pillar)}</p>
-        <div class="regime-value">${stale ? `${stale} stale / missing` : "Data current"}</div>
+        <div class="regime-value">${stale ? `${stale} not current` : "Data current"}</div>
         <div class="regime-note">${fresh} of ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"} current</div>
       </div>`;
     })
