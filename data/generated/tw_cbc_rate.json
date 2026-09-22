@@ -8,7 +8,8 @@
     "pillar": "context",
     "units": "percent",
     "frequency": "irregular",
-    "polarity": "contextual"
+    "polarity": "contextual",
+    "comparison": "basis_points"
   },
   "source": {
     "provider": "Central Bank of the Republic of China (Taiwan)",
@@ -33,7 +34,7 @@
     "state": "fresh",
     "max_age_days": 2000,
     "age_days": 914,
-    "evaluated_at": "2026-09-22T05:42:46.231024Z",
+    "evaluated_at": "2026-09-22T10:54:31.193425Z",
     "reason": "Irregular change-date series; old effective date can still be current."
   },
   "lineage": {
@@ -45,7 +46,7 @@
   "baselines": [],
   "latest": {
     "as_of": "2024-03-22",
-    "fetched_at": "2026-09-22T05:42:46.231024Z",
+    "fetched_at": "2026-09-22T10:54:31.193425Z",
     "value": 2.0,
     "revision_tag": null
   },

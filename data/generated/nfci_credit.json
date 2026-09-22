@@ -8,7 +8,8 @@
     "pillar": "credit_risk",
     "units": "index",
     "frequency": "weekly",
-    "polarity": "higher_is_riskier"
+    "polarity": "higher_is_riskier",
+    "comparison": "absolute"
   },
   "source": {
     "provider": "Federal Reserve Bank of St. Louis (FRED)",
@@ -28,7 +29,7 @@
     "state": "fresh",
     "max_age_days": 14,
     "age_days": 11,
-    "evaluated_at": "2026-09-22T05:41:24.422277Z",
+    "evaluated_at": "2026-09-22T10:54:24.252339Z",
     "reason": null
   },
   "lineage": {
@@ -49,7 +50,7 @@
   ],
   "latest": {
     "as_of": "2026-09-11",
-    "fetched_at": "2026-09-22T05:41:24.422277Z",
+    "fetched_at": "2026-09-22T10:54:24.252339Z",
     "value": -0.071,
     "revision_tag": null
   },

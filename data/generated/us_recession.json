@@ -8,7 +8,8 @@
     "pillar": "context",
     "units": "binary",
     "frequency": "monthly",
-    "polarity": "neutral"
+    "polarity": "neutral",
+    "comparison": "none"
   },
   "source": {
     "provider": "Federal Reserve Bank of St. Louis (FRED)",
@@ -28,7 +29,7 @@
     "state": "fresh",
     "max_age_days": 90,
     "age_days": 52,
-    "evaluated_at": "2026-09-22T05:41:24.422277Z",
+    "evaluated_at": "2026-09-22T10:54:24.252339Z",
     "reason": null
   },
   "lineage": {
@@ -49,7 +50,7 @@
   ],
   "latest": {
     "as_of": "2026-08-01",
-    "fetched_at": "2026-09-22T05:41:24.422277Z",
+    "fetched_at": "2026-09-22T10:54:24.252339Z",
     "value": 0.0,
     "revision_tag": null
   },

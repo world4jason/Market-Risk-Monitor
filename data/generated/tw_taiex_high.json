@@ -8,7 +8,8 @@
     "pillar": "market",
     "units": "index",
     "frequency": "daily",
-    "polarity": "contextual"
+    "polarity": "contextual",
+    "comparison": "percent_change"
   },
   "source": {
     "provider": "Taiwan Stock Exchange (TWSE)",
@@ -33,7 +34,7 @@
     "state": "fresh",
     "max_age_days": 5,
     "age_days": 0,
-    "evaluated_at": "2026-09-22T05:42:45.953853Z",
+    "evaluated_at": "2026-09-22T10:54:30.867967Z",
     "reason": null
   },
   "lineage": {
@@ -62,7 +63,7 @@
   ],
   "latest": {
     "as_of": "2026-09-22",
-    "fetched_at": "2026-09-22T05:42:45.953853Z",
+    "fetched_at": "2026-09-22T10:54:30.867967Z",
     "value": 48601.53,
     "revision_tag": null
   },

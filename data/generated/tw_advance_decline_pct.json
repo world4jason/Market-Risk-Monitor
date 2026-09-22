@@ -4,11 +4,12 @@
   "metric": {
     "id": "tw_advance_decline_pct",
     "name": "TWSE Advance-Decline %",
-    "description": "100 \u00d7 (advancing - declining) / (advancing + declining).",
+    "description": "100 × (advancing - declining) / (advancing + declining).",
     "pillar": "breadth",
     "units": "percent",
     "frequency": "daily",
-    "polarity": "lower_is_riskier"
+    "polarity": "lower_is_riskier",
+    "comparison": "percentage_points"
   },
   "source": {
     "provider": "Taiwan Stock Exchange (TWSE)",
@@ -33,7 +34,7 @@
     "state": "fresh",
     "max_age_days": 5,
     "age_days": 1,
-    "evaluated_at": "2026-09-22T05:42:46.227555Z",
+    "evaluated_at": "2026-09-22T10:54:31.187834Z",
     "reason": null
   },
   "lineage": {
@@ -65,7 +66,7 @@
   ],
   "latest": {
     "as_of": "2026-09-21",
-    "fetched_at": "2026-09-22T05:42:46.227555Z",
+    "fetched_at": "2026-09-22T10:54:31.187834Z",
     "value": -1.4256619144602851,
     "revision_tag": null
   },

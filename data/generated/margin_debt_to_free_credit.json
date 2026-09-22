@@ -8,7 +8,8 @@
     "pillar": "leverage",
     "units": "ratio",
     "frequency": "monthly",
-    "polarity": "higher_is_riskier"
+    "polarity": "higher_is_riskier",
+    "comparison": "percent_change"
   },
   "source": {
     "provider": "FINRA",
@@ -28,7 +29,7 @@
     "state": "fresh",
     "max_age_days": 70,
     "age_days": 22,
-    "evaluated_at": "2026-09-22T05:42:46.308213Z",
+    "evaluated_at": "2026-09-22T10:54:31.276344Z",
     "reason": null
   },
   "lineage": {
@@ -60,7 +61,7 @@
   ],
   "latest": {
     "as_of": "2026-08-31",
-    "fetched_at": "2026-09-22T05:42:46.308213Z",
+    "fetched_at": "2026-09-22T10:54:31.276344Z",
     "value": 3.419654701980524,
     "revision_tag": null
   },

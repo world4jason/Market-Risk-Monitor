@@ -8,7 +8,8 @@
     "pillar": "valuation",
     "units": "ratio",
     "frequency": "monthly",
-    "polarity": "contextual"
+    "polarity": "contextual",
+    "comparison": "percent_change"
   },
   "source": {
     "provider": "Robert J. Shiller",
@@ -28,7 +29,7 @@
     "state": "fresh",
     "max_age_days": 75,
     "age_days": 52,
-    "evaluated_at": "2026-09-22T05:42:46.364004Z",
+    "evaluated_at": "2026-09-22T10:54:31.335508Z",
     "reason": "Current partial month intentionally excluded."
   },
   "lineage": {
@@ -57,7 +58,7 @@
   ],
   "latest": {
     "as_of": "2026-08-01",
-    "fetched_at": "2026-09-22T05:42:46.364004Z",
+    "fetched_at": "2026-09-22T10:54:31.335508Z",
     "value": 41.11984417915712,
     "revision_tag": "partial-current-month-excluded"
   },

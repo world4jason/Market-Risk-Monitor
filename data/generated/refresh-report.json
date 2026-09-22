@@ -1,6 +1,41 @@
 {
-  "generated_at": "2026-09-22T05:42:48.219003Z",
+  "generated_at": "2026-09-22T10:54:33.228741Z",
   "results": [
+    {
+      "metric": "nfci",
+      "status": "updated",
+      "path": "data/generated/nfci.json"
+    },
+    {
+      "metric": "nfci_risk",
+      "status": "updated",
+      "path": "data/generated/nfci_risk.json"
+    },
+    {
+      "metric": "nfci_credit",
+      "status": "updated",
+      "path": "data/generated/nfci_credit.json"
+    },
+    {
+      "metric": "nfci_nonfinancial_leverage",
+      "status": "updated",
+      "path": "data/generated/nfci_nonfinancial_leverage.json"
+    },
+    {
+      "metric": "us_recession",
+      "status": "updated",
+      "path": "data/generated/us_recession.json"
+    },
+    {
+      "metric": "fed_target_legacy",
+      "status": "updated",
+      "path": "data/generated/fed_target_legacy.json"
+    },
+    {
+      "metric": "fed_target_upper",
+      "status": "updated",
+      "path": "data/generated/fed_target_upper.json"
+    },
     {
       "metric": "vix",
       "status": "updated",
@@ -166,5 +201,6 @@
       "status": "updated",
       "path": "data/generated/us_fed_policy_change_12m_bp.json"
     }
-  ]
+  ],
+  "removed_artifacts": []
 }
