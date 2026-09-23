@@ -245,9 +245,208 @@ def validate_overview(payload: dict) -> None:
         raise ValidationError("overview: unsupported schema_version")
     _datetime(payload["generated_at"], field="overview.generated_at")
 
+    rows = payload.get("metrics")
+    if not isinstance(rows, list):
+        raise ValidationError("overview: metrics must be a list")
+
     ids = []
-    for row in payload.get("metrics", []):
-        metric = row.get("metric") or {}
+    required_row_keys = {
+        "metric",
+        "source",
+        "coverage",
+        "freshness",
+        "latest",
+        "baselines",
+        "summary",
+    }
+    required_metric_keys = {
+        "id",
+        "name",
+        "pillar",
+        "units",
+        "frequency",
+        "polarity",
+        "comparison",
+    }
+    required_summary_keys = {
+        "observation_count",
+        "rolling_percentile",
+        "recent_change",
+        "preview_observations",
+    }
+
+    for row in rows:
+        missing_row = required_row_keys - set(row)
+        if missing_row:
+            raise ValidationError(
+                f"overview row missing keys: {sorted(missing_row)}"
+            )
+
+        metric = row["metric"]
+        missing_metric = required_metric_keys - set(metric)
+        if missing_metric:
+            raise ValidationError(
+                f"overview metric missing keys: {sorted(missing_metric)}"
+            )
+
+        metric_id = metric.get("id")
+        if not metric_id:
+            raise ValidationError("overview: metric id missing")
+        ids.append(metric_id)
+
+        if "observations" in row:
+            raise ValidationError(
+                f"overview[{metric_id}]: full observations are forbidden"
+            )
+
+        source = row["source"]
+        for field in ("provider", "dataset", "url"):
+            if not source.get(field):
+                raise ValidationError(
+                    f"overview[{metric_id}]: source.{field} missing"
+                )
+
+        coverage = row["coverage"]
+        start = coverage.get("history_start")
+        end = coverage.get("history_end")
+        if start:
+            _date(start, field=f"overview[{metric_id}].coverage.history_start")
+        if end:
+            _date(end, field=f"overview[{metric_id}].coverage.history_end")
+        if start and end and start > end:
+            raise ValidationError(f"overview[{metric_id}]: coverage start > end")
+
+        freshness = row["freshness"]
+        if freshness.get("state") not in ALLOWED_STATES:
+            raise ValidationError(
+                f"overview[{metric_id}]: invalid freshness state"
+            )
+        evaluated_at = freshness.get("evaluated_at")
+        if evaluated_at:
+            _datetime(
+                evaluated_at,
+                field=f"overview[{metric_id}].freshness.evaluated_at",
+            )
+
+        comparison = metric.get("comparison")
+        if comparison not in ALLOWED_COMPARISONS:
+            raise ValidationError(
+                f"overview[{metric_id}]: invalid comparison"
+            )
+
+        latest = row["latest"]
+        if "value" not in latest or "as_of" not in latest or "fetched_at" not in latest:
+            raise ValidationError(
+                f"overview[{metric_id}]: latest is incomplete"
+            )
+        if latest.get("as_of"):
+            _date(
+                latest["as_of"],
+                field=f"overview[{metric_id}].latest.as_of",
+            )
+        if latest.get("fetched_at"):
+            _datetime(
+                latest["fetched_at"],
+                field=f"overview[{metric_id}].latest.fetched_at",
+            )
+        if latest.get("value") is not None and not isfinite(float(latest["value"])):
+            raise ValidationError(
+                f"overview[{metric_id}]: latest value is non-finite"
+            )
+
+        if not isinstance(row["baselines"], list):
+            raise ValidationError(
+                f"overview[{metric_id}]: baselines must be a list"
+            )
+
+        summary = row["summary"]
+        missing_summary = required_summary_keys - set(summary)
+        if missing_summary:
+            raise ValidationError(
+                f"overview[{metric_id}]: summary missing keys {sorted(missing_summary)}"
+            )
+
+        observation_count = summary.get("observation_count")
+        if not isinstance(observation_count, int) or observation_count < 0:
+            raise ValidationError(
+                f"overview[{metric_id}]: invalid observation_count"
+            )
+
+        percentile = summary.get("rolling_percentile")
+        if percentile is not None:
+            if (
+                not isfinite(float(percentile))
+                or not 0 <= float(percentile) <= 100
+            ):
+                raise ValidationError(
+                    f"overview[{metric_id}]: invalid rolling_percentile"
+                )
+
+        change = summary.get("recent_change")
+        if change is not None:
+            if change.get("comparison") not in ALLOWED_COMPARISONS - {"none"}:
+                raise ValidationError(
+                    f"overview[{metric_id}]: invalid recent_change comparison"
+                )
+            value = change.get("value")
+            if value is None or not isfinite(float(value)):
+                raise ValidationError(
+                    f"overview[{metric_id}]: invalid recent_change value"
+                )
+
+        preview = summary.get("preview_observations")
+        if not isinstance(preview, list):
+            raise ValidationError(
+                f"overview[{metric_id}]: preview_observations must be a list"
+            )
+        if len(preview) > 30:
+            raise ValidationError(
+                f"overview[{metric_id}]: preview exceeds 30 observations"
+            )
+
+        dates = []
+        for item in preview:
+            _date(
+                item["date"],
+                field=f"overview[{metric_id}].preview.date",
+            )
+            dates.append(item["date"])
+            if (
+                item.get("value") is not None
+                and not isfinite(float(item["value"]))
+            ):
+                raise ValidationError(
+                    f"overview[{metric_id}]: non-finite preview value"
+                )
+            if item.get("status") not in ALLOWED_OBSERVATION_STATUSES:
+                raise ValidationError(
+                    f"overview[{metric_id}]: invalid preview status"
+                )
+
+        if dates != sorted(dates) or len(dates) != len(set(dates)):
+            raise ValidationError(
+                f"overview[{metric_id}]: preview dates invalid"
+            )
+        if observation_count == 0 and preview:
+            raise ValidationError(
+                f"overview[{metric_id}]: zero observations with non-empty preview"
+            )
+        if observation_count > 0 and not preview:
+            raise ValidationError(
+                f"overview[{metric_id}]: observations exist but preview is empty"
+            )
+        if preview and latest.get("as_of") != preview[-1]["date"]:
+            raise ValidationError(
+                f"overview[{metric_id}]: preview/latest date mismatch"
+            )
+        if preview and latest.get("value") is not None:
+            if float(latest["value"]) != float(preview[-1]["value"]):
+                raise ValidationError(
+                    f"overview[{metric_id}]: preview/latest value mismatch"
+                )
+
+    if len(ids) != len(set(ids)):
+        raise ValidationError("overview: duplicate metric id")
         metric_id = metric.get("id")
         if not metric_id:
             raise ValidationError("overview: metric id missing")
