@@ -367,7 +367,27 @@ function usableObservationCount(metric) {
 }
 
 function percentileContextSuffix(metric) {
-  return metric?.metric?.polarity === "contextual" ? " · context only" : "";
+  const parts = [];
+  if (metric?.metric?.polarity === "contextual") {
+    parts.push("context only");
+  }
+  if (rollingPercentileSemantics(metric) === "retrospective") {
+    parts.push("retrospective; not PIT/backtest-safe");
+  }
+  return parts.length ? ` · ${parts.join(" · ")}` : "";
+}
+
+function percentileCaveatSentence(metric) {
+  const parts = [];
+  if (metric?.metric?.polarity === "contextual") {
+    parts.push("This rank is context only; it is not a risk direction.");
+  }
+  if (rollingPercentileSemantics(metric) === "retrospective") {
+    parts.push(
+      "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
+    );
+  }
+  return parts.join(" ");
 }
 
 function overviewPercentileText(metric, presentation = percentilePresentation(metric)) {
@@ -569,15 +589,23 @@ function historicalPercentileAllowed(metric) {
   );
 }
 
+function rollingPercentileSemantics(metric) {
+  const config = baselineConfig(metric, "rolling_percentile");
+  if (metric?.source?.point_in_time_membership === false) {
+    return "unavailable";
+  }
+
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (config?.point_in_time === true && eligibility.allowed) {
+    return "point_in_time";
+  }
+  return "retrospective";
+}
+
 function rollingPercentile(metric) {
   const config = baselineConfig(metric, "rolling_percentile");
-  if (
-    !historicalPercentileAllowed(metric) ||
-    !config ||
-    config.point_in_time !== true
-  ) {
-    return null;
-  }
+  const semantics = rollingPercentileSemantics(metric);
+  if (semantics === "unavailable") return null;
 
   if (!Array.isArray(metric?.observations) && metric?.summary) {
     const value = metric.summary.rolling_percentile;
@@ -585,16 +613,27 @@ function rollingPercentile(metric) {
   }
 
   const raw = metric.observations || [];
-  const present = raw
-    .map((observation, index) =>
-      observation?.value != null ? index : null,
-    )
-    .filter((index) => index != null);
+  const present = raw.filter((observation) => observation?.value != null);
   if (present.length < 3) return null;
 
-  const series = strictPastPercentileSeries(metric, { rolling: true });
-  const value = series[present.at(-1)]?.value;
-  return value == null ? null : Number(value);
+  if (semantics === "point_in_time") {
+    const series = strictPastPercentileSeries(metric, { rolling: true });
+    const value = series
+      .filter((observation) => observation?.value != null)
+      .at(-1)?.value;
+    return value == null ? null : Number(value);
+  }
+
+  const window =
+    config?.window_observations || defaultRollingWindow(metric);
+  const minObs = config?.min_observations || Math.min(20, window);
+  const values = present.map((observation) => Number(observation.value));
+  const baseline = values.slice(
+    Math.max(0, values.length - 1 - window),
+    -1,
+  );
+  if (baseline.length < minObs) return null;
+  return percentileRank(values.at(-1), baseline);
 }
 
 // Period-to-period change, in the comparison the artifact declares.
@@ -744,6 +783,30 @@ function rateOfChangeSeries(metric) {
   });
 }
 
+function knowledgeTimelineSeries(metric, observations) {
+  return observations
+    .map((observation) => {
+      const referenceDate =
+        observation.reference_date || observation.date || null;
+      const availabilityDate =
+        observation.availability_date ||
+        observationAvailabilityDate(metric, observation);
+
+      return {
+        ...observation,
+        date: availabilityDate || referenceDate,
+        reference_date: referenceDate,
+        availability_date: availabilityDate,
+      };
+    })
+    .sort((left, right) =>
+      String(left.date || "").localeCompare(String(right.date || "")) ||
+      String(left.reference_date || "").localeCompare(
+        String(right.reference_date || ""),
+      ),
+    );
+}
+
 function historyView(metric, mode) {
   if (mode === "pit_percentile") {
     return {
@@ -753,7 +816,10 @@ function historyView(metric, mode) {
         name: `${metric.metric.name} — point-in-time percentile`,
         units: "percentile",
       },
-      observations: strictPastPercentileSeries(metric),
+      observations: knowledgeTimelineSeries(
+        metric,
+        strictPastPercentileSeries(metric),
+      ),
     };
   }
 
@@ -765,7 +831,10 @@ function historyView(metric, mode) {
         name: `${metric.metric.name} — rolling percentile`,
         units: "percentile",
       },
-      observations: strictPastPercentileSeries(metric, { rolling: true }),
+      observations: knowledgeTimelineSeries(
+        metric,
+        strictPastPercentileSeries(metric, { rolling: true }),
+      ),
     };
   }
 
@@ -1616,6 +1685,16 @@ function metricChartSummary(metric, observations) {
   const range = values.length
     ? ` Range ${formatValue(Math.min(...values), metric.metric.units)} to ${formatValue(Math.max(...values), metric.metric.units)}.`
     : "";
+  const usesKnowledgeTimeline = obs.some(
+    (item) =>
+      item.reference_date &&
+      item.date &&
+      item.reference_date !== item.date,
+  );
+  if (usesKnowledgeTimeline) {
+    const reference = last.reference_date || last.date;
+    return `${metric.metric.name}. ${obs.length} point-in-time observations on knowledge dates from ${first.date} to ${last.date}. Latest knowledge date ${last.date}, reference period ${reference}: ${formatValue(last.value, metric.metric.units)}.${range}`;
+  }
   return `${metric.metric.name}. ${obs.length} observations from ${first.date} to ${last.date}. Latest ${last.date}: ${formatValue(last.value, metric.metric.units)}.${range}`;
 }
 
@@ -2406,7 +2485,7 @@ async function openMetric(id, invoker = document.activeElement) {
     : "Snapshot fetched";
   $("#dialog-source").innerHTML =
     `${metricContextGuide(metric)}
-     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)}${percentileContextSuffix(metric) ? " This rank is context only; it is not a risk direction." : ""}</p>`}
+     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)} ${escapeHtml(percentileCaveatSentence(metric))}</p>`}
      <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
      ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
 }

@@ -11,11 +11,6 @@ from .methodology import (
 PREVIEW_OBSERVATIONS = 30
 
 
-def _historical_percentile_allowed(metric: dict) -> bool:
-    eligible, _ = historical_analysis_eligibility(metric)
-    return eligible
-
-
 def _default_rolling_window(metric: dict) -> int:
     frequency = metric.get("metric", {}).get("frequency")
     if frequency == "daily":
@@ -43,11 +38,12 @@ def _percentile_rank(value: float, baseline: list[float]) -> float | None:
 
 
 def rolling_percentile(metric: dict) -> float | None:
-    if not _historical_percentile_allowed(metric):
-        return None
+    config = _baseline_config(metric, "rolling_percentile") or {}
 
-    config = _baseline_config(metric, "rolling_percentile")
-    if not config or config.get("point_in_time") is not True:
+    # A current retrospective rank can still be useful when exact historical
+    # release timing is unavailable. Membership-sensitive backfills are the
+    # exception: current-constituent history can distort the distribution itself.
+    if metric.get("source", {}).get("point_in_time_membership") is False:
         return None
 
     observations = metric.get("observations", [])
@@ -66,14 +62,36 @@ def rolling_percentile(metric: dict) -> float | None:
     min_observations = int(
         config.get("min_observations") or min(20, window)
     )
-    basis = metric.get("source", {}).get("availability_basis") or "unknown"
-    series = point_in_time_percentiles(
-        observations,
-        window_observations=window,
-        min_observations=min_observations,
-        availability_basis=basis,
-    )
-    return series[present[-1]].get("percentile")
+
+    eligible, _ = historical_analysis_eligibility(metric)
+    if config.get("point_in_time") is True and eligible:
+        basis = (
+            metric.get("source", {}).get("availability_basis")
+            or "unknown"
+        )
+        series = point_in_time_percentiles(
+            observations,
+            window_observations=window,
+            min_observations=min_observations,
+            availability_basis=basis,
+        )
+        return series[present[-1]].get("percentile")
+
+    # Retrospective current context: rank today's latest reference-period value
+    # against prior reference-period observations. This fallback also preserves
+    # the pre-#48 presentation behavior for metrics that never declared a
+    # rolling baseline. It is descriptive only, not a PIT/backtest guarantee.
+    values = [
+        float(item["value"])
+        for item in observations
+        if item.get("value") is not None
+    ]
+    baseline = values[
+        max(0, len(values) - 1 - window) : -1
+    ]
+    if len(baseline) < min_observations:
+        return None
+    return _percentile_rank(values[-1], baseline)
 
 
 def recent_change(metric: dict) -> dict | None:

@@ -435,21 +435,9 @@ def validate_overview(payload: dict) -> None:
                 raise ValidationError(
                     f"overview[{metric_id}]: invalid rolling_percentile"
                 )
-            rolling_baseline = next(
-                (
-                    baseline
-                    for baseline in row["baselines"]
-                    if baseline.get("type") == "rolling_percentile"
-                ),
-                None,
-            )
-            if (
-                availability_basis == "unknown"
-                or not rolling_baseline
-                or rolling_baseline.get("point_in_time") is not True
-            ):
+            if source.get("point_in_time_membership") is False:
                 raise ValidationError(
-                    f"overview[{metric_id}]: rolling_percentile lacks PIT availability contract"
+                    f"overview[{metric_id}]: membership-sensitive retrospective percentile is disabled"
                 )
 
         change = summary.get("recent_change")

@@ -131,14 +131,35 @@ class OverviewArtifactTests(unittest.TestCase):
         overview = build_overview({metric["metric"]["id"]: metric})
         self.assertIsNone(overview["metrics"][0]["summary"]["rolling_percentile"])
 
-    def test_unknown_availability_blocks_historical_percentile(self) -> None:
+    def test_unknown_availability_preserves_retrospective_current_rank(self) -> None:
         metric = metric_fixture(values=[float(i) for i in range(1, 41)])
         metric["source"]["availability_basis"] = "unknown"
+        metric["baselines"][0]["point_in_time"] = False
+        metric["baselines"][0]["notes"] = (
+            "Retrospective current context only; not PIT/backtest-safe."
+        )
 
-        self.assertIsNone(rolling_percentile(metric))
+        value = rolling_percentile(metric)
+        self.assertIsNotNone(value)
+
         overview = build_overview({"fixture": metric})
-        self.assertIsNone(
-            overview["metrics"][0]["summary"]["rolling_percentile"]
+        row = overview["metrics"][0]
+        self.assertEqual(row["summary"]["rolling_percentile"], value)
+        self.assertFalse(row["baselines"][0]["point_in_time"])
+        validate_overview(overview)
+
+    def test_no_rolling_baseline_keeps_retrospective_presentation_rank(self) -> None:
+        metric = metric_fixture(values=[float(i) for i in range(1, 41)])
+        metric["source"]["availability_basis"] = "unknown"
+        metric["baselines"] = []
+
+        value = rolling_percentile(metric)
+        self.assertIsNotNone(value)
+
+        overview = build_overview({"fixture": metric})
+        self.assertEqual(
+            overview["metrics"][0]["summary"]["rolling_percentile"],
+            value,
         )
         validate_overview(overview)
 
@@ -180,6 +201,45 @@ class OverviewArtifactTests(unittest.TestCase):
             "release_date missing from preview",
         ):
             validate_overview(broken)
+
+    def test_checked_in_unknown_metrics_keep_retrospective_current_context(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        generated = root / "data" / "generated"
+        overview = json.loads(
+            (generated / "overview.json").read_text(encoding="utf-8")
+        )
+        rows = {
+            row["metric"]["id"]: row
+            for row in overview["metrics"]
+        }
+
+        for metric_id in (
+            "finra_margin_debt",
+            "finra_margin_debt_yoy_pct",
+            "nfci",
+            "nfci_risk",
+            "shiller_cape",
+            "shiller_real_tr_price",
+        ):
+            row = rows[metric_id]
+            with self.subTest(metric_id=metric_id):
+                self.assertEqual(
+                    row["source"].get("availability_basis"),
+                    "unknown",
+                )
+                self.assertIsNotNone(
+                    row["summary"]["rolling_percentile"]
+                )
+                self.assertFalse(
+                    any(
+                        baseline.get("point_in_time") is True
+                        and baseline.get("type") in {
+                            "full_history_percentile",
+                            "rolling_percentile",
+                        }
+                        for baseline in row["baselines"]
+                    )
+                )
 
     def test_checked_in_metrics_declare_availability_basis(self) -> None:
         root = Path(__file__).resolve().parents[1]

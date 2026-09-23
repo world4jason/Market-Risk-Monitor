@@ -56,7 +56,7 @@ def _available_observations(
             )
         ]
 
-    by_availability: dict[str, dict] = {}
+    out = []
     for obs in metric.get("observations", []):
         if obs.get("value") is None:
             continue
@@ -67,16 +67,17 @@ def _available_observations(
         if _parse_date(available) > evaluation_date:
             continue
 
-        current = by_availability.get(available)
-        if current is None or obs["date"] >= current["date"]:
-            retained = dict(obs)
-            retained["_availability_date"] = available
-            by_availability[available] = retained
+        retained = dict(obs)
+        retained["_availability_date"] = available
+        out.append(retained)
 
-    return [
-        by_availability[key]
-        for key in sorted(by_availability)
-    ]
+    return sorted(
+        out,
+        key=lambda item: (
+            item["date"],
+            item["_availability_date"],
+        ),
+    )
 
 
 def _rule_value(rule: dict, observations: list[dict]):
@@ -112,10 +113,22 @@ def _rule_value(rule: dict, observations: list[dict]):
 
     if rule_type in {"percentile_above", "percentile_below"}:
         min_observations = int(rule.get("min_observations", 20))
-        if len(observations) <= min_observations:
-            return None, None, f"needs > {min_observations} observations"
+        prior = observations[:-1]
+        latest_availability = observations[-1].get("_availability_date")
+        if latest_availability:
+            prior = [
+                observation
+                for observation in prior
+                if (
+                    observation.get("_availability_date")
+                    and observation["_availability_date"] < latest_availability
+                )
+            ]
 
-        baseline = [float(o["value"]) for o in observations[:-1]]
+        if len(prior) < min_observations:
+            return None, None, f"needs >= {min_observations} prior observations"
+
+        baseline = [float(o["value"]) for o in prior]
         value = percentile_rank(latest, baseline)
         if value is None:
             return None, None, "percentile unavailable"

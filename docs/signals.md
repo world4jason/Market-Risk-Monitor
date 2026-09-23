@@ -122,9 +122,15 @@ Historical evaluation differs from the current snapshot in one important way: it
 - `source.availability_basis = release_date` uses each observation's recorded `release_date`.
 - `source.availability_basis = unknown` leaves the historical condition `unknown`; the engine does not reconstruct a PIT series from `expected_observation_lag_days`.
 
-When multiple historical rows first become available on one release date, that release is one information arrival. The backfill keeps the latest reference-period value from that batch for that arrival rather than pretending each row was independently available in the past.
+When multiple historical rows first become available on one release date, they
+become available simultaneously. Before that release, none are usable. On and
+after that release, all rows in the batch are part of the information set, so a
+3-period delta or 6-period return may use them immediately if enough reference
+periods are present.
 
-For percentile rules, the current historical observation is compared only with earlier available observations. Future observations and same-release siblings are never used as prior information.
+This differs from a transform that assigns a percentile to each historical row:
+same-release siblings cannot be treated as earlier information for one another.
+Future releases are never used.
 
 ## Why no composite score
 

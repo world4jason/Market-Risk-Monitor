@@ -334,17 +334,20 @@ class UiContractTests(unittest.TestCase):
         self.assertEqual(self.margin_level["metric"]["polarity"], "contextual")
 
         suffix = extract_function(self.app, "percentileContextSuffix")
+        caveat = extract_function(self.app, "percentileCaveatSentence")
         card = extract_function(self.app, "metricCard")
         overview = extract_function(self.app, "renderOverview")
         dialog = extract_function(self.app, "openMetric")
 
         self.assertIn('polarity === "contextual"', suffix)
-        self.assertIn('" · context only"', suffix)
+        self.assertIn('parts.push("context only")', suffix)
+        self.assertIn("retrospective; not PIT/backtest-safe", suffix)
         self.assertIn("percentileContextSuffix(metric)", card)
         self.assertIn("overviewPercentileText(margin, marginPct)", overview)
         self.assertIn("percentileContextSuffix(metric)", overview)
-        self.assertIn("percentileContextSuffix(metric)", dialog)
-        self.assertIn("it is not a risk direction", dialog)
+        self.assertIn("percentileCaveatSentence(metric)", dialog)
+        self.assertIn("it is not a risk direction", caveat)
+        self.assertIn("not safe for historical PIT/backtest use", caveat)
 
     def test_breadth_beginner_copy_is_not_snapshot_specific(self) -> None:
         registry = extract_braced_block(self.app, "const beginnerContext =")

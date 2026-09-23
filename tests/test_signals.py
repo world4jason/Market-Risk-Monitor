@@ -106,6 +106,109 @@ class SignalTests(unittest.TestCase):
         self.assertEqual(result["status"], "unknown")
         self.assertEqual(result["reason"], "no observation available")
 
+    def test_same_release_batch_is_fully_available_after_release(self):
+        values = [
+            ("2026-01-31", 1.0),
+            ("2026-02-28", 2.0),
+            ("2026-03-31", 3.0),
+            ("2026-04-30", 5.0),
+        ]
+        release_dates = {
+            obs_date: "2026-09-21"
+            for obs_date, _ in values
+        }
+        metrics = {
+            "x": metric(
+                "x",
+                values,
+                availability_basis="release_date",
+                release_dates=release_dates,
+            )
+        }
+        rule = {
+            "type": "delta_periods_above",
+            "metric": "x",
+            "periods": 3,
+            "threshold": 3,
+        }
+
+        before = evaluate_rule(
+            rule,
+            metrics,
+            datetime(2026, 9, 20, tzinfo=timezone.utc).date(),
+            respect_publication_lag=True,
+            require_fresh_current=False,
+        )
+        after = evaluate_rule(
+            rule,
+            metrics,
+            datetime(2026, 9, 21, tzinfo=timezone.utc).date(),
+            respect_publication_lag=True,
+            require_fresh_current=False,
+        )
+
+        self.assertEqual(before["status"], "unknown")
+        self.assertEqual(after["status"], "active")
+        self.assertEqual(after["as_of"], "2026-04-30")
+        self.assertAlmostEqual(after["value"], 4.0)
+
+    def test_same_release_siblings_do_not_seed_signal_percentile(self):
+        first_batch = [
+            ("2026-01-31", 1.0),
+            ("2026-02-28", 2.0),
+            ("2026-03-31", 3.0),
+            ("2026-04-30", 4.0),
+        ]
+        release_dates = {
+            obs_date: "2026-09-21"
+            for obs_date, _ in first_batch
+        }
+        metrics = {
+            "x": metric(
+                "x",
+                first_batch,
+                availability_basis="release_date",
+                release_dates=release_dates,
+            )
+        }
+        rule = {
+            "type": "percentile_above",
+            "metric": "x",
+            "threshold": 90,
+            "min_observations": 2,
+        }
+
+        same_day = evaluate_rule(
+            rule,
+            metrics,
+            datetime(2026, 9, 21, tzinfo=timezone.utc).date(),
+            respect_publication_lag=True,
+            require_fresh_current=False,
+        )
+        self.assertEqual(same_day["status"], "unknown")
+
+        second_batch = first_batch + [("2026-05-31", 5.0)]
+        second_releases = {
+            **release_dates,
+            "2026-05-31": "2026-10-21",
+        }
+        later = evaluate_rule(
+            rule,
+            {
+                "x": metric(
+                    "x",
+                    second_batch,
+                    availability_basis="release_date",
+                    release_dates=second_releases,
+                )
+            },
+            datetime(2026, 10, 21, tzinfo=timezone.utc).date(),
+            respect_publication_lag=True,
+            require_fresh_current=False,
+        )
+        self.assertEqual(later["status"], "active")
+        self.assertAlmostEqual(later["value"], 100.0)
+
     def test_strict_past_percentile(self):
         values = [(f"2020-{month:02d}-01", float(month)) for month in range(1, 13)]
         metrics = {"x": metric("x", values)}

@@ -149,9 +149,26 @@ whole batch has been scored. A first CIER ingest containing twelve historical
 months all first verified on one date cannot manufacture eleven synthetic
 strict-past comparisons.
 
-For event/backfill consumers, one availability date contributes at most one
-state to the point-in-time sequence; the latest reference-period value in that
-release batch represents what became known at that arrival.
+For a visual/event knowledge timeline, one availability date contributes at
+most one state; the latest reference-period value in that release batch
+represents the state visible at that arrival.
+
+Signal evaluation is different: once a release date has arrived, every row in
+that batch is part of the information set and may be used by a multi-period
+delta/return rule. The engine must not permanently collapse the batch to one
+observation.
+
+### Revision-prone sources and vintages
+
+A release date is not enough when a provider revises previously published
+history. If the canonical artifact keeps only one value per reference date, it
+cannot reconstruct what an earlier vintage contained.
+
+NDC leading/coincident/lagging/monitoring families are therefore
+`availability_basis: unknown` and non-PIT until the repository preserves
+vintages such as `(reference_date, release_date/vintage, value)`. Keeping only
+the newest revised row and attaching a release date must never be treated as a
+canonical PIT history.
 
 ### Relationship to baselines
 
@@ -160,8 +177,12 @@ availability basis. Validation rejects canonical PIT baselines when
 availability is missing/unknown. Membership-sensitive metrics are additionally
 subject to their constituent-membership PIT gate.
 
-A non-PIT baseline may still describe retrospective history, but the UI must
-label or disable PIT modes rather than silently upgrading it.
+A non-PIT baseline may still describe retrospective history. In particular,
+the current value may be ranked against prior reference-period observations to
+answer a descriptive question such as “where is today versus recent history?”
+That **current retrospective rank** must be labeled as retrospective / not
+PIT-backtest-safe. Historical PIT percentile/event modes remain disabled rather
+than silently upgrading the same data into a backtest-safe series.
 
 ## History coverage
 
