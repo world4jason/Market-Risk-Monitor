@@ -149,6 +149,41 @@ class OverviewArtifactTests(unittest.TestCase):
             f"overview is {overview_bytes} bytes vs {full_bytes} bytes of full histories",
         )
 
+    def test_validator_requires_render_contract_fields_per_metric(self) -> None:
+        metric = metric_fixture()
+        overview = build_overview({"fixture": metric})
+
+        for key in ("source", "coverage", "latest", "baselines", "summary"):
+            broken = copy.deepcopy(overview)
+            del broken["metrics"][0][key]
+            with self.subTest(key=key):
+                with self.assertRaisesRegex(ValidationError, "missing keys"):
+                    validate_overview(broken)
+
+        broken = copy.deepcopy(overview)
+        del broken["metrics"][0]["metric"]["polarity"]
+        with self.assertRaisesRegex(ValidationError, "metric missing keys"):
+            validate_overview(broken)
+
+        broken = copy.deepcopy(overview)
+        del broken["metrics"][0]["summary"]["recent_change"]
+        with self.assertRaisesRegex(ValidationError, "summary missing keys"):
+            validate_overview(broken)
+
+    def test_validator_rejects_preview_that_disagrees_with_latest(self) -> None:
+        metric = metric_fixture()
+        overview = build_overview({"fixture": metric})
+
+        broken_date = copy.deepcopy(overview)
+        broken_date["metrics"][0]["latest"]["as_of"] = "2022-01-01"
+        with self.assertRaisesRegex(ValidationError, "preview/latest date mismatch"):
+            validate_overview(broken_date)
+
+        broken_value = copy.deepcopy(overview)
+        broken_value["metrics"][0]["latest"]["value"] = -999
+        with self.assertRaisesRegex(ValidationError, "preview/latest value mismatch"):
+            validate_overview(broken_value)
+
     def test_validator_rejects_full_history_inside_overview(self) -> None:
         metric = metric_fixture()
         overview = build_overview({"fixture": metric})
