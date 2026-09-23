@@ -20,6 +20,21 @@ Run deterministic unit tests:
 python -m unittest discover -s tests -v
 ```
 
+The unittest suite invokes the executable frontend behavior matrix through
+Node's built-in test runner. No npm install or live network is required.
+Node.js 20+ is required for this UI contract layer.
+
+Run the UI behavior layer directly when debugging frontend semantics:
+
+```bash
+python scripts/test_ui_behavior.py
+```
+
+It executes production functions from `assets/app.js` against committed
+`tests/fixtures/ui_behavior.json` cases for freshness/error states, unit-aware
+formatting, Taiwan breadth, PIT gating, unavailable modules, core snapshot
+failure, keyboard interaction, and overview interpretation.
+
 ## Covered invariants
 
 The test suite contains fixtures/tests for:
