@@ -2375,8 +2375,8 @@ async function ensureDeferredContext(kind) {
       const [macro, taiwanEvents, cbcRate, fedRate] = await Promise.all([
         fetchDeferredJson(TAIWAN_MACRO_REGIME_URL, { optionalNotFound: true }),
         fetchDeferredJson(TAIWAN_EVENTS_URL),
-        fetchDeferredJson(TAIWAN_CBC_RATE_REGIME_URL),
-        fetchDeferredJson(FED_RATE_REGIME_URL),
+        fetchDeferredJson(TAIWAN_CBC_RATE_REGIME_URL, { optionalNotFound: true }),
+        fetchDeferredJson(FED_RATE_REGIME_URL, { optionalNotFound: true }),
       ]);
       state.taiwanMacroRegime = macro;
       state.taiwanEvents = taiwanEvents?.events || [];
