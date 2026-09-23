@@ -1,0 +1,63 @@
+{
+  "freshness_states": [
+    {"id": "fresh", "state": "fresh"},
+    {"id": "stale", "state": "stale"},
+    {"id": "missing", "state": "missing"},
+    {"id": "error", "state": "error"},
+    {"id": "insufficient", "state": "insufficient_data"}
+  ],
+  "delta_cases": [
+    {"comparison": "percent_change", "value": 2.345, "expected": "+2.35%"},
+    {"comparison": "basis_points", "value": 25, "expected": "+25.0 bp"},
+    {"comparison": "percentage_points", "value": -1.25, "expected": "-1.25 pp"},
+    {"comparison": "absolute", "value": 0.004, "expected": "+0.004"}
+  ],
+  "frequency_windows": [
+    {"frequency": "daily", "expected": 2520},
+    {"frequency": "weekly", "expected": 520},
+    {"frequency": "monthly", "expected": 120}
+  ],
+  "value_cases": [
+    {"value": 2, "units": "percent", "expected": "2.00%"},
+    {"value": 1453832, "units": "USD millions", "expected": "$1.45T"},
+    {"value": 47800.17, "units": "index", "expected": "47,800.2"},
+    {"value": 21, "units": "percentile", "expected": "21st"}
+  ],
+  "taiwan_breadth_cases": [
+    {"present": false, "observations": 0, "state": "missing", "percentile": null, "expected": "missing"},
+    {"present": true, "observations": 0, "state": "fresh", "percentile": null, "expected": "missing"},
+    {"present": true, "observations": 1, "state": "fresh", "percentile": null, "expected": "snapshot_only"},
+    {"present": true, "observations": 2, "state": "fresh", "percentile": null, "expected": "history_building"},
+    {"present": true, "observations": 30, "state": "fresh", "percentile": 55, "expected": "context_available"},
+    {"present": true, "observations": 30, "state": "stale", "percentile": 55, "expected": "not_current"}
+  ],
+  "non_pit_metric": {
+    "id": "tw_above_50dma_pct",
+    "name": "Taiwan above 50DMA",
+    "pillar": "breadth",
+    "units": "percent",
+    "frequency": "daily",
+    "polarity": "contextual",
+    "comparison": "percentage_points"
+  },
+  "margin_condition": {
+    "id": "margin_debt_rollover",
+    "name": "Margin rollover",
+    "status": "active",
+    "metrics": ["finra_margin_debt_yoy_pct"],
+    "rules": {
+      "type": "all",
+      "children": [
+        {
+          "type": "delta_periods_below",
+          "metric": "finra_margin_debt_yoy_pct",
+          "status": "active",
+          "value": -16.5,
+          "threshold": -10,
+          "periods": 3,
+          "reason": "YoY growth decelerated sharply."
+        }
+      ]
+    }
+  }
+}

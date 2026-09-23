@@ -2309,24 +2309,61 @@ function renderSignalHistory(snapshot, element) {
   </svg>`;
 }
 
-function updateGlobalFreshness() {
-  const badge = $("#global-freshness");
-  const metrics = [...state.metrics.values()];
+function globalFreshnessSummary(metrics) {
+  const counts = {
+    fresh: 0,
+    stale: 0,
+    missing: 0,
+    error: 0,
+    insufficient_data: 0,
+  };
+
+  for (const metric of metrics) {
+    const freshness = effectiveFreshness(metric).state;
+    if (freshness in counts) counts[freshness] += 1;
+    else counts.error += 1;
+  }
 
   if (!metrics.length) {
-    badge.className = "badge badge-missing";
-    badge.textContent = "No production snapshot";
-    return;
+    return {
+      counts,
+      className: "badge badge-missing",
+      text: "No production snapshot",
+    };
   }
 
-  const bad = metrics.filter((m) => effectiveFreshness(m).state !== "fresh");
-  if (bad.length) {
-    badge.className = "badge badge-stale";
-    badge.textContent = `${bad.length} not current`;
-  } else {
-    badge.className = "health-passive";
-    badge.textContent = "Data current";
+  const parts = [
+    counts.error ? `${counts.error} error` : "",
+    counts.missing ? `${counts.missing} missing` : "",
+    counts.stale ? `${counts.stale} stale` : "",
+    counts.insufficient_data
+      ? `${counts.insufficient_data} insufficient data`
+      : "",
+  ].filter(Boolean);
+
+  if (!parts.length) {
+    return {
+      counts,
+      className: "health-passive",
+      text: "Data current",
+    };
   }
+
+  return {
+    counts,
+    className:
+      counts.error || counts.missing
+        ? "badge badge-error"
+        : "badge badge-stale",
+    text: parts.join(" · "),
+  };
+}
+
+function updateGlobalFreshness() {
+  const badge = $("#global-freshness");
+  const summary = globalFreshnessSummary([...state.metrics.values()]);
+  badge.className = summary.className;
+  badge.textContent = summary.text;
 }
 
 function applyTheme(theme) {
