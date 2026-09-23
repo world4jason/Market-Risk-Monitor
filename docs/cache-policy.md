@@ -38,6 +38,14 @@ Within one page session, `ensureMetricLoaded()` provides a stronger cache:
 Reopening the same metric therefore does not issue another request during the
 same session.
 
+## Deferred below-fold context
+
+Event definitions, optional MA study/config artifacts, Taiwan macro regime, and
+rate-regime context are not part of the first-view request set. The frontend
+loads them only when the corresponding below-fold section approaches the
+viewport or when the user requests a history/event view. This keeps the
+decision-first render bounded to catalog + overview + signals + refresh report.
+
 ## Static configuration and event definitions
 
 Examples:
