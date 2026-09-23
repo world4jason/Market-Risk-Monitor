@@ -2348,13 +2348,11 @@ function initTheme() {
 }
 
 
-async function fetchDeferredJson(url) {
-  try {
-    const response = await fetch(url);
-    return response.ok ? await response.json() : null;
-  } catch {
-    return null;
-  }
+async function fetchDeferredJson(url, { optionalNotFound = false } = {}) {
+  const response = await fetch(url);
+  if (response.ok) return await response.json();
+  if (optionalNotFound && response.status === 404) return null;
+  throw new Error(`${url} HTTP ${response.status}`);
 }
 
 async function ensureDeferredContext(kind) {
@@ -2368,13 +2366,13 @@ async function ensureDeferredContext(kind) {
     } else if (kind === "trend") {
       const [config, study] = await Promise.all([
         fetchDeferredJson(MA_BREADTH_CONFIG_URL),
-        fetchDeferredJson(MA_BREADTH_STUDY_URL),
+        fetchDeferredJson(MA_BREADTH_STUDY_URL, { optionalNotFound: true }),
       ]);
       state.maBreadthConfig = config;
       state.maBreadthStudy = study;
     } else if (kind === "taiwan") {
       const [macro, taiwanEvents, cbcRate, fedRate] = await Promise.all([
-        fetchDeferredJson(TAIWAN_MACRO_REGIME_URL),
+        fetchDeferredJson(TAIWAN_MACRO_REGIME_URL, { optionalNotFound: true }),
         fetchDeferredJson(TAIWAN_EVENTS_URL),
         fetchDeferredJson(TAIWAN_CBC_RATE_REGIME_URL),
         fetchDeferredJson(FED_RATE_REGIME_URL),
@@ -2383,7 +2381,12 @@ async function ensureDeferredContext(kind) {
       state.taiwanEvents = taiwanEvents?.events || [];
       state.taiwanCbcRateRegime = cbcRate;
       state.fedRateRegime = fedRate;
+    } else {
+      throw new Error(`unknown deferred context kind: ${kind}`);
     }
+
+    // Mark loaded only after every required request for this kind succeeds.
+    // Optional 404s are represented as null and still count as a successful load.
     state.deferredLoaded.add(kind);
   })();
 
@@ -2391,6 +2394,8 @@ async function ensureDeferredContext(kind) {
   try {
     return await promise;
   } finally {
+    // A rejected request is intentionally not added to deferredLoaded, so the
+    // next call can retry within the same page session.
     state.deferredLoads.delete(kind);
   }
 }
@@ -2399,17 +2404,37 @@ function observeSectionOnce(selector, onVisible) {
   const element = $(selector);
   if (!element) return;
 
+  let complete = false;
+  let inFlight = false;
+  let observer = null;
+
+  const attempt = async () => {
+    if (complete || inFlight) return;
+    inFlight = true;
+    try {
+      await onVisible();
+      complete = true;
+      observer?.disconnect();
+      element.removeEventListener("pointerenter", attempt);
+      element.removeEventListener("focusin", attempt);
+    } catch (error) {
+      // Keep the observer/listeners active. Scrolling away/back or interacting
+      // again retries the deferred load instead of caching a transient failure.
+      console.warn("deferred context load failed", selector, error);
+    } finally {
+      inFlight = false;
+    }
+  };
+
   if (!("IntersectionObserver" in window)) {
-    element.addEventListener("pointerenter", onVisible, { once: true });
-    element.addEventListener("focusin", onVisible, { once: true });
+    element.addEventListener("pointerenter", attempt);
+    element.addEventListener("focusin", attempt);
     return;
   }
 
-  const observer = new IntersectionObserver(
+  observer = new IntersectionObserver(
     (entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      onVisible();
+      if (entries.some((entry) => entry.isIntersecting)) attempt();
     },
     { rootMargin: "200px 0px" },
   );
