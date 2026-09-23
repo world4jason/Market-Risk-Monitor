@@ -82,6 +82,7 @@ would mean committing a placeholder.
 validate_data.py   exits 0 on the exact files being published
 site_smoke.py      exits 0 on the release tree
 coverage.json      every metric status ok, no short_history
+overview.json      lightweight summary present; no full observations
 refresh-report.json  removed_artifacts records anything pruned
 ```
 

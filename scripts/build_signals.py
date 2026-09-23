@@ -17,7 +17,7 @@ from pipeline.validate import validate_metric
 def load_metrics(output_dir: Path) -> dict[str, dict]:
     metrics = {}
     for path in sorted(output_dir.glob("*.json")):
-        if path.name in {"catalog.json", "refresh-report.json", "signals.json"}:
+        if path.name in {"catalog.json", "overview.json", "refresh-report.json", "signals.json"}:
             continue
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))

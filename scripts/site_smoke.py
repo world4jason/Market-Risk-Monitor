@@ -22,6 +22,7 @@ def main() -> None:
         ROOT / "assets" / "styles.css",
         ROOT / "data" / "events.json",
         ROOT / "data" / "generated" / "catalog.json",
+        ROOT / "data" / "generated" / "overview.json",
     ]
     for path in required:
         if not path.exists():
@@ -42,6 +43,7 @@ def main() -> None:
         './assets/styles.css',
         './assets/app.js',
         './data/generated/catalog.json',
+        './data/generated/overview.json',
         './data/events.json',
     ]
     combined = html + "\n" + app

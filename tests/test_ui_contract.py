@@ -157,7 +157,11 @@ class UiContractTests(unittest.TestCase):
         ):
             self.assertIn(state_id, self.parser.by_id)
 
-        mobile_css = self.styles[self.styles.rindex("@media (max-width: 640px)") :]
+        mobile_css = "\n".join(
+            block
+            for block in self.styles.split("@media (max-width: 640px)")
+            if block
+        )
         self.assertIn(".mode-nav { display: none; }", mobile_css)
         self.assertIn(".decision-summary", mobile_css)
         self.assertIn("grid-template-columns: 1fr;", mobile_css)

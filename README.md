@@ -27,6 +27,7 @@ See:
 - `docs/methodology.md`
 - `docs/signals.md`
 - `docs/qa.md`
+- `docs/cache-policy.md`
 
 ## Quick start
 

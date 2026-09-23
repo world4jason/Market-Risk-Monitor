@@ -1,0 +1,176 @@
+from __future__ import annotations
+
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def extract_function(source: str, name: str) -> str:
+    marker = f"function {name}("
+    start = source.index(marker)
+    async_start = source.rfind("async ", max(0, start - 8), start)
+    if async_start >= 0 and source[async_start:start] == "async ":
+        start = async_start
+    brace = source.index("{", start)
+
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    line_comment = False
+    block_comment = False
+    i = brace
+    while i < len(source):
+        char = source[i]
+        nxt = source[i + 1] if i + 1 < len(source) else ""
+
+        if line_comment:
+            if char == "\n":
+                line_comment = False
+            i += 1
+            continue
+        if block_comment:
+            if char == "*" and nxt == "/":
+                block_comment = False
+                i += 2
+                continue
+            i += 1
+            continue
+        if quote is not None:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            i += 1
+            continue
+        if char == "/" and nxt == "/":
+            line_comment = True
+            i += 2
+            continue
+        if char == "/" and nxt == "*":
+            block_comment = True
+            i += 2
+            continue
+        if char in ("'", '"', chr(96)):
+            quote = char
+            i += 1
+            continue
+
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return source[start : i + 1]
+        i += 1
+
+    raise AssertionError(f"unterminated function: {name}")
+
+
+class LazyLoadingContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.app = (ROOT / "assets" / "app.js").read_text(encoding="utf-8")
+
+    def test_default_load_uses_overview_without_catalog_history_enumeration(self) -> None:
+        load_data = extract_function(self.app, "loadData")
+        self.assertIn("OVERVIEW_URL", load_data)
+        self.assertIn("overview.metrics", load_data)
+
+        # The old eager path iterated every catalog entry and fetched its path.
+        self.assertNotIn("entries.map", load_data)
+        self.assertNotIn("entry.path", load_data)
+        self.assertNotIn("Promise.all(\n      entries.map", load_data)
+
+    def test_initial_path_fetches_only_first_view_artifacts(self) -> None:
+        load_data = extract_function(self.app, "loadData")
+        for required in (
+            "CATALOG_URL",
+            "OVERVIEW_URL",
+            "SIGNALS_URL",
+            "REFRESH_REPORT_URL",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, load_data)
+
+        for deferred in (
+            "EVENTS_URL",
+            "MA_BREADTH_CONFIG_URL",
+            "MA_BREADTH_STUDY_URL",
+            "TAIWAN_MACRO_REGIME_URL",
+            "TAIWAN_EVENTS_URL",
+            "TAIWAN_CBC_RATE_REGIME_URL",
+            "FED_RATE_REGIME_URL",
+        ):
+            with self.subTest(deferred=deferred):
+                self.assertNotIn(deferred, load_data)
+
+        self.assertIn("setupDeferredContextLoading()", load_data)
+        self.assertEqual(load_data.count("fetch("), 4)
+
+    def test_deferred_context_is_loaded_by_section_not_first_paint(self) -> None:
+        setup = extract_function(self.app, "setupDeferredContextLoading")
+        ensure = extract_function(self.app, "ensureDeferredContext")
+
+        self.assertIn('#trend-participation-section', setup)
+        self.assertIn('#taiwan-detail', setup)
+        self.assertIn('#signals-detail', setup)
+        self.assertIn('#research', setup)
+        self.assertIn('kind === "trend"', ensure)
+        self.assertIn('kind === "taiwan"', ensure)
+        self.assertIn('kind === "events"', ensure)
+        self.assertIn("state.deferredLoads.has(kind)", ensure)
+        self.assertIn("state.deferredLoaded.has(kind)", ensure)
+
+    def test_deferred_failures_are_retryable_and_optional_404s_are_explicit(self) -> None:
+        fetcher = extract_function(self.app, "fetchDeferredJson")
+        ensure = extract_function(self.app, "ensureDeferredContext")
+        observer = extract_function(self.app, "observeSectionOnce")
+
+        self.assertIn("optionalNotFound", fetcher)
+        self.assertIn("response.status === 404", fetcher)
+        self.assertIn("throw new Error", fetcher)
+        self.assertIn("state.deferredLoaded.add(kind)", ensure)
+        self.assertIn("state.deferredLoads.delete(kind)", ensure)
+        self.assertIn("optionalNotFound: true", ensure)
+        self.assertIn("console.warn(\"deferred context load failed\"", observer)
+        self.assertIn("observer?.disconnect()", observer)
+
+    def test_full_metric_loader_is_single_flight_and_session_cached(self) -> None:
+        loader = extract_function(self.app, "ensureMetricLoaded")
+        self.assertIn("Array.isArray(existing?.observations)", loader)
+        self.assertIn("state.metricLoads.has(id)", loader)
+        self.assertIn("state.metricLoads.set(id, promise)", loader)
+        self.assertIn("state.metrics.set(id, metric)", loader)
+        self.assertIn('cache: "no-cache"', loader)
+
+    def test_detail_and_research_paths_use_the_lazy_loader(self) -> None:
+        for name in ("openMetric", "renderHistory", "renderTaiwanEventSelector"):
+            with self.subTest(name=name):
+                fn = extract_function(self.app, name)
+                self.assertIn("ensureMetricLoaded", fn)
+
+    def test_summary_helpers_do_not_require_full_observation_history(self) -> None:
+        for name, expected in (
+            ("rollingPercentile", "metric.summary.rolling_percentile"),
+            ("recentChange", "metric.summary.recent_change"),
+            ("usableObservationCount", "metric.summary.observation_count"),
+            ("sparkline", "metric?.summary?.preview_observations"),
+        ):
+            with self.subTest(name=name):
+                self.assertIn(expected, extract_function(self.app, name))
+
+    def test_current_snapshot_uses_no_store_but_history_revalidates(self) -> None:
+        load_data = extract_function(self.app, "loadData")
+        self.assertIn('fetch(OVERVIEW_URL, { cache: "no-store" })', load_data)
+        self.assertIn('fetch(CATALOG_URL, { cache: "no-store" })', load_data)
+        self.assertIn('fetch(SIGNALS_URL, { cache: "no-store" })', load_data)
+
+        loader = extract_function(self.app, "ensureMetricLoaded")
+        self.assertIn('fetch(url, { cache: "no-cache" })', loader)
+
+
+if __name__ == "__main__":
+    unittest.main()
