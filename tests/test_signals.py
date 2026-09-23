@@ -4,13 +4,30 @@ from datetime import datetime, timezone
 from pipeline.signals import build_signal_snapshot, evaluate_rule
 
 
-def metric(metric_id, values, *, frequency="monthly", freshness="fresh", lag=0):
-    observations = [
-        {"date": date, "value": value, "status": "observed"}
-        for date, value in values
-    ]
+def metric(
+    metric_id,
+    values,
+    *,
+    frequency="monthly",
+    freshness="fresh",
+    lag=0,
+    availability_basis="observation_date",
+    release_dates=None,
+):
+    release_dates = release_dates or {}
+    observations = []
+    for obs_date, value in values:
+        observation = {
+            "date": obs_date,
+            "value": value,
+            "status": "observed",
+        }
+        if obs_date in release_dates:
+            observation["release_date"] = release_dates[obs_date]
+        observations.append(observation)
     return {
         "metric": {"id": metric_id, "frequency": frequency},
+        "source": {"availability_basis": availability_basis},
         "coverage": {"expected_observation_lag_days": lag},
         "freshness": {"state": freshness},
         "observations": observations,
@@ -39,12 +56,14 @@ class SignalTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "unknown")
 
-    def test_publication_lag_blocks_future_knowledge(self):
+    def test_release_date_blocks_future_knowledge(self):
         metrics = {
             "x": metric(
                 "x",
                 [("2026-01-31", 5.0)],
                 lag=25,
+                availability_basis="release_date",
+                release_dates={"2026-01-31": "2026-02-25"},
             )
         }
         rule = {"type": "latest_above", "metric": "x", "threshold": 0}
@@ -66,6 +85,26 @@ class SignalTests(unittest.TestCase):
 
         self.assertEqual(too_early["status"], "unknown")
         self.assertEqual(available["status"], "active")
+
+    def test_unknown_availability_is_not_recovered_from_expected_lag(self):
+        metrics = {
+            "x": metric(
+                "x",
+                [("2026-01-31", 5.0)],
+                lag=1,
+                availability_basis="unknown",
+            )
+        }
+        rule = {"type": "latest_above", "metric": "x", "threshold": 0}
+        result = evaluate_rule(
+            rule,
+            metrics,
+            datetime(2026, 3, 1, tzinfo=timezone.utc).date(),
+            respect_publication_lag=True,
+            require_fresh_current=False,
+        )
+        self.assertEqual(result["status"], "unknown")
+        self.assertEqual(result["reason"], "no observation available")
 
     def test_strict_past_percentile(self):
         values = [(f"2020-{month:02d}-01", float(month)) for month in range(1, 13)]

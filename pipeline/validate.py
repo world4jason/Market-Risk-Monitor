@@ -18,6 +18,11 @@ ALLOWED_OBSERVATION_STATUSES = {
 }
 ALLOWED_SIGNAL_STATES = {"active", "inactive", "unknown"}
 ALLOWED_REFRESH_STATES = {"updated", "error"}
+ALLOWED_AVAILABILITY_BASES = {
+    "observation_date",
+    "release_date",
+    "unknown",
+}
 # Mirrors metric.comparison in schemas/metric-series.schema.json.
 ALLOWED_COMPARISONS = {
     "absolute",
@@ -75,6 +80,38 @@ def validate_metric(metric: dict) -> None:
     if comparison is not None and comparison not in ALLOWED_COMPARISONS:
         raise ValidationError(f"Invalid metric comparison {comparison!r}")
 
+    availability_basis = metric["source"].get("availability_basis")
+    if (
+        availability_basis is not None
+        and availability_basis not in ALLOWED_AVAILABILITY_BASES
+    ):
+        raise ValidationError(
+            f"Invalid source availability_basis {availability_basis!r}"
+        )
+
+    historical_baseline_types = {
+        "full_history_percentile",
+        "rolling_percentile",
+        "rolling_zscore",
+        "rolling_robust_zscore",
+        "event_window",
+    }
+    canonical_pit_baselines = [
+        baseline
+        for baseline in metric.get("baselines", [])
+        if (
+            baseline.get("type") in historical_baseline_types
+            and baseline.get("point_in_time") is True
+        )
+    ]
+    if (
+        canonical_pit_baselines
+        and (availability_basis is None or availability_basis == "unknown")
+    ):
+        raise ValidationError(
+            "point-in-time baseline requires a known source availability_basis"
+        )
+
     if metric["metric"].get("pillar") == "breadth":
         scope = metric["source"].get("market_scope")
         metric_id = metric["metric"].get("id", "")
@@ -109,6 +146,18 @@ def validate_metric(metric: dict) -> None:
         value = obs.get("value")
         if value is not None and not isfinite(float(value)):
             raise ValidationError(f"Non-finite observation at {obs['date']}")
+
+        release_date = obs.get("release_date")
+        if release_date is not None:
+            _date(release_date, field="observation release_date")
+        if (
+            availability_basis == "release_date"
+            and value is not None
+            and not release_date
+        ):
+            raise ValidationError(
+                f"release_date required for non-null observation at {obs['date']}"
+            )
 
     if dates != sorted(dates):
         raise ValidationError("Observation dates are not monotonically ascending")
@@ -305,6 +354,11 @@ def validate_overview(payload: dict) -> None:
                 raise ValidationError(
                     f"overview[{metric_id}]: source.{field} missing"
                 )
+        availability_basis = source.get("availability_basis") or "unknown"
+        if availability_basis not in ALLOWED_AVAILABILITY_BASES:
+            raise ValidationError(
+                f"overview[{metric_id}]: invalid availability_basis"
+            )
 
         coverage = row["coverage"]
         start = coverage.get("history_start")
@@ -381,6 +435,22 @@ def validate_overview(payload: dict) -> None:
                 raise ValidationError(
                     f"overview[{metric_id}]: invalid rolling_percentile"
                 )
+            rolling_baseline = next(
+                (
+                    baseline
+                    for baseline in row["baselines"]
+                    if baseline.get("type") == "rolling_percentile"
+                ),
+                None,
+            )
+            if (
+                availability_basis == "unknown"
+                or not rolling_baseline
+                or rolling_baseline.get("point_in_time") is not True
+            ):
+                raise ValidationError(
+                    f"overview[{metric_id}]: rolling_percentile lacks PIT availability contract"
+                )
 
         change = summary.get("recent_change")
         if change is not None:
@@ -421,6 +491,20 @@ def validate_overview(payload: dict) -> None:
             if item.get("status") not in ALLOWED_OBSERVATION_STATUSES:
                 raise ValidationError(
                     f"overview[{metric_id}]: invalid preview status"
+                )
+            release_date = item.get("release_date")
+            if release_date is not None:
+                _date(
+                    release_date,
+                    field=f"overview[{metric_id}].preview.release_date",
+                )
+            if (
+                availability_basis == "release_date"
+                and item.get("value") is not None
+                and not release_date
+            ):
+                raise ValidationError(
+                    f"overview[{metric_id}]: release_date missing from preview"
                 )
 
         if dates != sorted(dates) or len(dates) != len(set(dates)):

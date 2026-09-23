@@ -88,6 +88,81 @@ Example:
 
 A monthly source can therefore be fresh even though `as_of` is weeks earlier, provided its metric-specific freshness rule accounts for publication cadence.
 
+## Historical availability and point-in-time guarantee
+
+Issue #48 records **Option A** as the canonical contract decision: availability
+timing belongs in the metric artifact itself. Audit artifacts remain diagnostic;
+historical/PIT consumers must not depend on a family-specific audit file to know
+when a canonical observation became available.
+
+Each source may declare:
+
+```text
+source.availability_basis =
+  observation_date | release_date | unknown
+```
+
+A missing `availability_basis` is treated as `unknown` for backward
+compatibility.
+
+- `observation_date`: the source observation date is itself the date the value
+  is considered publicly available. This is appropriate only for sources where
+  that guarantee is defensible, such as market closes/effective-date series.
+- `release_date`: every non-null observation carries
+  `observations[].release_date`. Historical consumers use that date rather
+  than the reference-period date.
+- `unknown`: the repository cannot reconstruct exact historical availability.
+  The data may still be shown as retrospective absolute history, but it must not
+  be represented as a canonical point-in-time percentile/event/backtest input.
+
+For example:
+
+```json
+{
+  "source": {
+    "availability_basis": "release_date"
+  },
+  "observations": [
+    {
+      "date": "2026-08-01",
+      "release_date": "2026-09-21",
+      "value": 48.3,
+      "status": "observed"
+    }
+  ]
+}
+```
+
+`coverage.expected_observation_lag_days` remains useful for operational
+freshness expectations. It is **not** evidence of the historical release date
+and must not be used to turn `unknown` availability into a PIT guarantee.
+
+### Same-release batches
+
+Multiple reference periods can become known on the same release date. This is
+common on the first ingest of a rolling source window. They are one information
+arrival, not a sequence of independent historical arrivals.
+
+PIT transforms therefore score every observation in one release-date batch
+against the same prior baseline and only add the batch to history after the
+whole batch has been scored. A first CIER ingest containing twelve historical
+months all first verified on one date cannot manufacture eleven synthetic
+strict-past comparisons.
+
+For event/backfill consumers, one availability date contributes at most one
+state to the point-in-time sequence; the latest reference-period value in that
+release batch represents what became known at that arrival.
+
+### Relationship to baselines
+
+`baselines[].point_in_time: true` is valid only when the source has a known
+availability basis. Validation rejects canonical PIT baselines when
+availability is missing/unknown. Membership-sensitive metrics are additionally
+subject to their constituent-membership PIT gate.
+
+A non-PIT baseline may still describe retrospective history, but the UI must
+label or disable PIT modes rather than silently upgrading it.
+
 ## History coverage
 
 `coverage.history_start` and `coverage.history_end` are per metric.

@@ -19,7 +19,8 @@
         "series_id": "DFEDTAR",
         "url": "https://fred.stlouisfed.org/series/DFEDTAR",
         "license_note": "Board of Governors/FOMC target-rate series distributed by FRED; preserve citation.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1982-09-27",
@@ -52,7 +53,7 @@
       ],
       "summary": {
         "observation_count": 9577,
-        "rolling_percentile": 8.293650793650794,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 0,
           "comparison": "basis_points"
@@ -228,7 +229,8 @@
         "series_id": "DFEDTARU",
         "url": "https://fred.stlouisfed.org/series/DFEDTARU",
         "license_note": "Board of Governors/FOMC target-range upper bound distributed by FRED; preserve citation.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2008-12-16",
@@ -261,7 +263,7 @@
       ],
       "summary": {
         "observation_count": 6489,
-        "rolling_percentile": 56.58730158730159,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 0,
           "comparison": "basis_points"
@@ -437,7 +439,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -464,21 +467,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 199,
-        "rolling_percentile": 76.66666666666667,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 1.223114872374853,
           "comparison": "percent_change"
@@ -654,7 +657,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -681,21 +685,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 356,
-        "rolling_percentile": 99.16666666666667,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 2.5830055213533543,
           "comparison": "percent_change"
@@ -871,7 +875,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -898,21 +903,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 355,
-        "rolling_percentile": 66.66666666666667,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -1085,7 +1090,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -1112,21 +1118,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 344,
-        "rolling_percentile": 85.83333333333333,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -1299,7 +1305,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -1326,21 +1333,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 199,
-        "rolling_percentile": 89.16666666666667,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 0.08927544235062257,
           "comparison": "percent_change"
@@ -1516,7 +1523,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -1543,21 +1551,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 356,
-        "rolling_percentile": 83.33333333333333,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 0.6398587244961895,
           "comparison": "percent_change"
@@ -1733,7 +1741,8 @@
         "series_id": null,
         "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
         "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1997-01-31",
@@ -1760,21 +1769,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 36,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 356,
-        "rolling_percentile": 100,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 1.9307924528953802,
           "comparison": "percent_change"
@@ -1950,7 +1959,8 @@
         "series_id": "NFCI",
         "url": "https://fred.stlouisfed.org/series/NFCI",
         "license_note": "Distributed by FRED from the Federal Reserve Bank of Chicago; preserve citation and review source terms before republishing full history.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1971-01-08",
@@ -1977,21 +1987,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-520w",
           "type": "rolling_percentile",
           "window_observations": 520,
           "min_observations": 104,
-          "point_in_time": true,
-          "notes": "Trailing ten-year weekly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year weekly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 2906,
-        "rolling_percentile": 26.73076923076923,
+        "rolling_percentile": null,
         "recent_change": {
           "value": -0.0020000000000000018,
           "comparison": "absolute"
@@ -2167,7 +2177,8 @@
         "series_id": "NFCICREDIT",
         "url": "https://fred.stlouisfed.org/series/NFCICREDIT",
         "license_note": "Distributed by FRED from the Federal Reserve Bank of Chicago; preserve citation and review source terms before republishing full history.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1971-01-08",
@@ -2194,13 +2205,13 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 2906,
-        "rolling_percentile": 21.53846153846154,
+        "rolling_percentile": null,
         "recent_change": {
           "value": -0.001999999999999988,
           "comparison": "absolute"
@@ -2376,7 +2387,8 @@
         "series_id": "NFCINONFINLEVERAGE",
         "url": "https://fred.stlouisfed.org/series/NFCINONFINLEVERAGE",
         "license_note": "Distributed by FRED from the Federal Reserve Bank of Chicago; preserve citation and review source terms before republishing full history.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1971-01-08",
@@ -2403,13 +2415,13 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 2906,
-        "rolling_percentile": 88.75,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 0.0050000000000000044,
           "comparison": "absolute"
@@ -2585,7 +2597,8 @@
         "series_id": "NFCIRISK",
         "url": "https://fred.stlouisfed.org/series/NFCIRISK",
         "license_note": "Distributed by FRED from the Federal Reserve Bank of Chicago; preserve citation and review source terms before republishing full history.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1971-01-08",
@@ -2612,13 +2625,13 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 2906,
-        "rolling_percentile": 27.01923076923077,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 0.0010000000000000009,
           "comparison": "absolute"
@@ -2794,7 +2807,8 @@
         "series_id": null,
         "url": "https://shillerdata.com/",
         "license_note": "Public workbook distributed by Robert Shiller; preserve attribution and provenance.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1871-01-01",
@@ -2821,21 +2835,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 120,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 60,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 1748,
-        "rolling_percentile": 100,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 2.7774204121256085,
           "comparison": "percent_change"
@@ -3011,7 +3025,8 @@
         "series_id": null,
         "url": "https://shillerdata.com/",
         "license_note": "Public workbook distributed by Robert Shiller; preserve attribution and provenance.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1871-01-01",
@@ -3038,21 +3053,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 120,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 60,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 1868,
-        "rolling_percentile": 100,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 3.0741053122923967,
           "comparison": "percent_change"
@@ -3228,7 +3243,8 @@
         "series_id": null,
         "url": "https://shillerdata.com/",
         "license_note": "Public workbook distributed by Robert Shiller; preserve attribution and provenance.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1871-01-01",
@@ -3255,21 +3271,21 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 120,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
           "type": "rolling_percentile",
           "window_observations": 120,
           "min_observations": 60,
-          "point_in_time": true,
-          "notes": "Trailing ten-year monthly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 1868,
-        "rolling_percentile": 100,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 3.0793531545878716,
           "comparison": "percent_change"
@@ -3450,7 +3466,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-21",
@@ -3524,7 +3541,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-21",
@@ -3598,7 +3616,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-21",
@@ -3672,7 +3691,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-21",
@@ -3746,7 +3766,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2000-12-29",
@@ -3770,7 +3791,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 42,
-        "rolling_percentile": 40,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -3948,7 +3969,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2000-12-29",
@@ -3972,7 +3994,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 51,
-        "rolling_percentile": 52.5,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -4150,7 +4172,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2000-12-29",
@@ -4174,7 +4197,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 48,
-        "rolling_percentile": 35,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -4352,7 +4375,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2000-12-29",
@@ -4376,7 +4400,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 54,
-        "rolling_percentile": 57.5,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 12.5,
           "comparison": "basis_points"
@@ -4557,7 +4581,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2000-12-29",
@@ -4581,7 +4606,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 53,
-        "rolling_percentile": 63.75,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -4759,7 +4784,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-21",
@@ -4833,7 +4859,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-01",
@@ -4980,7 +5007,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-01",
@@ -5127,7 +5155,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1999-01-05",
@@ -5349,7 +5378,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1999-01-05",
@@ -5571,7 +5601,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1999-01-05",
@@ -5793,7 +5824,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1999-01-05",
@@ -6015,7 +6047,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "2026-09-21",
@@ -6089,7 +6122,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1982-09-27",
@@ -6113,7 +6147,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 173,
-        "rolling_percentile": 42.5,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -6291,7 +6325,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1982-09-27",
@@ -6315,7 +6350,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 181,
-        "rolling_percentile": 58.75,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -6493,7 +6528,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1982-09-27",
@@ -6517,7 +6553,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 181,
-        "rolling_percentile": 53.75,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -6695,7 +6731,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1982-09-27",
@@ -6719,7 +6756,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 186,
-        "rolling_percentile": 70,
+        "rolling_percentile": null,
         "recent_change": {
           "value": 25,
           "comparison": "basis_points"
@@ -6900,7 +6937,8 @@
         "membership_mode": null,
         "membership_snapshot": null,
         "price_adjustment": null,
-        "point_in_time_membership": null
+        "point_in_time_membership": null,
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1982-09-27",
@@ -6924,7 +6962,7 @@
       "baselines": [],
       "summary": {
         "observation_count": 185,
-        "rolling_percentile": 67.5,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -7097,7 +7135,8 @@
         "series_id": "USREC",
         "url": "https://fred.stlouisfed.org/series/USREC",
         "license_note": "Context/shading only; not interpreted as a leading signal.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "unknown"
       },
       "coverage": {
         "history_start": "1854-12-01",
@@ -7130,7 +7169,7 @@
       ],
       "summary": {
         "observation_count": 2061,
-        "rolling_percentile": 49.166666666666664,
+        "rolling_percentile": null,
         "recent_change": null,
         "preview_observations": [
           {
@@ -7303,7 +7342,8 @@
         "series_id": "VIX",
         "url": "https://www.cboe.com/tradable_products/vix/vix_historical_data",
         "license_note": "Cboe official historical-data page; review Cboe terms before third-party redistribution outside this project.",
-        "redistribution": "unknown"
+        "redistribution": "unknown",
+        "availability_basis": "observation_date"
       },
       "coverage": {
         "history_start": "1990-01-02",

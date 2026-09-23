@@ -14,6 +14,48 @@ TRANSFORM_TO_OBSERVATION_STATUS = {
     "insufficient_data": "insufficient_data",
 }
 
+AVAILABILITY_BASES = {
+    "observation_date",
+    "release_date",
+    "unknown",
+}
+
+
+def observation_availability_date(
+    observation: dict,
+    availability_basis: str,
+) -> str | None:
+    if availability_basis == "observation_date":
+        return observation.get("date")
+    if availability_basis == "release_date":
+        return observation.get("release_date")
+    if availability_basis == "unknown":
+        return None
+    raise ValueError(f"unknown availability_basis {availability_basis!r}")
+
+
+def historical_analysis_eligibility(metric: dict) -> tuple[bool, str | None]:
+    source = metric.get("source", {})
+    if source.get("point_in_time_membership") is False:
+        return False, "historical membership is not point-in-time"
+
+    basis = source.get("availability_basis") or "unknown"
+    if basis not in AVAILABILITY_BASES:
+        return False, f"unknown availability basis {basis!r}"
+    if basis == "unknown":
+        return False, "observation availability timing is unknown"
+
+    if basis == "release_date":
+        missing = [
+            obs.get("date")
+            for obs in metric.get("observations", [])
+            if obs.get("value") is not None and not obs.get("release_date")
+        ]
+        if missing:
+            return False, "release-date availability is declared but release_date is missing"
+
+    return True, None
+
 
 def observation_status(transform_status: str) -> str:
     try:
@@ -87,29 +129,75 @@ def point_in_time_percentiles(
     *,
     window_observations: int | None = None,
     min_observations: int = 20,
+    availability_basis: str = "observation_date",
 ) -> list[dict]:
     """
-    Computes a strict-past percentile for each observation.
-    Observation i is scored only against observations before i.
+    Compute a strict-past percentile using observation availability, not merely
+    reference-period order.
+
+    Observations that become available on the same date are scored against the
+    same prior baseline and are appended to history only after the whole release
+    batch is scored. This prevents a first ingest containing many historical
+    rows from masquerading as many independent point-in-time arrivals.
     """
+    if availability_basis not in AVAILABILITY_BASES - {"unknown"}:
+        raise ValueError("point-in-time percentile requires a known availability basis")
+
     history: list[float] = []
-    out: list[dict] = []
-    for obs in observations:
+    out: list[dict | None] = [None] * len(observations)
+    groups: dict[str, list[tuple[int, dict]]] = {}
+
+    for index, obs in enumerate(observations):
         value = obs.get("value")
-        baseline = history[-window_observations:] if window_observations else history[:]
         if value is None:
-            pct = None
-            status = "missing"
-        elif len(baseline) < min_observations:
-            pct = None
-            status = "insufficient_data"
-        else:
-            pct = percentile_rank(value, baseline)
-            status = "ok"
-        out.append({"date": obs["date"], "value": value, "percentile": pct, "status": status})
-        if value is not None:
-            history.append(float(value))
-    return out
+            out[index] = {
+                "date": obs["date"],
+                "value": value,
+                "percentile": None,
+                "status": "missing",
+                "availability_date": observation_availability_date(
+                    obs, availability_basis
+                ),
+            }
+            continue
+
+        available = observation_availability_date(obs, availability_basis)
+        if not available:
+            raise ValueError(
+                f"observation {obs.get('date')} has no availability date"
+            )
+        groups.setdefault(available, []).append((index, obs))
+
+    for available in sorted(groups):
+        baseline = (
+            history[-window_observations:]
+            if window_observations
+            else history[:]
+        )
+        batch = groups[available]
+        for index, obs in batch:
+            value = obs.get("value")
+            if len(baseline) < min_observations:
+                pct = None
+                status = "insufficient_data"
+            else:
+                pct = percentile_rank(value, baseline)
+                status = "ok"
+            out[index] = {
+                "date": obs["date"],
+                "value": value,
+                "percentile": pct,
+                "status": status,
+                "availability_date": available,
+            }
+
+        history.extend(
+            float(obs["value"])
+            for _, obs in batch
+            if obs.get("value") is not None
+        )
+
+    return [item for item in out if item is not None]
 
 
 def point_in_time_robust_zscores(
@@ -117,25 +205,66 @@ def point_in_time_robust_zscores(
     *,
     window_observations: int | None = None,
     min_observations: int = 20,
+    availability_basis: str = "observation_date",
 ) -> list[dict]:
+    if availability_basis not in AVAILABILITY_BASES - {"unknown"}:
+        raise ValueError("point-in-time robust z-score requires a known availability basis")
+
     history: list[float] = []
-    out: list[dict] = []
-    for obs in observations:
+    out: list[dict | None] = [None] * len(observations)
+    groups: dict[str, list[tuple[int, dict]]] = {}
+
+    for index, obs in enumerate(observations):
         value = obs.get("value")
-        baseline = history[-window_observations:] if window_observations else history[:]
         if value is None:
-            z = None
-            status = "missing"
-        elif len(baseline) < min_observations:
-            z = None
-            status = "insufficient_data"
-        else:
-            z = robust_zscore(value, baseline)
-            status = "ok" if z is not None else "insufficient_data"
-        out.append({"date": obs["date"], "value": value, "robust_z": z, "status": status})
-        if value is not None:
-            history.append(float(value))
-    return out
+            out[index] = {
+                "date": obs["date"],
+                "value": value,
+                "robust_z": None,
+                "status": "missing",
+                "availability_date": observation_availability_date(
+                    obs, availability_basis
+                ),
+            }
+            continue
+
+        available = observation_availability_date(obs, availability_basis)
+        if not available:
+            raise ValueError(
+                f"observation {obs.get('date')} has no availability date"
+            )
+        groups.setdefault(available, []).append((index, obs))
+
+    for available in sorted(groups):
+        baseline = (
+            history[-window_observations:]
+            if window_observations
+            else history[:]
+        )
+        batch = groups[available]
+        for index, obs in batch:
+            value = obs.get("value")
+            if len(baseline) < min_observations:
+                z = None
+                status = "insufficient_data"
+            else:
+                z = robust_zscore(value, baseline)
+                status = "ok" if z is not None else "insufficient_data"
+            out[index] = {
+                "date": obs["date"],
+                "value": value,
+                "robust_z": z,
+                "status": status,
+                "availability_date": available,
+            }
+
+        history.extend(
+            float(obs["value"])
+            for _, obs in batch
+            if obs.get("value") is not None
+        )
+
+    return [item for item in out if item is not None]
 
 
 def period_pct_change(observations: list[dict], periods: int) -> list[dict]:

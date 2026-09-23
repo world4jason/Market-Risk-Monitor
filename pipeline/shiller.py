@@ -140,6 +140,7 @@ def _metric(rows: list[dict], *, metric_id: str, name: str, field: str, units: s
             "url": SOURCE_PAGE,
             "license_note": "Public workbook distributed by Robert Shiller; preserve attribution and provenance.",
             "redistribution": "unknown",
+            "availability_basis": "unknown",
         },
         "coverage": {
             "history_start": observations[0]["date"] if observations else None,
@@ -166,16 +167,16 @@ def _metric(rows: list[dict], *, metric_id: str, name: str, field: str, units: s
                 "type": "full_history_percentile",
                 "window_observations": None,
                 "min_observations": 120,
-                "point_in_time": True,
-                "notes": "Strict-past expanding baseline.",
+                "point_in_time": False,
+                "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline.",
             },
             {
                 "id": "rolling-120m",
                 "type": "rolling_percentile",
                 "window_observations": 120,
                 "min_observations": 60,
-                "point_in_time": True,
-                "notes": "Trailing ten-year monthly baseline.",
+                "point_in_time": False,
+                "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline.",
             },
         ],
         "latest": {

@@ -17,7 +17,8 @@
     "series_id": null,
     "url": "https://example.com/monthly",
     "license_note": "Fixture only; not production data.",
-    "redistribution": "allowed"
+    "redistribution": "allowed",
+    "availability_basis": "observation_date"
   },
   "coverage": {
     "history_start": "2025-10-31",

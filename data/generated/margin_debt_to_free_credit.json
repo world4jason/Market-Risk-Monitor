@@ -17,7 +17,8 @@
     "series_id": null,
     "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
     "license_note": "Official FINRA monthly margin statistics. Through Jan-2010, cash- and margin-account free credit was reported as a combined amount.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "unknown"
   },
   "coverage": {
     "history_start": "1997-01-31",
@@ -47,16 +48,16 @@
       "type": "full_history_percentile",
       "window_observations": null,
       "min_observations": 36,
-      "point_in_time": true,
-      "notes": "Strict-past expanding baseline."
+      "point_in_time": false,
+      "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
     },
     {
       "id": "rolling-120m",
       "type": "rolling_percentile",
       "window_observations": 120,
       "min_observations": 36,
-      "point_in_time": true,
-      "notes": "Trailing ten-year monthly baseline."
+      "point_in_time": false,
+      "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
     }
   ],
   "latest": {

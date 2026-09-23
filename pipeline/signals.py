@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import calendar
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from typing import Iterable
 
-from .methodology import percentile_rank
+from .methodology import observation_availability_date, percentile_rank
 
 
 class SignalError(ValueError):
@@ -42,18 +42,41 @@ def _available_observations(
     *,
     respect_publication_lag: bool,
 ) -> list[dict]:
-    lag = int(metric.get("coverage", {}).get("expected_observation_lag_days") or 0)
-    out = []
+    basis = metric.get("source", {}).get("availability_basis") or "unknown"
+    if respect_publication_lag and basis == "unknown":
+        return []
+
+    if not respect_publication_lag:
+        return [
+            obs
+            for obs in metric.get("observations", [])
+            if (
+                obs.get("value") is not None
+                and _parse_date(obs["date"]) <= evaluation_date
+            )
+        ]
+
+    by_availability: dict[str, dict] = {}
     for obs in metric.get("observations", []):
         if obs.get("value") is None:
             continue
-        obs_date = _parse_date(obs["date"])
-        available_date = obs_date + timedelta(days=lag if respect_publication_lag else 0)
-        if available_date <= evaluation_date:
-            out.append(obs)
-        else:
-            break
-    return out
+
+        available = observation_availability_date(obs, basis)
+        if not available:
+            return []
+        if _parse_date(available) > evaluation_date:
+            continue
+
+        current = by_availability.get(available)
+        if current is None or obs["date"] >= current["date"]:
+            retained = dict(obs)
+            retained["_availability_date"] = available
+            by_availability[available] = retained
+
+    return [
+        by_availability[key]
+        for key in sorted(by_availability)
+    ]
 
 
 def _rule_value(rule: dict, observations: list[dict]):
@@ -327,7 +350,8 @@ def build_signal_snapshot(
         "history": history,
         "methodology": {
             "current_freshness_required": True,
-            "historical_publication_lag_respected": True,
+            "historical_availability_contract_respected": True,
+            "unknown_availability_is_unknown": True,
             "unknown_is_not_inactive": True,
             "no_single_condition_is_a_crisis_label": True,
         },

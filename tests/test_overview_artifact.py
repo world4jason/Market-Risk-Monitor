@@ -49,6 +49,7 @@ def metric_fixture(
             "license_note": "fixture",
             "redistribution": "unknown",
             "point_in_time_membership": point_in_time_membership,
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"],
@@ -129,6 +130,77 @@ class OverviewArtifactTests(unittest.TestCase):
         self.assertIsNone(rolling_percentile(metric))
         overview = build_overview({metric["metric"]["id"]: metric})
         self.assertIsNone(overview["metrics"][0]["summary"]["rolling_percentile"])
+
+    def test_unknown_availability_blocks_historical_percentile(self) -> None:
+        metric = metric_fixture(values=[float(i) for i in range(1, 41)])
+        metric["source"]["availability_basis"] = "unknown"
+
+        self.assertIsNone(rolling_percentile(metric))
+        overview = build_overview({"fixture": metric})
+        self.assertIsNone(
+            overview["metrics"][0]["summary"]["rolling_percentile"]
+        )
+        validate_overview(overview)
+
+    def test_release_batch_is_scored_only_against_prior_release_batches(self) -> None:
+        first_batch = metric_fixture(
+            values=[float(i) for i in range(1, 13)]
+        )
+        first_batch["source"]["availability_basis"] = "release_date"
+        for observation in first_batch["observations"]:
+            observation["release_date"] = "2026-09-21"
+
+        self.assertIsNone(rolling_percentile(first_batch))
+
+        metric = metric_fixture(values=[float(i) for i in range(1, 14)])
+        metric["source"]["availability_basis"] = "release_date"
+        for index, observation in enumerate(metric["observations"]):
+            observation["release_date"] = (
+                "2026-09-21" if index < 12 else "2026-10-21"
+            )
+        metric["latest"]["fetched_at"] = "2026-10-22T10:00:00Z"
+
+        value = rolling_percentile(metric)
+        self.assertIsNotNone(value)
+        overview = build_overview({"fixture": metric})
+        row = overview["metrics"][0]
+        self.assertEqual(
+            row["summary"]["preview_observations"][-1]["release_date"],
+            "2026-10-21",
+        )
+        self.assertEqual(row["summary"]["rolling_percentile"], value)
+        validate_overview(overview)
+
+        broken = copy.deepcopy(overview)
+        del broken["metrics"][0]["summary"]["preview_observations"][-1][
+            "release_date"
+        ]
+        with self.assertRaisesRegex(
+            ValidationError,
+            "release_date missing from preview",
+        ):
+            validate_overview(broken)
+
+    def test_checked_in_metrics_declare_availability_basis(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        generated = root / "data" / "generated"
+        catalog = json.loads(
+            (generated / "catalog.json").read_text(encoding="utf-8")
+        )
+
+        declared = {"observation_date", "release_date", "unknown"}
+        for item in catalog["metrics"]:
+            metric = json.loads(
+                (
+                    generated
+                    / Path(item["path"]).name
+                ).read_text(encoding="utf-8")
+            )
+            with self.subTest(metric_id=item["id"]):
+                self.assertIn(
+                    metric["source"].get("availability_basis"),
+                    declared,
+                )
 
     def test_checked_in_overview_is_materially_smaller_than_full_histories(self) -> None:
         root = Path(__file__).resolve().parents[1]

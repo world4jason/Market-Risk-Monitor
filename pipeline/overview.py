@@ -2,22 +2,18 @@ from __future__ import annotations
 
 from math import isfinite
 
+from .methodology import (
+    historical_analysis_eligibility,
+    point_in_time_percentiles,
+)
+
 
 PREVIEW_OBSERVATIONS = 30
 
 
 def _historical_percentile_allowed(metric: dict) -> bool:
-    metric_id = str(metric.get("metric", {}).get("id", ""))
-    membership_sensitive = (
-        metric_id.startswith("sp500_above_")
-        or metric_id.startswith("tw_above_")
-        or metric_id.startswith("tw_new_52w_")
-        or metric_id in {"tw_net_new_52w_highs", "tw_high_low_pct"}
-    )
-    return not (
-        membership_sensitive
-        and metric.get("source", {}).get("point_in_time_membership") is False
-    )
+    eligible, _ = historical_analysis_eligibility(metric)
+    return eligible
 
 
 def _default_rolling_window(metric: dict) -> int:
@@ -50,26 +46,34 @@ def rolling_percentile(metric: dict) -> float | None:
     if not _historical_percentile_allowed(metric):
         return None
 
-    observations = [
-        item
-        for item in metric.get("observations", [])
+    config = _baseline_config(metric, "rolling_percentile")
+    if not config or config.get("point_in_time") is not True:
+        return None
+
+    observations = metric.get("observations", [])
+    present = [
+        index
+        for index, item in enumerate(observations)
         if item.get("value") is not None
     ]
-    if len(observations) < 3:
+    if len(present) < 3:
         return None
 
-    config = _baseline_config(metric, "rolling_percentile") or {}
-    window = int(config.get("window_observations") or _default_rolling_window(metric))
-    min_observations = int(config.get("min_observations") or min(20, window))
-    baseline = [
-        float(item["value"])
-        for item in observations[max(0, len(observations) - 1 - window) : -1]
-    ]
-    if len(baseline) < min_observations:
-        return None
-
-    value = float(observations[-1]["value"])
-    return _percentile_rank(value, baseline)
+    window = int(
+        config.get("window_observations")
+        or _default_rolling_window(metric)
+    )
+    min_observations = int(
+        config.get("min_observations") or min(20, window)
+    )
+    basis = metric.get("source", {}).get("availability_basis") or "unknown"
+    series = point_in_time_percentiles(
+        observations,
+        window_observations=window,
+        min_observations=min_observations,
+        availability_basis=basis,
+    )
+    return series[present[-1]].get("percentile")
 
 
 def recent_change(metric: dict) -> dict | None:
@@ -116,6 +120,11 @@ def summarize_metric(metric: dict) -> dict:
             "date": item.get("date"),
             "value": item.get("value"),
             "status": item.get("status"),
+            **(
+                {"release_date": item.get("release_date")}
+                if "release_date" in item
+                else {}
+            ),
         }
         for item in observations[-PREVIEW_OBSERVATIONS:]
     ]

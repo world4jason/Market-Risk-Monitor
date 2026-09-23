@@ -417,6 +417,7 @@ def _metric(
             "membership_snapshot": None,
             "price_adjustment": meta["price_adjustment"],
             "point_in_time_membership": pit,
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"],

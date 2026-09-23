@@ -17,7 +17,8 @@
     "series_id": "VIX",
     "url": "https://www.cboe.com/tradable_products/vix/vix_historical_data",
     "license_note": "Cboe official historical-data page; review Cboe terms before third-party redistribution outside this project.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "observation_date"
   },
   "coverage": {
     "history_start": "1990-01-02",

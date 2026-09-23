@@ -17,7 +17,8 @@
     "series_id": null,
     "url": "https://shillerdata.com/",
     "license_note": "Public workbook distributed by Robert Shiller; preserve attribution and provenance.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "unknown"
   },
   "coverage": {
     "history_start": "1871-01-01",
@@ -44,16 +45,16 @@
       "type": "full_history_percentile",
       "window_observations": null,
       "min_observations": 120,
-      "point_in_time": true,
-      "notes": "Strict-past expanding baseline."
+      "point_in_time": false,
+      "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
     },
     {
       "id": "rolling-120m",
       "type": "rolling_percentile",
       "window_observations": 120,
       "min_observations": 60,
-      "point_in_time": true,
-      "notes": "Trailing ten-year monthly baseline."
+      "point_in_time": false,
+      "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
     }
   ],
   "latest": {

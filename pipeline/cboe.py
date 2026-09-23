@@ -95,6 +95,7 @@ def build_vix_metric(observations: list[dict], fetched_at: datetime | None = Non
             "url": SOURCE_PAGE,
             "license_note": "Cboe official historical-data page; review Cboe terms before third-party redistribution outside this project.",
             "redistribution": "unknown",
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"] if observations else None,

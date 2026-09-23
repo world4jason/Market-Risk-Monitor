@@ -1,6 +1,7 @@
 import json
 import unittest
 
+from pipeline.methodology import point_in_time_percentiles
 from pipeline.taiwan_macro import (
     build_macro_metrics,
     build_macro_regime,
@@ -113,6 +114,41 @@ class TaiwanMacroTests(unittest.TestCase):
         self.assertEqual(current["regime"], "expansion")
         self.assertGreaterEqual(current["known_components"], 3)
         self.assertEqual(current["available_on"], "2026-08-27")
+
+    def test_cier_first_ingest_retains_release_date_without_fake_arrivals(self):
+        months = [
+            "2025-09-01", "2025-10-01", "2025-11-01", "2025-12-01",
+            "2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01",
+            "2026-05-01", "2026-06-01", "2026-07-01", "2026-08-01",
+        ]
+        lines = [
+            "date,provider,series_id,value,unit,release_date,source_url"
+        ]
+        lines.extend(
+            (
+                f"{obs_date},CIER,tw_manufacturing_pmi,{48 + index / 10},"
+                "index,2026-09-21,https://www.cier.edu.tw/pmi-trend/"
+            )
+            for index, obs_date in enumerate(months)
+        )
+        rows = parse_taiwan_macro_csv("\n".join(lines) + "\n")
+        metric = build_macro_metrics(rows)["tw_manufacturing_pmi"]
+
+        self.assertEqual(metric["source"]["availability_basis"], "release_date")
+        self.assertEqual(
+            {item["release_date"] for item in metric["observations"]},
+            {"2026-09-21"},
+        )
+        validate_metric(metric)
+
+        pit = point_in_time_percentiles(
+            metric["observations"],
+            min_observations=2,
+            availability_basis="release_date",
+        )
+        self.assertTrue(
+            all(item["percentile"] is None for item in pit)
+        )
 
     def test_duplicate_series_date_rejected(self):
         text = """date,provider,series_id,value,unit,release_date,source_url

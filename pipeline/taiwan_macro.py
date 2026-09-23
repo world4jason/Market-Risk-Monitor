@@ -184,6 +184,7 @@ def build_macro_metrics(
                 "membership_snapshot": None,
                 "price_adjustment": None,
                 "point_in_time_membership": None,
+                "availability_basis": "release_date",
             },
             "coverage": {
                 "history_start": series_rows[0]["date"],
@@ -211,7 +212,7 @@ def build_macro_metrics(
                     "window_observations": None,
                     "min_observations": 24,
                     "point_in_time": True,
-                    "notes": "Observation-time percentile; release dates are retained in audit data.",
+                    "notes": "Release-aware strict-past percentile; same-day release batches do not enter one another's baseline.",
                 }
             ],
             "latest": {
@@ -225,6 +226,7 @@ def build_macro_metrics(
                     "date": r["date"],
                     "value": r["value"],
                     "status": "observed",
+                    "release_date": r["release_date"],
                 }
                 for r in series_rows
             ],

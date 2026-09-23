@@ -339,6 +339,7 @@ def _metric_for_horizon(
             "membership_snapshot": rows[-1].get("membership_snapshot"),
             "price_adjustment": price_adjustment,
             "point_in_time_membership": point_in_time,
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"],
