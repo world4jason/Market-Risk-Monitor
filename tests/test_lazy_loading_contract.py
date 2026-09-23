@@ -124,6 +124,20 @@ class LazyLoadingContractTests(unittest.TestCase):
         self.assertIn("state.deferredLoads.has(kind)", ensure)
         self.assertIn("state.deferredLoaded.has(kind)", ensure)
 
+    def test_deferred_failures_are_retryable_and_optional_404s_are_explicit(self) -> None:
+        fetcher = extract_function(self.app, "fetchDeferredJson")
+        ensure = extract_function(self.app, "ensureDeferredContext")
+        observer = extract_function(self.app, "observeSectionOnce")
+
+        self.assertIn("optionalNotFound", fetcher)
+        self.assertIn("response.status === 404", fetcher)
+        self.assertIn("throw new Error", fetcher)
+        self.assertIn("state.deferredLoaded.add(kind)", ensure)
+        self.assertIn("state.deferredLoads.delete(kind)", ensure)
+        self.assertIn("optionalNotFound: true", ensure)
+        self.assertIn("console.warn(\"deferred context load failed\"", observer)
+        self.assertIn("observer?.disconnect()", observer)
+
     def test_full_metric_loader_is_single_flight_and_session_cached(self) -> None:
         loader = extract_function(self.app, "ensureMetricLoaded")
         self.assertIn("Array.isArray(existing?.observations)", loader)
