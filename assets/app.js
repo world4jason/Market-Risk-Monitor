@@ -2348,7 +2348,8 @@ function initTheme() {
 }
 
 
-async function fetchDeferredJson(url, { optionalNotFound = false } = {}) {
+async function fetchDeferredJson(url, options = null) {
+  const optionalNotFound = options?.optionalNotFound === true;
   const response = await fetch(url);
   if (response.ok) return await response.json();
   if (optionalNotFound && response.status === 404) return null;
