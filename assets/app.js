@@ -11,6 +11,8 @@ const TAIWAN_CBC_RATE_REGIME_URL = "./data/generated/taiwan-cbc-rate-regime.json
 const FED_RATE_REGIME_URL = "./data/generated/fed-rate-regime.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
+let dialogInvoker = null;
+
 const state = {
   catalog: null,
   metrics: new Map(),
@@ -727,7 +729,7 @@ function metricCard(metric) {
   const title = context?.plain_name || metric.metric.name;
   const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
-  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" tabindex="0">
+  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(title)} details and history">
     <div class="metric-card-top">
       <div>
         <p class="eyebrow">${escapeHtml(pillarLabels[metric.metric.pillar] || metric.metric.pillar)}</p>
@@ -939,6 +941,18 @@ function renderOverview() {
 }
 
 
+function bindMetricCardInteractions(grid) {
+  grid.querySelectorAll(".metric-card").forEach((card) => {
+    const open = () => openMetric(card.dataset.metricId, card);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      open();
+    });
+  });
+}
+
 function renderMetrics() {
   const grid = $("#metric-grid");
   const metrics = [...state.metrics.values()]
@@ -956,13 +970,7 @@ function renderMetrics() {
   }
 
   grid.innerHTML = metrics.map(metricCard).join("");
-  grid.querySelectorAll(".metric-card").forEach((card) => {
-    const open = () => openMetric(card.dataset.metricId);
-    card.addEventListener("click", open);
-    card.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") open();
-    });
-  });
+  bindMetricCardInteractions(grid);
 }
 
 function renderTaiwanMarket() {
@@ -1072,13 +1080,7 @@ function renderTaiwanMarket() {
     .filter(Boolean);
 
   grid.innerHTML = preferred.map(metricCard).join("");
-  grid.querySelectorAll(".metric-card").forEach((card) => {
-    const open = () => openMetric(card.dataset.metricId);
-    card.addEventListener("click", open);
-    card.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") open();
-    });
-  });
+  bindMetricCardInteractions(grid);
 
   if (taiex) {
     const observationCount = usableObservationCount(taiex);
@@ -1372,14 +1374,27 @@ function renderTrendParticipationChart() {
     }
   }
 
-  element.innerHTML = `<svg class="history-svg ma-breadth-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="S&P 500 moving-average breadth">
+  const coverageStart = new Date(firstTs).toISOString().slice(0, 10);
+  const coverageEnd = new Date(lastTs).toISOString().slice(0, 10);
+  const latestBreadth = lines
+    .map((line) => {
+      const latest = line.observations.at(-1);
+      return `${line.horizon}DMA ${formatValue(latest.value, "percent")} on ${latest.date}`;
+    })
+    .join("; ");
+  const a11y = chartA11y(
+    element,
+    "S&P 500 moving-average breadth",
+    `S&P 500 moving-average breadth from ${coverageStart} to ${coverageEnd}. Latest: ${latestBreadth}.`,
+  );
+  element.innerHTML = `${a11y.summaryHtml}<svg class="history-svg ma-breadth-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
     ${grids}
     ${bands}
     ${paths}
     ${spxPath}
     ${spxAxis}
-    <text x="${left}" y="${height - 12}" fill="currentColor" opacity=".55" font-size="11">${new Date(firstTs).toISOString().slice(0, 10)}</text>
-    <text x="${width - right}" y="${height - 12}" text-anchor="end" fill="currentColor" opacity=".55" font-size="11">${new Date(lastTs).toISOString().slice(0, 10)}</text>
+    <text x="${left}" y="${height - 12}" fill="currentColor" opacity=".55" font-size="11">${coverageStart}</text>
+    <text x="${width - right}" y="${height - 12}" text-anchor="end" fill="currentColor" opacity=".55" font-size="11">${coverageEnd}</text>
   </svg>`;
 }
 
@@ -1476,6 +1491,28 @@ function recessionIntervals() {
   return intervals;
 }
 
+function chartA11y(element, label, summary) {
+  const base = element?.id || "chart";
+  const summaryId = `${base}-a11y-summary`;
+  return {
+    summaryId,
+    summaryHtml: `<p id="${escapeHtml(summaryId)}" class="sr-only">${escapeHtml(summary)}</p>`,
+    svgAttrs: `role="img" aria-label="${escapeHtml(label)}" aria-describedby="${escapeHtml(summaryId)}"`,
+  };
+}
+
+function metricChartSummary(metric, observations) {
+  const obs = observations.filter((item) => item.value != null);
+  if (!obs.length) return `${metric.metric.name}. No usable observations.`;
+  const values = obs.map((item) => Number(item.value)).filter(Number.isFinite);
+  const first = obs[0];
+  const last = obs.at(-1);
+  const range = values.length
+    ? ` Range ${formatValue(Math.min(...values), metric.metric.units)} to ${formatValue(Math.max(...values), metric.metric.units)}.`
+    : "";
+  return `${metric.metric.name}. ${obs.length} observations from ${first.date} to ${last.date}. Latest ${last.date}: ${formatValue(last.value, metric.metric.units)}.${range}`;
+}
+
 function fullChart(metric, element, opts = {}) {
   const obs = (metric.observations || []).filter((o) => o.value != null);
   if (obs.length < 2) {
@@ -1533,7 +1570,12 @@ function fullChart(metric, element, opts = {}) {
     })
     .join("");
 
-  element.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(metric.metric.name)} history">
+  const a11y = chartA11y(
+    element,
+    `${metric.metric.name} history`,
+    metricChartSummary(metric, obs),
+  );
+  element.innerHTML = `${a11y.summaryHtml}<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
     ${bands}
     ${grids}
     <path class="line" d="${path}"></path>
@@ -1743,7 +1785,18 @@ function renderEvents(metric) {
     })
     .join("");
 
-  el.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+  const eventEndpoints = lines
+    .map((line) => {
+      const endpoint = [...line.points].sort((a, b) => a.offset - b.offset).at(-1);
+      return `${line.name}: ${endpoint.value.toFixed(1)} at T${endpoint.offset >= 0 ? "+" : ""}${endpoint.offset}m`;
+    })
+    .join("; ");
+  const a11y = chartA11y(
+    el,
+    `${metric.metric.name} historical event comparison`,
+    `${metric.metric.name} event comparison. ${lines.length} event paths indexed to 100 at the anchor, covering T${minOffset} to T+${maxOffset} months. Endpoints: ${eventEndpoints}.`,
+  );
+  el.innerHTML = `${a11y.summaryHtml}<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
     <line class="gridline" x1="${left}" y1="${y(100)}" x2="${width - right}" y2="${y(100)}"/>
     <line class="gridline" x1="${zeroX}" y1="${top}" x2="${zeroX}" y2="${height - bottom}"/>
     ${paths}
@@ -1971,7 +2024,18 @@ function renderTaiwanEvents(metric, mode = "normalized") {
         ? "percentile"
         : eventMetric.metric.units;
 
-  el.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Taiwan historical event comparison">
+  const taiwanEndpoints = lines
+    .map((line) => {
+      const endpoint = [...line.points].sort((a, b) => a.offset - b.offset).at(-1);
+      return `${line.name}: ${endpoint.value.toFixed(1)} ${unit} at T${endpoint.offset >= 0 ? "+" : ""}${endpoint.offset}m`;
+    })
+    .join("; ");
+  const a11y = chartA11y(
+    el,
+    `${metric.metric.name} Taiwan historical event comparison`,
+    `${metric.metric.name} Taiwan event comparison in ${unit}. ${lines.length} event paths from T${minOffset} to T+${maxOffset} months. Endpoints: ${taiwanEndpoints}.`,
+  );
+  el.innerHTML = `${a11y.summaryHtml}<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
     ${referenceLine}
     <line class="gridline" x1="${x(0)}" y1="${top}" x2="${x(0)}" y2="${height - bottom}"/>
     ${paths}
@@ -2089,7 +2153,20 @@ async function ensureMetricLoaded(id) {
   }
 }
 
-async function openMetric(id) {
+function setupDialogFocusManagement() {
+  const dialog = $("#metric-dialog");
+  if (!dialog || dialog.dataset.focusManaged === "true") return;
+  dialog.dataset.focusManaged = "true";
+  dialog.addEventListener("close", () => {
+    const invoker = dialogInvoker;
+    dialogInvoker = null;
+    if (invoker && invoker.isConnected !== false && typeof invoker.focus === "function") {
+      invoker.focus();
+    }
+  });
+}
+
+async function openMetric(id, invoker = document.activeElement) {
   const summary = state.metrics.get(id);
   if (!summary) return;
 
@@ -2103,7 +2180,13 @@ async function openMetric(id) {
   $("#dialog-chart").innerHTML =
     '<div class="empty-state compact">Loading full metric history…</div>';
   $("#dialog-source").innerHTML = "";
-  if (!dialog.open) dialog.showModal();
+  if (invoker && typeof invoker.focus === "function") {
+    dialogInvoker = invoker;
+  }
+  if (!dialog.open) {
+    dialog.showModal();
+    $("#dialog-close")?.focus();
+  }
 
   let metric;
   try {
@@ -2299,13 +2382,19 @@ function renderSignalHistory(snapshot, element) {
     })
     .join("");
 
-  element.innerHTML = `<svg class="history-svg signal-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Historical Deleveraging Watch condition counts">
+  const latest = history.at(-1);
+  const a11y = chartA11y(
+    element,
+    "Historical Deleveraging Watch condition counts",
+    `Deleveraging Watch history from ${history[0].date} to ${latest.date}. Latest: ${latest.summary.active} active, ${latest.summary.unknown} unknown, ${latest.summary.total} total conditions.`,
+  );
+  element.innerHTML = `${a11y.summaryHtml}<svg class="history-svg signal-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
     ${grids}
     ${eventLines}
     <path class="active-line" d="${activePath}"><title>Active conditions</title></path>
     <path class="unknown-line" d="${unknownPath}"><title>Unknown conditions</title></path>
     <text x="${left}" y="${height - 11}" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(history[0].date)}</text>
-    <text x="${width - right}" y="${height - 11}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(history.at(-1).date)}</text>
+    <text x="${width - right}" y="${height - 11}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">${escapeHtml(latest.date)}</text>
   </svg>`;
 }
 
@@ -2555,6 +2644,7 @@ async function loadData() {
 }
 
 initTheme();
+setupDialogFocusManagement();
 $("#refresh-view").addEventListener("click", loadData);
 $("#ma-bands-toggle")?.addEventListener("change", renderTrendParticipationChart);
 $("#ma-spx-toggle")?.addEventListener("change", renderTrendParticipationChart);
