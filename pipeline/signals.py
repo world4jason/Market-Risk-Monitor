@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import calendar
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from typing import Iterable
 
-from .methodology import percentile_rank
+from .methodology import observation_availability_date, percentile_rank
 
 
 class SignalError(ValueError):
@@ -42,18 +42,42 @@ def _available_observations(
     *,
     respect_publication_lag: bool,
 ) -> list[dict]:
-    lag = int(metric.get("coverage", {}).get("expected_observation_lag_days") or 0)
+    basis = metric.get("source", {}).get("availability_basis") or "unknown"
+    if respect_publication_lag and basis == "unknown":
+        return []
+
+    if not respect_publication_lag:
+        return [
+            obs
+            for obs in metric.get("observations", [])
+            if (
+                obs.get("value") is not None
+                and _parse_date(obs["date"]) <= evaluation_date
+            )
+        ]
+
     out = []
     for obs in metric.get("observations", []):
         if obs.get("value") is None:
             continue
-        obs_date = _parse_date(obs["date"])
-        available_date = obs_date + timedelta(days=lag if respect_publication_lag else 0)
-        if available_date <= evaluation_date:
-            out.append(obs)
-        else:
-            break
-    return out
+
+        available = observation_availability_date(obs, basis)
+        if not available:
+            return []
+        if _parse_date(available) > evaluation_date:
+            continue
+
+        retained = dict(obs)
+        retained["_availability_date"] = available
+        out.append(retained)
+
+    return sorted(
+        out,
+        key=lambda item: (
+            item["date"],
+            item["_availability_date"],
+        ),
+    )
 
 
 def _rule_value(rule: dict, observations: list[dict]):
@@ -89,10 +113,22 @@ def _rule_value(rule: dict, observations: list[dict]):
 
     if rule_type in {"percentile_above", "percentile_below"}:
         min_observations = int(rule.get("min_observations", 20))
-        if len(observations) <= min_observations:
-            return None, None, f"needs > {min_observations} observations"
+        prior = observations[:-1]
+        latest_availability = observations[-1].get("_availability_date")
+        if latest_availability:
+            prior = [
+                observation
+                for observation in prior
+                if (
+                    observation.get("_availability_date")
+                    and observation["_availability_date"] < latest_availability
+                )
+            ]
 
-        baseline = [float(o["value"]) for o in observations[:-1]]
+        if len(prior) < min_observations:
+            return None, None, f"needs >= {min_observations} prior observations"
+
+        baseline = [float(o["value"]) for o in prior]
         value = percentile_rank(latest, baseline)
         if value is None:
             return None, None, "percentile unavailable"
@@ -327,7 +363,8 @@ def build_signal_snapshot(
         "history": history,
         "methodology": {
             "current_freshness_required": True,
-            "historical_publication_lag_respected": True,
+            "historical_availability_contract_respected": True,
+            "unknown_availability_is_unknown": True,
             "unknown_is_not_inactive": True,
             "no_single_condition_is_a_crisis_label": True,
         },

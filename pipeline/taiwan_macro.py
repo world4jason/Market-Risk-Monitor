@@ -17,36 +17,43 @@ SERIES_META = {
         "name": "Taiwan NDC Monitoring Score",
         "units": "score",
         "polarity": "contextual",
+        "availability_basis": "unknown",
     },
     "tw_ndc_leading_index": {
         "name": "Taiwan NDC Leading Index",
         "units": "index",
         "polarity": "contextual",
+        "availability_basis": "unknown",
     },
     "tw_ndc_coincident_index": {
         "name": "Taiwan NDC Coincident Index",
         "units": "index",
         "polarity": "contextual",
+        "availability_basis": "unknown",
     },
     "tw_ndc_lagging_index": {
         "name": "Taiwan NDC Lagging Index",
         "units": "index",
         "polarity": "contextual",
+        "availability_basis": "unknown",
     },
     "tw_manufacturing_pmi": {
         "name": "Taiwan Manufacturing PMI",
         "units": "index",
         "polarity": "contextual",
+        "availability_basis": "release_date",
     },
     "tw_industrial_production": {
         "name": "Taiwan Industrial Production Index",
         "units": "index",
         "polarity": "contextual",
+        "availability_basis": "release_date",
     },
     "tw_manufacturing_production": {
         "name": "Taiwan Manufacturing Production Index",
         "units": "index",
         "polarity": "contextual",
+        "availability_basis": "release_date",
     },
 }
 
@@ -184,6 +191,7 @@ def build_macro_metrics(
                 "membership_snapshot": None,
                 "price_adjustment": None,
                 "point_in_time_membership": None,
+                "availability_basis": meta["availability_basis"],
             },
             "coverage": {
                 "history_start": series_rows[0]["date"],
@@ -210,8 +218,12 @@ def build_macro_metrics(
                     "type": "full_history_percentile",
                     "window_observations": None,
                     "min_observations": 24,
-                    "point_in_time": True,
-                    "notes": "Observation-time percentile; release dates are retained in audit data.",
+                    "point_in_time": meta["availability_basis"] == "release_date",
+                    "notes": (
+                        "Release-aware strict-past percentile; same-day release batches do not enter one another's baseline."
+                        if meta["availability_basis"] == "release_date"
+                        else "Retrospective only. NDC history is revision-prone and canonical artifacts do not retain vintages."
+                    ),
                 }
             ],
             "latest": {
@@ -225,6 +237,7 @@ def build_macro_metrics(
                     "date": r["date"],
                     "value": r["value"],
                     "status": "observed",
+                    "release_date": r["release_date"],
                 }
                 for r in series_rows
             ],
@@ -424,6 +437,13 @@ def build_macro_regime(
             "momentum_periods": momentum_periods,
             "no_proprietary_mm_formula": True,
             "release_dates_retained": True,
+            "historical_point_in_time": False,
+            "history_semantics": "retrospective_current_vintage",
+            "revision_prone_inputs": sorted(
+                series_id
+                for series_id in components
+                if series_id.startswith("tw_ndc_")
+            ),
         },
         "current": current,
         "history": provisional,

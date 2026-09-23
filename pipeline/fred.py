@@ -112,6 +112,7 @@ def build_metric(config: dict, observations: list[dict], fetched_at: datetime | 
             "url": f"https://fred.stlouisfed.org/series/{config['series_id']}",
             "license_note": config.get("license_note"),
             "redistribution": config.get("redistribution", "unknown"),
+            "availability_basis": config.get("availability_basis", "unknown"),
         },
         "coverage": {
             "history_start": history_start,

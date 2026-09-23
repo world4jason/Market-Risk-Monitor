@@ -170,6 +170,14 @@
             "null"
           ],
           "description": "Whether historical membership reflects the constituent universe at each observation date."
+        },
+        "availability_basis": {
+          "enum": [
+            "observation_date",
+            "release_date",
+            "unknown"
+          ],
+          "description": "How a historical consumer determines when an observation became available. Missing is treated as unknown for backward compatibility."
         }
       }
     },
@@ -394,6 +402,14 @@
               "revised",
               "insufficient_data"
             ]
+          },
+          "release_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Date this observation is known to have become publicly available when source.availability_basis is release_date."
           }
         }
       }

@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from pipeline.validate import (
+    ALLOWED_AVAILABILITY_BASES,
     ALLOWED_OBSERVATION_STATUSES,
     ValidationError,
     validate_metric,
@@ -28,6 +29,7 @@ BASE = {
         "url": "https://example.com",
         "license_note": "fixture",
         "redistribution": "allowed",
+        "availability_basis": "observation_date",
     },
     "coverage": {
         "history_start": "2026-01-31",
@@ -115,6 +117,44 @@ class ValidateTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validate_metric(payload)
 
+    def test_release_date_basis_requires_release_date(self):
+        payload = copy.deepcopy(BASE)
+        payload["source"]["availability_basis"] = "release_date"
+        with self.assertRaisesRegex(ValidationError, "release_date required"):
+            validate_metric(payload)
+
+        for observation in payload["observations"]:
+            observation["release_date"] = "2026-04-01"
+        validate_metric(payload)
+
+    def test_unknown_availability_cannot_claim_pit_baseline(self):
+        payload = copy.deepcopy(BASE)
+        payload["source"]["availability_basis"] = "unknown"
+        payload["baselines"] = [
+            {
+                "id": "pit",
+                "type": "rolling_percentile",
+                "window_observations": 12,
+                "min_observations": 2,
+                "point_in_time": True,
+                "notes": "fixture",
+            }
+        ]
+        with self.assertRaisesRegex(
+            ValidationError,
+            "point-in-time baseline requires",
+        ):
+            validate_metric(payload)
+
+        payload["baselines"][0]["point_in_time"] = False
+        validate_metric(payload)
+
+    def test_invalid_availability_basis_rejected(self):
+        payload = copy.deepcopy(BASE)
+        payload["source"]["availability_basis"] = "guessed"
+        with self.assertRaisesRegex(ValidationError, "availability_basis"):
+            validate_metric(payload)
+
     def test_observation_status_vocabulary_matches_json_schema(self):
         schema = json.loads(
             (
@@ -127,6 +167,14 @@ class ValidateTests(unittest.TestCase):
             schema["properties"]["observations"]["items"]["properties"]["status"]["enum"]
         )
         self.assertEqual(schema_statuses, set(ALLOWED_OBSERVATION_STATUSES))
+        schema_bases = set(
+            schema["properties"]["source"]["properties"]["availability_basis"]["enum"]
+        )
+        self.assertEqual(schema_bases, set(ALLOWED_AVAILABILITY_BASES))
+        self.assertIn(
+            "release_date",
+            schema["properties"]["observations"]["items"]["properties"],
+        )
 
 
 if __name__ == "__main__":

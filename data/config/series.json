@@ -20,19 +20,20 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         },
         {
           "id": "rolling-520w",
           "type": "rolling_percentile",
           "window_observations": 520,
           "min_observations": 104,
-          "point_in_time": true,
-          "notes": "Trailing ten-year weekly baseline."
+          "point_in_time": false,
+          "notes": "Trailing ten-year weekly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
-      "expected_history_start": "1971-01-08"
+      "expected_history_start": "1971-01-08",
+      "availability_basis": "unknown"
     },
     {
       "id": "nfci_risk",
@@ -54,11 +55,12 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
-      "expected_history_start": "1971-01-08"
+      "expected_history_start": "1971-01-08",
+      "availability_basis": "unknown"
     },
     {
       "id": "nfci_credit",
@@ -80,11 +82,12 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
-      "expected_history_start": "1971-01-08"
+      "expected_history_start": "1971-01-08",
+      "availability_basis": "unknown"
     },
     {
       "id": "nfci_nonfinancial_leverage",
@@ -106,11 +109,12 @@
           "type": "full_history_percentile",
           "window_observations": null,
           "min_observations": 52,
-          "point_in_time": true,
-          "notes": "Strict-past expanding baseline."
+          "point_in_time": false,
+          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
-      "expected_history_start": "1971-01-08"
+      "expected_history_start": "1971-01-08",
+      "availability_basis": "unknown"
     },
     {
       "id": "us_recession",
@@ -132,11 +136,12 @@
           "type": "none",
           "window_observations": null,
           "min_observations": 1,
-          "point_in_time": true,
-          "notes": "No percentile baseline."
+          "point_in_time": false,
+          "notes": "No percentile baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
-      "expected_history_start": "1854-12-01"
+      "expected_history_start": "1854-12-01",
+      "availability_basis": "unknown"
     },
     {
       "id": "sp500_index",
@@ -161,7 +166,8 @@
           "point_in_time": true,
           "notes": "Market-price context; no risk percentile by default."
         }
-      ]
+      ],
+      "availability_basis": "observation_date"
     },
     {
       "id": "fed_target_legacy",
@@ -187,7 +193,8 @@
           "notes": "Rate context; no percentile baseline."
         }
       ],
-      "expected_history_start": "1982-09-27"
+      "expected_history_start": "1982-09-27",
+      "availability_basis": "observation_date"
     },
     {
       "id": "fed_target_upper",
@@ -213,7 +220,8 @@
           "notes": "Rate context; no percentile baseline."
         }
       ],
-      "expected_history_start": "2008-12-16"
+      "expected_history_start": "2008-12-16",
+      "availability_basis": "observation_date"
     }
   ]
 }

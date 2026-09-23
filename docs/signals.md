@@ -116,17 +116,21 @@ This prevents a missing input from making the dashboard look safer.
 
 The signal engine generates a monthly history beginning at the configured historical start.
 
-Historical evaluation differs from the current snapshot in one important way: source publication lag is respected.
+Historical evaluation differs from the current snapshot in one important way: it follows the canonical historical-availability contract.
 
-For an observation dated `D` with configured lag `L`, it is only available to the historical evaluator on or after:
+- `source.availability_basis = observation_date` uses the observation date as the information-arrival date.
+- `source.availability_basis = release_date` uses each observation's recorded `release_date`.
+- `source.availability_basis = unknown` leaves the historical condition `unknown`; the engine does not reconstruct a PIT series from `expected_observation_lag_days`.
 
-```text
-D + L days
-```
+When multiple historical rows first become available on one release date, they
+become available simultaneously. Before that release, none are usable. On and
+after that release, all rows in the batch are part of the information set, so a
+3-period delta or 6-period return may use them immediately if enough reference
+periods are present.
 
-This is intentionally conservative. It avoids giving a historical observer a monthly FINRA value before that monthly report would reasonably have been published.
-
-For percentile rules, the current historical observation is compared only with earlier available observations. Future observations are never used.
+This differs from a transform that assigns a percentile to each historical row:
+same-release siblings cannot be treated as earlier information for one another.
+Future releases are never used.
 
 ## Why no composite score
 

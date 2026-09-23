@@ -587,6 +587,7 @@ def _build_metric(
             "membership_snapshot": None,
             "price_adjustment": None,
             "point_in_time_membership": None,
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"],

@@ -175,6 +175,7 @@ def _metric(
             ),
             "redistribution": "unknown",
             "market_scope": scope,
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"],

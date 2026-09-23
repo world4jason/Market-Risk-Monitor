@@ -22,7 +22,8 @@
     "membership_mode": null,
     "membership_snapshot": null,
     "price_adjustment": null,
-    "point_in_time_membership": null
+    "point_in_time_membership": null,
+    "availability_basis": "observation_date"
   },
   "coverage": {
     "history_start": "2026-09-01",

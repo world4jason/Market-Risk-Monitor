@@ -102,7 +102,7 @@ Fixtures are explicitly tagged `environment: fixture`.
 
 Derived history declares input lineage and formula/version.
 
-Point-in-time percentile and signal-history logic use only observations that are historically available at the evaluation point. Signal backfill additionally applies the configured publication lag.
+Point-in-time percentile and signal-history logic use only observations that are historically available at the evaluation point. Signal backfill follows the canonical `source.availability_basis` / `observations[].release_date` contract; an operational expected lag never upgrades unknown historical availability into PIT data.
 
 ## Accessibility interaction expectations
 

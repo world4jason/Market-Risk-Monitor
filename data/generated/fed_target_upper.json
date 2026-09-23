@@ -17,7 +17,8 @@
     "series_id": "DFEDTARU",
     "url": "https://fred.stlouisfed.org/series/DFEDTARU",
     "license_note": "Board of Governors/FOMC target-range upper bound distributed by FRED; preserve citation.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "observation_date"
   },
   "coverage": {
     "history_start": "2008-12-16",

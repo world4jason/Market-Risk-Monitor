@@ -17,7 +17,8 @@
     "series_id": "NFCIRISK",
     "url": "https://fred.stlouisfed.org/series/NFCIRISK",
     "license_note": "Distributed by FRED from the Federal Reserve Bank of Chicago; preserve citation and review source terms before republishing full history.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "unknown"
   },
   "coverage": {
     "history_start": "1971-01-08",
@@ -44,8 +45,8 @@
       "type": "full_history_percentile",
       "window_observations": null,
       "min_observations": 52,
-      "point_in_time": true,
-      "notes": "Strict-past expanding baseline."
+      "point_in_time": false,
+      "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
     }
   ],
   "latest": {

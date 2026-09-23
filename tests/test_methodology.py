@@ -1,6 +1,7 @@
 import unittest
 
 from pipeline.methodology import (
+    historical_analysis_eligibility,
     normalize_event_window,
     percentile_rank,
     period_pct_change,
@@ -29,6 +30,58 @@ class MethodologyTests(unittest.TestCase):
             out[2]["percentile"],
             point_in_time_percentiles(obs[:3], min_observations=2)[2]["percentile"],
         )
+
+    def test_release_date_batch_is_not_counted_as_sequential_arrivals(self):
+        dates = [
+            "2025-09-01", "2025-10-01", "2025-11-01", "2025-12-01",
+            "2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01",
+            "2026-05-01", "2026-06-01", "2026-07-01", "2026-08-01",
+            "2026-09-01",
+        ]
+        observations = [
+            {
+                "date": obs_date,
+                "value": index + 1,
+                "release_date": (
+                    "2026-09-21" if index < 12 else "2026-10-21"
+                ),
+            }
+            for index, obs_date in enumerate(dates)
+        ]
+        out = point_in_time_percentiles(
+            observations,
+            min_observations=2,
+            availability_basis="release_date",
+        )
+
+        self.assertTrue(
+            all(item["percentile"] is None for item in out[:12])
+        )
+        self.assertEqual(
+            {item["availability_date"] for item in out[:12]},
+            {"2026-09-21"},
+        )
+        self.assertIsNotNone(out[12]["percentile"])
+        self.assertEqual(out[12]["availability_date"], "2026-10-21")
+
+    def test_unknown_availability_is_not_pit_eligible(self):
+        metric = {
+            "source": {
+                "availability_basis": "unknown",
+                "point_in_time_membership": None,
+            },
+            "observations": [
+                {"date": "2026-01-01", "value": 1.0},
+            ],
+        }
+        eligible, reason = historical_analysis_eligibility(metric)
+        self.assertFalse(eligible)
+        self.assertIn("availability timing is unknown", reason)
+        with self.assertRaisesRegex(ValueError, "known availability basis"):
+            point_in_time_percentiles(
+                metric["observations"],
+                availability_basis="unknown",
+            )
 
     def test_rolling_window(self):
         obs=[{"date":f"2000-0{i+1}-01","value":v} for i,v in enumerate([10,20,30,5])]

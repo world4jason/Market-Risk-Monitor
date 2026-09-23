@@ -17,7 +17,8 @@
     "series_id": "USREC",
     "url": "https://fred.stlouisfed.org/series/USREC",
     "license_note": "Context/shading only; not interpreted as a leading signal.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "unknown"
   },
   "coverage": {
     "history_start": "1854-12-01",

@@ -17,7 +17,8 @@
     "series_id": "DFEDTAR",
     "url": "https://fred.stlouisfed.org/series/DFEDTAR",
     "license_note": "Board of Governors/FOMC target-rate series distributed by FRED; preserve citation.",
-    "redistribution": "unknown"
+    "redistribution": "unknown",
+    "availability_basis": "observation_date"
   },
   "coverage": {
     "history_start": "1982-09-27",

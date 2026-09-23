@@ -49,6 +49,7 @@ def metric_fixture(
             "license_note": "fixture",
             "redistribution": "unknown",
             "point_in_time_membership": point_in_time_membership,
+            "availability_basis": "observation_date",
         },
         "coverage": {
             "history_start": observations[0]["date"],
@@ -129,6 +130,137 @@ class OverviewArtifactTests(unittest.TestCase):
         self.assertIsNone(rolling_percentile(metric))
         overview = build_overview({metric["metric"]["id"]: metric})
         self.assertIsNone(overview["metrics"][0]["summary"]["rolling_percentile"])
+
+    def test_unknown_availability_preserves_retrospective_current_rank(self) -> None:
+        metric = metric_fixture(values=[float(i) for i in range(1, 41)])
+        metric["source"]["availability_basis"] = "unknown"
+        metric["baselines"][0]["point_in_time"] = False
+        metric["baselines"][0]["notes"] = (
+            "Retrospective current context only; not PIT/backtest-safe."
+        )
+
+        value = rolling_percentile(metric)
+        self.assertIsNotNone(value)
+
+        overview = build_overview({"fixture": metric})
+        row = overview["metrics"][0]
+        self.assertEqual(row["summary"]["rolling_percentile"], value)
+        self.assertFalse(row["baselines"][0]["point_in_time"])
+        validate_overview(overview)
+
+    def test_no_rolling_baseline_keeps_retrospective_presentation_rank(self) -> None:
+        metric = metric_fixture(values=[float(i) for i in range(1, 41)])
+        metric["source"]["availability_basis"] = "unknown"
+        metric["baselines"] = []
+
+        value = rolling_percentile(metric)
+        self.assertIsNotNone(value)
+
+        overview = build_overview({"fixture": metric})
+        self.assertEqual(
+            overview["metrics"][0]["summary"]["rolling_percentile"],
+            value,
+        )
+        validate_overview(overview)
+
+    def test_release_batch_is_scored_only_against_prior_release_batches(self) -> None:
+        first_batch = metric_fixture(
+            values=[float(i) for i in range(1, 13)]
+        )
+        first_batch["source"]["availability_basis"] = "release_date"
+        for observation in first_batch["observations"]:
+            observation["release_date"] = "2026-09-21"
+
+        self.assertIsNone(rolling_percentile(first_batch))
+
+        metric = metric_fixture(values=[float(i) for i in range(1, 14)])
+        metric["source"]["availability_basis"] = "release_date"
+        for index, observation in enumerate(metric["observations"]):
+            observation["release_date"] = (
+                "2026-09-21" if index < 12 else "2026-10-21"
+            )
+        metric["latest"]["fetched_at"] = "2026-10-22T10:00:00Z"
+
+        value = rolling_percentile(metric)
+        self.assertIsNotNone(value)
+        overview = build_overview({"fixture": metric})
+        row = overview["metrics"][0]
+        self.assertEqual(
+            row["summary"]["preview_observations"][-1]["release_date"],
+            "2026-10-21",
+        )
+        self.assertEqual(row["summary"]["rolling_percentile"], value)
+        validate_overview(overview)
+
+        broken = copy.deepcopy(overview)
+        del broken["metrics"][0]["summary"]["preview_observations"][-1][
+            "release_date"
+        ]
+        with self.assertRaisesRegex(
+            ValidationError,
+            "release_date missing from preview",
+        ):
+            validate_overview(broken)
+
+    def test_checked_in_unknown_metrics_keep_retrospective_current_context(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        generated = root / "data" / "generated"
+        overview = json.loads(
+            (generated / "overview.json").read_text(encoding="utf-8")
+        )
+        rows = {
+            row["metric"]["id"]: row
+            for row in overview["metrics"]
+        }
+
+        for metric_id in (
+            "finra_margin_debt",
+            "finra_margin_debt_yoy_pct",
+            "nfci",
+            "nfci_risk",
+            "shiller_cape",
+            "shiller_real_tr_price",
+        ):
+            row = rows[metric_id]
+            with self.subTest(metric_id=metric_id):
+                self.assertEqual(
+                    row["source"].get("availability_basis"),
+                    "unknown",
+                )
+                self.assertIsNotNone(
+                    row["summary"]["rolling_percentile"]
+                )
+                self.assertFalse(
+                    any(
+                        baseline.get("point_in_time") is True
+                        and baseline.get("type") in {
+                            "full_history_percentile",
+                            "rolling_percentile",
+                        }
+                        for baseline in row["baselines"]
+                    )
+                )
+
+    def test_checked_in_metrics_declare_availability_basis(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        generated = root / "data" / "generated"
+        catalog = json.loads(
+            (generated / "catalog.json").read_text(encoding="utf-8")
+        )
+
+        declared = {"observation_date", "release_date", "unknown"}
+        for item in catalog["metrics"]:
+            metric = json.loads(
+                (
+                    generated
+                    / Path(item["path"]).name
+                ).read_text(encoding="utf-8")
+            )
+            with self.subTest(metric_id=item["id"]):
+                self.assertIn(
+                    metric["source"].get("availability_basis"),
+                    declared,
+                )
 
     def test_checked_in_overview_is_materially_smaller_than_full_histories(self) -> None:
         root = Path(__file__).resolve().parents[1]

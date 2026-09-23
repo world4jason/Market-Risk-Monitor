@@ -88,6 +88,105 @@ Example:
 
 A monthly source can therefore be fresh even though `as_of` is weeks earlier, provided its metric-specific freshness rule accounts for publication cadence.
 
+## Historical availability and point-in-time guarantee
+
+Issue #48 records **Option A** as the canonical contract decision: availability
+timing belongs in the metric artifact itself. Audit artifacts remain diagnostic;
+historical/PIT consumers must not depend on a family-specific audit file to know
+when a canonical observation became available.
+
+Each source may declare:
+
+```text
+source.availability_basis =
+  observation_date | release_date | unknown
+```
+
+A missing `availability_basis` is treated as `unknown` for backward
+compatibility.
+
+- `observation_date`: the source observation date is itself the date the value
+  is considered publicly available. This is appropriate only for sources where
+  that guarantee is defensible, such as market closes/effective-date series.
+- `release_date`: every non-null observation carries
+  `observations[].release_date`. Historical consumers use that date rather
+  than the reference-period date.
+- `unknown`: the repository cannot reconstruct exact historical availability.
+  The data may still be shown as retrospective absolute history, but it must not
+  be represented as a canonical point-in-time percentile/event/backtest input.
+
+For example:
+
+```json
+{
+  "source": {
+    "availability_basis": "release_date"
+  },
+  "observations": [
+    {
+      "date": "2026-08-01",
+      "release_date": "2026-09-21",
+      "value": 48.3,
+      "status": "observed"
+    }
+  ]
+}
+```
+
+`coverage.expected_observation_lag_days` remains useful for operational
+freshness expectations. It is **not** evidence of the historical release date
+and must not be used to turn `unknown` availability into a PIT guarantee.
+
+### Same-release batches
+
+Multiple reference periods can become known on the same release date. This is
+common on the first ingest of a rolling source window. They are one information
+arrival, not a sequence of independent historical arrivals.
+
+PIT transforms therefore score every observation in one release-date batch
+against the same prior baseline and only add the batch to history after the
+whole batch has been scored. A first CIER ingest containing twelve historical
+months all first verified on one date cannot manufacture eleven synthetic
+strict-past comparisons.
+
+For a visual/event knowledge timeline, one availability date contributes at
+most one state; the latest reference-period value in that release batch
+represents the state visible at that arrival.
+
+Signal evaluation is different: once a release date has arrived, every row in
+that batch is part of the information set and may be used by a multi-period
+delta/return rule. The engine must not permanently collapse the batch to one
+observation.
+
+### Revision-prone sources and vintages
+
+A release date is not enough when a provider revises previously published
+history. If the canonical artifact keeps only one value per reference date, it
+cannot reconstruct what an earlier vintage contained.
+
+NDC leading/coincident/lagging/monitoring families are therefore
+`availability_basis: unknown` and non-PIT until the repository preserves
+vintages such as `(reference_date, release_date/vintage, value)`. Keeping only
+the newest revised row and attaching a release date must never be treated as a
+canonical PIT history. The derived Taiwan macro regime likewise labels its
+history `retrospective_current_vintage` with
+`historical_point_in_time: false`; its current state remains usable as a
+current-vintage interpretation.
+
+### Relationship to baselines
+
+`baselines[].point_in_time: true` is valid only when the source has a known
+availability basis. Validation rejects canonical PIT baselines when
+availability is missing/unknown. Membership-sensitive metrics are additionally
+subject to their constituent-membership PIT gate.
+
+A non-PIT baseline may still describe retrospective history. In particular,
+the current value may be ranked against prior reference-period observations to
+answer a descriptive question such as “where is today versus recent history?”
+That **current retrospective rank** must be labeled as retrospective / not
+PIT-backtest-safe. Historical PIT percentile/event modes remain disabled rather
+than silently upgrading the same data into a backtest-safe series.
+
 ## History coverage
 
 `coverage.history_start` and `coverage.history_end` are per metric.

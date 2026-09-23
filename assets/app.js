@@ -367,7 +367,27 @@ function usableObservationCount(metric) {
 }
 
 function percentileContextSuffix(metric) {
-  return metric?.metric?.polarity === "contextual" ? " · context only" : "";
+  const parts = [];
+  if (metric?.metric?.polarity === "contextual") {
+    parts.push("context only");
+  }
+  if (rollingPercentileSemantics(metric) === "retrospective") {
+    parts.push("retrospective; not PIT/backtest-safe");
+  }
+  return parts.length ? ` · ${parts.join(" · ")}` : "";
+}
+
+function percentileCaveatSentence(metric) {
+  const parts = [];
+  if (metric?.metric?.polarity === "contextual") {
+    parts.push("This rank is context only; it is not a risk direction.");
+  }
+  if (rollingPercentileSemantics(metric) === "retrospective") {
+    parts.push(
+      "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
+    );
+  }
+  return parts.join(" ");
 }
 
 function overviewPercentileText(metric, presentation = percentilePresentation(metric)) {
@@ -478,40 +498,142 @@ function setOverviewCard(kind, headline, evidence, note, displayState = "normal"
 }
 
 
-function historicalPercentileAllowed(metric) {
-  const id = String(metric?.metric?.id || "");
-  const membershipSensitive =
-    id.startsWith("sp500_above_") ||
-    id.startsWith("tw_above_") ||
-    id.startsWith("tw_new_52w_") ||
-    id === "tw_net_new_52w_highs" ||
-    id === "tw_high_low_pct";
+function observationAvailabilityDate(metric, observation) {
+  if (observation?.availability_date) return observation.availability_date;
+  const basis = metric?.source?.availability_basis || "unknown";
+  if (basis === "observation_date") return observation?.date || null;
+  if (basis === "release_date") return observation?.release_date || null;
+  return null;
+}
 
-  return !(
-    membershipSensitive &&
-    metric?.source?.point_in_time_membership === false
+function pointInTimeObservationSeries(
+  metric,
+  observations = metric?.observations || [],
+) {
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (!eligibility.allowed) return [];
+
+  const byAvailability = new Map();
+  observations.forEach((observation) => {
+    if (observation?.value == null) return;
+    const available = observationAvailabilityDate(metric, observation);
+    if (!available) return;
+
+    const current = byAvailability.get(available);
+    if (!current || String(observation.date) >= String(current.date)) {
+      byAvailability.set(available, {
+        ...observation,
+        availability_date: available,
+      });
+    }
+  });
+
+  return [...byAvailability.values()].sort(
+    (left, right) =>
+      left.availability_date.localeCompare(right.availability_date) ||
+      String(left.date).localeCompare(String(right.date)),
   );
 }
 
+function historicalAnalysisEligibility(metric) {
+  if (metric?.source?.point_in_time_membership === false) {
+    return {
+      allowed: false,
+      basis: metric?.source?.availability_basis || "unknown",
+      reason: "historical membership is not point-in-time",
+    };
+  }
+
+  const basis = metric?.source?.availability_basis || "unknown";
+  if (basis === "unknown") {
+    return {
+      allowed: false,
+      basis,
+      reason: "historical observation availability timing is unknown",
+    };
+  }
+  if (!["observation_date", "release_date"].includes(basis)) {
+    return {
+      allowed: false,
+      basis,
+      reason: `unsupported availability basis ${basis}`,
+    };
+  }
+
+  if (
+    basis === "release_date" &&
+    Array.isArray(metric?.observations) &&
+    metric.observations.some(
+      (observation) =>
+        observation?.value != null && !observation?.release_date,
+    )
+  ) {
+    return {
+      allowed: false,
+      basis,
+      reason: "release-date availability is declared but release_date is missing",
+    };
+  }
+
+  return { allowed: true, basis, reason: null };
+}
+
+function historicalPercentileAllowed(metric) {
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (!eligibility.allowed) return false;
+  return (metric?.baselines || []).some(
+    (baseline) =>
+      ["full_history_percentile", "rolling_percentile"].includes(
+        baseline?.type,
+      ) && baseline?.point_in_time === true,
+  );
+}
+
+function rollingPercentileSemantics(metric) {
+  const config = baselineConfig(metric, "rolling_percentile");
+  if (metric?.source?.point_in_time_membership === false) {
+    return "unavailable";
+  }
+
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (config?.point_in_time === true && eligibility.allowed) {
+    return "point_in_time";
+  }
+  return "retrospective";
+}
+
 function rollingPercentile(metric) {
-  if (!historicalPercentileAllowed(metric)) return null;
+  const config = baselineConfig(metric, "rolling_percentile");
+  const semantics = rollingPercentileSemantics(metric);
+  if (semantics === "unavailable") return null;
+
   if (!Array.isArray(metric?.observations) && metric?.summary) {
     const value = metric.summary.rolling_percentile;
     return value == null ? null : Number(value);
   }
 
-  const obs = (metric.observations || []).filter((o) => o.value != null);
-  if (obs.length < 3) return null;
+  const raw = metric.observations || [];
+  const present = raw.filter((observation) => observation?.value != null);
+  if (present.length < 3) return null;
 
-  const config = baselineConfig(metric, "rolling_percentile");
-  const window = config?.window_observations || defaultRollingWindow(metric);
+  if (semantics === "point_in_time") {
+    const series = strictPastPercentileSeries(metric, { rolling: true });
+    const value = series
+      .filter((observation) => observation?.value != null)
+      .at(-1)?.value;
+    return value == null ? null : Number(value);
+  }
+
+  const window =
+    config?.window_observations || defaultRollingWindow(metric);
   const minObs = config?.min_observations || Math.min(20, window);
-  const baseline = obs
-    .slice(Math.max(0, obs.length - 1 - window), -1)
-    .map((o) => Number(o.value));
-
+  const values = present.map((observation) => Number(observation.value));
+  const baseline = values.slice(
+    Math.max(0, values.length - 1 - window),
+    -1,
+  );
   if (baseline.length < minObs) return null;
-  return percentileRank(Number(obs.at(-1).value), baseline);
+  return percentileRank(values.at(-1), baseline);
 }
 
 // Period-to-period change, in the comparison the artifact declares.
@@ -575,40 +697,63 @@ function formatChange(change) {
 
 function strictPastPercentileSeries(metric, { rolling = false } = {}) {
   const raw = metric.observations || [];
-  if (!historicalPercentileAllowed(metric)) {
-    return raw.map((obs) => ({
-      date: obs.date,
-      value: null,
-      status: "insufficient_data",
-    }));
-  }
   const config = baselineConfig(
     metric,
     rolling ? "rolling_percentile" : "full_history_percentile",
   );
-  const window = rolling
-    ? (config?.window_observations || defaultRollingWindow(metric))
-    : null;
-  const minObs = config?.min_observations || 20;
-
-  const history = [];
-  const out = [];
-
-  for (const obs of raw) {
-    const baseline = window ? history.slice(-window) : history;
-    let value = null;
-    let status = "insufficient_data";
-
-    if (obs.value == null) {
-      status = "missing";
-    } else if (baseline.length >= minObs) {
-      value = percentileRank(Number(obs.value), baseline);
-      status = "observed";
-    }
-
-    out.push({ date: obs.date, value, status });
-    if (obs.value != null) history.push(Number(obs.value));
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (
+    !eligibility.allowed ||
+    !config ||
+    config.point_in_time !== true
+  ) {
+    return raw.map((obs) => ({
+      date: obs.date,
+      value: null,
+      status: obs.value == null ? "missing" : "insufficient_data",
+    }));
   }
+
+  const window = rolling
+    ? (config.window_observations || defaultRollingWindow(metric))
+    : null;
+  const minObs = config.min_observations || 20;
+  const history = [];
+  const out = raw.map((obs) => ({
+    date: obs.date,
+    value: null,
+    status: obs.value == null ? "missing" : "insufficient_data",
+  }));
+  const groups = new Map();
+
+  raw.forEach((obs, index) => {
+    if (obs.value == null) return;
+    const available = observationAvailabilityDate(metric, obs);
+    if (!available) return;
+    out[index].availability_date = available;
+    if (!groups.has(available)) groups.set(available, []);
+    groups.get(available).push({ index, obs });
+  });
+
+  [...groups.keys()].sort().forEach((available) => {
+    const baseline = window ? history.slice(-window) : [...history];
+    const batch = groups.get(available);
+
+    batch.forEach(({ index, obs }) => {
+      if (baseline.length < minObs) return;
+      out[index] = {
+        date: obs.date,
+        value: percentileRank(Number(obs.value), baseline),
+        status: "observed",
+        availability_date: available,
+      };
+    });
+
+    batch.forEach(({ obs }) => {
+      history.push(Number(obs.value));
+    });
+  });
+
   return out;
 }
 
@@ -638,6 +783,30 @@ function rateOfChangeSeries(metric) {
   });
 }
 
+function knowledgeTimelineSeries(metric, observations) {
+  return observations
+    .map((observation) => {
+      const referenceDate =
+        observation.reference_date || observation.date || null;
+      const availabilityDate =
+        observation.availability_date ||
+        observationAvailabilityDate(metric, observation);
+
+      return {
+        ...observation,
+        date: availabilityDate || referenceDate,
+        reference_date: referenceDate,
+        availability_date: availabilityDate,
+      };
+    })
+    .sort((left, right) =>
+      String(left.date || "").localeCompare(String(right.date || "")) ||
+      String(left.reference_date || "").localeCompare(
+        String(right.reference_date || ""),
+      ),
+    );
+}
+
 function historyView(metric, mode) {
   if (mode === "pit_percentile") {
     return {
@@ -647,7 +816,10 @@ function historyView(metric, mode) {
         name: `${metric.metric.name} — point-in-time percentile`,
         units: "percentile",
       },
-      observations: strictPastPercentileSeries(metric),
+      observations: knowledgeTimelineSeries(
+        metric,
+        strictPastPercentileSeries(metric),
+      ),
     };
   }
 
@@ -659,7 +831,10 @@ function historyView(metric, mode) {
         name: `${metric.metric.name} — rolling percentile`,
         units: "percentile",
       },
-      observations: strictPastPercentileSeries(metric, { rolling: true }),
+      observations: knowledgeTimelineSeries(
+        metric,
+        strictPastPercentileSeries(metric, { rolling: true }),
+      ),
     };
   }
 
@@ -1155,9 +1330,9 @@ function renderTrendParticipation() {
         return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>not published</small></div>`;
       }
       const pct = rollingPercentile(metric);
-      const pit = metric?.source?.point_in_time_membership;
-      const context = pit === false
-        ? "non-PIT history · percentile disabled"
+      const eligibility = historicalAnalysisEligibility(metric);
+      const context = !eligibility.allowed
+        ? `non-PIT history · ${eligibility.reason}`
         : (pct == null
             ? "historical percentile unavailable"
             : `${ordinal(pct)} percentile vs ${rollingWindowLabel(metric)}`);
@@ -1510,6 +1685,16 @@ function metricChartSummary(metric, observations) {
   const range = values.length
     ? ` Range ${formatValue(Math.min(...values), metric.metric.units)} to ${formatValue(Math.max(...values), metric.metric.units)}.`
     : "";
+  const usesKnowledgeTimeline = obs.some(
+    (item) =>
+      item.reference_date &&
+      item.date &&
+      item.reference_date !== item.date,
+  );
+  if (usesKnowledgeTimeline) {
+    const reference = last.reference_date || last.date;
+    return `${metric.metric.name}. ${obs.length} point-in-time observations on knowledge dates from ${first.date} to ${last.date}. Latest knowledge date ${last.date}, reference period ${reference}: ${formatValue(last.value, metric.metric.units)}.${range}`;
+  }
   return `${metric.metric.name}. ${obs.length} observations from ${first.date} to ${last.date}. Latest ${last.date}: ${formatValue(last.value, metric.metric.units)}.${range}`;
 }
 
@@ -1637,8 +1822,34 @@ async function renderHistory(id, mode = "absolute") {
     return;
   }
 
+  const percentileMode =
+    mode === "pit_percentile" || mode === "rolling_percentile";
+  const eligibility = historicalAnalysisEligibility(metric);
+  const baselineType =
+    mode === "rolling_percentile"
+      ? "rolling_percentile"
+      : "full_history_percentile";
+  const baseline = percentileMode
+    ? baselineConfig(metric, baselineType)
+    : null;
+  const percentileBlocked =
+    percentileMode &&
+    (
+      !eligibility.allowed ||
+      !baseline ||
+      baseline.point_in_time !== true
+    );
+
   const view = historyView(metric, mode);
-  fullChart(view, $("#history-chart"));
+  if (percentileBlocked) {
+    const reason = !eligibility.allowed
+      ? eligibility.reason
+      : "the selected baseline is not declared point-in-time";
+    $("#history-chart").innerHTML =
+      `<div class="empty-state compact"><strong>Point-in-time historical view disabled.</strong><span>${escapeHtml(reason)}. Use Absolute level for retrospective history.</span></div>`;
+  } else {
+    fullChart(view, $("#history-chart"));
+  }
 
   const available = (view.observations || []).filter((o) => o.value != null);
   const modeLabel =
@@ -1663,7 +1874,8 @@ function observationOnOrBeforeIndex(obs, anchor) {
   let best = -1;
   for (let i = 0; i < obs.length; i += 1) {
     if (obs[i].value == null) continue;
-    if (Date.parse(obs[i].date) <= target) best = i;
+    const available = obs[i].availability_date || obs[i].date;
+    if (Date.parse(available) <= target) best = i;
     else break;
   }
   return best;
@@ -1671,16 +1883,33 @@ function observationOnOrBeforeIndex(obs, anchor) {
 
 function renderEvents(metric) {
   const list = $("#event-list");
-  const obs = (metric.observations || []).filter((o) => o.value != null);
+  const el = $("#event-chart");
+  const rawObs = (metric.observations || []).filter((o) => o.value != null);
 
-  if (!state.events.length || !obs.length) {
+  if (!state.events.length || !rawObs.length) {
     list.innerHTML = "";
-    $("#event-chart").innerHTML =
+    el.innerHTML =
       '<div class="empty-state compact">Event definitions or history unavailable.</div>';
     return;
   }
 
-  const coverageStart = Date.parse(metric.coverage.history_start);
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (!eligibility.allowed) {
+    list.innerHTML = "";
+    el.innerHTML =
+      `<div class="empty-state compact"><strong>Historical event comparison disabled.</strong><span>${escapeHtml(eligibility.reason)}. Raw absolute history remains available.</span></div>`;
+    return;
+  }
+
+  const obs = pointInTimeObservationSeries(metric, rawObs);
+  if (!obs.length) {
+    list.innerHTML = "";
+    el.innerHTML =
+      '<div class="empty-state compact">No point-in-time event history is available.</div>';
+    return;
+  }
+
+  const coverageStart = Date.parse(obs[0].availability_date);
   const colors = [
     "#5dc2aa",
     "#e7b75f",
@@ -1714,13 +1943,17 @@ function renderEvents(metric) {
     const anchorValue = Number(obs[anchorIdx].value);
     if (!anchorValue) return;
 
-    const anchorDate = new Date(`${obs[anchorIdx].date}T00:00:00Z`);
+    const anchorDate = new Date(
+      `${obs[anchorIdx].availability_date || obs[anchorIdx].date}T00:00:00Z`,
+    );
     const pre = Number(event.window?.pre_months ?? 12);
     const post = Number(event.window?.post_months ?? 24);
     const points = [];
 
     for (const item of obs) {
-      const dt = new Date(`${item.date}T00:00:00Z`);
+      const dt = new Date(
+        `${item.availability_date || item.date}T00:00:00Z`,
+      );
       const offset = monthOffset(anchorDate, dt);
       if (offset < -pre || offset > post) continue;
       points.push({
@@ -1740,7 +1973,6 @@ function renderEvents(metric) {
     }
   });
 
-  const el = $("#event-chart");
   if (!lines.length) {
     el.innerHTML =
       '<div class="empty-state compact">No event has sufficient metric history.</div>';
@@ -1876,10 +2108,20 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     return;
   }
 
-  if (!historicalPercentileAllowed(metric) && mode !== "raw") {
+  const eligibility = historicalAnalysisEligibility(metric);
+  if (!eligibility.allowed && mode !== "raw") {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">This membership-sensitive Taiwan breadth series is non-point-in-time, so canonical historical normalization/percentiles are disabled.</div>';
+      `<div class="empty-state compact"><strong>Point-in-time Taiwan event comparison disabled.</strong><span>${escapeHtml(eligibility.reason)}. Raw retrospective history remains available.</span></div>`;
+    return;
+  }
+  if (
+    mode === "pit_percentile" &&
+    !historicalPercentileAllowed(metric)
+  ) {
+    list.innerHTML = "";
+    el.innerHTML =
+      '<div class="empty-state compact">Point-in-time percentile mode is disabled because no eligible PIT percentile baseline is declared.</div>';
     return;
   }
 
@@ -1895,7 +2137,13 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     };
   }
 
-  const obs = (eventMetric.observations || []).filter((o) => o.value != null);
+  const retrospectiveObs = (eventMetric.observations || []).filter(
+    (observation) => observation.value != null,
+  );
+  const obs =
+    mode === "raw"
+      ? retrospectiveObs
+      : pointInTimeObservationSeries(eventMetric, retrospectiveObs);
   if (obs.length < 2) {
     list.innerHTML = "";
     el.innerHTML =
@@ -1903,7 +2151,11 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     return;
   }
 
-  const coverageStart = Date.parse(metric.coverage.history_start);
+  const coverageStart = Date.parse(
+    mode === "raw"
+      ? metric.coverage.history_start
+      : (obs[0].availability_date || obs[0].date),
+  );
   const colors = [
     "#5dc2aa",
     "#e7b75f",
@@ -1936,7 +2188,9 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     if (!Number.isFinite(anchorValue)) return;
     if (mode === "normalized" && anchorValue === 0) return;
 
-    const anchorDate = new Date(`${obs[anchorIdx].date}T00:00:00Z`);
+    const anchorDate = new Date(
+      `${obs[anchorIdx].availability_date || obs[anchorIdx].date}T00:00:00Z`,
+    );
     const pre = Number(event.window?.pre_months ?? 12);
     const post = Number(event.window?.post_months ?? 24);
     const points = [];
@@ -1944,7 +2198,9 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     for (const item of obs) {
       const offset = monthOffset(
         anchorDate,
-        new Date(`${item.date}T00:00:00Z`),
+        new Date(
+          `${item.availability_date || item.date}T00:00:00Z`,
+        ),
       );
       if (offset < -pre || offset > post) continue;
 
@@ -2229,7 +2485,7 @@ async function openMetric(id, invoker = document.activeElement) {
     : "Snapshot fetched";
   $("#dialog-source").innerHTML =
     `${metricContextGuide(metric)}
-     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)}${percentileContextSuffix(metric) ? " This rank is context only; it is not a risk direction." : ""}</p>`}
+     ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)} ${escapeHtml(percentileCaveatSentence(metric))}</p>`}
      <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
      ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
 }

@@ -1,13 +1,14 @@
 import json
 import unittest
 
+from pipeline.methodology import point_in_time_percentiles
 from pipeline.taiwan_macro import (
     build_macro_metrics,
     build_macro_regime,
     monitoring_light,
     parse_taiwan_macro_csv,
 )
-from pipeline.validate import validate_metric
+from pipeline.validate import validate_metric, validate_taiwan_macro_regime
 
 
 CONFIG = {
@@ -113,6 +114,90 @@ class TaiwanMacroTests(unittest.TestCase):
         self.assertEqual(current["regime"], "expansion")
         self.assertGreaterEqual(current["known_components"], 3)
         self.assertEqual(current["available_on"], "2026-08-27")
+        self.assertFalse(regime["methodology"]["historical_point_in_time"])
+        self.assertEqual(
+            regime["methodology"]["history_semantics"],
+            "retrospective_current_vintage",
+        )
+        self.assertIn(
+            "tw_ndc_leading_index",
+            regime["methodology"]["revision_prone_inputs"],
+        )
+        validate_taiwan_macro_regime(regime)
+
+    def test_cier_first_ingest_retains_release_date_without_fake_arrivals(self):
+        months = [
+            "2025-09-01", "2025-10-01", "2025-11-01", "2025-12-01",
+            "2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01",
+            "2026-05-01", "2026-06-01", "2026-07-01", "2026-08-01",
+        ]
+        lines = [
+            "date,provider,series_id,value,unit,release_date,source_url"
+        ]
+        lines.extend(
+            (
+                f"{obs_date},CIER,tw_manufacturing_pmi,{48 + index / 10},"
+                "index,2026-09-21,https://www.cier.edu.tw/pmi-trend/"
+            )
+            for index, obs_date in enumerate(months)
+        )
+        rows = parse_taiwan_macro_csv("\n".join(lines) + "\n")
+        metric = build_macro_metrics(rows)["tw_manufacturing_pmi"]
+
+        self.assertEqual(metric["source"]["availability_basis"], "release_date")
+        self.assertEqual(
+            {item["release_date"] for item in metric["observations"]},
+            {"2026-09-21"},
+        )
+        validate_metric(metric)
+
+        pit = point_in_time_percentiles(
+            metric["observations"],
+            min_observations=2,
+            availability_basis="release_date",
+        )
+        self.assertTrue(
+            all(item["percentile"] is None for item in pit)
+        )
+
+    def test_ndc_revision_prone_series_is_gated_without_vintages(self):
+        first = """date,provider,series_id,value,unit,release_date,source_url
+2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-09-21,https://www.ndc.gov.tw/en/
+2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/
+"""
+        revised = """date,provider,series_id,value,unit,release_date,source_url
+2026-01-01,NDC,tw_ndc_leading_index,102,index,2026-10-21,https://www.ndc.gov.tw/en/
+2026-02-01,NDC,tw_ndc_leading_index,103,index,2026-10-21,https://www.ndc.gov.tw/en/
+"""
+
+        first_metric = build_macro_metrics(
+            parse_taiwan_macro_csv(first)
+        )["tw_ndc_leading_index"]
+        revised_metric = build_macro_metrics(
+            parse_taiwan_macro_csv(revised)
+        )["tw_ndc_leading_index"]
+
+        self.assertEqual(
+            first_metric["observations"][0]["value"],
+            100.0,
+        )
+        self.assertEqual(
+            revised_metric["observations"][0]["value"],
+            102.0,
+        )
+        self.assertEqual(
+            revised_metric["source"]["availability_basis"],
+            "unknown",
+        )
+        self.assertFalse(
+            revised_metric["baselines"][0]["point_in_time"]
+        )
+        self.assertIn(
+            "do not retain vintages",
+            revised_metric["baselines"][0]["notes"],
+        )
+        validate_metric(first_metric)
+        validate_metric(revised_metric)
 
     def test_duplicate_series_date_rejected(self):
         text = """date,provider,series_id,value,unit,release_date,source_url

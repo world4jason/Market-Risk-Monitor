@@ -113,7 +113,10 @@ globalThis.__MRM__ = {
   formatValue,
   formatChange,
   defaultRollingWindow,
+  historicalAnalysisEligibility,
   historicalPercentileAllowed,
+  pointInTimeObservationSeries,
+  strictPastPercentileSeries,
   rollingPercentile,
   historyView,
   taiwanBreadthState,
@@ -179,6 +182,7 @@ function summaryMetric({
   comparison = "percent_change",
   latest = 100,
   pointInTime = true,
+  availabilityBasis = "observation_date",
 }) {
   const preview = observations
     ? [
@@ -193,6 +197,7 @@ function summaryMetric({
       dataset: "fixture",
       url: "https://example.test/source",
       point_in_time_membership: pointInTime,
+      availability_basis: availabilityBasis,
     },
     coverage: { history_start: "2020-01-01", history_end: "2026-01-02" },
     freshness: {
@@ -210,6 +215,7 @@ function summaryMetric({
         type: "rolling_percentile",
         window_observations: frequency === "monthly" ? 120 : frequency === "weekly" ? 520 : 2520,
         min_observations: 2,
+        point_in_time: true,
       },
     ],
     summary: {
@@ -349,7 +355,8 @@ test("non-PIT historical percentile and event modes stay blocked", () => {
   ];
   runtime.api.renderTaiwanEvents(metric, "normalized");
   assert.equal(list.innerHTML, "");
-  assert.match(chart.innerHTML, /non-point-in-time/);
+  assert.match(chart.innerHTML, /Point-in-time Taiwan event comparison disabled/);
+  assert.match(chart.innerHTML, /historical membership is not point-in-time/);
 
   const pitMetric = fullMetricFromSummary(
     summaryMetric({
@@ -362,11 +369,127 @@ test("non-PIT historical percentile and event modes stay blocked", () => {
   pitMetric.baselines.push({
     type: "full_history_percentile",
     min_observations: 2,
+    point_in_time: true,
   });
   assert.equal(runtime.api.historicalPercentileAllowed(pitMetric), true);
   const pitView = runtime.api.historyView(pitMetric, "pit_percentile");
   assert.ok(pitView.observations.some((item) => item.value !== null));
 });
+test("same-day release batch does not masquerade as independent PIT arrivals", () => {
+  const runtime = buildRuntime();
+  const metric = fullMetricFromSummary(
+    summaryMetric({
+      id: "cier-batch",
+      frequency: "monthly",
+      availabilityBasis: "release_date",
+    }),
+    Array.from({ length: 13 }, (_, index) => index + 1),
+  );
+  metric.baselines = [
+    {
+      type: "full_history_percentile",
+      min_observations: 2,
+      point_in_time: true,
+    },
+    {
+      type: "rolling_percentile",
+      window_observations: 12,
+      min_observations: 2,
+      point_in_time: true,
+    },
+  ];
+  const dates = [
+    "2025-09-01", "2025-10-01", "2025-11-01", "2025-12-01",
+    "2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01",
+    "2026-05-01", "2026-06-01", "2026-07-01", "2026-08-01",
+    "2026-09-01",
+  ];
+  metric.observations = dates.map((date, index) => ({
+    date,
+    value: index + 1,
+    status: "observed",
+    release_date: index < 12 ? "2026-09-21" : "2026-10-21",
+  }));
+
+  const eligibility = runtime.api.historicalAnalysisEligibility(metric);
+  assert.equal(eligibility.allowed, true);
+
+  const series = runtime.api.strictPastPercentileSeries(metric);
+  assert.ok(series.slice(0, 12).every((item) => item.value === null));
+  assert.notEqual(series[12].value, null);
+
+  const arrivals = runtime.api.pointInTimeObservationSeries(metric);
+  assert.equal(arrivals.length, 2);
+  assert.equal(arrivals[0].availability_date, "2026-09-21");
+  assert.equal(arrivals[0].date, "2026-08-01");
+  assert.equal(arrivals[1].availability_date, "2026-10-21");
+
+  const unknown = structuredClone(metric);
+  unknown.source.availability_basis = "unknown";
+  assert.equal(runtime.api.historicalAnalysisEligibility(unknown).allowed, false);
+});
+
+test("release-date PIT chart uses knowledge dates and preserves reference periods", () => {
+  const runtime = buildRuntime();
+  const metric = fullMetricFromSummary(
+    summaryMetric({
+      id: "release-timeline",
+      frequency: "monthly",
+      availabilityBasis: "release_date",
+    }),
+    [10, 20, 30, 40],
+  );
+  metric.baselines = [
+    {
+      type: "full_history_percentile",
+      min_observations: 1,
+      point_in_time: true,
+    },
+  ];
+  metric.observations = [
+    {
+      date: "2026-01-01",
+      value: 10,
+      status: "observed",
+      release_date: "2026-02-15",
+    },
+    {
+      date: "2026-02-01",
+      value: 20,
+      status: "observed",
+      release_date: "2026-03-15",
+    },
+    {
+      date: "2026-03-01",
+      value: 30,
+      status: "observed",
+      release_date: "2026-04-15",
+    },
+    {
+      date: "2026-04-01",
+      value: 40,
+      status: "observed",
+      release_date: "2026-05-15",
+    },
+  ];
+
+  const view = runtime.api.historyView(metric, "pit_percentile");
+  const usable = view.observations.filter((item) => item.value != null);
+  assert.equal(usable[0].date, "2026-03-15");
+  assert.equal(usable[0].reference_date, "2026-02-01");
+  assert.equal(usable.at(-1).date, "2026-05-15");
+  assert.equal(usable.at(-1).reference_date, "2026-04-01");
+
+  const chart = runtime.dom.register("pit-release-chart");
+  runtime.api.fullChart(view, chart);
+  assert.match(chart.innerHTML, /2026-03-15/);
+  assert.match(chart.innerHTML, /2026-05-15/);
+  assert.match(
+    chart.innerHTML,
+    /Latest knowledge date 2026-05-15, reference period 2026-04-01/,
+  );
+});
+
 test("optional MA family renders compact unavailable state", () => {
   const runtime = buildRuntime();
   const section = runtime.dom.register("trend-participation-section");
@@ -476,17 +599,19 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
       latest: 14.87,
     }),
   );
-  runtime.api.state.metrics.set(
-    "finra_margin_debt",
-    summaryMetric({
-      id: "finra_margin_debt",
-      pillar: "leverage",
-      units: "USD millions",
-      polarity: "contextual",
-      latest: 1453832,
-      percentile: 100,
-    }),
-  );
+  const margin = summaryMetric({
+    id: "finra_margin_debt",
+    pillar: "leverage",
+    units: "USD millions",
+    polarity: "contextual",
+    latest: 1453832,
+    percentile: 100,
+    availabilityBasis: "unknown",
+  });
+  margin.baselines[0].point_in_time = false;
+  assert.equal(runtime.api.historicalPercentileAllowed(margin), false);
+  assert.equal(runtime.api.rollingPercentile(margin), 100);
+  runtime.api.state.metrics.set("finra_margin_debt", margin);
   runtime.api.state.metrics.set(
     "finra_margin_debt_yoy_pct",
     summaryMetric({
@@ -530,6 +655,10 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   assert.match(
     runtime.dom.byId.get("overview-leverage-evidence").innerHTML,
     /context only/,
+  );
+  assert.match(
+    runtime.dom.byId.get("overview-leverage-evidence").innerHTML,
+    /retrospective; not PIT\/backtest-safe/,
   );
   assert.match(
     runtime.dom.byId.get("overview-leverage-note").textContent,

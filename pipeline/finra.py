@@ -333,6 +333,7 @@ def _raw_metric(
                 "cash- and margin-account free credit was reported as a combined amount."
             ),
             "redistribution": "unknown",
+            "availability_basis": "unknown",
         },
         "coverage": {
             "history_start": obs[0]["date"] if obs else None,
@@ -359,16 +360,16 @@ def _raw_metric(
                 "type": "full_history_percentile",
                 "window_observations": None,
                 "min_observations": 36,
-                "point_in_time": True,
-                "notes": "Strict-past expanding baseline.",
+                "point_in_time": False,
+                "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline.",
             },
             {
                 "id": "rolling-120m",
                 "type": "rolling_percentile",
                 "window_observations": 120,
                 "min_observations": 36,
-                "point_in_time": True,
-                "notes": "Trailing ten-year monthly baseline.",
+                "point_in_time": False,
+                "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline.",
             },
         ],
         "latest": {
