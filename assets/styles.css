@@ -30,6 +30,24 @@ body {
 }
 a { color: inherit; }
 button, select { font: inherit; }
+
+:where(a, button, select, input, summary, [role="button"]):focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--panel);
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 .site-header, main, footer { width: min(1280px, calc(100% - 32px)); margin-inline: auto; }
 .site-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 42px 0 24px; }
 h1, h2, h3, p { margin-top: 0; }

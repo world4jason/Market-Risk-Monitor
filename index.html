@@ -349,14 +349,14 @@
     </section>
   </main>
 
-  <dialog id="metric-dialog" class="metric-dialog">
+  <dialog id="metric-dialog" class="metric-dialog" aria-labelledby="dialog-title">
     <form method="dialog" class="dialog-shell">
       <div class="dialog-header">
         <div>
           <p id="dialog-pillar" class="eyebrow"></p>
           <h2 id="dialog-title">Metric</h2>
         </div>
-        <button class="icon-button" value="close" aria-label="Close">×</button>
+        <button id="dialog-close" class="icon-button" value="close" aria-label="Close metric details">×</button>
       </div>
       <div id="dialog-summary" class="detail-summary"></div>
       <div id="dialog-chart" class="chart-frame detail-chart"></div>

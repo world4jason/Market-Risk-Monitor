@@ -38,6 +38,8 @@ class FakeElement {
     this.metricCards = [];
     this.open = false;
     this.disabled = false;
+    this.focused = false;
+    this.isConnected = true;
   }
   addEventListener(type, handler) {
     if (!this.listeners.has(type)) this.listeners.set(type, []);
@@ -48,9 +50,21 @@ class FakeElement {
     this.listeners.set(type, current.filter((item) => item !== handler));
   }
   dispatch(type, event = {}) {
+    const dispatched = {
+      defaultPrevented: false,
+      preventDefault() {
+        this.defaultPrevented = true;
+      },
+      ...event,
+      currentTarget: this,
+    };
     for (const handler of this.listeners.get(type) || []) {
-      handler({ ...event, currentTarget: this });
+      handler(dispatched);
     }
+    return dispatched;
+  }
+  focus() {
+    this.focused = true;
   }
   querySelectorAll(selector) {
     if (selector === ".metric-card") return this.metricCards;
@@ -109,6 +123,9 @@ globalThis.__MRM__ = {
   renderTrendParticipation,
   renderTaiwanEvents,
   updateGlobalFreshness,
+  setupDialogFocusManagement,
+  openMetric,
+  fullChart,
   loadData,
   setOpenMetricForTest(fn) { openMetric = fn; },
   setRenderStubsForTest(stubs) {
@@ -421,16 +438,21 @@ test("metric cards open from click, Enter, and Space at interaction level", () =
   runtime.api.renderMetrics();
 
   card.dispatch("click");
-  card.dispatch("keydown", { key: "Enter" });
-  card.dispatch("keydown", { key: " " });
-  card.dispatch("keydown", { key: "Escape" });
+  const enter = card.dispatch("keydown", { key: "Enter" });
+  const space = card.dispatch("keydown", { key: " " });
+  const escape = card.dispatch("keydown", { key: "Escape" });
 
   assert.deepEqual(opened, [
     "fixture-index",
     "fixture-index",
     "fixture-index",
   ]);
+  assert.equal(enter.defaultPrevented, true);
+  assert.equal(space.defaultPrevented, true);
+  assert.equal(escape.defaultPrevented, false);
+  assert.match(grid.innerHTML, /role="button"/);
   assert.match(grid.innerHTML, /tabindex="0"/);
+  assert.match(grid.innerHTML, /aria-label="Open fixture-index details and history"/);
 });
 test("overview executes partial-stress and positive-YoY rollover semantics", () => {
   const runtime = buildRuntime();
@@ -513,4 +535,49 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
     runtime.dom.byId.get("overview-leverage-note").textContent,
     /not described as falling/,
   );
+});
+
+test("metric dialog moves focus to close and returns it to the invoker", async () => {
+  const runtime = buildRuntime();
+  const dialog = runtime.dom.register("metric-dialog");
+  const close = runtime.dom.register("dialog-close");
+  runtime.dom.register("dialog-pillar");
+  runtime.dom.register("dialog-title");
+  runtime.dom.register("dialog-summary");
+  runtime.dom.register("dialog-chart");
+  runtime.dom.register("dialog-source");
+
+  const invoker = new FakeElement("metric-card-invoker");
+  const summary = summaryMetric({ id: "fixture-dialog", pillar: "market" });
+  runtime.api.state.metrics.set(
+    "fixture-dialog",
+    fullMetricFromSummary(summary, [10, 11, 12, 13, 14]),
+  );
+
+  runtime.api.setupDialogFocusManagement();
+  await runtime.api.openMetric("fixture-dialog", invoker);
+
+  assert.equal(dialog.open, true);
+  assert.equal(close.focused, true);
+  assert.equal(invoker.focused, false);
+
+  dialog.dispatch("close");
+  assert.equal(invoker.focused, true);
+});
+
+test("full history chart exposes a non-visual key-value summary", () => {
+  const runtime = buildRuntime();
+  const chart = runtime.dom.register("history-chart");
+  const metric = fullMetricFromSummary(
+    summaryMetric({ id: "fixture-history", pillar: "market", units: "index" }),
+    [10, 12, 11, 14, 13],
+  );
+
+  runtime.api.fullChart(metric, chart);
+
+  assert.match(chart.innerHTML, /class="sr-only"/);
+  assert.match(chart.innerHTML, /aria-describedby="history-chart-a11y-summary"/);
+  assert.match(chart.innerHTML, /5 observations from 2026-01-01 to 2026-01-05/);
+  assert.match(chart.innerHTML, /Latest 2026-01-05: 13/);
+  assert.match(chart.innerHTML, /Range 10 to 14/);
 });

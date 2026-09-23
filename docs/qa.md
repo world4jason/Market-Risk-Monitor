@@ -104,6 +104,42 @@ Derived history declares input lineage and formula/version.
 
 Point-in-time percentile and signal-history logic use only observations that are historically available at the evaluation point. Signal backfill additionally applies the configured publication lag.
 
+## Accessibility interaction expectations
+
+The public dashboard targets WCAG 2.2 AA interaction behavior where applicable:
+
+- **2.1.1 Keyboard** — interactive metric cards, buttons, selects, disclosure
+  controls, and the metric dialog are operable without a pointer.
+- **2.4.7 Focus Visible** and **2.4.11 Focus Not Obscured (Minimum)** — keyboard
+  focus uses an explicit high-contrast outline and the modal keeps the focused
+  close control visible.
+- **1.4.1 Use of Color** — freshness and signal state remain available as text
+  (`fresh`, `stale`, `error`, `active`, `unknown`) rather than color alone.
+- **2.5.3 Label in Name** and **4.1.2 Name, Role, Value** — custom metric-card
+  controls expose button role, accessible name, and keyboard activation;
+  dialog/select/toggle controls retain programmatic labels.
+- Chart SVGs have meaningful names and are paired with visually-hidden text
+  summaries containing key coverage dates and values so the plotted line is not
+  the only way to obtain the information.
+
+Keyboard-only verification for the core path:
+
+1. Tab to a metric card and confirm a visible focus indicator.
+2. Open with Enter, close with Escape, and confirm focus returns to that card.
+3. Re-open with Space and confirm the page does not scroll/double-activate.
+4. Tab through Reload, theme, history selects, disclosure summary, and source
+   links; every control must retain a visible focus indicator.
+5. In the metric dialog, confirm the Close control receives focus immediately.
+6. At desktop and 390px widths, confirm focused controls are not hidden or
+   clipped by the viewport.
+
+Relevant W3C understanding references:
+- https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html
+- https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html
+- https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html
+- https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html
+- https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html
+
 ## Manual release checklist
 
 The release command itself is in [release.md](./release.md). It is not
