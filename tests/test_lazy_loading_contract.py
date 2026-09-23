@@ -84,6 +84,45 @@ class LazyLoadingContractTests(unittest.TestCase):
         self.assertNotIn("entry.path", load_data)
         self.assertNotIn("Promise.all(\n      entries.map", load_data)
 
+    def test_initial_path_fetches_only_first_view_artifacts(self) -> None:
+        load_data = extract_function(self.app, "loadData")
+        for required in (
+            "CATALOG_URL",
+            "OVERVIEW_URL",
+            "SIGNALS_URL",
+            "REFRESH_REPORT_URL",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, load_data)
+
+        for deferred in (
+            "EVENTS_URL",
+            "MA_BREADTH_CONFIG_URL",
+            "MA_BREADTH_STUDY_URL",
+            "TAIWAN_MACRO_REGIME_URL",
+            "TAIWAN_EVENTS_URL",
+            "TAIWAN_CBC_RATE_REGIME_URL",
+            "FED_RATE_REGIME_URL",
+        ):
+            with self.subTest(deferred=deferred):
+                self.assertNotIn(deferred, load_data)
+
+        self.assertIn("setupDeferredContextLoading()", load_data)
+
+    def test_deferred_context_is_loaded_by_section_not_first_paint(self) -> None:
+        setup = extract_function(self.app, "setupDeferredContextLoading")
+        ensure = extract_function(self.app, "ensureDeferredContext")
+
+        self.assertIn('#trend-participation-section', setup)
+        self.assertIn('#taiwan-detail', setup)
+        self.assertIn('#signals-detail', setup)
+        self.assertIn('#research', setup)
+        self.assertIn('kind === "trend"', ensure)
+        self.assertIn('kind === "taiwan"', ensure)
+        self.assertIn('kind === "events"', ensure)
+        self.assertIn("state.deferredLoads.has(kind)", ensure)
+        self.assertIn("state.deferredLoaded.has(kind)", ensure)
+
     def test_full_metric_loader_is_single_flight_and_session_cached(self) -> None:
         loader = extract_function(self.app, "ensureMetricLoaded")
         self.assertIn("Array.isArray(existing?.observations)", loader)
