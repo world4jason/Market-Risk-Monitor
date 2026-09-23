@@ -8,7 +8,7 @@ from pipeline.taiwan_macro import (
     monitoring_light,
     parse_taiwan_macro_csv,
 )
-from pipeline.validate import validate_metric
+from pipeline.validate import validate_metric, validate_taiwan_macro_regime
 
 
 CONFIG = {
@@ -123,6 +123,7 @@ class TaiwanMacroTests(unittest.TestCase):
             "tw_ndc_leading_index",
             regime["methodology"]["revision_prone_inputs"],
         )
+        validate_taiwan_macro_regime(regime)
 
     def test_cier_first_ingest_retains_release_date_without_fake_arrivals(self):
         months = [

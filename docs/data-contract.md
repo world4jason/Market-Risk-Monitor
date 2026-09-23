@@ -168,7 +168,10 @@ NDC leading/coincident/lagging/monitoring families are therefore
 `availability_basis: unknown` and non-PIT until the repository preserves
 vintages such as `(reference_date, release_date/vintage, value)`. Keeping only
 the newest revised row and attaching a release date must never be treated as a
-canonical PIT history.
+canonical PIT history. The derived Taiwan macro regime likewise labels its
+history `retrospective_current_vintage` with
+`historical_point_in_time: false`; its current state remains usable as a
+current-vintage interpretation.
 
 ### Relationship to baselines
 

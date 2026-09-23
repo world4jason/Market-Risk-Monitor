@@ -677,6 +677,30 @@ def validate_taiwan_macro_regime(payload: dict) -> None:
     if not isinstance(history, list):
         raise ValidationError("taiwan-macro-regime: history must be a list")
 
+    methodology = payload.get("methodology") or {}
+    historical_pit = methodology.get("historical_point_in_time")
+    if historical_pit not in {True, False}:
+        raise ValidationError(
+            "taiwan-macro-regime: historical_point_in_time must be boolean"
+        )
+    history_semantics = methodology.get("history_semantics")
+    if history_semantics not in {
+        "point_in_time",
+        "retrospective_current_vintage",
+    }:
+        raise ValidationError(
+            "taiwan-macro-regime: invalid history_semantics"
+        )
+    revision_prone = methodology.get("revision_prone_inputs")
+    if not isinstance(revision_prone, list):
+        raise ValidationError(
+            "taiwan-macro-regime: revision_prone_inputs must be a list"
+        )
+    if revision_prone and historical_pit is not False:
+        raise ValidationError(
+            "taiwan-macro-regime: revision-prone history cannot be PIT without vintages"
+        )
+
     allowed = {
         "expansion",
         "deceleration",
