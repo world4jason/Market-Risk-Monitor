@@ -1,6 +1,29 @@
 {
   "schema_version": "1.0.0",
   "name": "Fed Policy Rate Regime",
+  "provenance": {
+    "contract_version": "1.0.0",
+    "methodology": {
+      "id": "policy-rate-regime",
+      "version": "rate-regime-v1"
+    },
+    "config": {
+      "id": "data/config/rates.json",
+      "content_digest": "sha256:13bc364c64ff13e573161a7216313d053adfa4c8dfd6c460d68c9b56716f3ebf"
+    },
+    "required_inputs": [
+      "us_fed_policy_rate"
+    ],
+    "inputs": [
+      {
+        "id": "us_fed_policy_rate",
+        "as_of": "2026-09-17",
+        "snapshot_at": "2026-09-22T10:54:31.364172Z",
+        "content_digest": "sha256:23ca04ee7dc998f8948e80040b17d7f86fbf065ec9bef9f0204c2a6e6953cf21"
+      }
+    ],
+    "generated_at": "2026-09-22T10:54:31.364172Z"
+  },
   "current": {
     "date": "2026-09-17",
     "rate": 4.0,

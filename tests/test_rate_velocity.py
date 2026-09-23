@@ -1,3 +1,4 @@
+import copy
 import json
 import unittest
 from datetime import datetime, timezone
@@ -10,7 +11,7 @@ from pipeline.rate_velocity import (
     rate_regime,
     rate_velocity_rows,
 )
-from pipeline.validate import validate_metric
+from pipeline.validate import validate_metric, validate_rate_regime
 
 
 CONFIG = {
@@ -107,6 +108,19 @@ class RateVelocityTests(unittest.TestCase):
         self.assertEqual(
             artifact["current"]["regime"],
             "aggressive_tightening",
+        )
+        validate_rate_regime(artifact)
+        self.assertEqual(
+            artifact["provenance"]["methodology"]["id"],
+            "policy-rate-regime",
+        )
+        self.assertEqual(
+            artifact,
+            build_rate_regime_artifact(
+                copy.deepcopy(rows),
+                copy.deepcopy(CONFIG),
+                name="Fed Policy Rate Regime",
+            ),
         )
 
 

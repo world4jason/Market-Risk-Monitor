@@ -100,7 +100,10 @@ Fixtures are explicitly tagged `environment: fixture`.
 
 ## Historical reproducibility
 
-Derived history declares input lineage and formula/version.
+Derived history declares input lineage and formula/version. Aggregate derived
+artifacts also carry and validate the [derived provenance contract](./derived-provenance.md):
+methodology version, config digest, required/actual input manifests, snapshot
+metadata, and input content digests.
 
 Point-in-time percentile and signal-history logic use only observations that are historically available at the evaluation point. Signal backfill follows the canonical `source.availability_basis` / `observations[].release_date` contract; an operational expected lag never upgrades unknown historical availability into PIT data.
 

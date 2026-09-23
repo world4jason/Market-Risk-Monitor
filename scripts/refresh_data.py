@@ -551,6 +551,7 @@ def refresh_cbc_rate_file(
             rate_rows,
             config,
             name="Taiwan CBC Rate Regime",
+            input_metrics=[metrics["tw_cbc_rate"]],
         ),
     )
     return report
@@ -595,6 +596,7 @@ def maybe_build_fed_rate_outputs(output_dir: Path) -> list[dict]:
             rate_rows,
             config,
             name="Fed Policy Rate Regime",
+            input_metrics=[metrics["us_fed_policy_rate"]],
         ),
     )
     return report

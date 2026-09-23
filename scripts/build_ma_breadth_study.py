@@ -48,10 +48,15 @@ def main() -> None:
         )
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    try:
+        config_id = args.config.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        config_id = str(args.config.resolve())
     study = build_event_study(
         load_metric(breadth_path),
         load_metric(price_path),
         config,
+        config_id=config_id,
     )
     atomic_json(args.output_dir / "ma-breadth-event-study.json", study)
 

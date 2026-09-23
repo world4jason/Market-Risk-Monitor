@@ -7,6 +7,8 @@ from calendar import monthrange
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from .provenance import build_provenance, metric_input, records_input
+
 
 class RateVelocityError(ValueError):
     pass
@@ -330,15 +332,42 @@ def build_rate_regime_artifact(
     config: dict,
     *,
     name: str,
+    input_metrics: list[dict] | None = None,
+    config_id: str = "data/config/rates.json",
 ) -> dict:
     rows = rate_velocity_rows(rate_rows)
     history = [
         {**row, "regime": rate_regime(row, config)}
         for row in rows
     ]
+
+    if input_metrics:
+        provenance_inputs = [
+            metric_input(metric)
+            for metric in input_metrics
+        ]
+    else:
+        latest_date = rate_rows[-1]["date"] if rate_rows else None
+        provenance_inputs = [
+            records_input(
+                "rate_rows",
+                rate_rows,
+                as_of=latest_date,
+                snapshot_at=latest_date,
+            )
+        ]
+
+    provenance = build_provenance(
+        methodology_id="policy-rate-regime",
+        methodology_version="rate-regime-v1",
+        config_id=config_id,
+        config=config,
+        inputs=provenance_inputs,
+    )
     return {
         "schema_version": "1.0.0",
         "name": name,
+        "provenance": provenance,
         "current": history[-1] if history else None,
         "history": history,
     }

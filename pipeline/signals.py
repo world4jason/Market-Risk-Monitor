@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 from typing import Iterable
 
 from .methodology import observation_availability_date, percentile_rank
+from .provenance import build_provenance, metric_input
 
 
 class SignalError(ValueError):
@@ -332,8 +333,21 @@ def build_signal_snapshot(
     metrics: dict[str, dict],
     config: dict,
     evaluated_at: datetime | None = None,
+    *,
+    config_id: str = "data/config/signals.json",
 ) -> dict:
-    evaluated_at = evaluated_at or datetime.now(timezone.utc)
+    if evaluated_at is None:
+        snapshots = [
+            metric_input(metric).get("snapshot_at")
+            for metric in metrics.values()
+        ]
+        snapshots = [value for value in snapshots if value]
+        if snapshots:
+            evaluated_at = datetime.fromisoformat(
+                max(snapshots).replace("Z", "+00:00")
+            )
+        else:
+            evaluated_at = datetime(1970, 1, 1, tzinfo=timezone.utc)
     evaluation_date = evaluated_at.date()
 
     current_conditions = [
@@ -350,8 +364,34 @@ def build_signal_snapshot(
     start = _parse_date(config.get("history_start", "1997-01-31"))
     history = _monthly_history(metrics, config, start, _month_end(evaluation_date))
 
+    required_inputs = sorted(
+        {
+            metric_id
+            for condition in config["conditions"]
+            for metric_id in referenced_metrics(condition["rules"])
+        }
+    )
+    present_inputs = [
+        metric_id
+        for metric_id in required_inputs
+        if metric_id in metrics
+    ]
+    provenance = build_provenance(
+        methodology_id="deleveraging-watch",
+        methodology_version="signals-v2",
+        config_id=config_id,
+        config=config,
+        inputs=[
+            metric_input(metrics[metric_id])
+            for metric_id in present_inputs
+        ],
+        required_input_ids=required_inputs,
+        generated_at=evaluated_at,
+    )
+
     return {
         "schema_version": "1.0.0",
+        "provenance": provenance,
         "name": config.get("name", "Deleveraging Watch"),
         "description": config.get("description", ""),
         "generated_at": evaluated_at.isoformat().replace("+00:00", "Z"),

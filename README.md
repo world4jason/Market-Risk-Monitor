@@ -23,6 +23,7 @@ This project intentionally avoids hidden BUY / SELL logic. Current values are pa
 See:
 - `docs/architecture.md`
 - `docs/data-contract.md`
+- `docs/derived-provenance.md`
 - `docs/data-sources.md`
 - `docs/methodology.md`
 - `docs/signals.md`

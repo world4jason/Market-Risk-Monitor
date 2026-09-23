@@ -1,3 +1,4 @@
+import copy
 import json
 import unittest
 
@@ -108,6 +109,13 @@ class TaiwanMacroTests(unittest.TestCase):
             validate_metric(metric)
 
         regime = build_macro_regime(rows, CONFIG)
+        self.assertEqual(
+            regime,
+            build_macro_regime(
+                copy.deepcopy(rows),
+                copy.deepcopy(CONFIG),
+            ),
+        )
         current = regime["current"]
         self.assertEqual(current["date"], "2026-07-01")
         self.assertEqual(current["ndc_monitoring_light"], "red")

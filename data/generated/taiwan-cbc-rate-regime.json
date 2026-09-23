@@ -1,6 +1,29 @@
 {
   "schema_version": "1.0.0",
   "name": "Taiwan CBC Rate Regime",
+  "provenance": {
+    "contract_version": "1.0.0",
+    "methodology": {
+      "id": "policy-rate-regime",
+      "version": "rate-regime-v1"
+    },
+    "config": {
+      "id": "data/config/rates.json",
+      "content_digest": "sha256:13bc364c64ff13e573161a7216313d053adfa4c8dfd6c460d68c9b56716f3ebf"
+    },
+    "required_inputs": [
+      "tw_cbc_rate"
+    ],
+    "inputs": [
+      {
+        "id": "tw_cbc_rate",
+        "as_of": "2024-03-22",
+        "snapshot_at": "2026-09-22T10:54:31.193425Z",
+        "content_digest": "sha256:1c0a8c71f4793a816618601f94128ce1f9515ec874e9b704fbdefd96c96f9ac1"
+      }
+    ],
+    "generated_at": "2026-09-22T10:54:31.193425Z"
+  },
   "current": {
     "date": "2024-03-22",
     "rate": 2.0,
