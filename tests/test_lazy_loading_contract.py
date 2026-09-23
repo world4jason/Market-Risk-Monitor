@@ -108,6 +108,7 @@ class LazyLoadingContractTests(unittest.TestCase):
                 self.assertNotIn(deferred, load_data)
 
         self.assertIn("setupDeferredContextLoading()", load_data)
+        self.assertEqual(load_data.count("fetch("), 4)
 
     def test_deferred_context_is_loaded_by_section_not_first_paint(self) -> None:
         setup = extract_function(self.app, "setupDeferredContextLoading")
