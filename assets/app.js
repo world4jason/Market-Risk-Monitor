@@ -15,6 +15,8 @@ const state = {
   catalog: null,
   metrics: new Map(),
   metricLoads: new Map(),
+  deferredLoads: new Map(),
+  deferredLoaded: new Set(),
   events: [],
   signals: null,
   refreshReport: null,
@@ -1582,7 +1584,10 @@ function renderHistorySelector() {
 async function renderHistory(id, mode = "absolute") {
   let metric;
   try {
-    metric = await ensureMetricLoaded(id);
+    [metric] = await Promise.all([
+      ensureMetricLoaded(id),
+      ensureDeferredContext("events"),
+    ]);
   } catch (error) {
     console.warn("history load failed", id, error);
     $("#history-chart").innerHTML =
@@ -1787,7 +1792,10 @@ function renderTaiwanEventSelector() {
       return;
     }
     try {
-      const metric = await ensureMetricLoaded(select.value);
+      const [metric] = await Promise.all([
+        ensureMetricLoaded(select.value),
+        ensureDeferredContext("taiwan"),
+      ]);
       renderTaiwanEvents(metric, mode.value);
     } catch (error) {
       console.warn("Taiwan history load failed", select.value, error);
@@ -2339,23 +2347,111 @@ function initTheme() {
     );
 }
 
+
+async function fetchDeferredJson(url) {
+  try {
+    const response = await fetch(url);
+    return response.ok ? await response.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+async function ensureDeferredContext(kind) {
+  if (state.deferredLoaded.has(kind)) return;
+  if (state.deferredLoads.has(kind)) return state.deferredLoads.get(kind);
+
+  const promise = (async () => {
+    if (kind === "events") {
+      const payload = await fetchDeferredJson(EVENTS_URL);
+      state.events = payload?.events || [];
+    } else if (kind === "trend") {
+      const [config, study] = await Promise.all([
+        fetchDeferredJson(MA_BREADTH_CONFIG_URL),
+        fetchDeferredJson(MA_BREADTH_STUDY_URL),
+      ]);
+      state.maBreadthConfig = config;
+      state.maBreadthStudy = study;
+    } else if (kind === "taiwan") {
+      const [macro, taiwanEvents, cbcRate, fedRate] = await Promise.all([
+        fetchDeferredJson(TAIWAN_MACRO_REGIME_URL),
+        fetchDeferredJson(TAIWAN_EVENTS_URL),
+        fetchDeferredJson(TAIWAN_CBC_RATE_REGIME_URL),
+        fetchDeferredJson(FED_RATE_REGIME_URL),
+      ]);
+      state.taiwanMacroRegime = macro;
+      state.taiwanEvents = taiwanEvents?.events || [];
+      state.taiwanCbcRateRegime = cbcRate;
+      state.fedRateRegime = fedRate;
+    }
+    state.deferredLoaded.add(kind);
+  })();
+
+  state.deferredLoads.set(kind, promise);
+  try {
+    return await promise;
+  } finally {
+    state.deferredLoads.delete(kind);
+  }
+}
+
+function observeSectionOnce(selector, onVisible) {
+  const element = $(selector);
+  if (!element) return;
+
+  if (!("IntersectionObserver" in window)) {
+    element.addEventListener("pointerenter", onVisible, { once: true });
+    element.addEventListener("focusin", onVisible, { once: true });
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      onVisible();
+    },
+    { rootMargin: "200px 0px" },
+  );
+  observer.observe(element);
+}
+
+function setupDeferredContextLoading() {
+  observeSectionOnce("#trend-participation-section", async () => {
+    await ensureDeferredContext("trend");
+    renderTrendParticipation();
+  });
+  observeSectionOnce("#taiwan-detail", async () => {
+    await ensureDeferredContext("taiwan");
+    renderTaiwanMarket();
+  });
+  observeSectionOnce("#signals-detail", async () => {
+    await ensureDeferredContext("events");
+    renderSignals();
+  });
+  observeSectionOnce("#research", () => ensureDeferredContext("events"));
+}
+
+
 async function loadData() {
   state.metrics.clear();
   state.metricLoads.clear();
+  state.deferredLoads.clear();
+  state.deferredLoaded.clear();
+  state.events = [];
+  state.maBreadthConfig = null;
+  state.maBreadthStudy = null;
+  state.taiwanMacroRegime = null;
+  state.taiwanEvents = [];
+  state.taiwanCbcRateRegime = null;
+  state.fedRateRegime = null;
 
   try {
-    const [catalogResp, overviewResp, eventsResp, signalsResp, refreshResp, maConfigResp, maStudyResp, twMacroResp, twEventsResp, twCbcRateResp, fedRateResp] = await Promise.all([
+    const [catalogResp, overviewResp, signalsResp, refreshResp] = await Promise.all([
       fetch(CATALOG_URL, { cache: "no-store" }),
       fetch(OVERVIEW_URL, { cache: "no-store" }),
-      fetch(EVENTS_URL),
       fetch(SIGNALS_URL, { cache: "no-store" }).catch(() => null),
       fetch(REFRESH_REPORT_URL, { cache: "no-store" }).catch(() => null),
-      fetch(MA_BREADTH_CONFIG_URL).catch(() => null),
-      fetch(MA_BREADTH_STUDY_URL).catch(() => null),
-      fetch(TAIWAN_MACRO_REGIME_URL).catch(() => null),
-      fetch(TAIWAN_EVENTS_URL).catch(() => null),
-      fetch(TAIWAN_CBC_RATE_REGIME_URL).catch(() => null),
-      fetch(FED_RATE_REGIME_URL).catch(() => null),
     ]);
     if (!catalogResp.ok) throw new Error(`catalog HTTP ${catalogResp.status}`);
     if (!overviewResp.ok) throw new Error(`overview HTTP ${overviewResp.status}`);
@@ -2366,17 +2462,8 @@ async function loadData() {
       state.metrics.set(metric.metric.id, metric);
     }
 
-    state.events = eventsResp.ok
-      ? (await eventsResp.json()).events || []
-      : [];
     state.signals = signalsResp?.ok ? await signalsResp.json() : null;
     state.refreshReport = refreshResp?.ok ? await refreshResp.json() : null;
-    state.maBreadthConfig = maConfigResp?.ok ? await maConfigResp.json() : null;
-    state.maBreadthStudy = maStudyResp?.ok ? await maStudyResp.json() : null;
-    state.taiwanMacroRegime = twMacroResp?.ok ? await twMacroResp.json() : null;
-    state.taiwanEvents = twEventsResp?.ok ? (await twEventsResp.json()).events || [] : [];
-    state.taiwanCbcRateRegime = twCbcRateResp?.ok ? await twCbcRateResp.json() : null;
-    state.fedRateRegime = fedRateResp?.ok ? await fedRateResp.json() : null;
     state.refreshErrors.clear();
     for (const result of state.refreshReport?.results || []) {
       if (result.status === "error" && result.metric) {
@@ -2401,6 +2488,7 @@ async function loadData() {
   renderRegime();
   renderCoverage();
   updateGlobalFreshness();
+  setupDeferredContextLoading();
 }
 
 initTheme();
