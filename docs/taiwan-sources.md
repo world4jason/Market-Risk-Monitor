@@ -133,9 +133,26 @@ simultaneously available rather than as twelve historical arrivals.
 
 For repeated observations:
 
-- unchanged values keep their earliest verified release date;
-- a revised value takes the newer verification/release date;
+- ingestion is forward-only by verification/release date; an older replay is
+  rejected even when its numeric value matches the current vintage;
+- an unchanged value observed again at the same or a later date keeps the
+  current vintage's stored release date;
+- a revised value is accepted only when its verification/release date is
+  strictly newer than the stored vintage; same-date conflicting values are
+  rejected rather than allowed to make canonical history ambiguous;
 - months that roll off the source page remain in the accumulated local history.
+
+The bootstrap also requires at least 12 contiguous monthly rows from the
+official rolling table. A syntactically valid but shortened/gapped response is
+therefore treated as a source-shape failure instead of silently publishing a
+partial window.
+
+For live fetches, the bootstrap uses the current UTC date as the verification
+date unless `--observed-at` is supplied. For `--page-file`, `--observed-at` is
+**required** and must be the date that saved page was actually fetched or
+verified public. A saved HTML file never inherits today's date implicitly;
+this prevents replaying an old page from silently manufacturing a newer
+vintage.
 
 Run:
 

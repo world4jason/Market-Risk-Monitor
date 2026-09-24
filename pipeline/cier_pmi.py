@@ -19,6 +19,7 @@ UNIT = "index"
 # outside it has read the wrong column, not an extreme reading.
 PMI_MIN = 0.0
 PMI_MAX = 100.0
+EXPECTED_ROLLING_WINDOW_MONTHS = 12
 
 _MONTH_PATTERN = re.compile(r"^(\d{4})/(\d{1,2})$")
 # The page uses the full-width percent sign; be tolerant of the ASCII one too.
@@ -99,6 +100,25 @@ def _select_pmi_table(tables: list[list[list[str]]]) -> tuple[list[str], list[li
         f"no CIER PMI table found: expected header columns "
         f"{MONTH_COLUMN!r} and {HEADLINE_COLUMN!r}"
     )
+
+
+def _next_month_start(obs_date: str) -> str:
+    current = date.fromisoformat(obs_date)
+    if current.month == 12:
+        return date(current.year + 1, 1, 1).isoformat()
+    return date(current.year, current.month + 1, 1).isoformat()
+
+
+def validate_rolling_window(
+    rows: list[dict],
+    *,
+    min_months: int = EXPECTED_ROLLING_WINDOW_MONTHS,
+) -> None:
+    if len(rows) < min_months:
+        raise CierPmiError(
+            f"CIER PMI rolling window has {len(rows)} months; "
+            f"expected at least {min_months}"
+        )
 
 
 def parse_cier_pmi_html(text: str) -> list[dict]:
@@ -188,6 +208,14 @@ def parse_cier_pmi_html(text: str) -> list[dict]:
 
     # The page lists newest first; downstream contracts require ascending.
     rows.sort(key=lambda row: row["date"])
+    for previous, current in zip(rows, rows[1:]):
+        expected = _next_month_start(previous["date"])
+        if current["date"] != expected:
+            raise CierPmiError(
+                "CIER PMI table months are not contiguous: "
+                f"expected {expected} after {previous['date']}, "
+                f"got {current['date']}"
+            )
     return rows
 
 
@@ -241,13 +269,14 @@ def merge_macro_rows(
     The official table only exposes the last 12 months, so coverage is built
     by merging successive observations rather than by backfilling.
 
-    When a month is seen again with the same value, the *earliest* release
-    date wins: that is the tightest defensible upper bound on when the value
-    was publicly available, and re-observing it later does not make it newer.
+    Ingestion is forward-only by verified release date. An incoming vintage
+    older than the currently stored vintage is rejected even if its numeric
+    value happens to match the current value; this prevents a value reversion
+    chain from being rolled back by replaying an older snapshot.
 
-    When the value has changed, the month has been revised. The revised figure
-    demonstrably was not available at the earlier date, so it takes the newer
-    release date with it.
+    Re-observing the current value at the same or a later verification date
+    keeps the stored release date. A changed value is accepted only at a
+    strictly newer verification date and then becomes the new current vintage.
     """
     merged: dict[tuple[str, str], dict] = {
         (row["series_id"], row["date"]): dict(row) for row in existing
@@ -259,15 +288,31 @@ def merge_macro_rows(
         if previous is None:
             merged[key] = dict(row)
             continue
+        previous_release = date.fromisoformat(previous["release_date"])
+        incoming_release = date.fromisoformat(row["release_date"])
+        if incoming_release < previous_release:
+            raise CierPmiError(
+                "out-of-order CIER observation for "
+                f"{row['date']}: stored vintage verified "
+                f"{previous['release_date']}, incoming vintage verified "
+                f"{row['release_date']}"
+            )
+
         if float(previous["value"]) == float(row["value"]):
+            # Forward re-observation of an unchanged value does not move its
+            # verified availability date. Equal-date replay is idempotent.
             merged[key] = {
                 **dict(row),
-                "release_date": min(
-                    previous["release_date"],
-                    row["release_date"],
-                ),
+                "release_date": previous["release_date"],
             }
         else:
+            if incoming_release == previous_release:
+                raise CierPmiError(
+                    "same-date conflicting CIER revision for "
+                    f"{row['date']}: existing value {previous['value']} "
+                    f"and incoming value {row['value']} both claim "
+                    f"{row['release_date']}"
+                )
             merged[key] = dict(row)
 
     return [merged[key] for key in sorted(merged, key=lambda k: (k[0], k[1]))]

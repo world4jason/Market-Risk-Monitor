@@ -335,27 +335,36 @@ def build_rate_regime_artifact(
     input_metrics: list[dict] | None = None,
     config_id: str = "data/config/rates.json",
 ) -> dict:
-    rows = rate_velocity_rows(rate_rows)
+    normalized_rate_rows = sorted(
+        (
+            {"date": row["date"], "value": float(row["value"])}
+            for row in rate_rows
+        ),
+        key=lambda row: row["date"],
+    )
+    rows = rate_velocity_rows(normalized_rate_rows)
     history = [
         {**row, "regime": rate_regime(row, config)}
         for row in rows
     ]
 
-    if input_metrics:
-        provenance_inputs = [
-            metric_input(metric)
-            for metric in input_metrics
-        ]
-    else:
-        latest_date = rate_rows[-1]["date"] if rate_rows else None
-        provenance_inputs = [
-            records_input(
-                "rate_rows",
-                rate_rows,
-                as_of=latest_date,
-                snapshot_at=latest_date,
-            )
-        ]
+    latest_date = (
+        normalized_rate_rows[-1]["date"]
+        if normalized_rate_rows
+        else None
+    )
+    provenance_inputs = [
+        records_input(
+            "rate_rows",
+            normalized_rate_rows,
+            as_of=latest_date,
+            snapshot_at=None,
+        )
+    ]
+    provenance_inputs.extend(
+        metric_input(metric)
+        for metric in (input_metrics or [])
+    )
 
     provenance = build_provenance(
         methodology_id="policy-rate-regime",
@@ -363,6 +372,8 @@ def build_rate_regime_artifact(
         config_id=config_id,
         config=config,
         inputs=provenance_inputs,
+        required_input_ids=["rate_rows"],
+        parameters={"name": name},
     )
     return {
         "schema_version": "1.0.0",

@@ -121,6 +121,7 @@ globalThis.__MRM__ = {
   historyView,
   taiwanBreadthState,
   marginMomentumEvidence,
+  formatRuleDetail,
   renderOverview,
   renderMetrics,
   renderTrendParticipation,
@@ -309,6 +310,49 @@ test("unit-aware values, deltas, and frequency windows are executable", () => {
     });
     assert.equal(api.defaultRollingWindow(metric), item.expected);
   }
+});
+
+test("missing signal evidence never renders as numeric zero", () => {
+  const { api } = buildRuntime();
+  const missing = api.formatRuleDetail({
+    label: "Missing breadth",
+    status: "unknown",
+    value: null,
+    reason: "metric missing",
+  });
+  assert.match(missing, /Missing breadth: unknown/);
+  assert.doesNotMatch(missing, /observed 0\.00/);
+
+  for (const malformed of ["", "   ", "0", false]) {
+    const rendered = api.formatRuleDetail({
+      label: "Malformed",
+      status: "unknown",
+      value: malformed,
+      reason: "fixture",
+    });
+    assert.doesNotMatch(rendered, /observed 0\.00/);
+  }
+
+  const actualZero = api.formatRuleDetail({
+    label: "Real zero",
+    status: "inactive",
+    value: 0,
+    reason: "fixture",
+  });
+  assert.match(actualZero, /observed 0\.00/);
+
+  assert.equal(
+    api.marginMomentumEvidence({
+      rules: {
+        type: "delta_periods_below",
+        metric: "finra_margin_debt_yoy_pct",
+        status: "active",
+        value: "-12.5",
+        periods: 3,
+      },
+    }),
+    null,
+  );
 });
 
 test("Taiwan breadth state machine executes the production classifier", () => {

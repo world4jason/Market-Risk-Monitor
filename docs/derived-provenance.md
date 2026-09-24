@@ -50,6 +50,11 @@ Every covered artifact carries a top-level `provenance` object:
 `build_revision` may be added as supporting provenance, but it is optional and
 never replaces methodology/config/input provenance.
 
+`parameters` may record deterministic builder arguments that affect the
+artifact but are not part of the referenced config file or consumed inputs.
+For example, policy-rate regime artifacts record their top-level display name
+there, so changing that argument also changes the provenance manifest.
+
 ## Deterministic digests
 
 All digests are SHA-256 over canonical JSON:
@@ -110,6 +115,11 @@ Each actual input records:
 
 At least one of `as_of` or `snapshot_at` must be present.
 
+`as_of` and `snapshot_at` are not interchangeable. If a source/input has a
+known effective/reference date but no defensible verification timestamp,
+record the date in `as_of` and leave `snapshot_at` null. Do not copy an
+effective date into `snapshot_at` merely to make the field non-null.
+
 ## Generated time and determinism
 
 Derived builders must not use wall-clock time when the same committed inputs
@@ -121,8 +131,9 @@ condition semantics are evaluation-date dependent; if omitted, it derives that
 time only from the input metrics referenced by its configured rules. Unrelated
 artifacts in the same output directory cannot move the signal evaluation time.
 
-Therefore, rebuilding the same committed fixtures with the same methodology and
-config produces byte-equivalent logical output, including provenance.
+Therefore, rebuilding the same committed fixtures with the same methodology,
+config, and declared builder parameters produces byte-equivalent logical output,
+including provenance.
 
 ## Covered artifacts
 

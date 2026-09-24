@@ -12,8 +12,7 @@
       "content_digest": "sha256:13bc364c64ff13e573161a7216313d053adfa4c8dfd6c460d68c9b56716f3ebf"
     },
     "required_inputs": [
-      "fed_target_legacy",
-      "fed_target_upper"
+      "rate_rows"
     ],
     "inputs": [
       {
@@ -27,9 +26,18 @@
         "as_of": "2026-09-21",
         "snapshot_at": "2026-09-22T10:54:24.252339Z",
         "content_digest": "sha256:0d282218bd1270b9abdb6f56ab2f44712874596dbbdac548777022fadbdaa026"
+      },
+      {
+        "id": "rate_rows",
+        "as_of": "2026-09-17",
+        "snapshot_at": null,
+        "content_digest": "sha256:6e8de4d67b1ffd3d61ee092317a72bd20f9456de748055d1fa19a326732f5ab6"
       }
     ],
-    "generated_at": "2026-09-22T10:54:24.252339Z"
+    "generated_at": "2026-09-22T10:54:24.252339Z",
+    "parameters": {
+      "name": "Fed Policy Rate Regime"
+    }
   },
   "current": {
     "date": "2026-09-17",

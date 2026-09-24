@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 from pipeline.provenance import (
@@ -203,6 +204,32 @@ class ProvenanceTests(unittest.TestCase):
             context="fixture.provenance",
         )
 
+    def test_builder_parameters_change_the_manifest(self) -> None:
+        base_input = records_input(
+            "fixture",
+            [{"date": "2026-01-01", "value": 1}],
+            as_of="2026-01-01",
+            snapshot_at=None,
+        )
+        first = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[base_input],
+            parameters={"name": "A"},
+        )
+        second = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[base_input],
+            parameters={"name": "B"},
+        )
+        self.assertNotEqual(first, second)
+        validate_derived_provenance(first, context="fixture.provenance")
+
     def test_validator_rejects_incomplete_provenance(self) -> None:
         provenance = build_provenance(
             methodology_id="fixture-method",
@@ -350,6 +377,114 @@ class ProvenanceTests(unittest.TestCase):
             ["x"],
         )
 
+    def test_signals_choose_latest_fractional_snapshot_instant(self) -> None:
+        def metric(metric_id, fetched_at, value):
+            return {
+                "metric": {"id": metric_id, "frequency": "monthly"},
+                "source": {"availability_basis": "observation_date"},
+                "freshness": {"state": "fresh"},
+                "latest": {
+                    "as_of": "2026-02-28",
+                    "fetched_at": fetched_at,
+                    "value": value,
+                },
+                "observations": [
+                    {
+                        "date": "2026-02-28",
+                        "value": value,
+                        "status": "observed",
+                    }
+                ],
+            }
+
+        config = {
+            "schema_version": "1.0.0",
+            "history_start": "2026-02-28",
+            "conditions": [
+                {
+                    "id": "x",
+                    "name": "X",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "x",
+                        "threshold": 0,
+                    },
+                },
+                {
+                    "id": "y",
+                    "name": "Y",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "y",
+                        "threshold": 0,
+                    },
+                },
+            ],
+        }
+        snapshot = build_signal_snapshot(
+            {
+                "x": metric("x", "2026-03-01T12:00:00Z", 1),
+                "y": metric("y", "2026-03-01T12:00:00.500000Z", 2),
+            },
+            config,
+        )
+
+        self.assertEqual(
+            snapshot["generated_at"],
+            "2026-03-01T12:00:00.500000Z",
+        )
+
+    def test_explicit_signal_evaluation_time_is_normalized_before_date_semantics(self) -> None:
+        metric = {
+            "metric": {"id": "x", "frequency": "daily"},
+            "source": {"availability_basis": "observation_date"},
+            "freshness": {"state": "fresh"},
+            "latest": {
+                "as_of": "2026-03-01",
+                "fetched_at": "2026-03-01T02:00:00Z",
+                "value": 2.0,
+            },
+            "observations": [
+                {"date": "2026-02-28", "value": 1.0, "status": "observed"},
+                {"date": "2026-03-01", "value": 2.0, "status": "observed"},
+            ],
+        }
+        config = {
+            "schema_version": "1.0.0",
+            "history_start": "2026-02-28",
+            "conditions": [
+                {
+                    "id": "x_high",
+                    "name": "X high",
+                    "description": "",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "x",
+                        "threshold": 0,
+                    },
+                }
+            ],
+        }
+        plus_eight = datetime.fromisoformat("2026-03-01T00:30:00+08:00")
+        utc = datetime.fromisoformat("2026-02-28T16:30:00+00:00")
+
+        left = build_signal_snapshot(
+            {"x": copy.deepcopy(metric)},
+            copy.deepcopy(config),
+            evaluated_at=plus_eight,
+        )
+        right = build_signal_snapshot(
+            {"x": copy.deepcopy(metric)},
+            copy.deepcopy(config),
+            evaluated_at=utc,
+        )
+
+        self.assertEqual(left, right)
+        self.assertEqual(left["generated_at"], "2026-02-28T16:30:00Z")
+        self.assertEqual(left["current"]["as_of"], "2026-02-28")
+        leaf = left["current"]["conditions"][0]["rules"]
+        self.assertEqual(leaf["as_of"], "2026-02-28")
+
     def test_signals_all_missing_inputs_is_still_deterministic(self) -> None:
         config = {
             "schema_version": "1.0.0",
@@ -381,6 +516,23 @@ class ProvenanceTests(unittest.TestCase):
             ["not_published"],
         )
         self.assertEqual(first["provenance"]["inputs"], [])
+
+    def test_signal_validator_rejects_coercible_non_numeric_leaf_values(self) -> None:
+        root = Path(__file__).resolve().parents[1] / "data" / "generated"
+        payload = json.loads(
+            (root / "signals.json").read_text(encoding="utf-8")
+        )
+        broken = copy.deepcopy(payload)
+        leaf = broken["current"]["conditions"][0]["rules"]["children"][0]
+        leaf["value"] = ""
+        with self.assertRaisesRegex(ValidationError, "rule value must be"):
+            validate_signal_snapshot(broken)
+
+        broken = copy.deepcopy(payload)
+        leaf = broken["current"]["conditions"][0]["rules"]["children"][1]
+        leaf["periods"] = "3"
+        with self.assertRaisesRegex(ValidationError, "periods must be"):
+            validate_signal_snapshot(broken)
 
     def test_checked_in_derived_artifacts_have_valid_provenance(self) -> None:
         root = Path(__file__).resolve().parents[1] / "data" / "generated"

@@ -119,6 +119,7 @@ def build_provenance(
     required_input_ids: Iterable[str] | None = None,
     generated_at: str | datetime | None = None,
     build_revision: str | None = None,
+    parameters: dict | None = None,
 ) -> dict:
     manifest = []
     for item in inputs:
@@ -157,4 +158,11 @@ def build_provenance(
     }
     if build_revision:
         provenance["build_revision"] = build_revision
+    if parameters is not None:
+        if not isinstance(parameters, dict):
+            raise ValueError("provenance parameters must be an object")
+        # Round-trip through canonical JSON semantics now so non-JSON values
+        # cannot sneak into a supposedly reproducible manifest.
+        canonical_json_bytes(parameters)
+        provenance["parameters"] = parameters
     return provenance

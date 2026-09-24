@@ -328,12 +328,18 @@ class DerivedProvenanceProductionPathTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(
             first["provenance"]["required_inputs"],
-            ["fed_target_legacy", "fed_target_upper"],
+            ["rate_rows"],
         )
         self.assertEqual(
             [item["id"] for item in first["provenance"]["inputs"]],
-            ["fed_target_legacy", "fed_target_upper"],
+            ["fed_target_legacy", "fed_target_upper", "rate_rows"],
         )
+        rate_rows = next(
+            item
+            for item in first["provenance"]["inputs"]
+            if item["id"] == "rate_rows"
+        )
+        self.assertIsNone(rate_rows["snapshot_at"])
 
     def test_cbc_rate_regime_is_stable_across_rebuild_wall_clock(self):
         source = self.out / "cbc.csv"
@@ -367,6 +373,9 @@ class DerivedProvenanceProductionPathTests(unittest.TestCase):
         self.assertEqual(
             first["provenance"]["generated_at"],
             "2024-03-22T00:00:00Z",
+        )
+        self.assertIsNone(
+            first["provenance"]["inputs"][0]["snapshot_at"]
         )
 
 

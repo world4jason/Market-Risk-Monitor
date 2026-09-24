@@ -18,6 +18,7 @@ from pipeline.cier_pmi import (
     merge_macro_rows,
     parse_cier_pmi_html,
     to_macro_rows,
+    validate_rolling_window,
 )
 
 
@@ -61,20 +62,29 @@ def main() -> None:
     parser.add_argument(
         "--observed-at",
         type=date.fromisoformat,
-        default=datetime.now(timezone.utc).date(),
+        default=None,
         help=(
             "Date the values were verified public; recorded as release_date. "
-            "Defaults to today (UTC)."
+            "Required with --page-file so an old saved page cannot be silently "
+            "re-labeled as a new vintage. Live fetches default to today (UTC)."
         ),
     )
     args = parser.parse_args()
 
     if args.page_file:
+        if args.observed_at is None:
+            parser.error(
+                "--observed-at is required with --page-file; use the date the "
+                "saved page was actually fetched/verified public"
+            )
         rows = parse_cier_pmi_html(args.page_file.read_text(encoding="utf-8"))
+        observed_at = args.observed_at
     else:
         rows = fetch_cier_pmi_rows()
+        observed_at = args.observed_at or datetime.now(timezone.utc).date()
 
-    incoming = to_macro_rows(rows, observed_at=args.observed_at)
+    validate_rolling_window(rows)
+    incoming = to_macro_rows(rows, observed_at=observed_at)
     existing = read_existing(args.output)
     merged = merge_macro_rows(existing, incoming)
 
@@ -96,7 +106,7 @@ def main() -> None:
         "previous_rows": len(existing),
         "start": merged[0]["date"] if merged else None,
         "end": merged[-1]["date"] if merged else None,
-        "observed_at": args.observed_at.isoformat(),
+        "observed_at": observed_at.isoformat(),
         "sector_columns_parsed_but_not_canonical": sectors,
         "output": str(args.output),
     }
