@@ -336,10 +336,23 @@ def build_signal_snapshot(
     *,
     config_id: str = "data/config/signals.json",
 ) -> dict:
+    required_inputs = sorted(
+        {
+            metric_id
+            for condition in config["conditions"]
+            for metric_id in referenced_metrics(condition["rules"])
+        }
+    )
+    present_inputs = [
+        metric_id
+        for metric_id in required_inputs
+        if metric_id in metrics
+    ]
+
     if evaluated_at is None:
         snapshots = [
-            metric_input(metric).get("snapshot_at")
-            for metric in metrics.values()
+            metric_input(metrics[metric_id]).get("snapshot_at")
+            for metric_id in present_inputs
         ]
         snapshots = [value for value in snapshots if value]
         if snapshots:
@@ -364,18 +377,6 @@ def build_signal_snapshot(
     start = _parse_date(config.get("history_start", "1997-01-31"))
     history = _monthly_history(metrics, config, start, _month_end(evaluation_date))
 
-    required_inputs = sorted(
-        {
-            metric_id
-            for condition in config["conditions"]
-            for metric_id in referenced_metrics(condition["rules"])
-        }
-    )
-    present_inputs = [
-        metric_id
-        for metric_id in required_inputs
-        if metric_id in metrics
-    ]
     provenance = build_provenance(
         methodology_id="deleveraging-watch",
         methodology_version="signals-v2",
