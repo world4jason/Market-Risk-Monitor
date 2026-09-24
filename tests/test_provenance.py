@@ -173,6 +173,36 @@ class ProvenanceTests(unittest.TestCase):
             context="fixture.provenance",
         )
 
+    def test_optional_consumed_input_can_be_outside_required_set(self) -> None:
+        provenance = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[
+                records_input(
+                    "optional_context",
+                    [{"date": "2026-01-01", "value": 1}],
+                    as_of="2026-01-01",
+                    snapshot_at="2026-01-02T00:00:00Z",
+                )
+            ],
+            required_input_ids=["missing_required"],
+        )
+
+        self.assertEqual(
+            provenance["required_inputs"],
+            ["missing_required"],
+        )
+        self.assertEqual(
+            [item["id"] for item in provenance["inputs"]],
+            ["optional_context"],
+        )
+        validate_derived_provenance(
+            provenance,
+            context="fixture.provenance",
+        )
+
     def test_validator_rejects_incomplete_provenance(self) -> None:
         provenance = build_provenance(
             methodology_id="fixture-method",
@@ -252,6 +282,73 @@ class ProvenanceTests(unittest.TestCase):
             first["generated_at"],
         )
 
+
+    def test_unrelated_metric_does_not_change_signal_evaluation_time(self) -> None:
+        referenced = {
+            "metric": {"id": "x", "frequency": "monthly"},
+            "source": {"availability_basis": "observation_date"},
+            "freshness": {"state": "fresh"},
+            "latest": {
+                "as_of": "2026-02-28",
+                "fetched_at": "2026-03-01T12:00:00Z",
+                "value": 2.0,
+            },
+            "observations": [
+                {
+                    "date": "2026-01-31",
+                    "value": 1.0,
+                    "status": "observed",
+                },
+                {
+                    "date": "2026-02-28",
+                    "value": 2.0,
+                    "status": "observed",
+                },
+            ],
+        }
+        unrelated = copy.deepcopy(referenced)
+        unrelated["metric"]["id"] = "unrelated"
+        unrelated["latest"]["as_of"] = "2030-01-31"
+        unrelated["latest"]["fetched_at"] = "2030-02-01T00:00:00Z"
+        unrelated["observations"] = [
+            {
+                "date": "2030-01-31",
+                "value": 99.0,
+                "status": "observed",
+            }
+        ]
+        config = {
+            "schema_version": "1.0.0",
+            "history_start": "2026-01-31",
+            "conditions": [
+                {
+                    "id": "x_high",
+                    "name": "X high",
+                    "description": "",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "x",
+                        "threshold": 0,
+                    },
+                }
+            ],
+        }
+
+        expected = build_signal_snapshot({"x": referenced}, config)
+        with_unrelated = build_signal_snapshot(
+            {"x": referenced, "unrelated": unrelated},
+            config,
+        )
+
+        self.assertEqual(expected, with_unrelated)
+        self.assertEqual(
+            with_unrelated["generated_at"],
+            "2026-03-01T12:00:00Z",
+        )
+        self.assertEqual(
+            [item["id"] for item in with_unrelated["provenance"]["inputs"]],
+            ["x"],
+        )
 
     def test_signals_all_missing_inputs_is_still_deterministic(self) -> None:
         config = {
