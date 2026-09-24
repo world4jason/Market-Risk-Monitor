@@ -1182,6 +1182,10 @@ function renderTaiwanMarket() {
       .some((prefix) => m.metric.id.startsWith(prefix)),
   );
   const macroCurrent = state.taiwanMacroRegime?.current || null;
+  const macroLastKnown = state.taiwanMacroRegime?.latest_known || null;
+  const macroLastKnownNote = macroLastKnown
+    ? `last known ${macroLastKnown.regime} ${macroLastKnown.date}`
+    : "no known regime yet";
   const rateMetrics = metrics.filter((m) =>
     m.metric.id.startsWith("tw_cbc_"),
   );
@@ -1220,7 +1224,9 @@ function renderTaiwanMarket() {
       "Macro cycle",
       macroCurrent ? String(macroCurrent.regime || "Unknown") : "Not published",
       macroCurrent
-        ? `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`
+        ? (macroCurrent.score === null || macroCurrent.score === undefined
+            ? `${macroCurrent.known_components}/${macroCurrent.total_components} inputs · ${macroLastKnownNote}`
+            : `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`)
         : (macroMetrics.length
             ? `${macroMetrics.length} public macro metrics; regime summary unavailable`
             : "Taiwan macro/regime family is not included in this public release"),

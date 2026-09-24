@@ -387,6 +387,16 @@ class UiContractTests(unittest.TestCase):
         self.assertIn("percentile vs", self.app)
         self.assertNotIn("rolling history percentile", self.app)
 
+    def test_taiwan_macro_unknown_never_formats_null_as_zero(self) -> None:
+        taiwan = extract_function(self.app, "renderTaiwanMarket")
+        self.assertIn(
+            "macroCurrent.score === null || macroCurrent.score === undefined",
+            taiwan,
+        )
+        self.assertIn("macroLastKnownNote", taiwan)
+        self.assertIn("known_components", taiwan)
+        self.assertIn("total_components", taiwan)
+
     def test_cbc_effective_and_verified_dates_remain_distinct(self) -> None:
         self.assertIn("effective_vs_verified", self.app)
         self.assertIn("effective since", self.app)
