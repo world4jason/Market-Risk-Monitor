@@ -252,7 +252,10 @@ def validate_metric(metric: dict) -> None:
 
     dates = []
     for obs in metric["observations"]:
-        _date(obs["date"], field="observation date")
+        observation_date = _date(
+            obs["date"],
+            field="observation date",
+        )
         dates.append(obs["date"])
         status = obs.get("status")
         if status not in ALLOWED_OBSERVATION_STATUSES:
@@ -265,7 +268,15 @@ def validate_metric(metric: dict) -> None:
 
         release_date = obs.get("release_date")
         if release_date is not None:
-            _date(release_date, field="observation release_date")
+            release = _date(
+                release_date,
+                field="observation release_date",
+            )
+            if release < observation_date:
+                raise ValidationError(
+                    "release_date cannot precede observation date at "
+                    f"{obs['date']}"
+                )
         if (
             availability_basis == "release_date"
             and value is not None

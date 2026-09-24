@@ -18,6 +18,7 @@ from pipeline.cier_pmi import (
     merge_macro_rows,
     parse_cier_pmi_html,
     to_macro_rows,
+    validate_rolling_window,
 )
 
 
@@ -74,6 +75,7 @@ def main() -> None:
     else:
         rows = fetch_cier_pmi_rows()
 
+    validate_rolling_window(rows)
     incoming = to_macro_rows(rows, observed_at=args.observed_at)
     existing = read_existing(args.output)
     merged = merge_macro_rows(existing, incoming)

@@ -356,8 +356,9 @@ def build_signal_snapshot(
         ]
         snapshots = [value for value in snapshots if value]
         if snapshots:
-            evaluated_at = datetime.fromisoformat(
-                max(snapshots).replace("Z", "+00:00")
+            evaluated_at = max(
+                datetime.fromisoformat(value.replace("Z", "+00:00"))
+                for value in snapshots
             )
         else:
             evaluated_at = datetime(1970, 1, 1, tzinfo=timezone.utc)

@@ -110,6 +110,11 @@ Each actual input records:
 
 At least one of `as_of` or `snapshot_at` must be present.
 
+`as_of` and `snapshot_at` are not interchangeable. If a source/input has a
+known effective/reference date but no defensible verification timestamp,
+record the date in `as_of` and leave `snapshot_at` null. Do not copy an
+effective date into `snapshot_at` merely to make the field non-null.
+
 ## Generated time and determinism
 
 Derived builders must not use wall-clock time when the same committed inputs

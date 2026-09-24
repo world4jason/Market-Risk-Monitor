@@ -466,7 +466,11 @@ function dynamicMetricCaveat(metric) {
 
 function formatRuleDetail(detail) {
   const parts = [`${detail.label}: ${detail.status}`];
-  if (Number.isFinite(Number(detail.value))) {
+  if (
+    detail.value !== null &&
+    detail.value !== undefined &&
+    Number.isFinite(Number(detail.value))
+  ) {
     const value = Number(detail.value);
     const unit =
       detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"

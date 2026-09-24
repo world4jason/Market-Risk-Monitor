@@ -221,6 +221,13 @@ class TaiwanMacroTests(unittest.TestCase):
         validate_metric(first_metric)
         validate_metric(revised_metric)
 
+    def test_release_date_before_observation_date_is_rejected(self):
+        text = """date,provider,series_id,value,unit,release_date,source_url
+2026-08-01,CIER,tw_manufacturing_pmi,62.5,index,2026-07-15,https://example.com
+"""
+        with self.assertRaisesRegex(ValueError, "release_date .* precedes"):
+            parse_taiwan_macro_csv(text)
+
     def test_duplicate_series_date_rejected(self):
         text = """date,provider,series_id,value,unit,release_date,source_url
 2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-02-01,https://example.com

@@ -18,7 +18,7 @@
       {
         "id": "rate_rows",
         "as_of": "2024-03-22",
-        "snapshot_at": "2024-03-22T00:00:00Z",
+        "snapshot_at": null,
         "content_digest": "sha256:8df84be0010c61ae82742d842f85a2c898237c5b287211d2661056e568249adc"
       }
     ],

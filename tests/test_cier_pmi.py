@@ -11,6 +11,7 @@ from pipeline.cier_pmi import (
     merge_macro_rows,
     parse_cier_pmi_html,
     to_macro_rows,
+    validate_rolling_window,
 )
 from pipeline.taiwan_macro import build_macro_metrics, parse_taiwan_macro_csv
 from pipeline.validate import validate_metric
@@ -113,6 +114,19 @@ class CierPmiParseTests(unittest.TestCase):
             parse_cier_pmi_html(
                 table("2026/08|62.5％|65.2％", "2026-07|61.5％|65.5％")
             )
+
+    def test_missing_month_in_valid_rows_is_rejected(self):
+        with self.assertRaisesRegex(CierPmiError, "not contiguous"):
+            parse_cier_pmi_html(
+                table("2026/08|62.5％|65.2％", "2026/06|60.0％|64.0％")
+            )
+
+    def test_bootstrap_window_guard_rejects_short_complete_page(self):
+        rows = parse_cier_pmi_html(
+            table("2026/08|62.5％|65.2％", "2026/07|61.5％|65.5％")
+        )
+        with self.assertRaisesRegex(CierPmiError, "expected at least 12"):
+            validate_rolling_window(rows)
 
     def test_blank_spacer_row_is_ignored(self):
         # An all-empty row is layout, not mangled data.
@@ -252,6 +266,20 @@ class CierPmiMergeTests(unittest.TestCase):
         self.assertEqual(len(merged), 1)
         self.assertAlmostEqual(merged[0]["value"], 61.9)
         self.assertEqual(merged[0]["release_date"], "2026-11-30")
+
+    def test_older_conflicting_vintage_is_rejected(self):
+        existing = [self.row("2026-08-01", 61.9, "2026-11-30")]
+        older = [self.row("2026-08-01", 62.5, "2026-09-21")]
+
+        with self.assertRaisesRegex(CierPmiError, "out-of-order CIER revision"):
+            merge_macro_rows(existing, older)
+
+    def test_same_release_date_conflicting_value_is_rejected(self):
+        existing = [self.row("2026-08-01", 61.9, "2026-11-30")]
+        conflicting = [self.row("2026-08-01", 62.5, "2026-11-30")]
+
+        with self.assertRaisesRegex(CierPmiError, "out-of-order CIER revision"):
+            merge_macro_rows(existing, conflicting)
 
     def test_merged_output_still_satisfies_the_macro_contract(self):
         merged = merge_macro_rows(

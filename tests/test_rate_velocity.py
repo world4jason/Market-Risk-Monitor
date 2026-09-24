@@ -115,6 +115,13 @@ class RateVelocityTests(unittest.TestCase):
             "policy-rate-regime",
         )
         self.assertEqual(
+            artifact["provenance"]["required_inputs"],
+            ["rate_rows"],
+        )
+        self.assertIsNone(
+            artifact["provenance"]["inputs"][0]["snapshot_at"]
+        )
+        self.assertEqual(
             artifact,
             build_rate_regime_artifact(
                 copy.deepcopy(rows),
@@ -122,6 +129,53 @@ class RateVelocityTests(unittest.TestCase):
                 name="Fed Policy Rate Regime",
             ),
         )
+
+    def test_rate_rows_are_fingerprinted_with_upstream_metrics(self):
+        upstream = {
+            "metric": {"id": "raw_rate"},
+            "latest": {
+                "as_of": "2022-06-16",
+                "fetched_at": "2026-01-01T00:00:00Z",
+            },
+            "observations": [
+                {"date": "2022-06-16", "value": 1.75},
+            ],
+        }
+        first_rows = [
+            {"date": "2022-03-17", "value": 0.50},
+            {"date": "2022-06-16", "value": 1.75},
+        ]
+        second_rows = [
+            {"date": "2022-03-17", "value": 0.50},
+            {"date": "2022-06-16", "value": 2.00},
+        ]
+
+        first = build_rate_regime_artifact(
+            first_rows,
+            CONFIG,
+            name="Rate Regime",
+            input_metrics=[upstream],
+        )
+        second = build_rate_regime_artifact(
+            second_rows,
+            CONFIG,
+            name="Rate Regime",
+            input_metrics=[upstream],
+        )
+
+        self.assertEqual(first["provenance"]["required_inputs"], ["rate_rows"])
+        first_inputs = {item["id"]: item for item in first["provenance"]["inputs"]}
+        second_inputs = {item["id"]: item for item in second["provenance"]["inputs"]}
+        self.assertEqual(
+            first_inputs["raw_rate"]["content_digest"],
+            second_inputs["raw_rate"]["content_digest"],
+        )
+        self.assertNotEqual(
+            first_inputs["rate_rows"]["content_digest"],
+            second_inputs["rate_rows"]["content_digest"],
+        )
+        self.assertIsNone(first_inputs["rate_rows"]["snapshot_at"])
+
 
 
 if __name__ == "__main__":

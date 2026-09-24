@@ -134,8 +134,15 @@ simultaneously available rather than as twelve historical arrivals.
 For repeated observations:
 
 - unchanged values keep their earliest verified release date;
-- a revised value takes the newer verification/release date;
+- a revised value is accepted only when its verification/release date is
+  strictly newer than the stored vintage; older or same-date conflicting
+  values are rejected rather than allowed to roll canonical history backward;
 - months that roll off the source page remain in the accumulated local history.
+
+The bootstrap also requires at least 12 contiguous monthly rows from the
+official rolling table. A syntactically valid but shortened/gapped response is
+therefore treated as a source-shape failure instead of silently publishing a
+partial window.
 
 Run:
 

@@ -127,6 +127,19 @@ class ValidateTests(unittest.TestCase):
             observation["release_date"] = "2026-04-01"
         validate_metric(payload)
 
+    def test_release_date_cannot_precede_observation_date(self):
+        payload = copy.deepcopy(BASE)
+        payload["source"]["availability_basis"] = "release_date"
+        for observation in payload["observations"]:
+            observation["release_date"] = "2026-04-01"
+        payload["observations"][0]["release_date"] = "2025-12-31"
+
+        with self.assertRaisesRegex(
+            ValidationError,
+            "release_date cannot precede observation date",
+        ):
+            validate_metric(payload)
+
     def test_unknown_availability_cannot_claim_pit_baseline(self):
         payload = copy.deepcopy(BASE)
         payload["source"]["availability_basis"] = "unknown"

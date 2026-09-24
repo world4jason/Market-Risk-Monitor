@@ -121,6 +121,7 @@ globalThis.__MRM__ = {
   historyView,
   taiwanBreadthState,
   marginMomentumEvidence,
+  formatRuleDetail,
   renderOverview,
   renderMetrics,
   renderTrendParticipation,
@@ -309,6 +310,26 @@ test("unit-aware values, deltas, and frequency windows are executable", () => {
     });
     assert.equal(api.defaultRollingWindow(metric), item.expected);
   }
+});
+
+test("missing signal evidence never renders as numeric zero", () => {
+  const { api } = buildRuntime();
+  const missing = api.formatRuleDetail({
+    label: "Missing breadth",
+    status: "unknown",
+    value: null,
+    reason: "metric missing",
+  });
+  assert.match(missing, /Missing breadth: unknown/);
+  assert.doesNotMatch(missing, /observed 0\.00/);
+
+  const actualZero = api.formatRuleDetail({
+    label: "Real zero",
+    status: "inactive",
+    value: 0,
+    reason: "fixture",
+  });
+  assert.match(actualZero, /observed 0\.00/);
 });
 
 test("Taiwan breadth state machine executes the production classifier", () => {

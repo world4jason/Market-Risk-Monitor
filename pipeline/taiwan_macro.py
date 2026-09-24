@@ -106,6 +106,12 @@ def parse_taiwan_macro_csv(text: str) -> list[dict]:
                 f"row {line_no}: invalid date/value"
             ) from exc
 
+        if release_date < obs_date:
+            raise TaiwanMacroError(
+                f"row {line_no}: release_date {release_date} precedes "
+                f"observation date {obs_date}"
+            )
+
         key = (series_id, obs_date)
         if key in seen:
             raise TaiwanMacroError(

@@ -350,6 +350,63 @@ class ProvenanceTests(unittest.TestCase):
             ["x"],
         )
 
+    def test_signals_choose_latest_fractional_snapshot_instant(self) -> None:
+        def metric(metric_id, fetched_at, value):
+            return {
+                "metric": {"id": metric_id, "frequency": "monthly"},
+                "source": {"availability_basis": "observation_date"},
+                "freshness": {"state": "fresh"},
+                "latest": {
+                    "as_of": "2026-02-28",
+                    "fetched_at": fetched_at,
+                    "value": value,
+                },
+                "observations": [
+                    {
+                        "date": "2026-02-28",
+                        "value": value,
+                        "status": "observed",
+                    }
+                ],
+            }
+
+        config = {
+            "schema_version": "1.0.0",
+            "history_start": "2026-02-28",
+            "conditions": [
+                {
+                    "id": "x",
+                    "name": "X",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "x",
+                        "threshold": 0,
+                    },
+                },
+                {
+                    "id": "y",
+                    "name": "Y",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "y",
+                        "threshold": 0,
+                    },
+                },
+            ],
+        }
+        snapshot = build_signal_snapshot(
+            {
+                "x": metric("x", "2026-03-01T12:00:00Z", 1),
+                "y": metric("y", "2026-03-01T12:00:00.500000Z", 2),
+            },
+            config,
+        )
+
+        self.assertEqual(
+            snapshot["generated_at"],
+            "2026-03-01T12:00:00.500000Z",
+        )
+
     def test_signals_all_missing_inputs_is_still_deterministic(self) -> None:
         config = {
             "schema_version": "1.0.0",
