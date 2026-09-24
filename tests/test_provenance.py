@@ -81,6 +81,78 @@ class ProvenanceTests(unittest.TestCase):
             changed_input["inputs"][0]["content_digest"],
         )
 
+    def test_mixed_timezone_offsets_normalize_and_order_by_instant(self) -> None:
+        provenance = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[
+                {
+                    "id": "earlier",
+                    "as_of": "2026-01-01",
+                    "snapshot_at": "2026-01-01T09:00:00+08:00",
+                    "content_digest": "sha256:" + "a" * 64,
+                },
+                {
+                    "id": "later",
+                    "as_of": "2026-01-01",
+                    "snapshot_at": "2026-01-01T02:00:00Z",
+                    "content_digest": "sha256:" + "b" * 64,
+                },
+            ],
+        )
+
+        self.assertEqual(
+            provenance["generated_at"],
+            "2026-01-01T02:00:00Z",
+        )
+        snapshots = {
+            item["id"]: item["snapshot_at"]
+            for item in provenance["inputs"]
+        }
+        self.assertEqual(
+            snapshots["earlier"],
+            "2026-01-01T01:00:00Z",
+        )
+        self.assertEqual(
+            snapshots["later"],
+            "2026-01-01T02:00:00Z",
+        )
+
+    def test_equivalent_snapshot_offsets_produce_same_manifest_timestamp(self) -> None:
+        base = {
+            "id": "fixture",
+            "as_of": "2026-01-01",
+            "content_digest": "sha256:" + "c" * 64,
+        }
+        left = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[
+                {
+                    **base,
+                    "snapshot_at": "2026-01-01T09:00:00+08:00",
+                }
+            ],
+        )
+        right = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[
+                {
+                    **base,
+                    "snapshot_at": "2026-01-01T01:00:00Z",
+                }
+            ],
+        )
+
+        self.assertEqual(left, right)
+
     def test_required_inputs_can_record_missing_artifacts(self) -> None:
         provenance = build_provenance(
             methodology_id="fixture-method",

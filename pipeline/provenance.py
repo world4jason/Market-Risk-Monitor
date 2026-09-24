@@ -25,19 +25,26 @@ def content_digest(payload) -> str:
     ).hexdigest()
 
 
+def _as_utc_datetime(value: str | datetime) -> datetime:
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        text = str(value).strip()
+        if len(text) == 10:
+            text = f"{text}T00:00:00+00:00"
+        elif text.endswith("Z"):
+            text = text[:-1] + "+00:00"
+        parsed = datetime.fromisoformat(text)
+
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
 def _iso_datetime(value: str | datetime | None) -> str | None:
     if value is None:
         return None
-    if isinstance(value, datetime):
-        if value.tzinfo is None:
-            value = value.replace(tzinfo=timezone.utc)
-        return value.astimezone(timezone.utc).isoformat().replace(
-            "+00:00", "Z"
-        )
-    text = str(value)
-    if len(text) == 10:
-        return f"{text}T00:00:00Z"
-    return text
+    return _as_utc_datetime(value).isoformat().replace("+00:00", "Z")
 
 
 def metric_input(metric: dict) -> dict:
@@ -85,12 +92,12 @@ def records_input(
 
 def _default_generated_at(inputs: list[dict]) -> str:
     snapshots = [
-        item.get("snapshot_at")
+        _as_utc_datetime(item["snapshot_at"])
         for item in inputs
         if item.get("snapshot_at")
     ]
     if snapshots:
-        return max(snapshots)
+        return max(snapshots).isoformat().replace("+00:00", "Z")
 
     as_of = [
         item.get("as_of")
@@ -113,10 +120,15 @@ def build_provenance(
     generated_at: str | datetime | None = None,
     build_revision: str | None = None,
 ) -> dict:
-    manifest = sorted(
-        [dict(item) for item in inputs],
-        key=lambda item: item["id"],
-    )
+    manifest = []
+    for item in inputs:
+        normalized = dict(item)
+        if normalized.get("snapshot_at") is not None:
+            normalized["snapshot_at"] = _iso_datetime(
+                normalized["snapshot_at"]
+            )
+        manifest.append(normalized)
+    manifest.sort(key=lambda item: item["id"])
     required = sorted(
         set(required_input_ids or [item["id"] for item in manifest])
     )
