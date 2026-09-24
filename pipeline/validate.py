@@ -158,11 +158,6 @@ def validate_derived_provenance(
         raise ValidationError(f"{context}: inputs must be sorted by id")
     if len(ids) != len(set(ids)):
         raise ValidationError(f"{context}: duplicate input id")
-    if any(input_id not in required_inputs for input_id in ids):
-        raise ValidationError(
-            f"{context}: actual input not declared in required_inputs"
-        )
-
     build_revision = provenance.get("build_revision")
     if build_revision is not None and (
         not isinstance(build_revision, str) or not build_revision
