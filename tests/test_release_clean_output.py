@@ -122,7 +122,7 @@ class GroupedSourceFailureTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()
         self.module.WRITTEN_ARTIFACTS.clear()
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
         self.out = Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 
@@ -302,7 +302,7 @@ class DerivedProvenanceProductionPathTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()
         self.module.WRITTEN_ARTIFACTS.clear()
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
         self.out = Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 
@@ -374,7 +374,7 @@ class CleanOutputTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()
         self.module.WRITTEN_ARTIFACTS.clear()
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
         self.out = Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 
