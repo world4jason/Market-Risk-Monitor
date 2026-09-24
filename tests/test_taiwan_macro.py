@@ -118,6 +118,7 @@ class TaiwanMacroTests(unittest.TestCase):
         )
         current = regime["current"]
         self.assertEqual(current["date"], "2026-07-01")
+        self.assertEqual(regime["latest_known"], current)
         self.assertEqual(current["ndc_monitoring_light"], "red")
         self.assertEqual(current["regime"], "expansion")
         self.assertGreaterEqual(current["known_components"], 3)
@@ -234,7 +235,10 @@ class TaiwanMacroTests(unittest.TestCase):
 """
         rows = parse_taiwan_macro_csv(text)
         regime = build_macro_regime(rows, CONFIG)
-        self.assertIsNone(regime["current"])
+        self.assertEqual(regime["current"]["date"], "2026-01-01")
+        self.assertIsNone(regime["current"]["score"])
+        self.assertEqual(regime["current"]["regime"], "unknown")
+        self.assertIsNone(regime["latest_known"])
         self.assertEqual(
             regime["provenance"]["required_inputs"],
             sorted(CONFIG["mrm_regime"]["components"]),
@@ -243,6 +247,58 @@ class TaiwanMacroTests(unittest.TestCase):
             [item["id"] for item in regime["provenance"]["inputs"]],
             ["tw_manufacturing_pmi"],
         )
+        validate_taiwan_macro_regime(regime)
+
+    def test_current_does_not_carry_forward_a_stale_known_regime(self):
+        rows = parse_taiwan_macro_csv(csv_fixture())
+        stale = [
+            row
+            for row in rows
+            if not (
+                row["date"] == "2026-07-01"
+                and row["series_id"] != "tw_manufacturing_pmi"
+            )
+        ]
+
+        regime = build_macro_regime(stale, CONFIG)
+        current = regime["current"]
+        latest_known = regime["latest_known"]
+
+        self.assertEqual(current["date"], "2026-07-01")
+        self.assertEqual(current["regime"], "unknown")
+        self.assertIsNone(current["score"])
+        self.assertLess(current["known_components"], 2)
+        self.assertIsNotNone(latest_known)
+        self.assertLess(latest_known["date"], current["date"])
+        self.assertNotEqual(latest_known["regime"], "unknown")
+        validate_taiwan_macro_regime(regime)
+
+    def test_validator_derives_current_and_latest_known_from_history(self):
+        regime = build_macro_regime(
+            parse_taiwan_macro_csv(csv_fixture()),
+            CONFIG,
+        )
+        validate_taiwan_macro_regime(regime)
+
+        earlier = copy.deepcopy(regime)
+        earlier["current"] = earlier["history"][-2]
+        with self.assertRaises(ValueError):
+            validate_taiwan_macro_regime(earlier)
+
+        known_rows = [
+            row for row in regime["history"]
+            if row["regime"] != "unknown"
+        ]
+        stale_known = copy.deepcopy(regime)
+        stale_known["latest_known"] = known_rows[-2]
+        with self.assertRaises(ValueError):
+            validate_taiwan_macro_regime(stale_known)
+
+        fabricated = copy.deepcopy(regime)
+        fabricated["latest_known"] = copy.deepcopy(known_rows[-1])
+        fabricated["latest_known"]["score"] = 0.12345
+        with self.assertRaises(ValueError):
+            validate_taiwan_macro_regime(fabricated)
 
 
 if __name__ == "__main__":

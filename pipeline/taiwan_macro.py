@@ -421,7 +421,8 @@ def build_macro_regime(
             else None
         )
 
-    current = next(
+    current = provisional[-1] if provisional else None
+    latest_known = next(
         (
             row
             for row in reversed(provisional)
@@ -479,6 +480,7 @@ def build_macro_regime(
             ),
         },
         "current": current,
+        "latest_known": latest_known,
         "history": provisional,
     }
 

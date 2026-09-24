@@ -881,12 +881,43 @@ def validate_taiwan_macro_regime(payload: dict) -> None:
     if len(dates) != len(set(dates)):
         raise ValidationError("taiwan-macro-regime: duplicate dates")
 
+    expected_current = history[-1] if history else None
     current = payload.get("current")
-    if current is not None:
-        if current.get("regime") == "unknown":
+    if current != expected_current:
+        raise ValidationError(
+            "taiwan-macro-regime: current must match the latest history row"
+        )
+
+    expected_latest_known = next(
+        (
+            row
+            for row in reversed(history)
+            if row.get("regime") != "unknown"
+        ),
+        None,
+    )
+    latest_known = payload.get("latest_known")
+    if latest_known != expected_latest_known:
+        if expected_latest_known is None:
             raise ValidationError(
-                "taiwan-macro-regime: current should be latest known regime"
+                "taiwan-macro-regime: latest_known must be null when history "
+                "contains no known regime"
             )
+        expected_date = expected_latest_known.get("date")
+        actual_date = (
+            latest_known.get("date")
+            if isinstance(latest_known, dict)
+            else None
+        )
+        if actual_date == expected_date:
+            raise ValidationError(
+                "taiwan-macro-regime: latest_known does not match the history "
+                f"row it claims to be ({expected_date})"
+            )
+        raise ValidationError(
+            "taiwan-macro-regime: latest_known must be the last non-unknown "
+            f"history row ({expected_date}), got {actual_date!r}"
+        )
 
 
 def validate_taiwan_macro_audit(payload: dict) -> None:
