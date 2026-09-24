@@ -138,9 +138,6 @@ def build_provenance(
         raise ValueError("config id is required")
     if not required:
         raise ValueError("at least one required provenance input is required")
-    if any(item["id"] not in required for item in manifest):
-        raise ValueError("actual provenance input is not declared required")
-
     provenance = {
         "contract_version": PROVENANCE_CONTRACT_VERSION,
         "methodology": {
