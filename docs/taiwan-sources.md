@@ -117,6 +117,33 @@ PMI interpretation:
 
 CIER content is publicly viewable but redistribution rights are not assumed. The repository therefore stores parser/config logic and small fixtures; a full historical snapshot is committed only if rights are verified.
 
+### CIER rolling-window bootstrap
+
+`scripts/bootstrap_cier_pmi.py` parses the official CIER table by its own
+`月份` + `臺灣製造業PMI` headers and writes the normalized Taiwan macro CSV
+contract consumed by `refresh_data.py --taiwan-macro-file`. The public table is
+a rolling 12-month window, not a historical archive, so each run merges the
+current window into the local CSV instead of replacing accumulated history.
+
+The page does not expose a publication timestamp. Each parsed value therefore
+uses the date it was actually verified public as its conservative
+`release_date`. On the first ingest, all months in the rolling window can share
+one release date; the canonical release-aware contract must treat that batch as
+simultaneously available rather than as twelve historical arrivals.
+
+For repeated observations:
+
+- unchanged values keep their earliest verified release date;
+- a revised value takes the newer verification/release date;
+- months that roll off the source page remain in the accumulated local history.
+
+Run:
+
+```bash
+python scripts/bootstrap_cier_pmi.py
+python scripts/refresh_data.py --taiwan-macro-file .cache/taiwan-macro/cier-pmi.csv
+```
+
 ## 4. Industrial/manufacturing production — MOEA
 
 Official:
