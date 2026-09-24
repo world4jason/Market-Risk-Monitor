@@ -130,6 +130,56 @@ class RateVelocityTests(unittest.TestCase):
             ),
         )
 
+    def test_empty_history_requires_null_current(self):
+        artifact = build_rate_regime_artifact(
+            [],
+            CONFIG,
+            name="Empty Rate Regime",
+        )
+        # Empty record inputs have no natural as_of/snapshot timestamp; add a
+        # valid synthetic snapshot only to exercise the specialized current
+        # invariant rather than failing earlier in generic provenance shape.
+        artifact["provenance"]["inputs"][0]["snapshot_at"] = (
+            "2026-01-01T00:00:00Z"
+        )
+        artifact["current"] = {
+            "date": "2026-01-01",
+            "rate": 1.0,
+            "step_bp": None,
+            "change_3m_bp": None,
+            "change_6m_bp": None,
+            "change_12m_bp": None,
+            "regime": "unknown",
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            "current must equal latest history row or null when empty",
+        ):
+            validate_rate_regime(artifact)
+
+    def test_rate_regime_builder_canonical_sorts_input_rows(self):
+        unsorted_rows = [
+            {"date": "2022-06-16", "value": 1.75},
+            {"date": "2022-03-17", "value": 0.50},
+            {"date": "2022-05-05", "value": 1.00},
+        ]
+        artifact = build_rate_regime_artifact(
+            unsorted_rows,
+            CONFIG,
+            name="Sorted Rate Regime",
+        )
+        self.assertEqual(
+            [row["date"] for row in artifact["history"]],
+            ["2022-03-17", "2022-05-05", "2022-06-16"],
+        )
+        rate_rows = next(
+            item
+            for item in artifact["provenance"]["inputs"]
+            if item["id"] == "rate_rows"
+        )
+        self.assertEqual(rate_rows["as_of"], "2022-06-16")
+        validate_rate_regime(artifact)
+
     def test_rate_regime_validator_enforces_rate_rows_contract(self):
         rows = [
             {"date": "2022-03-17", "value": 0.50},

@@ -1081,9 +1081,12 @@ def validate_rate_regime(payload: dict) -> None:
     if rate_input.get("as_of") != expected_as_of:
         raise ValidationError("rate-regime: rate_rows as_of does not match history")
 
+    expected_current = history[-1] if history else None
     current = payload.get("current")
-    if history and current != history[-1]:
-        raise ValidationError("rate-regime: current must equal last history row")
+    if current != expected_current:
+        raise ValidationError(
+            "rate-regime: current must equal latest history row or null when empty"
+        )
 
 
 def validate_taiwan_trend_breadth_audit(payload: dict) -> None:

@@ -147,6 +147,13 @@ official rolling table. A syntactically valid but shortened/gapped response is
 therefore treated as a source-shape failure instead of silently publishing a
 partial window.
 
+For live fetches, the bootstrap uses the current UTC date as the verification
+date unless `--observed-at` is supplied. For `--page-file`, `--observed-at` is
+**required** and must be the date that saved page was actually fetched or
+verified public. A saved HTML file never inherits today's date implicitly;
+this prevents replaying an old page from silently manufacturing a newer
+vintage.
+
 Run:
 
 ```bash

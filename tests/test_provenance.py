@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 from pipeline.provenance import (
@@ -432,6 +433,57 @@ class ProvenanceTests(unittest.TestCase):
             snapshot["generated_at"],
             "2026-03-01T12:00:00.500000Z",
         )
+
+    def test_explicit_signal_evaluation_time_is_normalized_before_date_semantics(self) -> None:
+        metric = {
+            "metric": {"id": "x", "frequency": "daily"},
+            "source": {"availability_basis": "observation_date"},
+            "freshness": {"state": "fresh"},
+            "latest": {
+                "as_of": "2026-03-01",
+                "fetched_at": "2026-03-01T02:00:00Z",
+                "value": 2.0,
+            },
+            "observations": [
+                {"date": "2026-02-28", "value": 1.0, "status": "observed"},
+                {"date": "2026-03-01", "value": 2.0, "status": "observed"},
+            ],
+        }
+        config = {
+            "schema_version": "1.0.0",
+            "history_start": "2026-02-28",
+            "conditions": [
+                {
+                    "id": "x_high",
+                    "name": "X high",
+                    "description": "",
+                    "rules": {
+                        "type": "latest_above",
+                        "metric": "x",
+                        "threshold": 0,
+                    },
+                }
+            ],
+        }
+        plus_eight = datetime.fromisoformat("2026-03-01T00:30:00+08:00")
+        utc = datetime.fromisoformat("2026-02-28T16:30:00+00:00")
+
+        left = build_signal_snapshot(
+            {"x": copy.deepcopy(metric)},
+            copy.deepcopy(config),
+            evaluated_at=plus_eight,
+        )
+        right = build_signal_snapshot(
+            {"x": copy.deepcopy(metric)},
+            copy.deepcopy(config),
+            evaluated_at=utc,
+        )
+
+        self.assertEqual(left, right)
+        self.assertEqual(left["generated_at"], "2026-02-28T16:30:00Z")
+        self.assertEqual(left["current"]["as_of"], "2026-02-28")
+        leaf = left["current"]["conditions"][0]["rules"]
+        self.assertEqual(leaf["as_of"], "2026-02-28")
 
     def test_signals_all_missing_inputs_is_still_deterministic(self) -> None:
         config = {

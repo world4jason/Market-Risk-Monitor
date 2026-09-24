@@ -1,5 +1,8 @@
 import csv
 import io
+import subprocess
+import sys
+import tempfile
 import unittest
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -188,6 +191,60 @@ class CierPmiMacroContractTests(unittest.TestCase):
         self.assertAlmostEqual(metric["latest"]["value"], 62.5)
         self.assertEqual(metric["latest"]["as_of"], "2026-08-01")
         validate_metric(metric)
+
+
+class CierPmiBootstrapCliTests(unittest.TestCase):
+    def test_saved_page_requires_explicit_original_observed_at(self):
+        script = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap_cier_pmi.py"
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "cier.csv"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(script),
+                    "--page-file",
+                    str(FIXTURE),
+                    "--output",
+                    str(output),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(
+                "--observed-at is required with --page-file",
+                result.stderr,
+            )
+            self.assertFalse(output.exists())
+
+    def test_saved_page_with_explicit_observed_at_succeeds(self):
+        script = Path(__file__).resolve().parents[1] / "scripts" / "bootstrap_cier_pmi.py"
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "cier.csv"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(script),
+                    "--page-file",
+                    str(FIXTURE),
+                    "--observed-at",
+                    "2026-09-21",
+                    "--output",
+                    str(output),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(output.exists())
+            with output.open(encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertEqual(
+                {row["release_date"] for row in rows},
+                {"2026-09-21"},
+            )
 
 
 class CierPmiMergeTests(unittest.TestCase):

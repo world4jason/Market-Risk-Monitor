@@ -362,6 +362,10 @@ def build_signal_snapshot(
             )
         else:
             evaluated_at = datetime(1970, 1, 1, tzinfo=timezone.utc)
+
+    if evaluated_at.tzinfo is None:
+        evaluated_at = evaluated_at.replace(tzinfo=timezone.utc)
+    evaluated_at = evaluated_at.astimezone(timezone.utc)
     evaluation_date = evaluated_at.date()
 
     current_conditions = [

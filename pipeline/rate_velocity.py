@@ -335,10 +335,13 @@ def build_rate_regime_artifact(
     input_metrics: list[dict] | None = None,
     config_id: str = "data/config/rates.json",
 ) -> dict:
-    normalized_rate_rows = [
-        {"date": row["date"], "value": float(row["value"])}
-        for row in rate_rows
-    ]
+    normalized_rate_rows = sorted(
+        (
+            {"date": row["date"], "value": float(row["value"])}
+            for row in rate_rows
+        ),
+        key=lambda row: row["date"],
+    )
     rows = rate_velocity_rows(normalized_rate_rows)
     history = [
         {**row, "regime": rate_regime(row, config)}
