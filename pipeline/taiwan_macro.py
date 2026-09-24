@@ -7,6 +7,8 @@ from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from .provenance import build_provenance, records_input
+
 
 class TaiwanMacroError(ValueError):
     pass
@@ -309,6 +311,8 @@ def _component_vote(
 def build_macro_regime(
     rows: list[dict],
     config: dict,
+    *,
+    config_id: str = "data/config/taiwan-macro.json",
 ) -> dict:
     grouped = _series_values(rows)
     regime_cfg = config["mrm_regime"]
@@ -425,8 +429,37 @@ def build_macro_regime(
         ),
         None,
     )
+    required_input_ids = sorted(components)
+    consumed_input_ids = [
+        series_id
+        for series_id in sorted(
+            set(required_input_ids) | {"tw_ndc_monitoring_score"}
+        )
+        if series_id in grouped
+    ]
+    provenance_inputs = [
+        records_input(
+            series_id,
+            grouped[series_id],
+            as_of=max(row["date"] for row in grouped[series_id]),
+            snapshot_at=max(
+                row["release_date"]
+                for row in grouped[series_id]
+            ),
+        )
+        for series_id in consumed_input_ids
+    ]
+    provenance = build_provenance(
+        methodology_id="taiwan-macro-regime",
+        methodology_version="taiwan-macro-regime-v1",
+        config_id=config_id,
+        config=config,
+        inputs=provenance_inputs,
+        required_input_ids=required_input_ids,
+    )
     return {
         "schema_version": "1.0.0",
+        "provenance": provenance,
         "name": "MRM Taiwan Macro Regime",
         "description": (
             "Transparent public-input regime; does not reproduce MacroMicro/MM."

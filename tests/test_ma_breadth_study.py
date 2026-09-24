@@ -1,6 +1,8 @@
+import copy
 import unittest
 
 from pipeline.ma_breadth_study import build_event_study
+from pipeline.validate import validate_ma_breadth_study
 
 
 def metric(metric_id, values, *, point_in_time=True, scope="S&P 500"):
@@ -83,7 +85,16 @@ class MovingAverageBreadthStudyTests(unittest.TestCase):
 
     def test_event_crossings_are_not_consecutive_day_duplicates(self):
         result = build_event_study(self.breadth, self.price, self.config)
+        validate_ma_breadth_study(result)
         self.assertEqual(result["status"], "ready")
+        self.assertEqual(
+            result,
+            build_event_study(
+                copy.deepcopy(self.breadth),
+                copy.deepcopy(self.price),
+                copy.deepcopy(self.config),
+            ),
+        )
         pairs = {(e["threshold"], e["direction"]) for e in result["events"]}
         self.assertIn((25.0, "down"), pairs)
         self.assertIn((25.0, "up"), pairs)

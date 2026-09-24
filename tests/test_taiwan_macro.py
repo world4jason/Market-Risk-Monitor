@@ -1,3 +1,4 @@
+import copy
 import json
 import unittest
 
@@ -108,6 +109,13 @@ class TaiwanMacroTests(unittest.TestCase):
             validate_metric(metric)
 
         regime = build_macro_regime(rows, CONFIG)
+        self.assertEqual(
+            regime,
+            build_macro_regime(
+                copy.deepcopy(rows),
+                copy.deepcopy(CONFIG),
+            ),
+        )
         current = regime["current"]
         self.assertEqual(current["date"], "2026-07-01")
         self.assertEqual(current["ndc_monitoring_light"], "red")
@@ -122,6 +130,19 @@ class TaiwanMacroTests(unittest.TestCase):
         self.assertIn(
             "tw_ndc_leading_index",
             regime["methodology"]["revision_prone_inputs"],
+        )
+        self.assertEqual(
+            regime["provenance"]["required_inputs"],
+            sorted(CONFIG["mrm_regime"]["components"]),
+        )
+        self.assertEqual(
+            [item["id"] for item in regime["provenance"]["inputs"]],
+            sorted(
+                [
+                    *CONFIG["mrm_regime"]["components"],
+                    "tw_ndc_monitoring_score",
+                ]
+            ),
         )
         validate_taiwan_macro_regime(regime)
 
@@ -214,6 +235,14 @@ class TaiwanMacroTests(unittest.TestCase):
         rows = parse_taiwan_macro_csv(text)
         regime = build_macro_regime(rows, CONFIG)
         self.assertIsNone(regime["current"])
+        self.assertEqual(
+            regime["provenance"]["required_inputs"],
+            sorted(CONFIG["mrm_regime"]["components"]),
+        )
+        self.assertEqual(
+            [item["id"] for item in regime["provenance"]["inputs"]],
+            ["tw_manufacturing_pmi"],
+        )
 
 
 if __name__ == "__main__":

@@ -44,7 +44,15 @@ def main():
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
     metrics = load_metrics(args.output_dir)
-    snapshot = build_signal_snapshot(metrics, config)
+    try:
+        config_id = args.config.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        config_id = str(args.config.resolve())
+    snapshot = build_signal_snapshot(
+        metrics,
+        config,
+        config_id=config_id,
+    )
     atomic_json(args.output_dir / "signals.json", snapshot)
 
     summary = snapshot["current"]["summary"]

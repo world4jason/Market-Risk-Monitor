@@ -122,7 +122,7 @@ class GroupedSourceFailureTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()
         self.module.WRITTEN_ARTIFACTS.clear()
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
         self.out = Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 
@@ -298,11 +298,83 @@ class GroupedSourceFailureTests(unittest.TestCase):
         )
 
 
+class DerivedProvenanceProductionPathTests(unittest.TestCase):
+    def setUp(self):
+        self.module = load_refresh_module()
+        self.module.WRITTEN_ARTIFACTS.clear()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
+        self.out = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def test_fed_rate_regime_uses_raw_source_snapshots(self):
+        legacy = metric_artifact("fed_target_legacy", units="percent", value=1.0)
+        upper = metric_artifact("fed_target_upper", units="percent", value=2.0)
+        (self.out / "fed_target_legacy.json").write_text(
+            json.dumps(legacy), encoding="utf-8"
+        )
+        (self.out / "fed_target_upper.json").write_text(
+            json.dumps(upper), encoding="utf-8"
+        )
+
+        self.module.maybe_build_fed_rate_outputs(self.out)
+        first = json.loads(
+            (self.out / "fed-rate-regime.json").read_text(encoding="utf-8")
+        )
+        self.module.maybe_build_fed_rate_outputs(self.out)
+        second = json.loads(
+            (self.out / "fed-rate-regime.json").read_text(encoding="utf-8")
+        )
+
+        self.assertEqual(first, second)
+        self.assertEqual(
+            first["provenance"]["required_inputs"],
+            ["fed_target_legacy", "fed_target_upper"],
+        )
+        self.assertEqual(
+            [item["id"] for item in first["provenance"]["inputs"]],
+            ["fed_target_legacy", "fed_target_upper"],
+        )
+
+    def test_cbc_rate_regime_is_stable_across_rebuild_wall_clock(self):
+        source = self.out / "cbc.csv"
+        source.write_text(
+            (
+                "date,discount_rate,collateral_rate,short_term_rate,source_url\n"
+                "2024-01-01,1.875,,,https://www.cbc.gov.tw/en/lp-695-2.html\n"
+                "2024-03-22,2.0,,,https://www.cbc.gov.tw/en/lp-695-2.html\n"
+            ),
+            encoding="utf-8",
+        )
+
+        self.module.refresh_cbc_rate_file(source, self.out)
+        first = json.loads(
+            (self.out / "taiwan-cbc-rate-regime.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.module.refresh_cbc_rate_file(source, self.out)
+        second = json.loads(
+            (self.out / "taiwan-cbc-rate-regime.json").read_text(
+                encoding="utf-8"
+            )
+        )
+
+        self.assertEqual(first, second)
+        self.assertEqual(
+            first["provenance"]["required_inputs"],
+            ["rate_rows"],
+        )
+        self.assertEqual(
+            first["provenance"]["generated_at"],
+            "2024-03-22T00:00:00Z",
+        )
+
+
 class CleanOutputTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()
         self.module.WRITTEN_ARTIFACTS.clear()
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
         self.out = Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)
 

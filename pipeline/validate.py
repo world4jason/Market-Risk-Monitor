@@ -51,6 +51,122 @@ def _datetime(value: str, *, field: str) -> datetime:
         raise ValidationError(f"Invalid {field}: {value!r}") from exc
 
 
+def _validate_digest(value: str, *, field: str) -> None:
+    if (
+        not isinstance(value, str)
+        or not value.startswith("sha256:")
+        or len(value) != 71
+        or any(
+            char not in "0123456789abcdef"
+            for char in value.removeprefix("sha256:")
+        )
+    ):
+        raise ValidationError(f"Invalid {field}: {value!r}")
+
+
+def validate_derived_provenance(
+    provenance: dict,
+    *,
+    context: str,
+) -> None:
+    if not isinstance(provenance, dict):
+        raise ValidationError(f"{context}: provenance missing")
+    if provenance.get("contract_version") != "1.0.0":
+        raise ValidationError(
+            f"{context}: unsupported provenance contract_version"
+        )
+
+    methodology = provenance.get("methodology")
+    if not isinstance(methodology, dict):
+        raise ValidationError(f"{context}: methodology missing")
+    if not methodology.get("id") or not methodology.get("version"):
+        raise ValidationError(
+            f"{context}: methodology id/version required"
+        )
+
+    config = provenance.get("config")
+    if not isinstance(config, dict) or not config.get("id"):
+        raise ValidationError(f"{context}: config id required")
+    _validate_digest(
+        config.get("content_digest"),
+        field=f"{context}.config.content_digest",
+    )
+
+    generated_at = provenance.get("generated_at")
+    _datetime(generated_at, field=f"{context}.generated_at")
+
+    required_inputs = provenance.get("required_inputs")
+    if (
+        not isinstance(required_inputs, list)
+        or not required_inputs
+        or any(
+            not isinstance(input_id, str) or not input_id
+            for input_id in required_inputs
+        )
+    ):
+        raise ValidationError(
+            f"{context}: required_inputs must be non-empty strings"
+        )
+    if required_inputs != sorted(required_inputs):
+        raise ValidationError(
+            f"{context}: required_inputs must be sorted"
+        )
+    if len(required_inputs) != len(set(required_inputs)):
+        raise ValidationError(
+            f"{context}: duplicate required input id"
+        )
+
+    inputs = provenance.get("inputs")
+    if not isinstance(inputs, list):
+        raise ValidationError(f"{context}: inputs must be a list")
+
+    ids = []
+    for index, item in enumerate(inputs):
+        if not isinstance(item, dict):
+            raise ValidationError(
+                f"{context}: input[{index}] must be an object"
+            )
+        input_id = item.get("id")
+        if not input_id:
+            raise ValidationError(
+                f"{context}: input[{index}].id required"
+            )
+        ids.append(input_id)
+
+        as_of = item.get("as_of")
+        if as_of is not None:
+            _date(
+                as_of,
+                field=f"{context}.inputs[{input_id}].as_of",
+            )
+        snapshot_at = item.get("snapshot_at")
+        if snapshot_at is not None:
+            _datetime(
+                snapshot_at,
+                field=f"{context}.inputs[{input_id}].snapshot_at",
+            )
+        if as_of is None and snapshot_at is None:
+            raise ValidationError(
+                f"{context}: input[{input_id}] needs as_of or snapshot_at"
+            )
+        _validate_digest(
+            item.get("content_digest"),
+            field=f"{context}.inputs[{input_id}].content_digest",
+        )
+
+    if ids != sorted(ids):
+        raise ValidationError(f"{context}: inputs must be sorted by id")
+    if len(ids) != len(set(ids)):
+        raise ValidationError(f"{context}: duplicate input id")
+    build_revision = provenance.get("build_revision")
+    if build_revision is not None and (
+        not isinstance(build_revision, str) or not build_revision
+    ):
+        raise ValidationError(
+            f"{context}: build_revision must be a non-empty string"
+        )
+
+
 def validate_metric(metric: dict) -> None:
     required = {
         "schema_version",
@@ -199,6 +315,14 @@ def _validate_signal_summary(summary: dict, *, context: str) -> None:
 def validate_signal_snapshot(payload: dict) -> None:
     if payload.get("schema_version") != "1.0.0":
         raise ValidationError("signals: unsupported schema_version")
+    validate_derived_provenance(
+        payload.get("provenance"),
+        context="signals.provenance",
+    )
+    if payload["provenance"]["methodology"]["id"] != "deleveraging-watch":
+        raise ValidationError("signals: wrong provenance methodology id")
+    if payload["provenance"]["generated_at"] != payload.get("generated_at"):
+        raise ValidationError("signals: provenance/generated_at mismatch")
     if "current" not in payload or "history" not in payload:
         raise ValidationError("signals: missing current/history")
     _datetime(payload["generated_at"], field="signals.generated_at")
@@ -643,6 +767,17 @@ def validate_ma_breadth_audit(payload: dict) -> None:
 def validate_ma_breadth_study(payload: dict) -> None:
     if payload.get("schema_version") != "1.0.0":
         raise ValidationError("ma-breadth-study: unsupported schema_version")
+    validate_derived_provenance(
+        payload.get("provenance"),
+        context="ma-breadth-study.provenance",
+    )
+    if (
+        payload["provenance"]["methodology"]["id"]
+        != "ma-breadth-event-study"
+    ):
+        raise ValidationError(
+            "ma-breadth-study: wrong provenance methodology id"
+        )
     if payload.get("status") not in {"ready", "blocked_non_point_in_time"}:
         raise ValidationError(
             f"ma-breadth-study: invalid status {payload.get('status')!r}"
@@ -673,6 +808,17 @@ def validate_ma_breadth_study(payload: dict) -> None:
 def validate_taiwan_macro_regime(payload: dict) -> None:
     if payload.get("schema_version") != "1.0.0":
         raise ValidationError("taiwan-macro-regime: unsupported schema_version")
+    validate_derived_provenance(
+        payload.get("provenance"),
+        context="taiwan-macro-regime.provenance",
+    )
+    if (
+        payload["provenance"]["methodology"]["id"]
+        != "taiwan-macro-regime"
+    ):
+        raise ValidationError(
+            "taiwan-macro-regime: wrong provenance methodology id"
+        )
     history = payload.get("history")
     if not isinstance(history, list):
         raise ValidationError("taiwan-macro-regime: history must be a list")
@@ -782,6 +928,12 @@ def validate_taiwan_macro_audit(payload: dict) -> None:
 def validate_rate_regime(payload: dict) -> None:
     if payload.get("schema_version") != "1.0.0":
         raise ValidationError("rate-regime: unsupported schema_version")
+    validate_derived_provenance(
+        payload.get("provenance"),
+        context="rate-regime.provenance",
+    )
+    if payload["provenance"]["methodology"]["id"] != "policy-rate-regime":
+        raise ValidationError("rate-regime: wrong provenance methodology id")
     allowed = {
         "easing",
         "stable",

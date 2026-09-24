@@ -239,6 +239,11 @@ Derived metric:
 
 Derived series must remain reproducible from documented inputs.
 
+Aggregate/derived artifacts additionally follow the machine-readable provenance
+contract in [derived-provenance.md](./derived-provenance.md): methodology
+version, deterministic config digest, required/actual input manifests, input
+snapshot metadata/content digests, and generated time.
+
 ## Baselines
 
 A metric declares the historical contexts it supports.

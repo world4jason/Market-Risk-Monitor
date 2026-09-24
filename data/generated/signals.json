@@ -1,8 +1,63 @@
 {
   "schema_version": "1.0.0",
+  "provenance": {
+    "contract_version": "1.0.0",
+    "methodology": {
+      "id": "deleveraging-watch",
+      "version": "signals-v2"
+    },
+    "config": {
+      "id": "data/config/signals.json",
+      "content_digest": "sha256:446f3593a986fc4de015ba526c927b16786c496c898a038f98ded7956b4c45f4"
+    },
+    "required_inputs": [
+      "finra_margin_debt_yoy_pct",
+      "mrm_mcclellan_volume_summation",
+      "nfci",
+      "nfci_risk",
+      "nyse_high_low_pct",
+      "shiller_real_tr_price",
+      "sp500_above_200dma_pct",
+      "sp500_above_50dma_pct",
+      "vix"
+    ],
+    "inputs": [
+      {
+        "id": "finra_margin_debt_yoy_pct",
+        "as_of": "2026-08-31",
+        "snapshot_at": "2026-09-22T10:54:31.276344Z",
+        "content_digest": "sha256:5f3deb084f75f36ecd798a14ef7eab81cf3f7c51f0f623ea94a6b1945421459d"
+      },
+      {
+        "id": "nfci",
+        "as_of": "2026-09-11",
+        "snapshot_at": "2026-09-22T10:54:24.252339Z",
+        "content_digest": "sha256:608673c4be59fd9b69a18ba4de4f08cc081f659c1770047023f0a9cf130ec712"
+      },
+      {
+        "id": "nfci_risk",
+        "as_of": "2026-09-11",
+        "snapshot_at": "2026-09-22T10:54:24.252339Z",
+        "content_digest": "sha256:0c1d356ab8b7e0b826666466c3b574a810c6fc9e9abcbd048f54b0cd9775721f"
+      },
+      {
+        "id": "shiller_real_tr_price",
+        "as_of": "2026-08-01",
+        "snapshot_at": "2026-09-22T10:54:31.335508Z",
+        "content_digest": "sha256:fab1a44e29638243a3320d708630446ce0a8ed028bfec7955753842811a96be8"
+      },
+      {
+        "id": "vix",
+        "as_of": "2026-09-21",
+        "snapshot_at": "2026-09-22T10:54:30.303885Z",
+        "content_digest": "sha256:829ea355cbc049121248e5f5140f0aa37c589ac19048ff43594ea18e329e181e"
+      }
+    ],
+    "generated_at": "2026-09-22T10:54:31.335508Z"
+  },
   "name": "Deleveraging Watch",
   "description": "Transparent concurrent-deterioration checks. Conditions are descriptive confirmations, not crash predictions or trading signals.",
-  "generated_at": "2026-09-22T10:54:33.304394Z",
+  "generated_at": "2026-09-22T10:54:31.335508Z",
   "current": {
     "as_of": "2026-09-22",
     "summary": {

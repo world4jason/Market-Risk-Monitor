@@ -595,6 +595,11 @@ def maybe_build_fed_rate_outputs(output_dir: Path) -> list[dict]:
             rate_rows,
             config,
             name="Fed Policy Rate Regime",
+            input_metrics=[
+                metric
+                for metric in (legacy, upper)
+                if metric is not None
+            ],
         ),
     )
     return report

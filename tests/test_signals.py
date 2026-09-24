@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime, timezone
 
 from pipeline.signals import build_signal_snapshot, evaluate_rule
+from pipeline.validate import validate_signal_snapshot
 
 
 def metric(
@@ -265,6 +266,16 @@ class SignalTests(unittest.TestCase):
             metrics,
             config,
             datetime(2026, 3, 1, tzinfo=timezone.utc),
+        )
+        validate_signal_snapshot(snapshot)
+        self.assertIn("provenance", snapshot)
+        self.assertEqual(
+            snapshot["provenance"]["required_inputs"],
+            ["known", "missing"],
+        )
+        self.assertEqual(
+            [item["id"] for item in snapshot["provenance"]["inputs"]],
+            ["known"],
         )
         summary = snapshot["current"]["summary"]
         self.assertEqual(summary["active"], 1)

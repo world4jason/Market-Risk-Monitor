@@ -4,6 +4,8 @@ from bisect import bisect_left
 from datetime import date
 from statistics import median
 
+from .provenance import build_provenance, metric_input
+
 
 class MovingAverageBreadthStudyError(ValueError):
     pass
@@ -101,6 +103,8 @@ def build_event_study(
     breadth_metric: dict,
     price_metric: dict,
     config: dict,
+    *,
+    config_id: str = "data/config/ma-breadth.json",
 ) -> dict:
     if breadth_metric.get("metric", {}).get("id") != config["event_study"]["metric"]:
         raise MovingAverageBreadthStudyError("breadth metric id does not match event-study config")
@@ -111,9 +115,20 @@ def build_event_study(
     point_in_time = breadth_metric.get("source", {}).get("point_in_time_membership")
     breadth_obs = _valid(breadth_metric)
     price_obs = _valid(price_metric)
+    provenance = build_provenance(
+        methodology_id="ma-breadth-event-study",
+        methodology_version="ma-breadth-event-study-v1",
+        config_id=config_id,
+        config=config,
+        inputs=[
+            metric_input(breadth_metric),
+            metric_input(price_metric),
+        ],
+    )
 
     result = {
         "schema_version": "1.0.0",
+        "provenance": provenance,
         "status": "ready" if point_in_time is True else "blocked_non_point_in_time",
         "breadth_metric": breadth_metric["metric"]["id"],
         "breadth_provider": breadth_metric["source"]["provider"],
