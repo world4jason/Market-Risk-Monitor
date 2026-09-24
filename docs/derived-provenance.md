@@ -84,9 +84,13 @@ itself because it does not say which config and input snapshots were consumed.
 
 ## Required inputs vs actual inputs
 
-`required_inputs` is the complete sorted set the methodology/config expects.
+`required_inputs` is the complete sorted set the methodology/config requires.
 
-`inputs` is the sorted manifest of artifacts actually present and consumed.
+`inputs` is the sorted manifest of artifacts/records actually present and
+consumed. It may include optional context that affects the output even though
+that input is not required for the artifact to exist. Conversely, a required
+input may be absent from `inputs`; that absence stays machine-readable rather
+than being silently collapsed into the actual-input set.
 
 This distinction is important for Deleveraging Watch: a missing breadth family
 must remain visible in provenance even when the runtime condition correctly
@@ -114,7 +118,8 @@ already provide a deterministic snapshot time.
 The default generated timestamp is derived from input snapshot metadata.
 Deleveraging Watch also accepts an explicit evaluation time because its current
 condition semantics are evaluation-date dependent; if omitted, it derives that
-time from its input snapshots.
+time only from the input metrics referenced by its configured rules. Unrelated
+artifacts in the same output directory cannot move the signal evaluation time.
 
 Therefore, rebuilding the same committed fixtures with the same methodology and
 config produces byte-equivalent logical output, including provenance.
