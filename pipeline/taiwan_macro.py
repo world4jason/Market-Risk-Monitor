@@ -429,17 +429,25 @@ def build_macro_regime(
         ),
         None,
     )
+    required_input_ids = sorted(components)
+    consumed_input_ids = [
+        series_id
+        for series_id in sorted(
+            set(required_input_ids) | {"tw_ndc_monitoring_score"}
+        )
+        if series_id in grouped
+    ]
     provenance_inputs = [
         records_input(
             series_id,
-            series_rows,
-            as_of=max(row["date"] for row in series_rows),
+            grouped[series_id],
+            as_of=max(row["date"] for row in grouped[series_id]),
             snapshot_at=max(
                 row["release_date"]
-                for row in series_rows
+                for row in grouped[series_id]
             ),
         )
-        for series_id, series_rows in sorted(grouped.items())
+        for series_id in consumed_input_ids
     ]
     provenance = build_provenance(
         methodology_id="taiwan-macro-regime",
@@ -447,6 +455,7 @@ def build_macro_regime(
         config_id=config_id,
         config=config,
         inputs=provenance_inputs,
+        required_input_ids=required_input_ids,
     )
     return {
         "schema_version": "1.0.0",
