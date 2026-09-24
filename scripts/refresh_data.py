@@ -40,10 +40,12 @@ from pipeline.tradermonty_ma_breadth import (
     fetch_tradermonty_csv,
 )
 from pipeline.taiwan_macro import (
+    assemble_taiwan_macro_sources,
     build_macro_audit,
     build_macro_metrics,
     build_macro_regime,
     parse_taiwan_macro_csv,
+    validate_macro_refresh_superset,
 )
 from pipeline.taiwan_trend_breadth import compute_from_panel as compute_taiwan_trend_breadth
 from pipeline.taiwan_twse import (
@@ -496,13 +498,31 @@ def refresh_twse_breadth_file(
     )
 
 
-def refresh_taiwan_macro_file(
-    input_path: Path,
+def refresh_taiwan_macro_files(
+    input_paths: list[Path],
     output_dir: Path,
 ) -> list[dict]:
-    rows = parse_taiwan_macro_csv(
-        input_path.read_text(encoding="utf-8-sig")
-    )
+    parsed_sources = [
+        (
+            str(input_path),
+            parse_taiwan_macro_csv(
+                input_path.read_text(encoding="utf-8-sig")
+            ),
+        )
+        for input_path in input_paths
+    ]
+    rows = assemble_taiwan_macro_sources(parsed_sources)
+
+    audit_path = output_dir / "taiwan-macro-audit.json"
+    if audit_path.exists():
+        previous_audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        previous_rows = previous_audit.get("rows")
+        if not isinstance(previous_rows, list):
+            raise ValueError(
+                "existing taiwan-macro-audit.json has invalid rows"
+            )
+        validate_macro_refresh_superset(previous_rows, rows)
+
     report = _write_metric_group(
         build_macro_metrics(rows),
         output_dir,
@@ -517,10 +537,18 @@ def refresh_taiwan_macro_file(
         build_macro_regime(rows, config),
     )
     atomic_json(
-        output_dir / "taiwan-macro-audit.json",
+        audit_path,
         build_macro_audit(rows),
     )
     return report
+
+
+def refresh_taiwan_macro_file(
+    input_path: Path,
+    output_dir: Path,
+) -> list[dict]:
+    """Backward-compatible single-source wrapper."""
+    return refresh_taiwan_macro_files([input_path], output_dir)
 
 
 def refresh_cbc_rate_file(
@@ -909,9 +937,11 @@ def main() -> None:
     parser.add_argument(
         "--taiwan-macro-file",
         type=Path,
+        action="append",
         help=(
             "Normalized Taiwan official/public macro CSV using "
-            "docs/taiwan-sources.md contract."
+            "docs/taiwan-sources.md contract. Repeat once per source-owned "
+            "snapshot (for example CIER plus NDC); the refresh unions them."
         ),
     )
     parser.add_argument(
@@ -1037,7 +1067,7 @@ def main() -> None:
 
     if args.taiwan_macro_file:
         report.extend(
-            refresh_taiwan_macro_file(
+            refresh_taiwan_macro_files(
                 args.taiwan_macro_file,
                 args.output_dir,
             )

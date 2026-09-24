@@ -48,6 +48,13 @@ class RefreshCliStructureTests(unittest.TestCase):
         ]:
             self.assertEqual(self.source.count(option), 1)
 
+    def test_taiwan_macro_file_is_repeatable_for_source_assembly(self):
+        marker = '"--taiwan-macro-file"'
+        start = self.source.index(marker)
+        block = self.source[start:start + 500]
+        self.assertIn('action="append"', block)
+        self.assertIn("refresh_taiwan_macro_files", self.source)
+
     def test_taiwan_refresh_functions_defined_once(self):
         expected = [
             "refresh_twse_current",

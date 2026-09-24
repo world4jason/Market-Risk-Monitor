@@ -379,6 +379,81 @@ class DerivedProvenanceProductionPathTests(unittest.TestCase):
         )
 
 
+class TaiwanMacroAssemblyRefreshTests(unittest.TestCase):
+    def setUp(self):
+        self.module = load_refresh_module()
+        self.module.WRITTEN_ARTIFACTS.clear()
+        self.tmp = tempfile.TemporaryDirectory(dir=ROOT)
+        self.out = Path(self.tmp.name) / "out"
+        self.out.mkdir()
+        self.addCleanup(self.tmp.cleanup)
+
+    def write_source(self, name, rows):
+        path = Path(self.tmp.name) / name
+        header = "date,provider,series_id,value,unit,release_date,source_url\n"
+        path.write_text(header + "\n".join(rows) + "\n", encoding="utf-8")
+        return path
+
+    def test_full_union_writes_both_source_families(self):
+        cier = self.write_source(
+            "cier.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,49,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        ndc = self.write_source(
+            "ndc.csv",
+            [
+                "2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-09-21,https://www.ndc.gov.tw/en/",
+                "2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/",
+            ],
+        )
+
+        self.module.refresh_taiwan_macro_files([cier, ndc], self.out)
+
+        self.assertTrue((self.out / "tw_manufacturing_pmi.json").exists())
+        self.assertTrue((self.out / "tw_ndc_leading_index.json").exists())
+        audit = json.loads(
+            (self.out / "taiwan-macro-audit.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            {row["series_id"] for row in audit["rows"]},
+            {"tw_manufacturing_pmi", "tw_ndc_leading_index"},
+        )
+
+    def test_partial_followup_fails_before_overwriting_previous_outputs(self):
+        cier = self.write_source(
+            "cier.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,49,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        ndc = self.write_source(
+            "ndc.csv",
+            [
+                "2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-09-21,https://www.ndc.gov.tw/en/",
+                "2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/",
+            ],
+        )
+        self.module.refresh_taiwan_macro_files([cier, ndc], self.out)
+        ndc_before = (self.out / "tw_ndc_leading_index.json").read_bytes()
+        audit_before = (self.out / "taiwan-macro-audit.json").read_bytes()
+
+        with self.assertRaisesRegex(ValueError, "would drop existing series"):
+            self.module.refresh_taiwan_macro_files([cier], self.out)
+
+        self.assertEqual(
+            (self.out / "tw_ndc_leading_index.json").read_bytes(),
+            ndc_before,
+        )
+        self.assertEqual(
+            (self.out / "taiwan-macro-audit.json").read_bytes(),
+            audit_before,
+        )
+
+
 class CleanOutputTests(unittest.TestCase):
     def setUp(self):
         self.module = load_refresh_module()

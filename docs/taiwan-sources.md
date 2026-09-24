@@ -101,6 +101,31 @@ Current release cadence: monthly.
 
 Because the web release/database surface is not guaranteed to be a stable machine API, v0.3 supports a normalized local CSV snapshot contract for historical ingestion.
 
+### NDC snapshot and revision semantics
+
+The committed/manual NDC file is a **current-vintage snapshot**, not a historical
+vintage archive. NDC history can be revised retrospectively, so canonical NDC
+metrics keep `availability_basis: unknown` and their historical baselines remain
+retrospective-only. Replacing a manual NDC snapshot may therefore revise prior
+months; the pipeline must not reinterpret those revised values as if they had
+been known at the original reference dates.
+
+Use the snapshot's actual verification/publication date in `release_date`. Until
+a real normalized NDC snapshot is legally obtained and committed, the NDC
+family remains absent rather than synthesized.
+
+### Multi-source Taiwan macro assembly
+
+`--taiwan-macro-file` is repeatable. Each input file owns one or more canonical
+series ids, and a given `series_id` may appear in only one input file per
+refresh. The assembler sorts the union deterministically by `(series_id, date)`.
+
+Once `taiwan-macro-audit.json` already contains a series/date, a later refresh
+may revise that row's value but may not omit the series or truncate previously
+published dates. A partial refresh fails before any metric/regime/audit file is
+rewritten. This makes separately maintained CIER and NDC snapshots safe to
+compose without one source erasing the other under `--clean-output`.
+
 ## 3. Taiwan manufacturing PMI — CIER
 
 Official:

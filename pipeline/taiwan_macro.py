@@ -143,6 +143,84 @@ def parse_taiwan_macro_csv(text: str) -> list[dict]:
     return rows
 
 
+def assemble_taiwan_macro_sources(
+    sources: list[tuple[str, list[dict]]],
+) -> list[dict]:
+    """Deterministically combine source-owned Taiwan macro snapshots.
+
+    Each canonical series id has exactly one owning input file in a refresh.
+    That keeps CIER's accumulated PMI history and the manual NDC current-vintage
+    snapshot composable without inventing cross-file revision precedence.
+    """
+    if not sources:
+        raise TaiwanMacroError("at least one Taiwan macro source is required")
+
+    owners: dict[str, str] = {}
+    combined: list[dict] = []
+    seen_keys: set[tuple[str, str]] = set()
+
+    for source_name, source_rows in sources:
+        if not source_rows:
+            raise TaiwanMacroError(
+                f"Taiwan macro source {source_name!r} contained no rows"
+            )
+        source_series = sorted({row["series_id"] for row in source_rows})
+        for series_id in source_series:
+            previous_owner = owners.get(series_id)
+            if previous_owner is not None and previous_owner != source_name:
+                raise TaiwanMacroError(
+                    f"series {series_id} appears in multiple Taiwan macro "
+                    f"sources: {previous_owner!r} and {source_name!r}"
+                )
+            owners[series_id] = source_name
+
+        for row in source_rows:
+            key = (row["series_id"], row["date"])
+            if key in seen_keys:
+                raise TaiwanMacroError(
+                    f"duplicate assembled Taiwan macro row {key[0]} {key[1]}"
+                )
+            seen_keys.add(key)
+            combined.append(dict(row))
+
+    combined.sort(key=lambda row: (row["series_id"], row["date"]))
+    return combined
+
+
+def validate_macro_refresh_superset(
+    existing_rows: list[dict],
+    incoming_rows: list[dict],
+) -> None:
+    """Refuse a refresh that silently drops an existing series/date.
+
+    Revised values for an existing key remain allowed; this guard is about
+    accidental source omission or history truncation, not freezing values.
+    """
+    existing_by_series: dict[str, set[str]] = defaultdict(set)
+    incoming_by_series: dict[str, set[str]] = defaultdict(set)
+    for row in existing_rows:
+        existing_by_series[row["series_id"]].add(row["date"])
+    for row in incoming_rows:
+        incoming_by_series[row["series_id"]].add(row["date"])
+
+    missing_series = sorted(set(existing_by_series) - set(incoming_by_series))
+    if missing_series:
+        raise TaiwanMacroError(
+            "partial Taiwan macro refresh would drop existing series: "
+            + ", ".join(missing_series)
+            + "; pass every source snapshot in the same refresh"
+        )
+
+    for series_id, existing_dates in sorted(existing_by_series.items()):
+        missing_dates = sorted(existing_dates - incoming_by_series[series_id])
+        if missing_dates:
+            raise TaiwanMacroError(
+                f"Taiwan macro refresh would truncate {series_id} history; "
+                f"missing {len(missing_dates)} existing dates starting "
+                f"{missing_dates[0]}"
+            )
+
+
 def _freshness(as_of: str, fetched_at: datetime, max_age_days: int = 75):
     age = max(
         (fetched_at.date() - date.fromisoformat(as_of)).days,

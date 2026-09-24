@@ -19,6 +19,20 @@ The official NDC monitoring score/light is also retained independently as:
 
 It is **not** one of the MRM vote components by default.
 
+### Current-vintage limitation
+
+NDC series are revision-prone and the repository does not yet retain historical
+vintages. They are therefore treated as retrospective current-vintage context:
+`availability_basis` remains `unknown`, historical PIT claims are disabled, and
+a later manual NDC snapshot may revise earlier months. CIER release-aware PMI
+rows can coexist in the same assembled macro dataset without upgrading NDC rows
+to PIT-safe history.
+
+The refresh command may take multiple `--taiwan-macro-file` arguments. Each
+canonical series belongs to exactly one source file in a run, and partial
+follow-up refreshes that would remove an already published series/date are
+rejected before output is rewritten.
+
 ## NDC official monitoring light
 
 NDC's published score bands are:

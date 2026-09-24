@@ -375,12 +375,21 @@ Normalized contract:
 date,provider,series_id,value,unit,release_date,source_url
 ```
 
-Then:
+Then pass every source-owned snapshot in the same refresh. The option is
+repeatable, so CIER and NDC can remain separate files while the pipeline builds
+one deterministic union:
 
 ```bash
 python scripts/refresh_data.py \
-  --taiwan-macro-file /path/to/taiwan-macro.csv
+  --taiwan-macro-file .cache/taiwan-macro/cier-pmi.csv \
+  --taiwan-macro-file /path/to/ndc-current-vintage.csv
 ```
+
+Each canonical `series_id` must belong to exactly one input file. Once a
+published macro audit contains a source family, a later refresh that omits that
+series or truncates its existing dates fails before writing anything. This keeps
+a CIER-only refresh from silently deleting NDC artifacts (and vice versa),
+including under `--clean-output`.
 
 The MRM Taiwan macro regime is documented in `docs/taiwan-macro-methodology.md` and is explicitly **not** a reconstruction of MacroMicro/MM.
 
