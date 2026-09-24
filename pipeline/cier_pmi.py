@@ -269,13 +269,14 @@ def merge_macro_rows(
     The official table only exposes the last 12 months, so coverage is built
     by merging successive observations rather than by backfilling.
 
-    When a month is seen again with the same value, the *earliest* release
-    date wins: that is the tightest defensible upper bound on when the value
-    was publicly available, and re-observing it later does not make it newer.
+    Ingestion is forward-only by verified release date. An incoming vintage
+    older than the currently stored vintage is rejected even if its numeric
+    value happens to match the current value; this prevents a value reversion
+    chain from being rolled back by replaying an older snapshot.
 
-    When the value has changed, the month has been revised. The revised figure
-    demonstrably was not available at the earlier date, so it takes the newer
-    release date with it.
+    Re-observing the current value at the same or a later verification date
+    keeps the stored release date. A changed value is accepted only at a
+    strictly newer verification date and then becomes the new current vintage.
     """
     merged: dict[tuple[str, str], dict] = {
         (row["series_id"], row["date"]): dict(row) for row in existing
@@ -287,23 +288,30 @@ def merge_macro_rows(
         if previous is None:
             merged[key] = dict(row)
             continue
+        previous_release = date.fromisoformat(previous["release_date"])
+        incoming_release = date.fromisoformat(row["release_date"])
+        if incoming_release < previous_release:
+            raise CierPmiError(
+                "out-of-order CIER observation for "
+                f"{row['date']}: stored vintage verified "
+                f"{previous['release_date']}, incoming vintage verified "
+                f"{row['release_date']}"
+            )
+
         if float(previous["value"]) == float(row["value"]):
+            # Forward re-observation of an unchanged value does not move its
+            # verified availability date. Equal-date replay is idempotent.
             merged[key] = {
                 **dict(row),
-                "release_date": min(
-                    previous["release_date"],
-                    row["release_date"],
-                ),
+                "release_date": previous["release_date"],
             }
         else:
-            previous_release = date.fromisoformat(previous["release_date"])
-            incoming_release = date.fromisoformat(row["release_date"])
-            if incoming_release <= previous_release:
+            if incoming_release == previous_release:
                 raise CierPmiError(
-                    "out-of-order CIER revision for "
+                    "same-date conflicting CIER revision for "
                     f"{row['date']}: existing value {previous['value']} "
-                    f"verified {previous['release_date']}, incoming value "
-                    f"{row['value']} verified {row['release_date']}"
+                    f"and incoming value {row['value']} both claim "
+                    f"{row['release_date']}"
                 )
             merged[key] = dict(row)
 

@@ -203,6 +203,32 @@ class ProvenanceTests(unittest.TestCase):
             context="fixture.provenance",
         )
 
+    def test_builder_parameters_change_the_manifest(self) -> None:
+        base_input = records_input(
+            "fixture",
+            [{"date": "2026-01-01", "value": 1}],
+            as_of="2026-01-01",
+            snapshot_at=None,
+        )
+        first = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[base_input],
+            parameters={"name": "A"},
+        )
+        second = build_provenance(
+            methodology_id="fixture-method",
+            methodology_version="v1",
+            config_id="fixture-config",
+            config={"x": 1},
+            inputs=[base_input],
+            parameters={"name": "B"},
+        )
+        self.assertNotEqual(first, second)
+        validate_derived_provenance(first, context="fixture.provenance")
+
     def test_validator_rejects_incomplete_provenance(self) -> None:
         provenance = build_provenance(
             methodology_id="fixture-method",
@@ -438,6 +464,23 @@ class ProvenanceTests(unittest.TestCase):
             ["not_published"],
         )
         self.assertEqual(first["provenance"]["inputs"], [])
+
+    def test_signal_validator_rejects_coercible_non_numeric_leaf_values(self) -> None:
+        root = Path(__file__).resolve().parents[1] / "data" / "generated"
+        payload = json.loads(
+            (root / "signals.json").read_text(encoding="utf-8")
+        )
+        broken = copy.deepcopy(payload)
+        leaf = broken["current"]["conditions"][0]["rules"]["children"][0]
+        leaf["value"] = ""
+        with self.assertRaisesRegex(ValidationError, "rule value must be"):
+            validate_signal_snapshot(broken)
+
+        broken = copy.deepcopy(payload)
+        leaf = broken["current"]["conditions"][0]["rules"]["children"][1]
+        leaf["periods"] = "3"
+        with self.assertRaisesRegex(ValidationError, "periods must be"):
+            validate_signal_snapshot(broken)
 
     def test_checked_in_derived_artifacts_have_valid_provenance(self) -> None:
         root = Path(__file__).resolve().parents[1] / "data" / "generated"

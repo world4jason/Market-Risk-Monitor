@@ -271,15 +271,34 @@ class CierPmiMergeTests(unittest.TestCase):
         existing = [self.row("2026-08-01", 61.9, "2026-11-30")]
         older = [self.row("2026-08-01", 62.5, "2026-09-21")]
 
-        with self.assertRaisesRegex(CierPmiError, "out-of-order CIER revision"):
+        with self.assertRaisesRegex(CierPmiError, "out-of-order CIER observation"):
             merge_macro_rows(existing, older)
 
     def test_same_release_date_conflicting_value_is_rejected(self):
         existing = [self.row("2026-08-01", 61.9, "2026-11-30")]
         conflicting = [self.row("2026-08-01", 62.5, "2026-11-30")]
 
-        with self.assertRaisesRegex(CierPmiError, "out-of-order CIER revision"):
+        with self.assertRaisesRegex(CierPmiError, "same-date conflicting CIER revision"):
             merge_macro_rows(existing, conflicting)
+
+    def test_value_reversion_then_old_same_value_replay_is_rejected(self):
+        d1 = [self.row("2026-08-01", 62.5, "2026-09-21")]
+        d2 = [self.row("2026-08-01", 61.9, "2026-11-30")]
+        d3 = [self.row("2026-08-01", 62.5, "2026-12-31")]
+
+        current = merge_macro_rows([], d1)
+        current = merge_macro_rows(current, d2)
+        current = merge_macro_rows(current, d3)
+        self.assertEqual(current[0]["value"], 62.5)
+        self.assertEqual(current[0]["release_date"], "2026-12-31")
+
+        with self.assertRaisesRegex(
+            CierPmiError,
+            "out-of-order CIER observation",
+        ):
+            merge_macro_rows(current, d1)
+
+        self.assertEqual(current[0]["release_date"], "2026-12-31")
 
     def test_merged_output_still_satisfies_the_macro_contract(self):
         merged = merge_macro_rows(

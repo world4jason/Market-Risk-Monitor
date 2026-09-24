@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import date, datetime
 from math import isfinite
 
+from .provenance import content_digest
+
 
 ALLOWED_STATES = {"fresh", "stale", "missing", "error", "insufficient_data"}
 # Must stay in sync with observations[].status in
@@ -165,6 +167,9 @@ def validate_derived_provenance(
         raise ValidationError(
             f"{context}: build_revision must be a non-empty string"
         )
+    parameters = provenance.get("parameters")
+    if parameters is not None and not isinstance(parameters, dict):
+        raise ValidationError(f"{context}: parameters must be an object")
 
 
 def validate_metric(metric: dict) -> None:
@@ -252,10 +257,7 @@ def validate_metric(metric: dict) -> None:
 
     dates = []
     for obs in metric["observations"]:
-        observation_date = _date(
-            obs["date"],
-            field="observation date",
-        )
+        _date(obs["date"], field="observation date")
         dates.append(obs["date"])
         status = obs.get("status")
         if status not in ALLOWED_OBSERVATION_STATUSES:
@@ -268,15 +270,7 @@ def validate_metric(metric: dict) -> None:
 
         release_date = obs.get("release_date")
         if release_date is not None:
-            release = _date(
-                release_date,
-                field="observation release_date",
-            )
-            if release < observation_date:
-                raise ValidationError(
-                    "release_date cannot precede observation date at "
-                    f"{obs['date']}"
-                )
+            _date(release_date, field="observation release_date")
         if (
             availability_basis == "release_date"
             and value is not None
@@ -323,6 +317,52 @@ def _validate_signal_summary(summary: dict, *, context: str) -> None:
         raise ValidationError(f"{context}: total != known + unknown")
 
 
+def _validate_signal_rule(rule: dict, *, context: str) -> None:
+    if not isinstance(rule, dict):
+        raise ValidationError(f"{context}: rule must be an object")
+    status = rule.get("status")
+    if status not in ALLOWED_SIGNAL_STATES:
+        raise ValidationError(f"{context}: invalid rule status {status!r}")
+
+    rule_type = rule.get("type")
+    if rule_type in {"any", "all"}:
+        children = rule.get("children")
+        if not isinstance(children, list):
+            raise ValidationError(f"{context}: composite rule children must be a list")
+        for index, child in enumerate(children):
+            _validate_signal_rule(
+                child,
+                context=f"{context}.children[{index}]",
+            )
+        return
+
+    value = rule.get("value")
+    if value is not None and (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not isfinite(float(value))
+    ):
+        raise ValidationError(f"{context}: rule value must be a finite number or null")
+    if status in {"active", "inactive"} and value is None:
+        raise ValidationError(f"{context}: known rule status requires numeric value")
+
+    periods = rule.get("periods")
+    if periods is not None and (
+        isinstance(periods, bool)
+        or not isinstance(periods, int)
+        or periods < 1
+    ):
+        raise ValidationError(f"{context}: periods must be a positive integer or null")
+
+    threshold = rule.get("threshold")
+    if threshold is not None and (
+        isinstance(threshold, bool)
+        or not isinstance(threshold, (int, float))
+        or not isfinite(float(threshold))
+    ):
+        raise ValidationError(f"{context}: threshold must be a finite number or null")
+
+
 def validate_signal_snapshot(payload: dict) -> None:
     if payload.get("schema_version") != "1.0.0":
         raise ValidationError("signals: unsupported schema_version")
@@ -348,6 +388,10 @@ def validate_signal_snapshot(payload: dict) -> None:
             raise ValidationError(
                 f"signals: invalid condition status {condition.get('status')!r}"
             )
+        _validate_signal_rule(
+            condition.get("rules"),
+            context=f"signals.current.conditions[{condition.get('id')}].rules",
+        )
 
     _validate_signal_summary(payload["current"]["summary"], context="signals.current")
     if payload["current"]["summary"]["total"] != len(current_conditions):
@@ -974,8 +1018,22 @@ def validate_rate_regime(payload: dict) -> None:
         payload.get("provenance"),
         context="rate-regime.provenance",
     )
-    if payload["provenance"]["methodology"]["id"] != "policy-rate-regime":
+    provenance = payload["provenance"]
+    if provenance["methodology"]["id"] != "policy-rate-regime":
         raise ValidationError("rate-regime: wrong provenance methodology id")
+    if provenance.get("required_inputs") != ["rate_rows"]:
+        raise ValidationError(
+            "rate-regime: required_inputs must be exactly ['rate_rows']"
+        )
+    rate_input = next(
+        (item for item in provenance.get("inputs", []) if item.get("id") == "rate_rows"),
+        None,
+    )
+    if rate_input is None:
+        raise ValidationError("rate-regime: rate_rows provenance input missing")
+    parameters = provenance.get("parameters")
+    if not isinstance(parameters, dict) or parameters.get("name") != payload.get("name"):
+        raise ValidationError("rate-regime: provenance name parameter mismatch")
     allowed = {
         "easing",
         "stable",
@@ -1010,6 +1068,19 @@ def validate_rate_regime(payload: dict) -> None:
         raise ValidationError("rate-regime: dates not monotonically ascending")
     if len(dates) != len(set(dates)):
         raise ValidationError("rate-regime: duplicate dates")
+
+    reconstructed_rate_rows = [
+        {"date": row["date"], "value": float(row["rate"])}
+        for row in history
+    ]
+    if rate_input.get("content_digest") != content_digest(reconstructed_rate_rows):
+        raise ValidationError(
+            "rate-regime: rate_rows provenance digest does not match history"
+        )
+    expected_as_of = history[-1]["date"] if history else None
+    if rate_input.get("as_of") != expected_as_of:
+        raise ValidationError("rate-regime: rate_rows as_of does not match history")
+
     current = payload.get("current")
     if history and current != history[-1]:
         raise ValidationError("rate-regime: current must equal last history row")

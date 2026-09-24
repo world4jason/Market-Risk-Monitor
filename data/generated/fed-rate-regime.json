@@ -34,7 +34,10 @@
         "content_digest": "sha256:6e8de4d67b1ffd3d61ee092317a72bd20f9456de748055d1fa19a326732f5ab6"
       }
     ],
-    "generated_at": "2026-09-22T10:54:24.252339Z"
+    "generated_at": "2026-09-22T10:54:24.252339Z",
+    "parameters": {
+      "name": "Fed Policy Rate Regime"
+    }
   },
   "current": {
     "date": "2026-09-17",

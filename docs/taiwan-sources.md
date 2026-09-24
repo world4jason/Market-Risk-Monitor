@@ -133,10 +133,13 @@ simultaneously available rather than as twelve historical arrivals.
 
 For repeated observations:
 
-- unchanged values keep their earliest verified release date;
+- ingestion is forward-only by verification/release date; an older replay is
+  rejected even when its numeric value matches the current vintage;
+- an unchanged value observed again at the same or a later date keeps the
+  current vintage's stored release date;
 - a revised value is accepted only when its verification/release date is
-  strictly newer than the stored vintage; older or same-date conflicting
-  values are rejected rather than allowed to roll canonical history backward;
+  strictly newer than the stored vintage; same-date conflicting values are
+  rejected rather than allowed to make canonical history ambiguous;
 - months that roll off the source page remain in the accumulated local history.
 
 The bootstrap also requires at least 12 contiguous monthly rows from the

@@ -130,6 +130,70 @@ class RateVelocityTests(unittest.TestCase):
             ),
         )
 
+    def test_rate_regime_validator_enforces_rate_rows_contract(self):
+        rows = [
+            {"date": "2022-03-17", "value": 0.50},
+            {"date": "2022-05-05", "value": 1.00},
+            {"date": "2022-06-16", "value": 1.75},
+        ]
+        artifact = build_rate_regime_artifact(
+            rows,
+            CONFIG,
+            name="Rate Regime",
+        )
+        validate_rate_regime(artifact)
+
+        broken = copy.deepcopy(artifact)
+        broken["provenance"]["required_inputs"] = ["other"]
+        with self.assertRaisesRegex(
+            Exception,
+            "required_inputs must be exactly",
+        ):
+            validate_rate_regime(broken)
+
+        broken = copy.deepcopy(artifact)
+        broken["provenance"]["inputs"] = []
+        with self.assertRaisesRegex(Exception, "rate_rows provenance input missing"):
+            validate_rate_regime(broken)
+
+        broken = copy.deepcopy(artifact)
+        broken["provenance"]["inputs"][0]["content_digest"] = (
+            "sha256:" + "0" * 64
+        )
+        with self.assertRaisesRegex(Exception, "digest does not match history"):
+            validate_rate_regime(broken)
+
+    def test_rate_regime_name_is_part_of_provenance_parameters(self):
+        rows = [
+            {"date": "2022-03-17", "value": 0.50},
+            {"date": "2022-06-16", "value": 1.75},
+        ]
+        first = build_rate_regime_artifact(
+            rows,
+            CONFIG,
+            name="Fed Policy Rate Regime",
+        )
+        second = build_rate_regime_artifact(
+            rows,
+            CONFIG,
+            name="Something Else",
+        )
+
+        self.assertEqual(
+            first["provenance"]["parameters"],
+            {"name": "Fed Policy Rate Regime"},
+        )
+        self.assertEqual(
+            second["provenance"]["parameters"],
+            {"name": "Something Else"},
+        )
+        self.assertNotEqual(first["provenance"], second["provenance"])
+
+        broken = copy.deepcopy(first)
+        broken["name"] = "Tampered"
+        with self.assertRaisesRegex(Exception, "name parameter mismatch"):
+            validate_rate_regime(broken)
+
     def test_rate_rows_are_fingerprinted_with_upstream_metrics(self):
         upstream = {
             "metric": {"id": "raw_rate"},

@@ -22,7 +22,10 @@
         "content_digest": "sha256:8df84be0010c61ae82742d842f85a2c898237c5b287211d2661056e568249adc"
       }
     ],
-    "generated_at": "2024-03-22T00:00:00Z"
+    "generated_at": "2024-03-22T00:00:00Z",
+    "parameters": {
+      "name": "Taiwan CBC Rate Regime"
+    }
   },
   "current": {
     "date": "2024-03-22",

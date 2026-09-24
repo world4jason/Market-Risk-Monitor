@@ -417,9 +417,14 @@ function marginMomentumEvidence(condition) {
       rule.metric === "finra_margin_debt_yoy_pct" &&
       rule.status === "active",
   );
-  const value = Number(trigger?.value);
-  const periods = Number(trigger?.periods);
-  if (!Number.isFinite(value) || !Number.isFinite(periods)) return null;
+  const value = trigger?.value;
+  const periods = trigger?.periods;
+  if (
+    typeof value !== "number" ||
+    !Number.isFinite(value) ||
+    typeof periods !== "number" ||
+    !Number.isFinite(periods)
+  ) return null;
   return `YoY growth slowed ${Math.abs(value).toFixed(1)} pp over ${periods} monthly observations`;
 }
 
@@ -467,11 +472,10 @@ function dynamicMetricCaveat(metric) {
 function formatRuleDetail(detail) {
   const parts = [`${detail.label}: ${detail.status}`];
   if (
-    detail.value !== null &&
-    detail.value !== undefined &&
-    Number.isFinite(Number(detail.value))
+    typeof detail.value === "number" &&
+    Number.isFinite(detail.value)
   ) {
-    const value = Number(detail.value);
+    const value = detail.value;
     const unit =
       detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"
         ? " pp"
