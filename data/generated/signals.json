@@ -53,11 +53,11 @@
         "content_digest": "sha256:829ea355cbc049121248e5f5140f0aa37c589ac19048ff43594ea18e329e181e"
       }
     ],
-    "generated_at": "2026-09-22T10:54:33.304394Z"
+    "generated_at": "2026-09-22T10:54:31.335508Z"
   },
   "name": "Deleveraging Watch",
   "description": "Transparent concurrent-deterioration checks. Conditions are descriptive confirmations, not crash predictions or trading signals.",
-  "generated_at": "2026-09-22T10:54:33.304394Z",
+  "generated_at": "2026-09-22T10:54:31.335508Z",
   "current": {
     "as_of": "2026-09-22",
     "summary": {
