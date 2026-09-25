@@ -4,10 +4,13 @@ import unittest
 
 from pipeline.methodology import point_in_time_percentiles
 from pipeline.taiwan_macro import (
+    assemble_taiwan_macro_sources,
     build_macro_metrics,
     build_macro_regime,
     monitoring_light,
     parse_taiwan_macro_csv,
+    reconcile_macro_refresh,
+    validate_macro_refresh_superset,
 )
 from pipeline.validate import validate_metric, validate_taiwan_macro_regime
 
@@ -87,6 +90,228 @@ def csv_fixture():
             ]
         )
     return "\n".join(rows) + "\n"
+
+
+class TaiwanMacroAssemblyTests(unittest.TestCase):
+    def rows(self, series_id, values, *, provider, release_date):
+        return [
+            {
+                "date": f"2026-{month:02d}-01",
+                "provider": provider,
+                "series_id": series_id,
+                "value": value,
+                "unit": "index",
+                "release_date": release_date,
+                "source_url": "https://example.com/source",
+            }
+            for month, value in enumerate(values, start=1)
+        ]
+
+    def test_disjoint_source_union_is_deterministic(self):
+        cier = self.rows(
+            "tw_manufacturing_pmi",
+            [49.0, 50.0],
+            provider="CIER",
+            release_date="2026-09-21",
+        )
+        ndc = self.rows(
+            "tw_ndc_leading_index",
+            [100.0, 101.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+
+        left = assemble_taiwan_macro_sources([("cier.csv", cier), ("ndc.csv", ndc)])
+        right = assemble_taiwan_macro_sources([("ndc.csv", ndc), ("cier.csv", cier)])
+
+        self.assertEqual(left, right)
+        self.assertEqual(
+            [(row["series_id"], row["date"]) for row in left],
+            sorted((row["series_id"], row["date"]) for row in left),
+        )
+
+    def test_assembler_rejects_noncanonical_first_owner_identity(self):
+        wrong = self.rows(
+            "tw_manufacturing_pmi",
+            [62.5],
+            provider="CIER",
+            release_date="2026-09-21",
+        )
+        wrong[0]["unit"] = "score"
+        with self.assertRaisesRegex(ValueError, "canonical provider/unit"):
+            assemble_taiwan_macro_sources([("bad.csv", wrong)])
+
+        wrong = self.rows(
+            "tw_ndc_leading_index",
+            [100.0],
+            provider="CIER",
+            release_date="2026-09-21",
+        )
+        with self.assertRaisesRegex(ValueError, "canonical provider/unit"):
+            assemble_taiwan_macro_sources([("bad.csv", wrong)])
+
+    def test_same_series_cannot_have_multiple_source_owners(self):
+        first = self.rows(
+            "tw_ndc_leading_index",
+            [100.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        second = self.rows(
+            "tw_ndc_leading_index",
+            [101.0],
+            provider="NDC",
+            release_date="2026-10-21",
+        )
+        second[0]["date"] = "2026-02-01"
+
+        with self.assertRaisesRegex(ValueError, "appears in multiple Taiwan macro sources"):
+            assemble_taiwan_macro_sources(
+                [("ndc-old.csv", first), ("ndc-new.csv", second)]
+            )
+
+    def test_refresh_superset_rejects_missing_series(self):
+        existing = self.rows(
+            "tw_manufacturing_pmi",
+            [49.0, 50.0],
+            provider="CIER",
+            release_date="2026-09-21",
+        ) + self.rows(
+            "tw_ndc_leading_index",
+            [100.0, 101.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        incoming = [
+            row for row in existing
+            if row["series_id"] == "tw_manufacturing_pmi"
+        ]
+
+        with self.assertRaisesRegex(ValueError, "would drop existing series"):
+            validate_macro_refresh_superset(existing, incoming)
+
+    def test_release_aware_refresh_is_forward_only_across_runs(self):
+        existing = self.rows(
+            "tw_manufacturing_pmi",
+            [62.5],
+            provider="CIER",
+            release_date="2026-12-31",
+        )
+        older = self.rows(
+            "tw_manufacturing_pmi",
+            [61.9],
+            provider="CIER",
+            release_date="2026-11-30",
+        )
+        with self.assertRaisesRegex(ValueError, "out-of-order release-aware revision"):
+            reconcile_macro_refresh(existing, older)
+
+        same_value_newer = self.rows(
+            "tw_manufacturing_pmi",
+            [62.5],
+            provider="CIER",
+            release_date="2027-01-31",
+        )
+        reconciled = reconcile_macro_refresh(existing, same_value_newer)
+        self.assertEqual(reconciled[0]["release_date"], "2026-12-31")
+
+        changed_newer = self.rows(
+            "tw_manufacturing_pmi",
+            [63.0],
+            provider="CIER",
+            release_date="2027-01-31",
+        )
+        reconciled = reconcile_macro_refresh(existing, changed_newer)
+        self.assertEqual(reconciled[0]["value"], 63.0)
+        self.assertEqual(reconciled[0]["release_date"], "2027-01-31")
+
+    def test_unknown_availability_ndc_may_revise_current_vintage(self):
+        existing = self.rows(
+            "tw_ndc_leading_index",
+            [100.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        revised = self.rows(
+            "tw_ndc_leading_index",
+            [102.0],
+            provider="NDC",
+            release_date="2026-10-21",
+        )
+        reconciled = reconcile_macro_refresh(existing, revised)
+        self.assertEqual(reconciled[0]["value"], 102.0)
+        self.assertEqual(reconciled[0]["release_date"], "2026-10-21")
+
+        replay_old = self.rows(
+            "tw_ndc_leading_index",
+            [100.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "out-of-order current-vintage snapshot",
+        ):
+            reconcile_macro_refresh(reconciled, replay_old)
+
+        same_date_revision = self.rows(
+            "tw_ndc_leading_index",
+            [103.0],
+            provider="NDC",
+            release_date="2026-10-21",
+        )
+        same_date = reconcile_macro_refresh(reconciled, same_date_revision)
+        self.assertEqual(same_date[0]["value"], 103.0)
+        self.assertEqual(same_date[0]["release_date"], "2026-10-21")
+
+
+    def test_provider_or_unit_change_is_rejected_across_runs(self):
+        existing = self.rows(
+            "tw_manufacturing_pmi",
+            [62.5],
+            provider="CIER",
+            release_date="2026-09-21",
+        )
+        changed_provider = self.rows(
+            "tw_manufacturing_pmi",
+            [62.5],
+            provider="OTHER",
+            release_date="2026-10-21",
+        )
+        with self.assertRaisesRegex(ValueError, "source ownership changed"):
+            reconcile_macro_refresh(existing, changed_provider)
+
+        changed_unit = [dict(row) for row in existing]
+        changed_unit[0]["unit"] = "score"
+        with self.assertRaisesRegex(ValueError, "source ownership changed"):
+            reconcile_macro_refresh(existing, changed_unit)
+
+    def test_series_cannot_mix_provider_or_unit_within_one_source(self):
+        rows = self.rows(
+            "tw_ndc_leading_index",
+            [100.0, 101.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        rows[1]["provider"] = "OTHER"
+        with self.assertRaisesRegex(ValueError, "exactly one provider/unit"):
+            assemble_taiwan_macro_sources([("mixed.csv", rows)])
+
+    def test_refresh_superset_rejects_history_truncation_but_allows_revision(self):
+        existing = self.rows(
+            "tw_ndc_leading_index",
+            [100.0, 101.0, 102.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        truncated = existing[1:]
+        with self.assertRaisesRegex(ValueError, "would truncate"):
+            validate_macro_refresh_superset(existing, truncated)
+
+        revised = [dict(row) for row in existing]
+        revised[0]["value"] = 99.5
+        revised[0]["release_date"] = "2026-10-21"
+        validate_macro_refresh_superset(existing, revised)
 
 
 class TaiwanMacroTests(unittest.TestCase):
@@ -227,6 +452,19 @@ class TaiwanMacroTests(unittest.TestCase):
 """
         with self.assertRaisesRegex(ValueError, "release_date .* precedes"):
             parse_taiwan_macro_csv(text)
+
+    def test_first_ingest_rejects_noncanonical_unit_or_provider(self):
+        wrong_unit = """date,provider,series_id,value,unit,release_date,source_url
+2026-08-01,CIER,tw_manufacturing_pmi,62.5,score,2026-09-21,https://example.com
+"""
+        with self.assertRaisesRegex(ValueError, "unit must be 'index'"):
+            parse_taiwan_macro_csv(wrong_unit)
+
+        wrong_provider = """date,provider,series_id,value,unit,release_date,source_url
+2026-08-01,CIER,tw_ndc_leading_index,100,index,2026-09-21,https://example.com
+"""
+        with self.assertRaisesRegex(ValueError, "provider must be 'NDC'"):
+            parse_taiwan_macro_csv(wrong_provider)
 
     def test_duplicate_series_date_rejected(self):
         text = """date,provider,series_id,value,unit,release_date,source_url

@@ -97,9 +97,68 @@ Canonical ids:
 - `tw_ndc_coincident_index`
 - `tw_ndc_lagging_index`
 
+Canonical normalized identity is also fixed, not inferred from the first file:
+
+| Series family | Provider | Unit |
+|---|---|---|
+| `tw_ndc_*` | `NDC` | `score` for monitoring score; `index` for cycle indexes |
+| `tw_manufacturing_pmi` | `CIER` | `index` |
+| `tw_industrial_production` / `tw_manufacturing_production` | `MOEA` | `index` |
+
+A first ingest with a noncanonical provider or unit is rejected before any
+artifact is built. Provider/unit consistency is then also enforced across
+subsequent refreshes.
+
 Current release cadence: monthly.
 
 Because the web release/database surface is not guaranteed to be a stable machine API, v0.3 supports a normalized local CSV snapshot contract for historical ingestion.
+
+### NDC snapshot and revision semantics
+
+The committed/manual NDC file is a **current-vintage snapshot**, not a historical
+vintage archive. NDC history can be revised retrospectively, so canonical NDC
+metrics keep `availability_basis: unknown` and their historical baselines remain
+retrospective-only. Replacing a manual NDC snapshot may therefore revise prior
+months; the pipeline must not reinterpret those revised values as if they had
+been known at the original reference dates.
+
+Use the snapshot's actual verification/publication date in `release_date`. Until
+a real normalized NDC snapshot is legally obtained and committed, the NDC
+family remains absent rather than synthesized.
+
+### Multi-source Taiwan macro assembly
+
+`--taiwan-macro-file` is repeatable. Each input file owns one or more canonical
+series ids, and a given `series_id` may appear in only one input file per
+refresh. Each series must also keep one provider/unit identity within a source
+and across refreshes. The assembler sorts the union deterministically by
+`(series_id, date)`.
+
+Before accepting a refresh, the pipeline loads every existing canonical Taiwan
+macro metric and cross-checks it against `taiwan-macro-audit.json` on series,
+dates, values, release dates, provider and unit. Existing canonical metrics with
+a missing or stale audit fail closed; the audit is not trusted as the sole
+retention truth. A later refresh may not omit an existing series or truncate
+previously published dates.
+
+Revision semantics depend on the canonical availability basis:
+
+- release-aware series (for example CIER PMI) are forward-only: an older
+  release/verification date is rejected, same-date conflicting values are
+  rejected, unchanged later re-observation keeps the stored release date, and
+  changed values require a strictly newer release date;
+- `availability_basis: unknown` NDC rows remain current-vintage retrospective
+  context and may revise existing values without creating PIT claims. Their
+  `release_date` is used only as a snapshot-verification watermark for ingestion
+  ordering: an incoming snapshot older than the stored verification date is
+  rejected, while same/newer verified snapshots may revise current-vintage
+  values. This ordering guard does not make NDC history PIT-safe.
+
+All input parsing, retention/ownership/chronology checks, metric builds and
+validations, regime build/validation, and audit build/validation complete before
+the first output write. Thus deterministic/application failures cannot leave a
+mixed new-metric/old-regime state, and separately maintained CIER/NDC snapshots
+cannot erase one another under `--clean-output`.
 
 ## 3. Taiwan manufacturing PMI — CIER
 
