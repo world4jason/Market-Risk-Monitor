@@ -97,6 +97,18 @@ Canonical ids:
 - `tw_ndc_coincident_index`
 - `tw_ndc_lagging_index`
 
+Canonical normalized identity is also fixed, not inferred from the first file:
+
+| Series family | Provider | Unit |
+|---|---|---|
+| `tw_ndc_*` | `NDC` | `score` for monitoring score; `index` for cycle indexes |
+| `tw_manufacturing_pmi` | `CIER` | `index` |
+| `tw_industrial_production` / `tw_manufacturing_production` | `MOEA` | `index` |
+
+A first ingest with a noncanonical provider or unit is rejected before any
+artifact is built. Provider/unit consistency is then also enforced across
+subsequent refreshes.
+
 Current release cadence: monthly.
 
 Because the web release/database surface is not guaranteed to be a stable machine API, v0.3 supports a normalized local CSV snapshot contract for historical ingestion.
@@ -136,7 +148,11 @@ Revision semantics depend on the canonical availability basis:
   rejected, unchanged later re-observation keeps the stored release date, and
   changed values require a strictly newer release date;
 - `availability_basis: unknown` NDC rows remain current-vintage retrospective
-  context and may revise existing values without creating PIT claims.
+  context and may revise existing values without creating PIT claims. Their
+  `release_date` is used only as a snapshot-verification watermark for ingestion
+  ordering: an incoming snapshot older than the stored verification date is
+  rejected, while same/newer verified snapshots may revise current-vintage
+  values. This ordering guard does not make NDC history PIT-safe.
 
 All input parsing, retention/ownership/chronology checks, metric builds and
 validations, regime build/validation, and audit build/validation complete before

@@ -594,6 +594,87 @@ class TaiwanMacroAssemblyRefreshTests(unittest.TestCase):
         self.assertEqual(self.module.WRITTEN_ARTIFACTS, set())
         self.assertEqual(self.macro_bytes(), before)
 
+    def test_macro_refresh_supports_output_dir_outside_repo(self):
+        cier = self.write_source(
+            "cier-external.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,49,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        ndc = self.write_source(
+            "ndc-external.csv",
+            [
+                "2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-09-21,https://www.ndc.gov.tw/en/",
+                "2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/",
+            ],
+        )
+        with tempfile.TemporaryDirectory() as external_temp:
+            external_out = Path(external_temp) / "out"
+            report = self.module.refresh_taiwan_macro_files(
+                [cier, ndc],
+                external_out,
+            )
+
+            self.assertTrue((external_out / "tw_manufacturing_pmi.json").exists())
+            self.assertTrue((external_out / "tw_ndc_leading_index.json").exists())
+            self.assertTrue((external_out / "taiwan-macro-regime.json").exists())
+            self.assertTrue((external_out / "taiwan-macro-audit.json").exists())
+            self.assertEqual(len(report), 2)
+            self.assertTrue(all(Path(item["path"]).is_absolute() for item in report))
+
+    def test_refresh_cli_supports_external_output_dir_without_partial_path_failure(self):
+        cier = self.write_source(
+            "cier-external-cli.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,49,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        ndc = self.write_source(
+            "ndc-external-cli.csv",
+            [
+                "2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-09-21,https://www.ndc.gov.tw/en/",
+                "2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/",
+            ],
+        )
+        with tempfile.TemporaryDirectory() as external_temp:
+            external_out = Path(external_temp) / "out"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts" / "refresh_data.py"),
+                    "--taiwan-macro-file",
+                    str(cier),
+                    "--taiwan-macro-file",
+                    str(ndc),
+                    "--output-dir",
+                    str(external_out),
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertTrue((external_out / "tw_manufacturing_pmi.json").exists())
+            self.assertTrue((external_out / "tw_ndc_leading_index.json").exists())
+            report = json.loads(
+                (external_out / "refresh-report.json").read_text(encoding="utf-8")
+            )
+            macro_results = [
+                item for item in report["results"]
+                if item.get("metric") in {
+                    "tw_manufacturing_pmi",
+                    "tw_ndc_leading_index",
+                }
+            ]
+            self.assertEqual(len(macro_results), 2)
+            self.assertTrue(
+                all(Path(item["path"]).is_absolute() for item in macro_results)
+            )
+
     def test_partial_followup_fails_before_overwriting_previous_outputs(self):
         cier = self.write_source(
             "cier.csv",

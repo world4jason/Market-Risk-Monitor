@@ -17,42 +17,49 @@ class TaiwanMacroError(ValueError):
 SERIES_META = {
     "tw_ndc_monitoring_score": {
         "name": "Taiwan NDC Monitoring Score",
+        "provider": "NDC",
         "units": "score",
         "polarity": "contextual",
         "availability_basis": "unknown",
     },
     "tw_ndc_leading_index": {
         "name": "Taiwan NDC Leading Index",
+        "provider": "NDC",
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "unknown",
     },
     "tw_ndc_coincident_index": {
         "name": "Taiwan NDC Coincident Index",
+        "provider": "NDC",
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "unknown",
     },
     "tw_ndc_lagging_index": {
         "name": "Taiwan NDC Lagging Index",
+        "provider": "NDC",
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "unknown",
     },
     "tw_manufacturing_pmi": {
         "name": "Taiwan Manufacturing PMI",
+        "provider": "CIER",
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "release_date",
     },
     "tw_industrial_production": {
         "name": "Taiwan Industrial Production Index",
+        "provider": "MOEA",
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "release_date",
     },
     "tw_manufacturing_production": {
         "name": "Taiwan Manufacturing Production Index",
+        "provider": "MOEA",
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "release_date",
@@ -126,6 +133,17 @@ def parse_taiwan_macro_csv(text: str) -> list[dict]:
             raise TaiwanMacroError(
                 f"row {line_no}: provider/unit/source_url required"
             )
+        meta = SERIES_META[series_id]
+        if provider != meta["provider"]:
+            raise TaiwanMacroError(
+                f"row {line_no}: {series_id} provider must be "
+                f"{meta['provider']!r}, got {provider!r}"
+            )
+        if unit != meta["units"]:
+            raise TaiwanMacroError(
+                f"row {line_no}: {series_id} unit must be "
+                f"{meta['units']!r}, got {unit!r}"
+            )
 
         rows.append(
             {
@@ -176,6 +194,13 @@ def assemble_taiwan_macro_sources(
                 raise TaiwanMacroError(
                     f"series {series_id} must have exactly one provider/unit "
                     f"within source {source_name!r}"
+                )
+            meta = SERIES_META[series_id]
+            if providers != {meta["provider"]} or units != {meta["units"]}:
+                raise TaiwanMacroError(
+                    f"series {series_id} canonical provider/unit must be "
+                    f"{meta['provider']!r}/{meta['units']!r}, got "
+                    f"{sorted(providers)}/{sorted(units)}"
                 )
 
             previous_owner = owners.get(series_id)
@@ -274,23 +299,34 @@ def reconcile_macro_refresh(
         canonical = dict(row)
         previous = existing_by_key.get((row["series_id"], row["date"]))
         basis = SERIES_META[row["series_id"]]["availability_basis"]
-        if previous is not None and basis == "release_date":
+        if previous is not None:
             previous_release = date.fromisoformat(previous["release_date"])
             incoming_release = date.fromisoformat(row["release_date"])
             if incoming_release < previous_release:
+                kind = (
+                    "release-aware revision"
+                    if basis == "release_date"
+                    else "current-vintage snapshot"
+                )
                 raise TaiwanMacroError(
-                    f"out-of-order release-aware revision for {row['series_id']} "
+                    f"out-of-order {kind} for {row['series_id']} "
                     f"{row['date']}: stored {previous['release_date']}, "
                     f"incoming {row['release_date']}"
                 )
-            same_value = float(previous["value"]) == float(row["value"])
-            if same_value:
-                canonical["release_date"] = previous["release_date"]
-            elif incoming_release == previous_release:
-                raise TaiwanMacroError(
-                    f"same-date conflicting release-aware revision for "
-                    f"{row['series_id']} {row['date']}"
-                )
+
+            if basis == "release_date":
+                same_value = float(previous["value"]) == float(row["value"])
+                if same_value:
+                    canonical["release_date"] = previous["release_date"]
+                elif incoming_release == previous_release:
+                    raise TaiwanMacroError(
+                        f"same-date conflicting release-aware revision for "
+                        f"{row['series_id']} {row['date']}"
+                    )
+            # availability_basis=unknown remains non-PIT/current-vintage. Its
+            # release_date is only an ingestion watermark: same/newer verified
+            # snapshots may revise values, but an older snapshot may not replay
+            # over the current vintage.
         reconciled.append(canonical)
 
     reconciled.sort(key=lambda row: (row["series_id"], row["date"]))

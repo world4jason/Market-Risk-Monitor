@@ -98,6 +98,15 @@ def atomic_json(path: Path, payload: dict) -> None:
     WRITTEN_ARTIFACTS.add(path.resolve())
 
 
+def report_path(path: Path) -> str:
+    """Stable report path for repo-local or external output directories."""
+    resolved = path.resolve()
+    try:
+        return str(resolved.relative_to(ROOT.resolve()))
+    except ValueError:
+        return str(resolved)
+
+
 # A single fetch can produce several metrics. When one fails, the report names
 # one representative metric, so the preserved set has to be declared explicitly
 # rather than inferred from that name -- otherwise --clean-output prunes the
@@ -219,7 +228,7 @@ def refresh_fred(
                 {
                     "metric": item["id"],
                     "status": "updated",
-                    "path": str(dest.relative_to(ROOT)),
+                    "path": report_path(dest),
                 }
             )
         except Exception as exc:
@@ -250,7 +259,7 @@ def refresh_cboe_vix(output_dir: Path) -> list[dict]:
             {
                 "metric": "vix",
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         ]
     except Exception as exc:
@@ -276,7 +285,7 @@ def refresh_breadth(input_path: Path, output_dir: Path) -> list[dict]:
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
     return report
@@ -308,7 +317,7 @@ def refresh_ma_breadth(input_path: Path, output_dir: Path) -> list[dict]:
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
 
@@ -369,7 +378,7 @@ def refresh_tradermonty_ma_breadth(output_dir: Path) -> list[dict]:
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
     return report
@@ -402,7 +411,7 @@ def _write_metric_group(
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
     return report
@@ -631,7 +640,7 @@ def refresh_taiwan_macro_files(
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
     atomic_json(
@@ -763,7 +772,7 @@ def refresh_taiwan_trend_panel(
                 {
                     "metric": metric_id,
                     "status": "updated",
-                    "path": str(dest.relative_to(ROOT)),
+                    "path": report_path(dest),
                 }
             )
 
@@ -806,7 +815,7 @@ def refresh_finra(input_path: Path, output_dir: Path) -> list[dict]:
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
     return report
@@ -836,7 +845,7 @@ def refresh_shiller(input_path: Path, output_dir: Path) -> list[dict]:
             {
                 "metric": metric_id,
                 "status": "updated",
-                "path": str(dest.relative_to(ROOT)),
+                "path": report_path(dest),
             }
         )
     return report

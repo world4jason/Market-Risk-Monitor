@@ -33,10 +33,11 @@ canonical series belongs to exactly one source file in a run and keeps a stable
 provider/unit identity across refreshes. Existing audit rows are cross-checked
 against canonical metric observations before they are used as the retention
 floor. Partial follow-up refreshes that would remove an already published
-series/date are rejected. Release-aware series use forward-only revision
-chronology; NDC current-vintage rows remain revision-prone and non-PIT. All
-macro metrics, the regime, and the audit are built and validated in memory
-before the write phase begins.
+series/date are rejected. Release-aware series use forward-only revision chronology. NDC current-vintage
+rows remain revision-prone and non-PIT, but their verification date is a
+monotonic ingestion watermark so an older snapshot cannot replay over a newer
+current vintage. All macro metrics, the regime, and the audit are built and
+validated in memory before the write phase begins.
 
 ## NDC official monitoring light
 

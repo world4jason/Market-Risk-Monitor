@@ -130,6 +130,26 @@ class TaiwanMacroAssemblyTests(unittest.TestCase):
             sorted((row["series_id"], row["date"]) for row in left),
         )
 
+    def test_assembler_rejects_noncanonical_first_owner_identity(self):
+        wrong = self.rows(
+            "tw_manufacturing_pmi",
+            [62.5],
+            provider="CIER",
+            release_date="2026-09-21",
+        )
+        wrong[0]["unit"] = "score"
+        with self.assertRaisesRegex(ValueError, "canonical provider/unit"):
+            assemble_taiwan_macro_sources([("bad.csv", wrong)])
+
+        wrong = self.rows(
+            "tw_ndc_leading_index",
+            [100.0],
+            provider="CIER",
+            release_date="2026-09-21",
+        )
+        with self.assertRaisesRegex(ValueError, "canonical provider/unit"):
+            assemble_taiwan_macro_sources([("bad.csv", wrong)])
+
     def test_same_series_cannot_have_multiple_source_owners(self):
         first = self.rows(
             "tw_ndc_leading_index",
@@ -216,10 +236,34 @@ class TaiwanMacroAssemblyTests(unittest.TestCase):
             "tw_ndc_leading_index",
             [102.0],
             provider="NDC",
-            release_date="2026-09-21",
+            release_date="2026-10-21",
         )
         reconciled = reconcile_macro_refresh(existing, revised)
         self.assertEqual(reconciled[0]["value"], 102.0)
+        self.assertEqual(reconciled[0]["release_date"], "2026-10-21")
+
+        replay_old = self.rows(
+            "tw_ndc_leading_index",
+            [100.0],
+            provider="NDC",
+            release_date="2026-09-21",
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "out-of-order current-vintage snapshot",
+        ):
+            reconcile_macro_refresh(reconciled, replay_old)
+
+        same_date_revision = self.rows(
+            "tw_ndc_leading_index",
+            [103.0],
+            provider="NDC",
+            release_date="2026-10-21",
+        )
+        same_date = reconcile_macro_refresh(reconciled, same_date_revision)
+        self.assertEqual(same_date[0]["value"], 103.0)
+        self.assertEqual(same_date[0]["release_date"], "2026-10-21")
+
 
     def test_provider_or_unit_change_is_rejected_across_runs(self):
         existing = self.rows(
@@ -408,6 +452,19 @@ class TaiwanMacroTests(unittest.TestCase):
 """
         with self.assertRaisesRegex(ValueError, "release_date .* precedes"):
             parse_taiwan_macro_csv(text)
+
+    def test_first_ingest_rejects_noncanonical_unit_or_provider(self):
+        wrong_unit = """date,provider,series_id,value,unit,release_date,source_url
+2026-08-01,CIER,tw_manufacturing_pmi,62.5,score,2026-09-21,https://example.com
+"""
+        with self.assertRaisesRegex(ValueError, "unit must be 'index'"):
+            parse_taiwan_macro_csv(wrong_unit)
+
+        wrong_provider = """date,provider,series_id,value,unit,release_date,source_url
+2026-08-01,CIER,tw_ndc_leading_index,100,index,2026-09-21,https://example.com
+"""
+        with self.assertRaisesRegex(ValueError, "provider must be 'NDC'"):
+            parse_taiwan_macro_csv(wrong_provider)
 
     def test_duplicate_series_date_rejected(self):
         text = """date,provider,series_id,value,unit,release_date,source_url
