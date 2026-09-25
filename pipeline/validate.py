@@ -987,9 +987,20 @@ def validate_taiwan_macro_audit(payload: dict) -> None:
         series_id = row.get("series_id")
         obs_date = row.get("date")
         release_date = row.get("release_date")
-        if not series_id or not obs_date or not release_date:
+        provider = row.get("provider")
+        unit = row.get("unit")
+        source_url = row.get("source_url")
+        if (
+            not series_id
+            or not obs_date
+            or not release_date
+            or not provider
+            or not unit
+            or not source_url
+        ):
             raise ValidationError(
-                "taiwan-macro-audit: series/date/release_date required"
+                "taiwan-macro-audit: series/date/release_date/provider/unit/"
+                "source_url required"
             )
         _date(obs_date, field="taiwan-macro-audit.date")
         _date(release_date, field="taiwan-macro-audit.release_date")

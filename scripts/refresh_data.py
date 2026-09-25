@@ -40,12 +40,13 @@ from pipeline.tradermonty_ma_breadth import (
     fetch_tradermonty_csv,
 )
 from pipeline.taiwan_macro import (
+    SERIES_META,
     assemble_taiwan_macro_sources,
     build_macro_audit,
     build_macro_metrics,
     build_macro_regime,
     parse_taiwan_macro_csv,
-    validate_macro_refresh_superset,
+    reconcile_macro_refresh,
 )
 from pipeline.taiwan_trend_breadth import compute_from_panel as compute_taiwan_trend_breadth
 from pipeline.taiwan_twse import (
@@ -61,7 +62,11 @@ from pipeline.taiwan_twse import (
     parse_taiex_month_json,
     parse_taiwan_breadth_csv,
 )
-from pipeline.validate import validate_metric
+from pipeline.validate import (
+    validate_metric,
+    validate_taiwan_macro_audit,
+    validate_taiwan_macro_regime,
+)
 
 
 SPECIAL_ARTIFACTS = {
@@ -498,6 +503,90 @@ def refresh_twse_breadth_file(
     )
 
 
+def _load_existing_taiwan_macro_rows(output_dir: Path) -> list[dict]:
+    """Load and cross-check the persisted macro retention floor.
+
+    Existing canonical metric artifacts and the audit must agree exactly on
+    series/date/value/release_date. Any missing or stale audit fails closed
+    before a refresh can write or clean outputs.
+    """
+    metric_payloads: dict[str, dict] = {}
+    for series_id in sorted(SERIES_META):
+        path = output_dir / f"{series_id}.json"
+        if not path.exists():
+            continue
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        validate_metric(payload)
+        if payload.get("metric", {}).get("id") != series_id:
+            raise ValueError(
+                f"existing {path.name} declares the wrong metric id"
+            )
+        metric_payloads[series_id] = payload
+
+    audit_path = output_dir / "taiwan-macro-audit.json"
+    if metric_payloads and not audit_path.exists():
+        raise ValueError(
+            "existing Taiwan macro metric artifacts require "
+            "taiwan-macro-audit.json before refresh"
+        )
+    if not audit_path.exists():
+        return []
+
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    validate_taiwan_macro_audit(audit)
+    rows = audit["rows"]
+    audit_by_series: dict[str, list[dict]] = {}
+    for row in rows:
+        audit_by_series.setdefault(row["series_id"], []).append(row)
+
+    if set(audit_by_series) != set(metric_payloads):
+        raise ValueError(
+            "taiwan-macro-audit.json series do not match existing canonical "
+            "Taiwan macro metric artifacts"
+        )
+
+    for series_id, metric in metric_payloads.items():
+        audit_rows = audit_by_series[series_id]
+        providers = {row["provider"] for row in audit_rows}
+        units = {row["unit"] for row in audit_rows}
+        if len(providers) != 1 or len(units) != 1:
+            raise ValueError(
+                f"taiwan-macro-audit.json has ambiguous provider/unit for {series_id}"
+            )
+        expected_provider = next(iter(providers))
+        expected_unit = next(iter(units))
+        if metric.get("source", {}).get("provider") != expected_provider:
+            raise ValueError(
+                f"taiwan-macro-audit.json provider is stale for {series_id}"
+            )
+        if metric.get("metric", {}).get("units") != expected_unit:
+            raise ValueError(
+                f"taiwan-macro-audit.json unit is stale for {series_id}"
+            )
+
+        audit_by_date = {row["date"]: row for row in audit_rows}
+        observations = metric.get("observations", [])
+        metric_dates = {obs["date"] for obs in observations}
+        if metric_dates != set(audit_by_date):
+            raise ValueError(
+                f"taiwan-macro-audit.json dates are stale for {series_id}"
+            )
+        for obs in observations:
+            row = audit_by_date[obs["date"]]
+            if float(row["value"]) != float(obs["value"]):
+                raise ValueError(
+                    f"taiwan-macro-audit.json value mismatch for "
+                    f"{series_id} {obs['date']}"
+                )
+            if row["release_date"] != obs.get("release_date"):
+                raise ValueError(
+                    f"taiwan-macro-audit.json release_date mismatch for "
+                    f"{series_id} {obs['date']}"
+                )
+
+    return rows
+
+
 def refresh_taiwan_macro_files(
     input_paths: list[Path],
     output_dir: Path,
@@ -511,34 +600,47 @@ def refresh_taiwan_macro_files(
         )
         for input_path in input_paths
     ]
-    rows = assemble_taiwan_macro_sources(parsed_sources)
+    incoming_rows = assemble_taiwan_macro_sources(parsed_sources)
+    existing_rows = _load_existing_taiwan_macro_rows(output_dir)
+    rows = reconcile_macro_refresh(existing_rows, incoming_rows)
 
-    audit_path = output_dir / "taiwan-macro-audit.json"
-    if audit_path.exists():
-        previous_audit = json.loads(audit_path.read_text(encoding="utf-8"))
-        previous_rows = previous_audit.get("rows")
-        if not isinstance(previous_rows, list):
-            raise ValueError(
-                "existing taiwan-macro-audit.json has invalid rows"
-            )
-        validate_macro_refresh_superset(previous_rows, rows)
+    # Complete deterministic/application preflight before the first write.
+    metrics = build_macro_metrics(rows)
+    for metric in metrics.values():
+        validate_metric(metric)
 
-    report = _write_metric_group(
-        build_macro_metrics(rows),
-        output_dir,
-    )
     config = json.loads(
         (ROOT / "data" / "config" / "taiwan-macro.json").read_text(
             encoding="utf-8"
         )
     )
+    regime = build_macro_regime(rows, config)
+    validate_taiwan_macro_regime(regime)
+    audit = build_macro_audit(rows)
+    validate_taiwan_macro_audit(audit)
+
+    # Writes begin only after every derived output has passed preflight. Do
+    # not call _write_metric_group() here: it interleaves validation and writes,
+    # while this path guarantees all deterministic/application validation is
+    # complete before the first artifact is replaced.
+    report = []
+    for metric_id in sorted(metrics):
+        dest = output_dir / f"{metric_id}.json"
+        atomic_json(dest, metrics[metric_id])
+        report.append(
+            {
+                "metric": metric_id,
+                "status": "updated",
+                "path": str(dest.relative_to(ROOT)),
+            }
+        )
     atomic_json(
         output_dir / "taiwan-macro-regime.json",
-        build_macro_regime(rows, config),
+        regime,
     )
     atomic_json(
-        audit_path,
-        build_macro_audit(rows),
+        output_dir / "taiwan-macro-audit.json",
+        audit,
     )
     return report
 

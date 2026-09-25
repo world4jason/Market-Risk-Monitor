@@ -385,11 +385,15 @@ python scripts/refresh_data.py \
   --taiwan-macro-file /path/to/ndc-current-vintage.csv
 ```
 
-Each canonical `series_id` must belong to exactly one input file. Once a
-published macro audit contains a source family, a later refresh that omits that
-series or truncates its existing dates fails before writing anything. This keeps
-a CIER-only refresh from silently deleting NDC artifacts (and vice versa),
-including under `--clean-output`.
+Each canonical `series_id` must belong to exactly one input file, with one
+stable provider/unit identity per series. Existing canonical macro metrics and
+`taiwan-macro-audit.json` are cross-checked before refresh; a missing/stale audit
+fails closed. A later refresh that omits an existing series or truncates its
+published dates also fails before writing anything. Release-aware series use
+forward-only vintage chronology, while NDC's `availability_basis=unknown`
+current-vintage history may be revised retrospectively. This keeps a CIER-only
+refresh from silently deleting NDC artifacts (and vice versa), including under
+`--clean-output`.
 
 The MRM Taiwan macro regime is documented in `docs/taiwan-macro-methodology.md` and is explicitly **not** a reconstruction of MacroMicro/MM.
 

@@ -118,13 +118,31 @@ family remains absent rather than synthesized.
 
 `--taiwan-macro-file` is repeatable. Each input file owns one or more canonical
 series ids, and a given `series_id` may appear in only one input file per
-refresh. The assembler sorts the union deterministically by `(series_id, date)`.
+refresh. Each series must also keep one provider/unit identity within a source
+and across refreshes. The assembler sorts the union deterministically by
+`(series_id, date)`.
 
-Once `taiwan-macro-audit.json` already contains a series/date, a later refresh
-may revise that row's value but may not omit the series or truncate previously
-published dates. A partial refresh fails before any metric/regime/audit file is
-rewritten. This makes separately maintained CIER and NDC snapshots safe to
-compose without one source erasing the other under `--clean-output`.
+Before accepting a refresh, the pipeline loads every existing canonical Taiwan
+macro metric and cross-checks it against `taiwan-macro-audit.json` on series,
+dates, values, release dates, provider and unit. Existing canonical metrics with
+a missing or stale audit fail closed; the audit is not trusted as the sole
+retention truth. A later refresh may not omit an existing series or truncate
+previously published dates.
+
+Revision semantics depend on the canonical availability basis:
+
+- release-aware series (for example CIER PMI) are forward-only: an older
+  release/verification date is rejected, same-date conflicting values are
+  rejected, unchanged later re-observation keeps the stored release date, and
+  changed values require a strictly newer release date;
+- `availability_basis: unknown` NDC rows remain current-vintage retrospective
+  context and may revise existing values without creating PIT claims.
+
+All input parsing, retention/ownership/chronology checks, metric builds and
+validations, regime build/validation, and audit build/validation complete before
+the first output write. Thus deterministic/application failures cannot leave a
+mixed new-metric/old-regime state, and separately maintained CIER/NDC snapshots
+cannot erase one another under `--clean-output`.
 
 ## 3. Taiwan manufacturing PMI — CIER
 

@@ -8,6 +8,7 @@ directory and the catalog.
 """
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -421,6 +422,177 @@ class TaiwanMacroAssemblyRefreshTests(unittest.TestCase):
             {row["series_id"] for row in audit["rows"]},
             {"tw_manufacturing_pmi", "tw_ndc_leading_index"},
         )
+
+    def seed_full_macro_state(self):
+        cier = self.write_source(
+            "cier.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,49,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-09-21,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        ndc = self.write_source(
+            "ndc.csv",
+            [
+                "2026-01-01,NDC,tw_ndc_leading_index,100,index,2026-09-21,https://www.ndc.gov.tw/en/",
+                "2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/",
+            ],
+        )
+        self.module.refresh_taiwan_macro_files([cier, ndc], self.out)
+        return cier, ndc
+
+    def macro_bytes(self):
+        return {
+            path.name: path.read_bytes()
+            for path in self.out.glob("*.json")
+            if (
+                path.stem in self.module.SERIES_META
+                or path.name in {
+                    "taiwan-macro-audit.json",
+                    "taiwan-macro-regime.json",
+                }
+            )
+        }
+
+    def test_existing_macro_metrics_without_audit_fail_closed(self):
+        cier, _ = self.seed_full_macro_state()
+        (self.out / "taiwan-macro-audit.json").unlink()
+        before = self.macro_bytes()
+        self.module.WRITTEN_ARTIFACTS.clear()
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "require taiwan-macro-audit.json",
+        ):
+            self.module.refresh_taiwan_macro_files([cier], self.out)
+
+        self.assertEqual(self.module.WRITTEN_ARTIFACTS, set())
+        self.assertEqual(self.macro_bytes(), before)
+        self.assertTrue((self.out / "tw_ndc_leading_index.json").exists())
+
+    def test_clean_output_cli_stops_before_pruning_when_audit_is_missing(self):
+        cier, _ = self.seed_full_macro_state()
+        (self.out / "taiwan-macro-audit.json").unlink()
+        ndc_path = self.out / "tw_ndc_leading_index.json"
+        ndc_before = ndc_path.read_bytes()
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "refresh_data.py"),
+                "--taiwan-macro-file",
+                str(cier),
+                "--output-dir",
+                str(self.out),
+                "--clean-output",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "require taiwan-macro-audit.json",
+            result.stderr + result.stdout,
+        )
+        self.assertTrue(ndc_path.exists())
+        self.assertEqual(ndc_path.read_bytes(), ndc_before)
+
+    def test_stale_audit_missing_existing_ndc_series_fails_closed(self):
+        cier, _ = self.seed_full_macro_state()
+        audit_path = self.out / "taiwan-macro-audit.json"
+        audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        audit["rows"] = [
+            row for row in audit["rows"]
+            if row["series_id"] == "tw_manufacturing_pmi"
+        ]
+        audit_path.write_text(json.dumps(audit), encoding="utf-8")
+        before = self.macro_bytes()
+        self.module.WRITTEN_ARTIFACTS.clear()
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "series do not match existing canonical",
+        ):
+            self.module.refresh_taiwan_macro_files([cier], self.out)
+
+        self.assertEqual(self.module.WRITTEN_ARTIFACTS, set())
+        self.assertEqual(self.macro_bytes(), before)
+        self.assertTrue((self.out / "tw_ndc_leading_index.json").exists())
+
+    def test_release_aware_older_vintage_fails_before_any_write(self):
+        _, ndc = self.seed_full_macro_state()
+        newer_cier = self.write_source(
+            "cier-newer.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,49.5,index,2026-12-31,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-12-31,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        self.module.refresh_taiwan_macro_files([newer_cier, ndc], self.out)
+        older_conflict = self.write_source(
+            "cier-older.csv",
+            [
+                "2026-01-01,CIER,tw_manufacturing_pmi,48,index,2026-11-30,https://www.cier.edu.tw/pmi-trend/",
+                "2026-02-01,CIER,tw_manufacturing_pmi,50,index,2026-11-30,https://www.cier.edu.tw/pmi-trend/",
+            ],
+        )
+        before = self.macro_bytes()
+        self.module.WRITTEN_ARTIFACTS.clear()
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "out-of-order release-aware revision",
+        ):
+            self.module.refresh_taiwan_macro_files(
+                [older_conflict, ndc],
+                self.out,
+            )
+
+        self.assertEqual(self.module.WRITTEN_ARTIFACTS, set())
+        self.assertEqual(self.macro_bytes(), before)
+
+    def test_metric_validation_failure_occurs_before_first_write(self):
+        cier, _ = self.seed_full_macro_state()
+        ndc_nan = self.write_source(
+            "ndc-nan.csv",
+            [
+                "2026-01-01,NDC,tw_ndc_leading_index,nan,index,2026-09-21,https://www.ndc.gov.tw/en/",
+                "2026-02-01,NDC,tw_ndc_leading_index,101,index,2026-09-21,https://www.ndc.gov.tw/en/",
+            ],
+        )
+        before = self.macro_bytes()
+        self.module.WRITTEN_ARTIFACTS.clear()
+
+        with self.assertRaisesRegex(ValueError, "Non-finite observation"):
+            self.module.refresh_taiwan_macro_files([cier, ndc_nan], self.out)
+
+        self.assertEqual(self.module.WRITTEN_ARTIFACTS, set())
+        self.assertEqual(self.macro_bytes(), before)
+
+    def test_regime_failure_occurs_before_first_write(self):
+        cier, ndc = self.seed_full_macro_state()
+        before = self.macro_bytes()
+        self.module.WRITTEN_ARTIFACTS.clear()
+        original = self.module.validate_taiwan_macro_regime
+
+        def fail_regime(_payload):
+            raise ValueError("simulated regime validation failure")
+
+        self.module.validate_taiwan_macro_regime = fail_regime
+        try:
+            with self.assertRaisesRegex(
+                ValueError,
+                "simulated regime validation failure",
+            ):
+                self.module.refresh_taiwan_macro_files([cier, ndc], self.out)
+        finally:
+            self.module.validate_taiwan_macro_regime = original
+
+        self.assertEqual(self.module.WRITTEN_ARTIFACTS, set())
+        self.assertEqual(self.macro_bytes(), before)
 
     def test_partial_followup_fails_before_overwriting_previous_outputs(self):
         cier = self.write_source(

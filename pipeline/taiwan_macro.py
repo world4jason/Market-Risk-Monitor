@@ -166,6 +166,18 @@ def assemble_taiwan_macro_sources(
             )
         source_series = sorted({row["series_id"] for row in source_rows})
         for series_id in source_series:
+            series_rows = [
+                row for row in source_rows
+                if row["series_id"] == series_id
+            ]
+            providers = {row["provider"] for row in series_rows}
+            units = {row["unit"] for row in series_rows}
+            if len(providers) != 1 or len(units) != 1:
+                raise TaiwanMacroError(
+                    f"series {series_id} must have exactly one provider/unit "
+                    f"within source {source_name!r}"
+                )
+
             previous_owner = owners.get(series_id)
             if previous_owner is not None and previous_owner != source_name:
                 raise TaiwanMacroError(
@@ -191,11 +203,7 @@ def validate_macro_refresh_superset(
     existing_rows: list[dict],
     incoming_rows: list[dict],
 ) -> None:
-    """Refuse a refresh that silently drops an existing series/date.
-
-    Revised values for an existing key remain allowed; this guard is about
-    accidental source omission or history truncation, not freezing values.
-    """
+    """Refuse a refresh that silently drops an existing series/date."""
     existing_by_series: dict[str, set[str]] = defaultdict(set)
     incoming_by_series: dict[str, set[str]] = defaultdict(set)
     for row in existing_rows:
@@ -219,6 +227,74 @@ def validate_macro_refresh_superset(
                 f"missing {len(missing_dates)} existing dates starting "
                 f"{missing_dates[0]}"
             )
+
+
+def reconcile_macro_refresh(
+    existing_rows: list[dict],
+    incoming_rows: list[dict],
+) -> list[dict]:
+    """Apply cross-refresh ownership and revision semantics.
+
+    Release-aware series are forward-only by verified release date. Revision-
+    prone series with unknown availability (currently NDC) are current-vintage
+    snapshots and may revise existing keys without claiming historical PIT.
+    """
+    if not existing_rows:
+        return [dict(row) for row in incoming_rows]
+
+    validate_macro_refresh_superset(existing_rows, incoming_rows)
+
+    existing_by_series: dict[str, list[dict]] = defaultdict(list)
+    incoming_by_series: dict[str, list[dict]] = defaultdict(list)
+    existing_by_key: dict[tuple[str, str], dict] = {}
+    for row in existing_rows:
+        existing_by_series[row["series_id"]].append(row)
+        existing_by_key[(row["series_id"], row["date"])] = row
+    for row in incoming_rows:
+        incoming_by_series[row["series_id"]].append(row)
+
+    for series_id in sorted(existing_by_series):
+        old_providers = {row["provider"] for row in existing_by_series[series_id]}
+        old_units = {row["unit"] for row in existing_by_series[series_id]}
+        new_providers = {row["provider"] for row in incoming_by_series[series_id]}
+        new_units = {row["unit"] for row in incoming_by_series[series_id]}
+        if len(old_providers) != 1 or len(old_units) != 1:
+            raise TaiwanMacroError(
+                f"existing audit has ambiguous provider/unit ownership for {series_id}"
+            )
+        if new_providers != old_providers or new_units != old_units:
+            raise TaiwanMacroError(
+                f"source ownership changed for {series_id}: "
+                f"provider/unit {sorted(old_providers)}/{sorted(old_units)} -> "
+                f"{sorted(new_providers)}/{sorted(new_units)}"
+            )
+
+    reconciled: list[dict] = []
+    for row in incoming_rows:
+        canonical = dict(row)
+        previous = existing_by_key.get((row["series_id"], row["date"]))
+        basis = SERIES_META[row["series_id"]]["availability_basis"]
+        if previous is not None and basis == "release_date":
+            previous_release = date.fromisoformat(previous["release_date"])
+            incoming_release = date.fromisoformat(row["release_date"])
+            if incoming_release < previous_release:
+                raise TaiwanMacroError(
+                    f"out-of-order release-aware revision for {row['series_id']} "
+                    f"{row['date']}: stored {previous['release_date']}, "
+                    f"incoming {row['release_date']}"
+                )
+            same_value = float(previous["value"]) == float(row["value"])
+            if same_value:
+                canonical["release_date"] = previous["release_date"]
+            elif incoming_release == previous_release:
+                raise TaiwanMacroError(
+                    f"same-date conflicting release-aware revision for "
+                    f"{row['series_id']} {row['date']}"
+                )
+        reconciled.append(canonical)
+
+    reconciled.sort(key=lambda row: (row["series_id"], row["date"]))
+    return reconciled
 
 
 def _freshness(as_of: str, fetched_at: datetime, max_age_days: int = 75):
