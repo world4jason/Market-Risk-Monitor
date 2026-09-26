@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "production",
+  "metric": {
+    "id": "tw_ndc_coincident_index",
+    "name": "Taiwan NDC Coincident Index",
+    "description": "Official/public Taiwan macro input used independently and by the transparent MRM Taiwan macro regime.",
+    "pillar": "context",
+    "units": "index",
+    "frequency": "monthly",
+    "polarity": "contextual",
+    "comparison": "percent_change"
+  },
+  "source": {
+    "provider": "NDC",
+    "dataset": "Taiwan official/public macro release",
+    "series_id": "tw_ndc_coincident_index",
+    "url": "https://index.ndc.gov.tw/n/zh_tw/coincident",
+    "license_note": "Official/public release. Full-history redistribution rights depend on the source; source attribution retained.",
+    "redistribution": "unknown",
+    "market_scope": "Taiwan",
+    "membership_mode": null,
+    "membership_snapshot": null,
+    "price_adjustment": null,
+    "point_in_time_membership": null,
+    "availability_basis": "unknown"
+  },
+  "coverage": {
+    "history_start": "2025-08-01",
+    "history_end": "2026-07-01",
+    "timezone": "Asia/Taipei",
+    "expected_observation_lag_days": 90
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 75,
+    "age_days": 0,
+    "evaluated_at": "2026-09-26T04:49:42.079353Z",
+    "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "taiwan-macro-raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "expanding-pit",
+      "type": "full_history_percentile",
+      "window_observations": null,
+      "min_observations": 24,
+      "point_in_time": false,
+      "notes": "Retrospective only. NDC history is revision-prone and canonical artifacts do not retain vintages."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-07-01",
+    "fetched_at": "2026-09-26T04:49:42.079353Z",
+    "value": 106.8049537676424,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2025-08-01",
+      "value": 100.4933250649451,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2025-09-01",
+      "value": 100.5386909509119,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2025-10-01",
+      "value": 100.8071502316055,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2025-11-01",
+      "value": 101.3059922159077,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2025-12-01",
+      "value": 101.9677742538671,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-01-01",
+      "value": 102.8238047181887,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-02-01",
+      "value": 103.7413367774932,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-03-01",
+      "value": 104.6226688954975,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-04-01",
+      "value": 105.3302958617588,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-05-01",
+      "value": 105.9461305755344,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-06-01",
+      "value": 106.423769051658,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    },
+    {
+      "date": "2026-07-01",
+      "value": 106.8049537676424,
+      "status": "observed",
+      "release_date": "2026-09-26"
+    }
+  ]
+}

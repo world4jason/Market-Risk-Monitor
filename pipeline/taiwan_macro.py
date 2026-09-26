@@ -21,6 +21,8 @@ SERIES_META = {
         "units": "score",
         "polarity": "contextual",
         "availability_basis": "unknown",
+        "freshness_basis": "verification_date",
+        "expected_observation_lag_days": 90,
     },
     "tw_ndc_leading_index": {
         "name": "Taiwan NDC Leading Index",
@@ -28,6 +30,8 @@ SERIES_META = {
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "unknown",
+        "freshness_basis": "verification_date",
+        "expected_observation_lag_days": 90,
     },
     "tw_ndc_coincident_index": {
         "name": "Taiwan NDC Coincident Index",
@@ -35,6 +39,8 @@ SERIES_META = {
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "unknown",
+        "freshness_basis": "verification_date",
+        "expected_observation_lag_days": 90,
     },
     "tw_ndc_lagging_index": {
         "name": "Taiwan NDC Lagging Index",
@@ -42,6 +48,8 @@ SERIES_META = {
         "units": "index",
         "polarity": "contextual",
         "availability_basis": "unknown",
+        "freshness_basis": "verification_date",
+        "expected_observation_lag_days": 90,
     },
     "tw_manufacturing_pmi": {
         "name": "Taiwan Manufacturing PMI",
@@ -355,7 +363,13 @@ def build_macro_metrics(
         meta = SERIES_META[series_id]
         series_rows.sort(key=lambda r: r["date"])
         latest = series_rows[-1]
-        state, age = _freshness(latest["date"], fetched_at)
+        freshness_basis = meta.get("freshness_basis", "observation_date")
+        freshness_reference = (
+            latest["release_date"]
+            if freshness_basis == "verification_date"
+            else latest["date"]
+        )
+        state, age = _freshness(freshness_reference, fetched_at)
         providers = sorted(set(r["provider"] for r in series_rows))
         urls = sorted(set(r["source_url"] for r in series_rows))
 
@@ -395,14 +409,21 @@ def build_macro_metrics(
                 "history_start": series_rows[0]["date"],
                 "history_end": latest["date"],
                 "timezone": "Asia/Taipei",
-                "expected_observation_lag_days": 35,
+                "expected_observation_lag_days": meta.get(
+                    "expected_observation_lag_days", 35
+                ),
             },
             "freshness": {
                 "state": state,
                 "max_age_days": 75,
                 "age_days": age,
                 "evaluated_at": fetched_at.isoformat().replace("+00:00", "Z"),
-                "reason": None,
+                "reason": (
+                    "Freshness uses the verified current-vintage snapshot "
+                    "watermark; this does not imply historical PIT availability."
+                    if freshness_basis == "verification_date"
+                    else None
+                ),
             },
             "lineage": {
                 "kind": "raw",
