@@ -1200,6 +1200,7 @@ function renderOverview() {
   const marginTrigger = findRuleLeaf(marginSignal, (rule) => rule.type === "latest_below");
   const breadthCondition = signalCondition("high_low_breadth_collapse");
   const breadthTrigger = findRuleLeaf(breadthCondition, (rule) => rule.type === "percentile_below");
+  const breadthThreshold = Number(breadthTrigger?.threshold);
   const thesisTriggers = [
     {
       label: "Stress confirms",
@@ -1215,9 +1216,9 @@ function renderOverview() {
     },
     {
       label: "Breadth confirms",
-      text: breadthTrigger
-        ? `NYSE High-Low breadth ≤ ${breadthTrigger.threshold}th percentile`
-        : "breadth deterioration becomes available and active",
+      text: Number.isFinite(breadthThreshold)
+        ? `NYSE High-Low breadth ≤ ${breadthThreshold}th percentile`
+        : (breadthTrigger?.label || "breadth deterioration becomes available and active"),
     },
   ];
 
