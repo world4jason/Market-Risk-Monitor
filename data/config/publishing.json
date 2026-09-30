@@ -1,0 +1,203 @@
+{
+  "schema_version": "1.0.0",
+  "checked_at": "2026-09-30",
+  "public_target": {
+    "mode": "commit_generated_to_main",
+    "generated_path": "data/generated",
+    "unknown_artifact_policy": "reject",
+    "restricted_artifact_policy": "reject",
+    "local_only_artifact_policy": "reject"
+  },
+  "source_families": [
+    {
+      "id": "fred-chicago-nfci",
+      "metric_ids": [
+        "nfci",
+        "nfci_risk",
+        "nfci_credit",
+        "nfci_nonfinancial_leverage"
+      ],
+      "decision": "publish",
+      "review_status": "copyrighted_citation_required",
+      "terms_url": "https://fred.stlouisfed.org/legal/",
+      "notes": "FRED labels the NFCI family Copyrighted: Citation Required; public display/publishing is allowed with proper attribution under FRED terms."
+    },
+    {
+      "id": "fred-us-recession",
+      "metric_ids": [
+        "us_recession"
+      ],
+      "decision": "publish",
+      "review_status": "copyrighted_citation_required",
+      "terms_url": "https://fred.stlouisfed.org/series/USREC",
+      "notes": "FRED labels USREC Copyrighted: Citation Required; retain FRED/source attribution."
+    },
+    {
+      "id": "fed-policy-rate",
+      "metric_ids": [
+        "fed_target_legacy",
+        "fed_target_upper",
+        "us_fed_policy_rate",
+        "us_fed_policy_step_bp",
+        "us_fed_policy_change_3m_bp",
+        "us_fed_policy_change_6m_bp",
+        "us_fed_policy_change_12m_bp"
+      ],
+      "decision": "publish",
+      "review_status": "official_federal_reserve_data_with_attribution",
+      "terms_url": "https://fred.stlouisfed.org/legal/",
+      "notes": "Board/FOMC policy-rate data distributed through FRED; public release keeps source attribution."
+    },
+    {
+      "id": "finra-margin-statistics",
+      "metric_ids": [
+        "finra_margin_debt",
+        "finra_total_free_credit",
+        "finra_cash_free_credit",
+        "finra_margin_free_credit",
+        "finra_margin_debt_mom_pct",
+        "finra_margin_debt_yoy_pct",
+        "margin_debt_to_free_credit"
+      ],
+      "decision": "publish",
+      "review_status": "official_public_aggregate_with_attribution",
+      "terms_url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics",
+      "notes": "Official aggregate Margin Statistics published by FINRA; this repository publishes normalized aggregate observations and derived measures with attribution."
+    },
+    {
+      "id": "shiller-public-workbook",
+      "metric_ids": [
+        "shiller_price",
+        "shiller_real_tr_price",
+        "shiller_cape"
+      ],
+      "decision": "publish",
+      "review_status": "public_workbook_with_attribution",
+      "terms_url": "https://shillerdata.com/",
+      "notes": "Public research workbook; retain author/source attribution. This is a project publication decision, not a claim that the workbook is public domain."
+    },
+    {
+      "id": "cboe-vix-history",
+      "metric_ids": [
+        "vix"
+      ],
+      "decision": "publish",
+      "review_status": "official_public_historical_download_with_attribution",
+      "terms_url": "https://www.cboe.com/tradable_products/vix/vix_historical_data",
+      "notes": "Cboe publishes the historical VIX download publicly. This repository republishes the normalized close series with attribution; proprietary DataShop feeds are a separate restricted product."
+    },
+    {
+      "id": "twse-market",
+      "metric_ids": [
+        "tw_taiex",
+        "tw_taiex_open",
+        "tw_taiex_high",
+        "tw_taiex_low",
+        "tw_market_trade_value",
+        "tw_market_trade_volume"
+      ],
+      "decision": "publish",
+      "review_status": "official_public_market_snapshot_with_attribution",
+      "terms_url": "https://openapi.twse.com.tw/",
+      "notes": "Official TWSE public web/OpenAPI observations; source attribution retained. This decision does not cover paid Data E-Shop history."
+    },
+    {
+      "id": "twse-open-breadth",
+      "metric_ids": [
+        "tw_advancing_stocks",
+        "tw_declining_stocks",
+        "tw_unchanged_stocks",
+        "tw_advance_decline_diff",
+        "tw_advance_decline_pct",
+        "tw_advance_decline_line"
+      ],
+      "decision": "publish",
+      "review_status": "taiwan_open_government_data_license_v1",
+      "terms_url": "https://data.gov.tw/license",
+      "notes": "The twtazu_od open-data family is released under Taiwan Open Government Data License v1; attribution is required."
+    },
+    {
+      "id": "cbc-policy-rate",
+      "metric_ids": [
+        "tw_cbc_rate",
+        "tw_cbc_step_bp",
+        "tw_cbc_change_3m_bp",
+        "tw_cbc_change_6m_bp",
+        "tw_cbc_change_12m_bp"
+      ],
+      "decision": "publish",
+      "review_status": "official_public_policy_rate_with_attribution",
+      "terms_url": "https://www.cbc.gov.tw/en/lp-695-2.html",
+      "notes": "Official CBC policy-rate history; source attribution retained."
+    },
+    {
+      "id": "cier-pmi",
+      "metric_ids": [
+        "tw_manufacturing_pmi"
+      ],
+      "decision": "publish",
+      "review_status": "official_public_release_snapshot_with_attribution",
+      "terms_url": "https://www.cier.edu.tw/pmi-trend/",
+      "notes": "Only the publicly displayed official rolling release is normalized; this is not a bulk mirror of a proprietary historical database."
+    },
+    {
+      "id": "ndc-business-cycle",
+      "metric_ids": [
+        "tw_ndc_monitoring_score",
+        "tw_ndc_leading_index",
+        "tw_ndc_coincident_index",
+        "tw_ndc_lagging_index"
+      ],
+      "decision": "publish",
+      "review_status": "taiwan_open_government_data_license_v1",
+      "terms_url": "https://data.gov.tw/license",
+      "notes": "NDC business-cycle open data is published under Taiwan Open Government Data License v1; attribution is required. Historical index vintages remain non-PIT unless separately captured."
+    },
+    {
+      "id": "sp500-index",
+      "metric_ids": [
+        "sp500_index"
+      ],
+      "decision": "local_only",
+      "review_status": "restricted_preapproval_required",
+      "terms_url": "https://fred.stlouisfed.org/series/SP500",
+      "notes": "FRED labels SP500 Copyrighted: Pre-Approval Required. Do not commit or serve it from the public repository."
+    },
+    {
+      "id": "sp500-ma-breadth",
+      "metric_ids": [
+        "sp500_above_20dma_pct",
+        "sp500_above_50dma_pct",
+        "sp500_above_200dma_pct"
+      ],
+      "decision": "local_only",
+      "review_status": "source_specific_authorization_required",
+      "terms_url": "docs/moving-average-breadth-sources.md",
+      "notes": "Public release is blocked unless the concrete source grants redistribution of the resulting artifact. TraderMonty/FMP/Barchart/TradingView data is not assumed redistributable."
+    },
+    {
+      "id": "nyse-breadth",
+      "metric_ids": [
+        "nyse_new_52w_highs",
+        "nyse_new_52w_lows",
+        "nyse_net_new_highs",
+        "nyse_high_low_pct",
+        "nyse_advancing_issues",
+        "nyse_declining_issues",
+        "nyse_unchanged_issues",
+        "nyse_advance_decline_diff",
+        "nyse_advance_decline_pct",
+        "nyse_advance_decline_line",
+        "nyse_up_volume",
+        "nyse_down_volume",
+        "nyse_up_minus_down_volume",
+        "mrm_mcclellan_volume_oscillator",
+        "mrm_mcclellan_volume_summation"
+      ],
+      "decision": "local_only",
+      "review_status": "authorized_export_required",
+      "terms_url": "docs/breadth-sources.md",
+      "notes": "Canonical history must come from an authorized export. Public redistribution is not assumed from an ingestion license."
+    }
+  ]
+}
