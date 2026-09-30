@@ -190,7 +190,10 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
   .site-header { align-items: flex-start; padding-top: 26px; }
   .header-actions { flex-direction: column-reverse; align-items: flex-end; }
   .metric-grid, .regime-grid, .signal-grid, .trend-summary, .ma-study-grid, .taiwan-panel .regime-grid { grid-template-columns: 1fr; }
-  .section-heading { align-items: flex-start; }
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
   .history-controls { width: 100%; justify-content: stretch; }
   .history-controls .select-control { flex: 1 1 100%; min-width: 0; }
   .detail-summary { grid-template-columns: 1fr 1fr; }
