@@ -707,7 +707,7 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   );
   assert.match(
     runtime.dom.byId.get("overview-leverage-sub").innerHTML,
-    /YoY 37\.20%/,
+    /YoY 37\.2%/,
   );
   assert.match(
     runtime.dom.byId.get("overview-leverage-sub").innerHTML,
