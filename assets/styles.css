@@ -622,19 +622,20 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
   }
   .snapshot-facts { margin-top: 11px; }
   .overview-health-strip {
-    grid-template-columns: 1fr auto;
-    gap: 8px 12px;
+    grid-template-columns: 1fr;
+    gap: 7px;
     padding: 10px 12px;
   }
+  .health-strip-main { white-space: normal; }
   .health-strip-detail {
-    grid-column: 1 / -1;
+    grid-column: 1;
     grid-row: 2;
     white-space: normal;
     line-height: 1.35;
   }
   .overview-health-strip .health-strip-link {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
   }
 }
