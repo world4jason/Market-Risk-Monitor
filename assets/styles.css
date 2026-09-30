@@ -609,6 +609,13 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
     padding: 15px;
     border-radius: 15px;
   }
+  .subtitle { display: none; }
+  .snapshot-card-top {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .snapshot-status { margin-left: 0; }
+  .snapshot-facts { padding-right: 0; }
   .snapshot-value {
     margin-top: 22px;
     font-size: 1.55rem;
