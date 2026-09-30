@@ -138,24 +138,27 @@ class UiContractTests(unittest.TestCase):
         cls.parser = IdAttributeParser()
         cls.parser.feed(cls.html)
 
-    def test_decision_summary_precedes_explanation_cards_and_market_detail(self) -> None:
-        decision = self.html.index('class="decision-summary"')
-        cards = self.html.index('class="overview-grid"')
+    def test_snapshot_grid_precedes_market_detail_and_stays_compact(self) -> None:
+        snapshot = self.html.index('class="snapshot-grid"')
+        health = self.html.index('id="overview-health-strip"')
         us_detail = self.html.index('id="us-detail"')
         taiwan_detail = self.html.index('id="taiwan-detail"')
 
-        self.assertLess(decision, cards)
-        self.assertLess(decision, us_detail)
-        self.assertLess(decision, taiwan_detail)
+        self.assertLess(snapshot, health)
+        self.assertLess(health, us_detail)
+        self.assertLess(health, taiwan_detail)
+        self.assertEqual(self.html.count('data-overview-card="'), 4)
 
-        for state_id in (
-            "decision-stress-state",
-            "decision-leverage-state",
-            "decision-deleveraging-state",
-            "decision-taiwan-state",
-            "decision-coverage-state",
+        for kind in ("stress", "leverage", "deleveraging", "taiwan"):
+            for suffix in ("status", "value", "sub"):
+                self.assertIn(f"overview-{kind}-{suffix}", self.parser.by_id)
+
+        for element_id in (
+            "overview-health-strip",
+            "overview-health-state",
+            "overview-health-detail",
         ):
-            self.assertIn(state_id, self.parser.by_id)
+            self.assertIn(element_id, self.parser.by_id)
 
         mobile_css = "\n".join(
             block
@@ -163,8 +166,7 @@ class UiContractTests(unittest.TestCase):
             if block
         )
         self.assertIn(".mode-nav { display: none; }", mobile_css)
-        self.assertIn(".decision-summary", mobile_css)
-        self.assertIn("grid-template-columns: 1fr;", mobile_css)
+        self.assertIn(".snapshot-grid { grid-template-columns: 1fr;", mobile_css)
         self.assertIn(".history-layout .section-heading { flex-direction: column; }", mobile_css)
 
     def test_every_lead_metric_has_every_required_beginner_field(self) -> None:
@@ -269,9 +271,10 @@ class UiContractTests(unittest.TestCase):
         detail = extract_function(self.app, "renderTaiwanMarket")
         self.assertIn("taiwanBreadthState(twBreadth)", overview)
         self.assertIn("taiwanBreadthState(adPct)", detail)
-        self.assertIn('breadth.state === "missing"', overview)
-        self.assertIn('breadth.state === "snapshot_only"', overview)
-        self.assertIn('breadth.state === "history_building"', overview)
+        self.assertIn('breadth.state !== "missing"', overview)
+        self.assertIn('"snapshot_only"', overview)
+        self.assertIn('"history_building"', overview)
+        self.assertIn('"not_current"', overview)
 
     def test_taiex_current_wording_is_guarded_by_effective_freshness(self) -> None:
         overview = extract_function(self.app, "renderOverview")
@@ -280,9 +283,10 @@ class UiContractTests(unittest.TestCase):
             overview,
         )
         freshness_guard = overview.index('taiexFreshness !== "fresh"')
-        current_wording = overview.index('"TAIEX is current;')
-        self.assertLess(freshness_guard, current_wording)
-        self.assertIn("TAIEX data is ${taiexFreshness}", overview)
+        refresh_wording = overview.index('taiwanHeadline = "Needs refresh"')
+        self.assertLess(freshness_guard, refresh_wording)
+        self.assertIn('taiwanStatus = String(taiexFreshness).toUpperCase()', overview)
+        self.assertIn('taiwanHeadline = "Market read available"', overview)
 
     def test_missing_expected_stress_condition_cannot_render_reassuring_summary(self) -> None:
         overview = extract_function(self.app, "renderOverview")
@@ -294,11 +298,9 @@ class UiContractTests(unittest.TestCase):
             "expectedStressConditions.some((condition) => !condition)",
             overview,
         )
-        self.assertIn('"U.S. stress evidence is incomplete"', overview)
-        self.assertIn(
-            '"Current U.S. stress checks are not broadly elevated"',
-            overview,
-        )
+        self.assertIn('stressUnknown ? "DATA GAP"', overview)
+        self.assertIn('stressUnknown ? "Incomplete read"', overview)
+        self.assertIn('"No broad stress"', overview)
 
     def test_margin_rollover_exposes_the_actual_positive_growth_deceleration_trigger(self) -> None:
         condition = next(
@@ -325,8 +327,9 @@ class UiContractTests(unittest.TestCase):
         self.assertIn('rule.metric === "finra_margin_debt_yoy_pct"', helper)
         self.assertIn('rule.type === "delta_periods_below"', helper)
         self.assertIn("Math.abs(value).toFixed(1)", helper)
-        self.assertIn("marginMomentumEvidence(marginSignal)", overview)
-        self.assertIn("this is the active rollover evidence", overview)
+        self.assertIn('const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;', overview)
+        self.assertIn('slowing ? "Growth slowing"', overview)
+        self.assertIn('YoY ${formatValue(marginYoy.latest?.value, "percent")}', overview)
         self.assertIn("details.map(formatRuleDetail)", signals)
         self.assertIn("detail.reason", rule_detail)
 
@@ -343,8 +346,7 @@ class UiContractTests(unittest.TestCase):
         self.assertIn('parts.push("context only")', suffix)
         self.assertIn("retrospective; not PIT/backtest-safe", suffix)
         self.assertIn("percentileContextSuffix(metric)", card)
-        self.assertIn("overviewPercentileText(margin, marginPct)", overview)
-        self.assertIn("percentileContextSuffix(metric)", overview)
+        self.assertIn('pct (context)', overview)
         self.assertIn("percentileCaveatSentence(metric)", dialog)
         self.assertIn("it is not a risk direction", caveat)
         self.assertIn("not safe for historical PIT/backtest use", caveat)
@@ -407,7 +409,9 @@ class UiContractTests(unittest.TestCase):
         signals = extract_function(self.app, "renderSignals")
         self.assertIn("unavailable/unknown", signals)
         self.assertIn("unknown is not inactive", signals)
-        self.assertIn("not counted as inactive or safe", overview)
+        self.assertIn('"Evidence incomplete"', overview)
+        self.assertIn('${unknown} unknown', overview)
+        self.assertIn('unknown ? "gap"', overview)
 
     def test_public_page_contains_no_operator_cli_recovery_commands(self) -> None:
         self.assertNotIn("python scripts/", self.html + "\n" + self.app)
