@@ -5,6 +5,8 @@ import json
 from datetime import date, timedelta
 from pathlib import Path
 
+from .artifacts import write_json_artifact
+
 from .ma_breadth_pit import MembershipSnapshot
 
 
@@ -213,21 +215,17 @@ def fetch_yfinance_recent(
                     failures[ticker] = "no valid adjusted-close rows"
 
     tmp.replace(output_path)
-    failures_path.write_text(
-        json.dumps(
-            {
-                "source": "Yahoo Finance via yfinance",
-                "intended_use": "local research / personal use",
-                "start": start_date,
-                "end_exclusive": end_date,
-                "tickers_requested": len(tickers),
-                "tickers_failed": len(failures),
-                "failures": failures,
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
+    write_json_artifact(
+        failures_path,
+        {
+            "source": "Yahoo Finance via yfinance",
+            "intended_use": "local research / personal use",
+            "start": start_date,
+            "end_exclusive": end_date,
+            "tickers_requested": len(tickers),
+            "tickers_failed": len(failures),
+            "failures": failures,
+        },
     )
 
     return {

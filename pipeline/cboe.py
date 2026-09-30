@@ -5,6 +5,8 @@ import io
 import json
 from datetime import date, datetime, timezone
 from pathlib import Path
+
+from .artifacts import write_json_artifact
 from urllib.request import Request, urlopen
 
 VIX_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv"
@@ -148,7 +150,5 @@ def refresh_vix(output_dir: Path, timeout: int = 30) -> Path:
     metric = build_vix_metric(parse_vix_csv(fetch_vix_csv(timeout=timeout)))
     output_dir.mkdir(parents=True, exist_ok=True)
     dest = output_dir / "vix.json"
-    tmp = dest.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(metric, indent=2) + "\n", encoding="utf-8")
-    tmp.replace(dest)
+    write_json_artifact(dest, metric)
     return dest

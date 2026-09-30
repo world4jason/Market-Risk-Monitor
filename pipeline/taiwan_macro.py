@@ -7,6 +7,8 @@ from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from .artifacts import write_json_artifact
+
 from .provenance import build_provenance, records_input
 
 
@@ -719,12 +721,7 @@ def write_macro_outputs(
 
     for metric_id, metric in build_macro_metrics(rows).items():
         dest = output_dir / f"{metric_id}.json"
-        tmp = dest.with_suffix(".json.tmp")
-        tmp.write_text(
-            json.dumps(metric, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
-        tmp.replace(dest)
+        write_json_artifact(dest, metric)
         paths.append(dest)
 
     for name, payload in (
@@ -732,12 +729,7 @@ def write_macro_outputs(
         ("taiwan-macro-audit.json", build_macro_audit(rows)),
     ):
         dest = output_dir / name
-        tmp = dest.with_suffix(".json.tmp")
-        tmp.write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
-        tmp.replace(dest)
+        write_json_artifact(dest, payload)
         paths.append(dest)
 
     return paths

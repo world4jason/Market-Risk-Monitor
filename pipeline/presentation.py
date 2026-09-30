@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 
 """
 Declared comparison semantics for metric display.
@@ -26,25 +28,22 @@ COMPARISONS = {
     "none",
 }
 
-# Percent-valued series that are policy-rate levels. Basis points and
-# percentage points are the same dimension, so misclassifying one of these
-# changes the unit shown, never the meaning -- see the safety note below.
-RATE_LEVEL_METRIC_IDS = {
-    "us_fed_policy_rate",
-    "tw_cbc_rate",
-    "fed_target_legacy",
-    "fed_target_upper",
-}
+_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "data" / "config" / "presentation.json"
 
-# Index-valued series that sit around zero and go negative, so the sign of a
-# relative change is undefined.
-ZERO_CENTRED_INDEX_METRIC_IDS = {
-    "nfci",
-    "nfci_risk",
-    "nfci_credit",
-    "nfci_nonfinancial_leverage",
-    "tw_advance_decline_line",
-}
+
+def _load_registry() -> dict:
+    payload = json.loads(_REGISTRY_PATH.read_text(encoding="utf-8"))
+    overrides = payload.get("metric_overrides")
+    if not isinstance(overrides, dict):
+        raise ValueError("presentation registry must define metric_overrides")
+    unknown = set(overrides.values()) - COMPARISONS
+    if unknown:
+        raise ValueError(f"presentation registry has invalid comparisons: {sorted(unknown)}")
+    return payload
+
+
+PRESENTATION_REGISTRY = _load_registry()
+METRIC_OVERRIDES = PRESENTATION_REGISTRY["metric_overrides"]
 
 _RELATIVE_UNITS = {
     "USD millions",
@@ -61,6 +60,10 @@ def comparison_for(metric: dict) -> str:
     metric_id = meta.get("id", "")
     transform = str(metric.get("lineage", {}).get("transform_version") or "")
 
+    declared = METRIC_OVERRIDES.get(metric_id)
+    if declared:
+        return declared
+
     # Already a change: showing a change of it compounds two different things.
     if transform.startswith("pct-change") or units == "basis points":
         return "none"
@@ -70,7 +73,7 @@ def comparison_for(metric: dict) -> str:
         return "none"
 
     if units == "percent":
-        if metric_id in RATE_LEVEL_METRIC_IDS or transform.startswith("rate-velocity"):
+        if transform.startswith("rate-velocity"):
             return "basis_points"
         # Safety default: any other percent-valued metric still compares in
         # percentage points. That is dimensionally correct even for a series we
@@ -85,7 +88,10 @@ def comparison_for(metric: dict) -> str:
         # Counts here include net differences that cross zero.
         return "absolute"
 
-    if units == "index" and metric_id in ZERO_CENTRED_INDEX_METRIC_IDS:
+    if units == "index":
+        # Index levels are ambiguous: some are positive price indexes while
+        # others cross zero. New index IDs must be classified explicitly in
+        # data/config/presentation.json; until then absolute is fail-safe.
         return "absolute"
 
     if units in _RELATIVE_UNITS:

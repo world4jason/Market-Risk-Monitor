@@ -6,6 +6,8 @@ import json
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from .artifacts import write_json_artifact
+
 
 class BreadthError(ValueError):
     pass
@@ -414,8 +416,6 @@ def write_breadth_metrics(
     paths = []
     for metric_id, metric in build_breadth_metrics(rows, fetched_at).items():
         dest = output_dir / f"{metric_id}.json"
-        tmp = dest.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(metric, indent=2) + "\n", encoding="utf-8")
-        tmp.replace(dest)
+        write_json_artifact(dest, metric)
         paths.append(dest)
     return paths

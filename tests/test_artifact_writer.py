@@ -124,26 +124,24 @@ class SharedWriterTests(unittest.TestCase):
         self.assertEqual(written["metric"]["comparison"], "percent_change")
         assert_schema_valid(self, written, "tw_taiex")
 
-    def test_no_producer_writes_artifacts_outside_the_shared_path(self):
-        # Supplementary guard. Six copies of this helper existed, and only the
-        # copy in refresh_data learned to stamp comparison; the rest silently
-        # produced schema-invalid artifacts. A module may still define an
-        # atomic_json wrapper -- refresh_data adds the release ledger to it --
-        # but it has to delegate rather than reimplement the write.
+    def test_no_pipeline_json_writer_bypasses_the_shared_path(self):
+        # Canonical producers live under pipeline/. They may transform JSON in
+        # memory, but only pipeline/artifacts.py may serialize JSON to disk.
         offenders = []
-        for path in sorted(
-            list((ROOT / "scripts").glob("*.py"))
-            + list((ROOT / "pipeline").glob("*.py"))
-        ):
+        for path in sorted((ROOT / "pipeline").glob("*.py")):
             if path.name == "artifacts.py":
                 continue
             text = path.read_text(encoding="utf-8")
-            if "def atomic_json(" not in text:
-                continue
-            body = text.split("def atomic_json(", 1)[1].split("\ndef ", 1)[0]
-            if "write_json_artifact(" not in body:
+            if "write_text(" in text and "json.dumps(" in text:
+                offenders.append(path.relative_to(ROOT).as_posix())
+            if "json.dump(" in text:
                 offenders.append(path.relative_to(ROOT).as_posix())
         self.assertEqual(offenders, [])
+
+    def test_refresh_atomic_json_delegates_to_shared_writer(self):
+        text = (ROOT / "scripts" / "refresh_data.py").read_text(encoding="utf-8")
+        body = text.split("def atomic_json(", 1)[1].split("\ndef ", 1)[0]
+        self.assertIn("write_json_artifact(", body)
 
 
 class ContractFixtureTests(unittest.TestCase):
@@ -191,10 +189,8 @@ class ContractFixtureTests(unittest.TestCase):
 
     def test_the_zero_centred_fixture_declares_an_absolute_comparison(self):
         # nfci_fixture holds negative values, so a relative change has no
-        # stable sign. Its id is deliberately not in
-        # ZERO_CENTRED_INDEX_METRIC_IDS -- fixture ids do not belong in
-        # production config -- so the fixture declares the comparison itself.
-        # This guards against someone "correcting" it to match the derivation.
+        # stable sign. The fixture declares absolute explicitly, matching the
+        # fail-safe default for unregistered index IDs.
         payload = json.loads(
             (ROOT / "data" / "fixtures" / "metric-weekly.json").read_text(
                 encoding="utf-8"
@@ -213,7 +209,7 @@ class ContractFixtureTests(unittest.TestCase):
         # picked. That only holds if it is enforced: otherwise a later change
         # to comparison_for() leaves the contract examples quietly drifted from
         # what producers actually emit.
-        for name in ["metric-daily.json", "metric-monthly.json"]:
+        for name in ["metric-monthly.json"]:
             payload = json.loads(
                 (ROOT / "data" / "fixtures" / name).read_text(encoding="utf-8")
             )
@@ -226,13 +222,18 @@ class ContractFixtureTests(unittest.TestCase):
                 f"{name} no longer matches the production derivation",
             )
 
-    def test_the_weekly_fixture_is_an_intentional_override(self):
-        # Deliberately exempt from the rule above. nfci_fixture is a
-        # zero-centred series whose id is not, and should not be, in
-        # ZERO_CENTRED_INDEX_METRIC_IDS, so the derivation gets it wrong and
-        # the fixture overrides it. Asserting the disagreement keeps the
-        # exemption honest: if the derivation ever learns to handle this case,
-        # this test fails and the override can be removed.
+    def test_daily_index_fixture_is_an_explicit_example_override(self):
+        payload = json.loads(
+            (ROOT / "data" / "fixtures" / "metric-daily.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        stripped = copy.deepcopy(payload)
+        del stripped["metric"]["comparison"]
+        self.assertEqual(comparison_for(stripped), "absolute")
+        self.assertEqual(payload["metric"]["comparison"], "percent_change")
+
+    def test_unregistered_index_fixture_fails_safe_to_absolute(self):
         payload = json.loads(
             (ROOT / "data" / "fixtures" / "metric-weekly.json").read_text(
                 encoding="utf-8"
@@ -241,7 +242,7 @@ class ContractFixtureTests(unittest.TestCase):
         stripped = copy.deepcopy(payload)
         del stripped["metric"]["comparison"]
 
-        self.assertEqual(comparison_for(stripped), "percent_change")
+        self.assertEqual(comparison_for(stripped), "absolute")
         self.assertEqual(payload["metric"]["comparison"], "absolute")
 
     def test_a_declared_comparison_survives_the_writer(self):

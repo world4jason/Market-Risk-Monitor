@@ -5,6 +5,8 @@ import io
 import json
 from datetime import date, datetime, timezone
 from pathlib import Path
+
+from .artifacts import write_json_artifact
 from typing import Iterable
 from urllib.request import Request, urlopen
 
@@ -150,7 +152,5 @@ def refresh_one(config: dict, output_dir: Path, timeout: int = 30) -> Path:
     metric = build_metric(config, observations)
     output_dir.mkdir(parents=True, exist_ok=True)
     dest = output_dir / f"{config['id']}.json"
-    tmp = dest.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(metric, indent=2) + "\n", encoding="utf-8")
-    tmp.replace(dest)
+    write_json_artifact(dest, metric)
     return dest

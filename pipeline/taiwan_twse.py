@@ -6,6 +6,8 @@ import json
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
+
+from .artifacts import write_json_artifact
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -839,12 +841,7 @@ def write_metrics(
     paths = []
     for metric_id, metric in metrics.items():
         dest = output_dir / f"{metric_id}.json"
-        tmp = dest.with_suffix(".json.tmp")
-        tmp.write_text(
-            json.dumps(metric, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
-        tmp.replace(dest)
+        write_json_artifact(dest, metric)
         paths.append(dest)
     return paths
 
