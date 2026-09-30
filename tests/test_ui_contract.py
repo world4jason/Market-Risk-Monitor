@@ -332,7 +332,7 @@ class UiContractTests(unittest.TestCase):
         self.assertIn("Math.abs(value).toFixed(1)", helper)
         self.assertIn('const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;', overview)
         self.assertIn('slowing ? "High, growth slowing"', overview)
-        self.assertIn('"Leverage is rolling over; broad stress is not confirmed"', overview)
+        self.assertIn('"Leverage rolling over; stress not confirmed"', overview)
         self.assertIn('YoY ${formatValue(marginYoy.latest?.value, "percent")}', overview)
         self.assertIn("details.map(formatRuleDetail)", signals)
         self.assertIn("detail.reason", rule_detail)
