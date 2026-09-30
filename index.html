@@ -31,73 +31,60 @@
     <section id="overview" class="section-block overview-section" aria-labelledby="overview-title">
       <div class="section-heading overview-heading">
         <div>
-          <p class="eyebrow">OVERVIEW</p>
-          <h2 id="overview-title">What the available evidence says now</h2>
+          <p class="eyebrow">MARKET SNAPSHOT</p>
+          <h2 id="overview-title">What matters now</h2>
         </div>
-        <p class="meta">Plain-language summary · lead evidence only · details remain auditable</p>
+        <p class="meta">Current evidence · select any card to inspect the underlying data</p>
       </div>
-      <div class="decision-summary" aria-label="At-a-glance market status">
-        <a class="decision-row" href="#us-detail">
-          <span>Financial stress</span>
-          <strong id="decision-stress-state">Loading…</strong>
+
+      <div class="snapshot-grid" aria-label="At-a-glance market snapshot">
+        <a class="snapshot-card" data-overview-card="stress" data-state="loading" href="#us-detail">
+          <div class="snapshot-card-top">
+            <span class="snapshot-kicker">U.S. stress</span>
+            <span id="overview-stress-status" class="snapshot-status">Loading</span>
+          </div>
+          <strong id="overview-stress-value" class="snapshot-value">—</strong>
+          <div id="overview-stress-sub" class="snapshot-facts"><span>Waiting for current evidence</span></div>
         </a>
-        <a class="decision-row" href="#us-detail">
-          <span>Leverage</span>
-          <strong id="decision-leverage-state">Loading…</strong>
+
+        <a class="snapshot-card" data-overview-card="leverage" data-state="loading" href="#us-detail">
+          <div class="snapshot-card-top">
+            <span class="snapshot-kicker">Leverage</span>
+            <span id="overview-leverage-status" class="snapshot-status">Loading</span>
+          </div>
+          <strong id="overview-leverage-value" class="snapshot-value">—</strong>
+          <div id="overview-leverage-sub" class="snapshot-facts"><span>Waiting for FINRA evidence</span></div>
         </a>
-        <a class="decision-row" href="#signals-detail">
-          <span>Deleveraging</span>
-          <strong id="decision-deleveraging-state">Loading…</strong>
+
+        <a class="snapshot-card" data-overview-card="deleveraging" data-state="loading" href="#signals-detail">
+          <div class="snapshot-card-top">
+            <span class="snapshot-kicker">Deleveraging</span>
+            <span id="overview-deleveraging-status" class="snapshot-status">Loading</span>
+          </div>
+          <strong id="overview-deleveraging-value" class="snapshot-value">—</strong>
+          <div id="overview-deleveraging-sub" class="snapshot-facts"><span>Waiting for signal coverage</span></div>
         </a>
-        <a class="decision-row" href="#taiwan-detail">
-          <span>Taiwan</span>
-          <strong id="decision-taiwan-state">Loading…</strong>
-        </a>
-        <a class="decision-row" href="#research">
-          <span>Evidence</span>
-          <strong id="decision-coverage-state">Loading…</strong>
+
+        <a class="snapshot-card" data-overview-card="taiwan" data-state="loading" href="#taiwan-detail">
+          <div class="snapshot-card-top">
+            <span class="snapshot-kicker">Taiwan</span>
+            <span id="overview-taiwan-status" class="snapshot-status">Loading</span>
+          </div>
+          <strong id="overview-taiwan-value" class="snapshot-value">—</strong>
+          <div id="overview-taiwan-sub" class="snapshot-facts"><span>Waiting for TAIEX evidence</span></div>
         </a>
       </div>
-      <div class="overview-grid">
-        <article class="panel overview-card" data-overview-card="stress">
-          <p class="eyebrow">FINANCIAL STRESS</p>
-          <h3 id="overview-stress-state">Loading current stress evidence…</h3>
-          <p id="overview-stress-evidence" class="overview-evidence">NFCI and VIX evidence will appear here.</p>
-          <p id="overview-stress-note" class="overview-note">No conclusion is produced without the underlying observations.</p>
-          <a class="drill-link" href="#us-detail">See U.S. details ↓</a>
-        </article>
 
-        <article class="panel overview-card" data-overview-card="leverage">
-          <p class="eyebrow">LEVERAGE / RISK APPETITE</p>
-          <h3 id="overview-leverage-state">Loading leverage evidence…</h3>
-          <p id="overview-leverage-evidence" class="overview-evidence">FINRA level, growth, and historical context will appear here.</p>
-          <p id="overview-leverage-note" class="overview-note">Level, growth, and momentum are kept separate.</p>
-          <a class="drill-link" href="#us-detail">See leverage details ↓</a>
-        </article>
-
-        <article class="panel overview-card" data-overview-card="deleveraging">
-          <p class="eyebrow">DELEVERAGING EVIDENCE</p>
-          <h3 id="overview-deleveraging-state">Loading signal coverage…</h3>
-          <p id="overview-deleveraging-evidence" class="overview-evidence">Known, active, and unavailable checks will appear here.</p>
-          <p id="overview-deleveraging-note" class="overview-note">Unknown evidence is never interpreted as safe.</p>
-          <a class="drill-link" href="#signals-detail">Inspect every check ↓</a>
-        </article>
-
-        <article class="panel overview-card overview-card-wide" data-overview-card="taiwan">
-          <p class="eyebrow">TAIWAN MARKET</p>
-          <h3 id="overview-taiwan-state">Loading Taiwan market evidence…</h3>
-          <p id="overview-taiwan-evidence" class="overview-evidence">TAIEX, breadth coverage, and policy-rate context will appear here.</p>
-          <p id="overview-taiwan-note" class="overview-note">A one-session breadth snapshot is not treated as a trend.</p>
-          <a class="drill-link" href="#taiwan-detail">See Taiwan details ↓</a>
-        </article>
-
-        <article class="panel overview-card overview-card-wide" data-overview-card="coverage">
-          <p class="eyebrow">HISTORICAL CONTEXT &amp; EVIDENCE COVERAGE</p>
-          <h3 id="overview-evidence-state">Loading historical comparison coverage…</h3>
-          <p id="overview-evidence-evidence" class="overview-evidence">Metric-specific comparison windows and missing evidence will appear here.</p>
-          <p id="overview-evidence-note" class="overview-note">Historical ranks describe the comparison set; they are not a forecast by themselves.</p>
-          <a class="drill-link" href="#research">Open research views ↓</a>
-        </article>
+      <div id="overview-health-strip" class="overview-health-strip" data-state="loading" aria-live="polite">
+        <div class="health-strip-main">
+          <span class="health-orb" aria-hidden="true"></span>
+          <div>
+            <span class="health-strip-label">DATA HEALTH</span>
+            <strong id="overview-health-state">Loading snapshot health…</strong>
+          </div>
+        </div>
+        <span id="overview-health-detail" class="health-strip-detail">Freshness and evidence coverage are being checked.</span>
+        <a class="health-strip-link" href="#data-health-details">Inspect health →</a>
       </div>
     </section>
 
