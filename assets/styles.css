@@ -248,6 +248,14 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
 .decision-thesis[data-confidence="watch"] { --thesis-color: var(--warn); }
 .decision-thesis[data-confidence="gap"] { --thesis-color: var(--danger); }
 .thesis-copy { min-width: 0; }
+.decision-thesis { min-width: 0; max-width: 100%; overflow: hidden; }
+.decision-thesis h3,
+#overview-thesis-summary,
+.thesis-chip,
+.trigger-item strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
 .thesis-topline {
   display: flex;
   align-items: center;
