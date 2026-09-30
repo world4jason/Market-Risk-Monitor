@@ -229,6 +229,49 @@ class SignalTests(unittest.TestCase):
         self.assertEqual(result["status"], "active")
         self.assertAlmostEqual(result["value"], 100.0)
 
+    def test_default_evaluation_time_orders_fractional_seconds_chronologically(self):
+        config = {
+            "schema_version": "1.0.0",
+            "history_start": "2026-01-31",
+            "conditions": [
+                {
+                    "id": "a",
+                    "name": "A",
+                    "description": "",
+                    "rules": {
+                        "type": "all",
+                        "children": [
+                            {"type": "latest_above", "metric": "x", "threshold": 0},
+                            {"type": "latest_above", "metric": "y", "threshold": 0},
+                        ],
+                    },
+                }
+            ],
+        }
+        metrics = {
+            "x": metric("x", [("2026-03-01", 1.0)]),
+            "y": metric("y", [("2026-03-01", 1.0)]),
+        }
+        metrics["x"]["latest"] = {
+            "as_of": "2026-03-01",
+            "fetched_at": "2026-03-01T12:00:00Z",
+        }
+        metrics["y"]["latest"] = {
+            "as_of": "2026-03-01",
+            "fetched_at": "2026-03-01T12:00:00.500000Z",
+        }
+
+        snapshot = build_signal_snapshot(metrics, config)
+
+        self.assertEqual(
+            snapshot["generated_at"],
+            "2026-03-01T12:00:00.500000Z",
+        )
+        self.assertEqual(
+            snapshot["provenance"]["generated_at"],
+            "2026-03-01T12:00:00.500000Z",
+        )
+
     def test_build_snapshot_keeps_unknown_count(self):
         config = {
             "schema_version": "1.0.0",
