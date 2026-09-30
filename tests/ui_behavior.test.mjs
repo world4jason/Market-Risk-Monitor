@@ -242,15 +242,16 @@ function fullMetricFromSummary(summary, values = [10, 11, 12, 13, 14]) {
   };
 }
 function registerOverviewDom(runtime) {
-  const kinds = ["stress", "leverage", "deleveraging", "taiwan", "coverage"];
+  const kinds = ["stress", "leverage", "deleveraging", "taiwan"];
   for (const kind of kinds) {
     runtime.dom.registerOverviewCard(kind);
-    const stateId = kind === "coverage" ? "evidence" : kind;
-    runtime.dom.register(`overview-${stateId}-state`);
-    runtime.dom.register(`overview-${stateId}-evidence`);
-    runtime.dom.register(`overview-${stateId}-note`);
-    runtime.dom.register(`decision-${kind}-state`);
+    runtime.dom.register(`overview-${kind}-status`);
+    runtime.dom.register(`overview-${kind}-value`);
+    runtime.dom.register(`overview-${kind}-sub`);
   }
+  runtime.dom.register("overview-health-strip");
+  runtime.dom.register("overview-health-state");
+  runtime.dom.register("overview-health-detail");
 }
 
 test("freshness matrix and preserved-refresh errors use production semantics", () => {
@@ -685,28 +686,32 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   runtime.api.renderOverview();
 
   assert.equal(
-    runtime.dom.byId.get("overview-stress-state").textContent,
-    "U.S. stress evidence is incomplete",
+    runtime.dom.byId.get("overview-stress-status").textContent,
+    "DATA GAP",
   );
   assert.equal(
-    runtime.dom.byId.get("overview-leverage-state").textContent,
-    "Leverage growth remains positive; its growth momentum is slowing",
+    runtime.dom.byId.get("overview-stress-value").textContent,
+    "Incomplete read",
   );
   assert.match(
-    runtime.dom.byId.get("overview-leverage-evidence").innerHTML,
-    /YoY growth slowed 16\.5 pp over 3 monthly observations/,
+    runtime.dom.byId.get("overview-stress-sub").innerHTML,
+    /Conditions looser than avg/,
+  );
+  assert.equal(
+    runtime.dom.byId.get("overview-leverage-status").textContent,
+    "WATCH",
+  );
+  assert.equal(
+    runtime.dom.byId.get("overview-leverage-value").textContent,
+    "Growth slowing",
   );
   assert.match(
-    runtime.dom.byId.get("overview-leverage-evidence").innerHTML,
-    /context only/,
+    runtime.dom.byId.get("overview-leverage-sub").innerHTML,
+    /YoY 37\.20%/,
   );
   assert.match(
-    runtime.dom.byId.get("overview-leverage-evidence").innerHTML,
-    /retrospective; not PIT\/backtest-safe/,
-  );
-  assert.match(
-    runtime.dom.byId.get("overview-leverage-note").textContent,
-    /not described as falling/,
+    runtime.dom.byId.get("overview-leverage-sub").innerHTML,
+    /pct \(context\)/,
   );
 });
 
