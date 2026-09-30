@@ -11,7 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pipeline.breadth import build_breadth_metrics, parse_breadth_csv
+from pipeline.breadth import (
+    assert_history_not_truncated as assert_breadth_history_not_truncated,
+    build_breadth_metrics,
+    parse_breadth_csv,
+)
 from pipeline.cboe import build_vix_metric, fetch_vix_csv, parse_vix_csv
 from pipeline.finra import build_finra_metrics, parse_finra_csv, parse_finra_xlsx
 from pipeline.fred import build_metric, fetch_fred_csv, parse_fred_csv
@@ -280,6 +284,16 @@ def refresh_breadth(input_path: Path, output_dir: Path) -> list[dict]:
     for metric_id, metric in metrics.items():
         validate_metric(metric)
         dest = output_dir / f"{metric_id}.json"
+        if dest.exists():
+            try:
+                previous = json.loads(dest.read_text(encoding="utf-8"))
+                validate_metric(previous)
+                assert_breadth_history_not_truncated(previous, metric)
+            except ValueError:
+                raise
+            except Exception:
+                # An invalid prior artifact must not block a valid replacement.
+                pass
         atomic_json(dest, metric)
         report.append(
             {
