@@ -1026,7 +1026,9 @@ function renderOverview() {
   const unknown = conditions.filter((condition) => condition.displayStatus === "unknown").length;
   const total = conditions.length;
   const activeName = activeConditions[0]
-    ? signalBeginnerContext[activeConditions[0].id]?.plain_name || activeConditions[0].name
+    ? (activeConditions[0].id === "margin_debt_rollover"
+        ? "Margin momentum slowing"
+        : signalBeginnerContext[activeConditions[0].id]?.plain_name || activeConditions[0].name)
     : null;
 
   const deleveragingFacts = [];
