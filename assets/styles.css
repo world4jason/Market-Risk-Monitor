@@ -788,5 +788,22 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
   }
   #overview-thesis-summary { font-size: .78rem; }
   .trigger-list { grid-template-columns: minmax(0, 1fr); }
+  .decision-thesis,
+  .snapshot-card,
+  .overview-health-strip {
+    width: 100%;
+    min-width: 0;
+  }
+  .thesis-evidence,
+  .snapshot-facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+  .thesis-chip,
+  .snapshot-facts span {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
