@@ -2,7 +2,12 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from pipeline.breadth import BreadthError, build_breadth_metrics, parse_breadth_csv
+from pipeline.breadth import (
+    BreadthError,
+    assert_history_not_truncated,
+    build_breadth_metrics,
+    parse_breadth_csv,
+)
 from pipeline.validate import validate_metric
 
 
@@ -30,6 +35,21 @@ class BreadthTests(unittest.TestCase):
 """
         with self.assertRaises(BreadthError):
             parse_breadth_csv(text)
+
+    def test_non_monotonic_dates_rejected(self):
+        text = """date,market_scope,provider,new_52w_highs
+2026-01-05,NYSE,test,2
+2026-01-02,NYSE,test,1
+"""
+        with self.assertRaises(BreadthError):
+            parse_breadth_csv(text)
+
+    def test_history_truncation_guard(self):
+        rows = parse_breadth_csv(FIXTURE.read_text())
+        previous = build_breadth_metrics(rows)["nyse_new_52w_highs"]
+        current = build_breadth_metrics(rows[1:])["nyse_new_52w_highs"]
+        with self.assertRaises(BreadthError):
+            assert_history_not_truncated(previous, current)
 
     def test_build_high_low_ad_and_volume_metrics(self):
         rows = parse_breadth_csv(FIXTURE.read_text())
