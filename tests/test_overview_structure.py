@@ -11,6 +11,21 @@ class OverviewStructureTests(unittest.TestCase):
         self.html = (ROOT / "index.html").read_text(encoding="utf-8")
         self.js = (ROOT / "assets" / "app.js").read_text(encoding="utf-8")
 
+    def test_decision_thesis_has_read_confidence_and_triggers(self):
+        for element_id in (
+            "decision-thesis",
+            "overview-thesis-title",
+            "overview-thesis-summary",
+            "overview-thesis-confidence",
+            "overview-thesis-evidence",
+            "overview-thesis-triggers",
+        ):
+            self.assertIn(f'id="{element_id}"', self.html)
+        self.assertIn("function setDecisionThesis(", self.js)
+        self.assertIn("WHAT CHANGES THE CALL", self.html)
+        self.assertIn("Margin-debt YoY", self.js)
+        self.assertIn("NYSE High-Low breadth", self.js)
+
     def test_first_screen_has_exactly_four_snapshot_cards(self):
         cards = re.findall(r'data-overview-card="([^"]+)"', self.html)
         self.assertEqual(cards, ["stress", "leverage", "deleveraging", "taiwan"])
