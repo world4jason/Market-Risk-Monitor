@@ -26,6 +26,7 @@ python scripts/refresh_data.py --clean-output \
 
 python scripts/build_signals.py
 python scripts/validate_data.py
+python scripts/check_publish_policy.py
 python scripts/site_smoke.py
 ```
 
@@ -105,17 +106,13 @@ overview.json      lightweight summary present; no full observations
 refresh-report.json  removed_artifacts records anything pruned
 ```
 
-Confirm no artifact declares `redistribution: "restricted"`:
+Enforce the reviewed source-by-source publication policy:
 
 ```bash
-python - <<'PY'
-import json, pathlib
-for p in pathlib.Path("data/generated").glob("*.json"):
-    d = json.loads(p.read_text())
-    if isinstance(d.get("source"), dict) and d["source"].get("redistribution") == "restricted":
-        print("RESTRICTED:", p.name)
-PY
+python scripts/check_publish_policy.py
 ```
+
+This is stronger than grepping for `redistribution: "restricted"`: it also rejects unclassified new metrics, source families marked local-only, and derived/special artifacts that actually consumed a local-only provenance input. The machine-readable decisions live in `data/config/publishing.json`.
 
 ## Publishing
 
@@ -123,6 +120,14 @@ Pages serves `main` at `/(root)`; see
 [GitHub Pages without GHA](../README.md#github-pages-without-gha). Merging the
 snapshot to `main` rebuilds the site.
 
-Refresh scheduling, snapshot retention and the long-term publishing
-architecture are open in #44. v0.1 is a bootstrap release, not that
-architecture: every future refresh rewrites most of these files.
+## Retention and subsequent refreshes
+
+The long-term decision from #44 is **tracked snapshots on `main`** for source families explicitly approved by `data/config/publishing.json`.
+
+- `data/generated/*.json` is release output **and intentionally versioned**.
+- Every release regenerates the complete public set with `--clean-output`; there is no second downsampled representation.
+- `validate_data.py`, `check_publish_policy.py`, and `site_smoke.py` must pass before generated files are committed.
+- Restricted/local-only inputs may exist in a developer's separate local output directory, but never in the tracked public release tree.
+- Each accepted refresh replaces the tracked snapshot set on `main`; Git history is the retention/audit trail.
+- We do not add a data branch or scheduler dependency while Pages deliberately serves `main/(root)` without GitHub Actions.
+- If repository/Pages visibility or a source license changes, update the dated policy review and machine-readable config before publishing.

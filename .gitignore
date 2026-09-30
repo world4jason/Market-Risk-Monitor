@@ -1,3 +1,4 @@
+# data/generated/ is intentionally tracked release output; do not ignore it.
 .env
 .env.*
 !.env.example

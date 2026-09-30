@@ -239,3 +239,83 @@ A metric is unavailable for an event if its source history did not yet exist.
 8. Source format changes fail validation rather than producing guessed values.
 9. Previous valid snapshots remain visible only with their original `as_of` and explicit stale state.
 10. Redistribution/licensing caveats stay machine-readable in metric metadata.
+
+## Publishing and redistribution decisions — checked 2026-09-30
+
+The operational decision is recorded in `data/config/publishing.json` and enforced
+by `scripts/check_publish_policy.py`. The status below is a repository
+publication decision based on the cited source terms; it is not a general legal
+opinion about every possible use of the source.
+
+| Source family | Public-repo decision | Basis |
+|---|---|---|
+| Chicago Fed NFCI family via FRED | Publish with attribution | FRED labels NFCI `Copyrighted: Citation Required`; FRED's legal notice permits display/publication of that class with proper attribution. |
+| FRED USREC | Publish with attribution | FRED labels USREC `Copyrighted: Citation Required`; same attribution rule. |
+| Board/FOMC policy-rate series via FRED | Publish with attribution | Official policy-rate data; retain Board/FRED attribution. |
+| FINRA Margin Statistics | Publish normalized aggregate history with attribution | FINRA publicly publishes the aggregate statistics used here; no member-level filings are published. |
+| Robert Shiller public workbook | Publish normalized research series with attribution | Public research workbook. This is a project publication decision, not a public-domain claim. |
+| Cboe VIX historical download | Publish normalized daily close with attribution | Cboe exposes the 1990-present historical download publicly; proprietary DataShop feeds are separate. |
+| TWSE `twtazu_od` breadth family | Publish with attribution | Taiwan Government Data Open License v1 permits reproduction, distribution and derivative use with attribution. |
+| TWSE public web/OpenAPI TAIEX/current-market observations | Publish snapshot with attribution | Official public endpoint decision; paid Data E-Shop history is not covered. |
+| NDC business-cycle open data | Publish with attribution | Taiwan Government Data Open License v1; revised historical vintages remain non-PIT unless separately captured. |
+| CBC policy-rate history | Publish snapshot with attribution | Official public policy-rate history. |
+| CIER PMI rolling public release | Publish normalized release snapshot with attribution | Only the public rolling release is normalized; no separate proprietary archive is mirrored. |
+| FRED `SP500` / S&P 500 | **Local only** | FRED labels it `Copyrighted: Pre-Approval Required`; S&P DJI states index-data use/distribution requires licensing. |
+| TraderMonty/FMP/Barchart/TradingView MA breadth | **Local only unless a redistribution license is supplied** | Vendor access is not treated as a redistribution grant. |
+| Authorized NYSE breadth export | **Local only by default** | Ingestion authorization does not imply redistribution; public release requires source-specific redistribution rights. |
+
+The release checker fails closed: a new metric needs an explicit source-family
+decision before it can enter the public release, any artifact declaring
+`redistribution: restricted` is rejected, and a derived/special artifact
+cannot consume an actually-present local-only provenance input.
+
+### Daily U.S. large-cap index replacement review (#58)
+
+No clearly redistributable drop-in replacement for `sp500_index` was found in
+the reviewed candidates. Terms were checked on 2026-09-30:
+
+| Candidate | Terms / evidence checked | Outcome |
+|---|---|---|
+| S&P 500 / FRED SP500 | https://fred.stlouisfed.org/series/SP500 and https://www.spglobal.com/spdji/ | Pre-approval / index-data licensing required; local only. |
+| Nasdaq Composite / Nasdaq-100 via FRED | https://fred.stlouisfed.org/tags/series?t=copyrighted%3A+pre-approval+required%3Bindexes | Same FRED pre-approval class; also wrong market universe. |
+| FT Wilshire 5000 | https://www.wilshireindexes.com/wilshire-indexes-disclaimer | Written permission / appropriate license required; wrong universe. |
+| Cboe SPX index feeds | https://datashop.cboe.com/main-channel-tick-data | Proprietary; external redistribution prohibited absent licensing. |
+| Yahoo Finance proxy prices | https://legal.yahoo.com/us/en/yahoo/terms/otos/ | General terms do not provide a redistribution grant for a canonical public data feed. |
+| ETF proxy via another vendor | Vendor-specific | Rejected before source selection because a fund price is not the index; no silent substitution. |
+| Self-computed proxy | S&P constituent/data license would still be required | Deferred; not an official S&P 500 replacement without licensed PIT inputs. |
+- **S&P 500 via FRED:** rejected for public release; FRED marks it
+  `Copyrighted: Pre-Approval Required`, and S&P DJI requires an index-data
+  license for use/distribution.
+- **Nasdaq Composite / Nasdaq-100 via FRED:** rejected as a substitute and as a
+  public-data shortcut; FRED places these index series in the same
+  pre-approval-required class, and they are not S&P 500 large-cap beta.
+- **FT Wilshire 5000:** rejected as a drop-in; Wilshire's legal notice says its
+  information does not carry a use right without written permission and an
+  appropriate license, and the universe is materially different.
+- **Cboe SPX / DataShop:** rejected for public redistribution; Cboe labels the
+  index dataset proprietary and says external redistribution is prohibited
+  absent licensing.
+- **ETF proxies (SPY/IVV/VOO):** rejected as a semantic substitute. A fund price
+  is not the S&P 500 index, and a price vendor adds a separate license question.
+- **Yahoo/Stooq/free aggregators:** rejected as the canonical public-release
+  path because convenience access is not a redistribution grant.
+- **Self-computed large-cap index:** not adopted. It would require licensed,
+  point-in-time constituents and prices and would otherwise be a project-defined
+  index rather than the S&P 500.
+
+**Decision:** keep `sp500_index` local-only. The public event study remains
+SPX-less until a suitable licensed input is available; no silent replacement is
+allowed.
+
+### Private-repository decision (#60)
+
+As of 2026-09-30 this repository and its GitHub Pages output are public.
+Therefore the preconditions for ingesting/publishing the restricted
+`sp500_index` are not met. A future visibility change does not retroactively
+remove data already served, cloned or cached.
+
+The current decision is **do not include `sp500_index` in any public release**.
+If the project later moves to a genuinely non-public delivery path, source terms
+must be re-checked at that time. The metric keeps
+`redistribution: restricted`, and the release checker prevents accidental
+publication even if a local/private workflow generated the file.
