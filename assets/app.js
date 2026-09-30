@@ -1029,8 +1029,8 @@ function renderOverview() {
   if (total) deleveragingFacts.push(`${known}/${total} usable · ${unknown} unknown`);
   setSnapshotCard(
     "deleveraging",
-    !total ? "DATA GAP" : active ? "WATCH" : unknown ? "PARTIAL" : "CLEAR",
-    !total ? "No signal read" : active ? `${active} active` : "No active checks",
+    !total ? "DATA GAP" : active ? `${active} ACTIVE` : unknown ? "PARTIAL" : "CLEAR",
+    !total ? "No signal read" : unknown ? "Evidence incomplete" : active ? "Deleveraging signs" : "No active checks",
     deleveragingFacts,
     !total ? "gap" : active ? "watch" : unknown ? "gap" : "normal",
   );
