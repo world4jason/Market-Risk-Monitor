@@ -58,6 +58,7 @@ def parse_breadth_csv(text: str, *, required_scope: str = "NYSE") -> list[dict]:
 
     rows = []
     seen_dates = set()
+    previous_date = None
     scopes = set()
     providers = set()
 
@@ -79,9 +80,16 @@ def parse_breadth_csv(text: str, *, required_scope: str = "NYSE") -> list[dict]:
         if not provider:
             raise BreadthError(f"row {row_number}: provider is blank")
 
-        if parsed_date.isoformat() in seen_dates:
-            raise BreadthError(f"duplicate date: {parsed_date.isoformat()}")
-        seen_dates.add(parsed_date.isoformat())
+        normalized_date = parsed_date.isoformat()
+        if normalized_date in seen_dates:
+            raise BreadthError(f"duplicate date: {normalized_date}")
+        if previous_date is not None and normalized_date < previous_date:
+            raise BreadthError(
+                "breadth dates must be strictly increasing; "
+                f"{normalized_date} follows {previous_date}"
+            )
+        seen_dates.add(normalized_date)
+        previous_date = normalized_date
         scopes.add(scope)
         providers.add(provider)
 
@@ -99,8 +107,6 @@ def parse_breadth_csv(text: str, *, required_scope: str = "NYSE") -> list[dict]:
 
         rows.append(parsed)
 
-    rows.sort(key=lambda row: row["date"])
-
     if len(scopes) > 1:
         raise BreadthError(f"mixed market scopes in one file: {sorted(scopes)}")
     if scopes and required_scope and scopes != {required_scope}:
@@ -117,6 +123,17 @@ def parse_breadth_csv(text: str, *, required_scope: str = "NYSE") -> list[dict]:
         raise BreadthError("breadth CSV contains no data rows")
 
     return rows
+
+
+def assert_history_not_truncated(previous: dict, current: dict) -> None:
+    """Reject replacement breadth history that silently loses its old start."""
+    previous_start = previous.get("coverage", {}).get("history_start")
+    current_start = current.get("coverage", {}).get("history_start")
+    if previous_start and current_start and current_start > previous_start:
+        raise BreadthError(
+            f"{current.get('metric', {}).get('id', 'breadth metric')} history "
+            f"starts at {current_start}, later than existing {previous_start}"
+        )
 
 
 def _freshness(as_of: str | None, fetched_at: datetime, max_age_days: int = 5):
