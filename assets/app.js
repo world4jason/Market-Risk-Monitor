@@ -970,7 +970,12 @@ function renderOverview() {
 
   const stressFacts = [];
   if (nfci) {
-    stressFacts.push(`NFCI ${formatValue(nfci.latest?.value, nfci.metric.units)}`);
+    const nfciValue = Number(nfci.latest?.value);
+    stressFacts.push(
+      Number.isFinite(nfciValue)
+        ? `Conditions ${nfciValue > 0 ? "tighter" : "looser"} than avg`
+        : "Financial conditions available",
+    );
   }
   if (vix) {
     const percentile = percentilePresentation(vix);
@@ -995,7 +1000,7 @@ function renderOverview() {
   const leverageFacts = [];
   if (margin) {
     leverageFacts.push(
-      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} pct` : ""}`,
+      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} pct (context)` : ""}`,
     );
   }
   if (marginYoy) {
