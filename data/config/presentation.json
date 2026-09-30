@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "metric_overrides": {
+    "fed_target_legacy": "basis_points",
+    "fed_target_upper": "basis_points",
+    "us_fed_policy_rate": "basis_points",
+    "tw_cbc_rate": "basis_points",
+    "nfci": "absolute",
+    "nfci_risk": "absolute",
+    "nfci_credit": "absolute",
+    "nfci_nonfinancial_leverage": "absolute",
+    "tw_advance_decline_line": "absolute",
+    "shiller_price": "percent_change",
+    "shiller_real_tr_price": "percent_change",
+    "tw_manufacturing_pmi": "percent_change",
+    "tw_ndc_coincident_index": "percent_change",
+    "tw_ndc_lagging_index": "percent_change",
+    "tw_ndc_leading_index": "percent_change",
+    "tw_taiex": "percent_change",
+    "tw_taiex_open": "percent_change",
+    "tw_taiex_high": "percent_change",
+    "tw_taiex_low": "percent_change",
+    "vix": "percent_change",
+    "sp500_index": "percent_change"
+  },
+  "notes": {
+    "index_default": "absolute",
+    "policy": "ID-specific ambiguous semantics belong in this registry; unknown index IDs fail safe to absolute rather than assuming relative percent change."
+  }
+}

@@ -274,3 +274,29 @@ The stable boundary is the generated JSON data contract defined in #4. The front
 - Stale/error behavior is explicit.
 - Future external scheduling is an adapter, not a frontend rewrite.
 - Historical coverage is metric-specific.
+
+## Enforced repository choke points
+
+The repository treats the following as structural invariants, not conventions:
+
+- **Canonical JSON writes:** pipeline.artifacts.write_json_artifact() is the only
+  serializer allowed under pipeline/. It applies presentation finalization
+  before atomic replacement. tests/test_artifact_writer.py scans the pipeline
+  and fails if another module starts serializing JSON directly.
+- **Release membership:** scripts/refresh_data.py records every written
+  artifact and --clean-output prunes anything not written or explicitly
+  preserved by a failed source. Tests pre-seed a dirty output directory so stale
+  files cannot bypass source allowlists.
+- **Grouped failures:** multi-metric sources declare the complete preserved
+  metric group. The TWSE path reports both TAIEX and breadth groups even when an
+  earlier dependent fetch fails, so pruning cannot erase a sibling group.
+- **Contract examples:** repository JSON fixtures/examples that look like metric
+  artifacts are scanned against the canonical JSON Schema, rather than relying
+  on a manually maintained filename list.
+- **Presentation semantics:** ID-specific ambiguous comparison behavior lives in
+  data/config/presentation.json. Unknown index IDs fail safe to absolute change
+  until explicitly classified, preventing a new zero-centred index from
+  silently receiving relative-percent semantics.
+
+These checks run in the ordinary deterministic local test suite and do not
+depend on GitHub Actions.

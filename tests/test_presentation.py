@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pipeline.presentation import (
     COMPARISONS,
+    METRIC_OVERRIDES,
     apply_presentation,
     comparison_for,
 )
@@ -130,6 +131,26 @@ class ComparisonSemanticsTests(unittest.TestCase):
             comparison_for(metric("some_percentile", "percentile")),
             "percentage_points",
         )
+
+    def test_ambiguous_index_semantics_live_in_config_registry(self):
+        self.assertEqual(METRIC_OVERRIDES["nfci"], "absolute")
+        self.assertEqual(METRIC_OVERRIDES["tw_taiex"], "percent_change")
+        self.assertEqual(METRIC_OVERRIDES["fed_target_upper"], "basis_points")
+        self.assertEqual(comparison_for(metric("new_unknown_index", "index")), "absolute")
+
+    def test_all_checked_in_index_metrics_are_explicitly_classified(self):
+        root = Path(__file__).resolve().parents[1]
+        missing = []
+        for path in sorted((root / "data" / "generated").glob("*.json")):
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except ValueError:
+                continue
+            meta = payload.get("metric")
+            if isinstance(meta, dict) and meta.get("units") == "index":
+                if meta.get("id") not in METRIC_OVERRIDES:
+                    missing.append(meta.get("id"))
+        self.assertEqual(missing, [])
 
     def test_every_result_is_in_the_declared_vocabulary(self):
         for units in [

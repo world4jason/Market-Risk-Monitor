@@ -6,6 +6,8 @@ import json
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from .artifacts import write_json_artifact
+
 
 class MovingAverageBreadthError(ValueError):
     pass
@@ -473,15 +475,11 @@ def write_ma_breadth_metrics(
     written = []
     for metric_id, metric in build_ma_breadth_metrics(rows, fetched_at).items():
         dest = output_dir / f"{metric_id}.json"
-        tmp = dest.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(metric, indent=2) + "\n", encoding="utf-8")
-        tmp.replace(dest)
+        write_json_artifact(dest, metric)
         written.append(dest)
 
     audit_dest = output_dir / "ma-breadth-audit.json"
-    tmp = audit_dest.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(audit_rows(rows), indent=2) + "\n", encoding="utf-8")
-    tmp.replace(audit_dest)
+    write_json_artifact(audit_dest, audit_rows(rows))
     written.append(audit_dest)
     return written
 
