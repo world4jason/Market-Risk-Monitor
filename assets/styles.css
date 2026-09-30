@@ -295,12 +295,15 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
   line-height: 1.5;
 }
 .thesis-evidence {
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
   margin-top: 14px;
 }
 .thesis-chip {
+  min-width: 0;
+  white-space: normal;
   display: inline-flex;
   padding: 6px 8px;
   border: 1px solid var(--line);
@@ -318,6 +321,7 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
   border-left: 1px solid var(--line);
 }
 .trigger-list {
+  min-width: 0;
   display: grid;
   gap: 8px;
 }
@@ -757,7 +761,7 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
 
 @media (max-width: 980px) {
   .decision-thesis {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
   .thesis-triggers {
@@ -783,6 +787,6 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
     font-size: 1.65rem;
   }
   #overview-thesis-summary { font-size: .78rem; }
-  .trigger-list { grid-template-columns: 1fr; }
+  .trigger-list { grid-template-columns: minmax(0, 1fr); }
 }
 
