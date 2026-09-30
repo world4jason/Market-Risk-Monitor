@@ -1,0 +1,545 @@
+{
+  "schema_version": "1.0.0",
+  "rows": [
+    {
+      "date": "2025-09-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 48.3,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2025-10-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 50.3,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2025-11-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 51.4,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2025-12-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 55.3,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-01-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 57.2,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-02-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 58.5,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-03-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 55.4,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-04-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 60.3,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-05-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 61.4,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-06-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 60.7,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-07-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 61.5,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2026-08-01",
+      "provider": "CIER",
+      "series_id": "tw_manufacturing_pmi",
+      "value": 62.5,
+      "unit": "index",
+      "release_date": "2026-09-21",
+      "source_url": "https://www.cier.edu.tw/pmi-trend/"
+    },
+    {
+      "date": "2025-08-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 100.4933250649451,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2025-09-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 100.5386909509119,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2025-10-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 100.8071502316055,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2025-11-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 101.3059922159077,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2025-12-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 101.9677742538671,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-01-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 102.8238047181887,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-02-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 103.7413367774932,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-03-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 104.6226688954975,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-04-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 105.3302958617588,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-05-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 105.9461305755344,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-06-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 106.423769051658,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2026-07-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_coincident_index",
+      "value": 106.8049537676424,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/coincident"
+    },
+    {
+      "date": "2025-08-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 97.35766441447042,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2025-09-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 97.34403062863193,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2025-10-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 97.30985532507411,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2025-11-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 97.26188219121136,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2025-12-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 97.30465201204993,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-01-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 97.56339329023686,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-02-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 98.14736841179909,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-03-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 99.14853597267371,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-04-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 100.4938484661689,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-05-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 101.9604260022271,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-06-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 103.3769490216439,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2026-07-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_lagging_index",
+      "value": 104.7914087010663,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lagged"
+    },
+    {
+      "date": "2025-08-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 98.78889873559753,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2025-09-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 99.20435642816588,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2025-10-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 99.73076765089073,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2025-11-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 100.2764482415886,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2025-12-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 100.7756578443083,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-01-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 101.1443536019292,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-02-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 101.3946378079098,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-03-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 101.8232329115334,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-04-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 102.4610897578671,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-05-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 103.1542179797833,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-06-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 103.8879885751358,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2026-07-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_leading_index",
+      "value": 104.6337282843642,
+      "unit": "index",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/leading"
+    },
+    {
+      "date": "2025-08-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 31.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2025-09-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 34.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2025-10-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 35.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2025-11-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 37.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2025-12-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 38.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-01-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 39.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-02-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 41.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-03-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 39.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-04-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 40.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-05-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 39.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-06-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 41.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    },
+    {
+      "date": "2026-07-01",
+      "provider": "NDC",
+      "series_id": "tw_ndc_monitoring_score",
+      "value": 41.0,
+      "unit": "score",
+      "release_date": "2026-09-26",
+      "source_url": "https://index.ndc.gov.tw/n/zh_tw/lightscore"
+    }
+  ]
+}

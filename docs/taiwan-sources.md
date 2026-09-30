@@ -111,20 +111,35 @@ subsequent refreshes.
 
 Current release cadence: monthly.
 
-Because the web release/database surface is not guaranteed to be a stable machine API, v0.3 supports a normalized local CSV snapshot contract for historical ingestion.
+The public NDC chart pages expose an undocumented JSON surface used by the site's own JavaScript. As verified on 2026-09-26, the four canonical inputs are:
+
+```text
+POST /n/json/lightscore  -> tw_ndc_monitoring_score
+POST /n/json/leading     -> tw_ndc_leading_index
+POST /n/json/coincident  -> tw_ndc_coincident_index
+POST /n/json/lagged      -> tw_ndc_lagging_index
+```
+
+The requests require the page session/CSRF token. `scripts/bootstrap_ndc_business_cycle.py` establishes that session, fetches all four endpoints, validates their common 12-month rolling window, and normalizes them to the Taiwan macro CSV contract. Because this is an undocumented website API rather than a guaranteed public machine API, the parser has a committed offline JSON fixture and accepts `--snapshot-file` for reproducible/manual recovery.
+
+The first committed real normalized snapshot is `data/source/ndc-business-cycle-2026-09-26.csv`, verified from the official endpoint payload on 2026-09-26. It contains 48 rows: four series x 12 months, covering 2025-08 through 2026-07.
 
 ### NDC snapshot and revision semantics
 
-The committed/manual NDC file is a **current-vintage snapshot**, not a historical
+The committed NDC file is a **current-vintage snapshot**, not a historical
 vintage archive. NDC history can be revised retrospectively, so canonical NDC
 metrics keep `availability_basis: unknown` and their historical baselines remain
-retrospective-only. Replacing a manual NDC snapshot may therefore revise prior
-months; the pipeline must not reinterpret those revised values as if they had
-been known at the original reference dates.
+retrospective-only. Replacing a snapshot may therefore revise prior months; the
+pipeline must not reinterpret those revised values as if they had been known at
+the original reference dates.
 
-Use the snapshot's actual verification/publication date in `release_date`. Until
-a real normalized NDC snapshot is legally obtained and committed, the NDC
-family remains absent rather than synthesized.
+Use the snapshot's actual verification date in `release_date`. The bootstrap
+requires an explicit `--observed-at` for saved JSON so a stale file cannot be
+silently relabeled as a newer vintage. Live fetches default to the current UTC
+date. Because the official chart payload is a 12-month rolling window, the
+bootstrap replaces overlapping months with the newest verified snapshot while
+retaining older accumulated months at their last observed vintage. Those older
+rows remain non-PIT `latest-observed-vintage` context.
 
 ### Multi-source Taiwan macro assembly
 
@@ -152,7 +167,9 @@ Revision semantics depend on the canonical availability basis:
   `release_date` is used only as a snapshot-verification watermark for ingestion
   ordering: an incoming snapshot older than the stored verification date is
   rejected, while same/newer verified snapshots may revise current-vintage
-  values. This ordering guard does not make NDC history PIT-safe.
+  values. The same verification watermark is used for source freshness so a
+  just-verified current snapshot is not mislabeled stale merely because its
+  reference month is old. This freshness rule does not make NDC history PIT-safe.
 
 All input parsing, retention/ownership/chronology checks, metric builds and
 validations, regime build/validation, and audit build/validation complete before
@@ -174,7 +191,7 @@ PMI interpretation:
 - >50 expansion
 - <50 contraction
 
-CIER content is publicly viewable but redistribution rights are not assumed. The repository therefore stores parser/config logic and small fixtures; a full historical snapshot is committed only if rights are verified.
+CIER content is publicly viewable. The repository does not assume redistribution rights for a deeper/full historical archive or the sector series. The public canonical artifact is limited to the headline PMI rolling window needed by MRM; sector series are parsed for shape verification but are not published as canonical metrics, and pre-window history is not backfilled.
 
 ### CIER rolling-window bootstrap
 

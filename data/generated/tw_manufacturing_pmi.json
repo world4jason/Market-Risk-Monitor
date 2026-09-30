@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0.0",
+  "environment": "production",
+  "metric": {
+    "id": "tw_manufacturing_pmi",
+    "name": "Taiwan Manufacturing PMI",
+    "description": "Official/public Taiwan macro input used independently and by the transparent MRM Taiwan macro regime.",
+    "pillar": "context",
+    "units": "index",
+    "frequency": "monthly",
+    "polarity": "contextual",
+    "comparison": "percent_change"
+  },
+  "source": {
+    "provider": "CIER",
+    "dataset": "Taiwan official/public macro release",
+    "series_id": "tw_manufacturing_pmi",
+    "url": "https://www.cier.edu.tw/pmi-trend/",
+    "license_note": "Official/public release. Full-history redistribution rights depend on the source; source attribution retained.",
+    "redistribution": "unknown",
+    "market_scope": "Taiwan",
+    "membership_mode": null,
+    "membership_snapshot": null,
+    "price_adjustment": null,
+    "point_in_time_membership": null,
+    "availability_basis": "release_date"
+  },
+  "coverage": {
+    "history_start": "2025-09-01",
+    "history_end": "2026-08-01",
+    "timezone": "Asia/Taipei",
+    "expected_observation_lag_days": 35
+  },
+  "freshness": {
+    "state": "fresh",
+    "max_age_days": 75,
+    "age_days": 56,
+    "evaluated_at": "2026-09-26T04:49:42.079353Z",
+    "reason": null
+  },
+  "lineage": {
+    "kind": "raw",
+    "inputs": [],
+    "formula": null,
+    "transform_version": "taiwan-macro-raw-v1"
+  },
+  "baselines": [
+    {
+      "id": "expanding-pit",
+      "type": "full_history_percentile",
+      "window_observations": null,
+      "min_observations": 24,
+      "point_in_time": true,
+      "notes": "Release-aware strict-past percentile; same-day release batches do not enter one another's baseline."
+    }
+  ],
+  "latest": {
+    "as_of": "2026-08-01",
+    "fetched_at": "2026-09-26T04:49:42.079353Z",
+    "value": 62.5,
+    "revision_tag": null
+  },
+  "observations": [
+    {
+      "date": "2025-09-01",
+      "value": 48.3,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2025-10-01",
+      "value": 50.3,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2025-11-01",
+      "value": 51.4,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2025-12-01",
+      "value": 55.3,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-01-01",
+      "value": 57.2,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-02-01",
+      "value": 58.5,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-03-01",
+      "value": 55.4,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-04-01",
+      "value": 60.3,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-05-01",
+      "value": 61.4,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-06-01",
+      "value": 60.7,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-07-01",
+      "value": 61.5,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    },
+    {
+      "date": "2026-08-01",
+      "value": 62.5,
+      "status": "observed",
+      "release_date": "2026-09-21"
+    }
+  ]
+}

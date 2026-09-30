@@ -193,6 +193,8 @@ uses an explicit source allowlist and `--clean-output`:
 
 ```bash
 python scripts/bootstrap_taiwan_taiex.py
+python scripts/bootstrap_cier_pmi.py
+python scripts/bootstrap_ndc_business_cycle.py
 
 python scripts/refresh_data.py --clean-output \
   --fred-id nfci --fred-id nfci_risk --fred-id nfci_credit \
@@ -202,6 +204,8 @@ python scripts/refresh_data.py --clean-output \
   --finra-file <margin-statistics.xlsx> \
   --shiller-file <ie_data.xls> \
   --twse-current \
+  --taiwan-macro-file .cache/taiwan-macro/cier-pmi.csv \
+  --taiwan-macro-file .cache/taiwan-macro/ndc-business-cycle.csv \
   --cbc-rate-file <cbc-rates.csv>
 
 python scripts/build_signals.py
@@ -368,6 +372,26 @@ This produces:
 - normalized High-Low %
 
 ### Import official/public Taiwan macro releases
+
+Bootstrap the public NDC business-cycle chart JSON into the normalized contract:
+
+```bash
+python scripts/bootstrap_ndc_business_cycle.py
+```
+
+For a saved/offline snapshot, preserve its real verification date:
+
+```bash
+python scripts/bootstrap_ndc_business_cycle.py \
+  --snapshot-file tests/fixtures/ndc_business_cycle_snapshot.json \
+  --observed-at 2026-09-26 \
+  --output /tmp/ndc-business-cycle.csv
+```
+
+The committed 2026-09-26 normalized NDC snapshot is in
+`data/source/ndc-business-cycle-2026-09-26.csv`. NDC remains current-vintage /
+non-PIT; `release_date` is a verification watermark, not a claim that revised
+historical values were known on their observation dates.
 
 Normalized contract:
 
