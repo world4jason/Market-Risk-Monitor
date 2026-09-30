@@ -139,11 +139,13 @@ class UiContractTests(unittest.TestCase):
         cls.parser.feed(cls.html)
 
     def test_snapshot_grid_precedes_market_detail_and_stays_compact(self) -> None:
+        thesis = self.html.index('id="decision-thesis"')
         snapshot = self.html.index('class="snapshot-grid"')
         health = self.html.index('id="overview-health-strip"')
         us_detail = self.html.index('id="us-detail"')
         taiwan_detail = self.html.index('id="taiwan-detail"')
 
+        self.assertLess(thesis, snapshot)
         self.assertLess(snapshot, health)
         self.assertLess(health, us_detail)
         self.assertLess(health, taiwan_detail)
@@ -283,7 +285,7 @@ class UiContractTests(unittest.TestCase):
             overview,
         )
         freshness_guard = overview.index('taiexFreshness !== "fresh"')
-        refresh_wording = overview.index('taiwanHeadline = "Needs refresh"')
+        refresh_wording = overview.index('taiwanHeadline = "No current call"')
         self.assertLess(freshness_guard, refresh_wording)
         self.assertIn('taiwanStatus = String(taiexFreshness).toUpperCase()', overview)
         self.assertIn('taiwanHeadline = "Market read available"', overview)
@@ -299,8 +301,9 @@ class UiContractTests(unittest.TestCase):
             overview,
         )
         self.assertIn('stressUnknown ? "DATA GAP"', overview)
-        self.assertIn('stressUnknown ? "Incomplete read"', overview)
-        self.assertIn('"No broad stress"', overview)
+        self.assertIn('stressUnknown ? "Known gauges calm"', overview)
+        self.assertIn('"Stress contained"', overview)
+        self.assertIn('"Known stress gauges are not elevated, but expected stress evidence is incomplete."', overview)
 
     def test_margin_rollover_exposes_the_actual_positive_growth_deceleration_trigger(self) -> None:
         condition = next(
@@ -328,7 +331,8 @@ class UiContractTests(unittest.TestCase):
         self.assertIn('rule.type === "delta_periods_below"', helper)
         self.assertIn("Math.abs(value).toFixed(1)", helper)
         self.assertIn('const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;', overview)
-        self.assertIn('slowing ? "Growth slowing"', overview)
+        self.assertIn('slowing ? "High, growth slowing"', overview)
+        self.assertIn('"Leverage is rolling over; broad stress is not confirmed"', overview)
         self.assertIn('YoY ${formatValue(marginYoy.latest?.value, "percent")}', overview)
         self.assertIn("details.map(formatRuleDetail)", signals)
         self.assertIn("detail.reason", rule_detail)
@@ -409,7 +413,8 @@ class UiContractTests(unittest.TestCase):
         signals = extract_function(self.app, "renderSignals")
         self.assertIn("unavailable/unknown", signals)
         self.assertIn("unknown is not inactive", signals)
-        self.assertIn('"Evidence incomplete"', overview)
+        self.assertIn('"Not confirmed"', overview)
+        self.assertIn('"LOW CONFIDENCE"', overview)
         self.assertIn('${unknown} unknown', overview)
         self.assertIn('unknown ? "gap"', overview)
 
