@@ -252,6 +252,12 @@ function registerOverviewDom(runtime) {
   runtime.dom.register("overview-health-strip");
   runtime.dom.register("overview-health-state");
   runtime.dom.register("overview-health-detail");
+  runtime.dom.register("decision-thesis");
+  runtime.dom.register("overview-thesis-title");
+  runtime.dom.register("overview-thesis-summary");
+  runtime.dom.register("overview-thesis-confidence");
+  runtime.dom.register("overview-thesis-evidence");
+  runtime.dom.register("overview-thesis-triggers");
 }
 
 test("freshness matrix and preserved-refresh errors use production semantics", () => {
@@ -691,7 +697,7 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   );
   assert.equal(
     runtime.dom.byId.get("overview-stress-value").textContent,
-    "Incomplete read",
+    "Known gauges calm",
   );
   assert.match(
     runtime.dom.byId.get("overview-stress-sub").innerHTML,
@@ -703,7 +709,7 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   );
   assert.equal(
     runtime.dom.byId.get("overview-leverage-value").textContent,
-    "Growth slowing",
+    "High, growth slowing",
   );
   assert.match(
     runtime.dom.byId.get("overview-leverage-sub").innerHTML,
@@ -712,6 +718,22 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   assert.match(
     runtime.dom.byId.get("overview-leverage-sub").innerHTML,
     /pct \(context\)/,
+  );
+  assert.equal(
+    runtime.dom.byId.get("overview-thesis-title").textContent,
+    "Leverage rolling over; stress not confirmed",
+  );
+  assert.equal(
+    runtime.dom.byId.get("overview-thesis-confidence").textContent,
+    "LOW CONFIDENCE",
+  );
+  assert.match(
+    runtime.dom.byId.get("overview-thesis-summary").textContent,
+    /Known stress gauges are not elevated/,
+  );
+  assert.match(
+    runtime.dom.byId.get("overview-thesis-summary").textContent,
+    /2\/2 deleveraging checks are usable; 1 is active/,
   );
 });
 

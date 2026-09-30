@@ -519,6 +519,33 @@ function setOverviewHealth(headline, detail, displayState = "normal") {
 }
 
 
+function setDecisionThesis(title, summary, confidence, evidence = [], triggers = [], displayState = "normal") {
+  const thesis = $("#decision-thesis");
+  const titleEl = $("#overview-thesis-title");
+  const summaryEl = $("#overview-thesis-summary");
+  const confidenceEl = $("#overview-thesis-confidence");
+  const evidenceEl = $("#overview-thesis-evidence");
+  const triggersEl = $("#overview-thesis-triggers");
+  if (!thesis || !titleEl || !summaryEl || !confidenceEl || !evidenceEl || !triggersEl) return;
+
+  thesis.dataset.confidence = displayState;
+  titleEl.textContent = title;
+  summaryEl.textContent = summary;
+  confidenceEl.textContent = confidence;
+  evidenceEl.innerHTML = evidence
+    .filter(Boolean)
+    .slice(0, 4)
+    .map((item) => `<span class="thesis-chip">${escapeHtml(item)}</span>`)
+    .join("");
+
+  triggersEl.innerHTML = triggers
+    .filter((item) => item?.text)
+    .slice(0, 3)
+    .map((item) => `<div class="trigger-item"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.text)}</strong></div>`)
+    .join("") || '<span class="trigger-item">No configured escalation threshold is available.</span>';
+}
+
+
 function observationAvailabilityDate(metric, observation) {
   if (observation?.availability_date) return observation.availability_date;
   const basis = metric?.source?.availability_basis || "unknown";
@@ -986,7 +1013,7 @@ function renderOverview() {
   setSnapshotCard(
     "stress",
     stressUnknown ? "DATA GAP" : stressActive ? "ELEVATED" : "CLEAR",
-    stressUnknown ? "Incomplete read" : stressActive ? "Stress elevated" : "No broad stress",
+    stressUnknown ? "Known gauges calm" : stressActive ? "Stress elevated" : "Stress contained",
     stressFacts,
     stressUnknown ? "gap" : stressActive ? "watch" : "normal",
   );
@@ -1010,7 +1037,7 @@ function renderOverview() {
   setSnapshotCard(
     "leverage",
     !leverageReady ? "DATA GAP" : slowing ? "WATCH" : "CONTEXT",
-    !leverageReady ? "Incomplete read" : slowing ? "Growth slowing" : "Growth available",
+    !leverageReady ? "Incomplete read" : slowing ? "High, growth slowing" : "Leverage context",
     leverageFacts,
     !leverageReady ? "gap" : slowing ? "watch" : "normal",
   );
@@ -1037,7 +1064,7 @@ function renderOverview() {
   setSnapshotCard(
     "deleveraging",
     !total ? "DATA GAP" : active ? `${active} ACTIVE` : unknown ? "PARTIAL" : "CLEAR",
-    !total ? "No signal read" : unknown ? "Evidence incomplete" : active ? "Deleveraging signs" : "No active checks",
+    !total ? "No signal read" : (active && unknown) ? "Not confirmed" : active ? "Deleveraging signs" : "No confirmation",
     deleveragingFacts,
     !total ? "gap" : active ? "watch" : unknown ? "gap" : "normal",
   );
@@ -1071,7 +1098,7 @@ function renderOverview() {
     taiwanState = "gap";
   } else if (taiexFreshness !== "fresh") {
     taiwanStatus = String(taiexFreshness).toUpperCase();
-    taiwanHeadline = "Needs refresh";
+    taiwanHeadline = "No current call";
     taiwanState = "watch";
   } else if (taiwanNeedsAttention) {
     taiwanStatus = "PARTIAL";
@@ -1105,6 +1132,105 @@ function renderOverview() {
   const healthHasHardGap = Boolean(health.counts.error || health.counts.missing);
   const healthNeedsRefresh = Boolean(health.counts.stale);
   const healthHasEvidenceGap = Boolean(unknown);
+  const marginRank = margin ? rollingPercentile(margin) : null;
+  const leverageElevated = Number.isFinite(marginRank) && marginRank >= 90;
+  const momentumEvidence = marginMomentumEvidence(marginSignal);
+
+  let thesisTitle;
+  if (stressActive) {
+    thesisTitle = active
+      ? "Stress rising; deleveraging signals appearing"
+      : "Stress rising; deleveraging not confirmed";
+  } else if (slowing) {
+    thesisTitle = "Leverage rolling over; stress not confirmed";
+  } else if (leverageElevated) {
+    thesisTitle = "Leverage stretched; stress not confirmed";
+  } else if (stressUnknown) {
+    thesisTitle = "Known stress gauges calm; read incomplete";
+  } else {
+    thesisTitle = "No broad stress confirmation";
+  }
+
+  const thesisParts = [];
+  if (stressActive) {
+    thesisParts.push("At least one current stress check is elevated.");
+  } else if (stressUnknown) {
+    thesisParts.push("Known stress gauges are not elevated, but expected stress evidence is incomplete.");
+  } else {
+    thesisParts.push("Current NFCI/VIX stress checks are not elevated.");
+  }
+  if (Number.isFinite(yoy)) {
+    thesisParts.push(
+      slowing
+        ? `Margin debt is still ${formatValue(yoy, "percent")} YoY while growth momentum is slowing.`
+        : `Margin debt growth is ${formatValue(yoy, "percent")} YoY.`,
+    );
+  }
+  if (total) {
+    thesisParts.push(
+      `${known}/${total} deleveraging checks are usable; ${active} ${active === 1 ? "is" : "are"} active.`,
+    );
+  }
+
+  let thesisConfidence = "HIGH CONFIDENCE";
+  let thesisState = "normal";
+  if (!total || unknown >= Math.ceil(Math.max(total, 1) / 2) || stressUnknown) {
+    thesisConfidence = "LOW CONFIDENCE";
+    thesisState = "gap";
+  } else if (unknown || healthNeedsRefresh) {
+    thesisConfidence = "MEDIUM CONFIDENCE";
+    thesisState = "watch";
+  }
+  if (healthNeedsRefresh) {
+    thesisConfidence += " · STALE DATA";
+    if (thesisState === "normal") thesisState = "watch";
+  }
+
+  const thesisEvidence = [
+    `Stress: ${stressActive ? "elevated" : stressUnknown ? "partial / known gauges calm" : "not elevated"}`,
+    margin
+      ? `Leverage: ${Number.isFinite(marginRank) ? `${formatValue(marginRank, "percentile")} vs 10y` : "available"}${Number.isFinite(yoy) ? ` · YoY ${formatValue(yoy, "percent")}` : ""}`
+      : "Leverage: unavailable",
+    total ? `Deleveraging: ${active} active / ${known} known` : "Deleveraging: unavailable",
+    snapshotDate ? `Snapshot: ${snapshotDate}` : null,
+  ];
+
+  const nfciTrigger = findRuleLeaf(financialCondition, (rule) => rule.type === "latest_above");
+  const vixTrigger = findRuleLeaf(vixStress, (rule) => rule.type === "percentile_above");
+  const marginTrigger = findRuleLeaf(marginSignal, (rule) => rule.type === "latest_below");
+  const breadthCondition = signalCondition("high_low_breadth_collapse");
+  const breadthTrigger = findRuleLeaf(breadthCondition, (rule) => rule.type === "percentile_below");
+  const breadthThreshold = Number(breadthTrigger?.threshold);
+  const thesisTriggers = [
+    {
+      label: "Stress confirms",
+      text: nfciTrigger && vixTrigger
+        ? `NFCI ≥ ${nfciTrigger.threshold} or VIX ≥ ${vixTrigger.threshold}th percentile`
+        : "configured NFCI / VIX stress threshold turns active",
+    },
+    {
+      label: "Rollover deepens",
+      text: marginTrigger
+        ? `Margin-debt YoY ≤ ${marginTrigger.threshold}%`
+        : "margin-debt growth turns negative",
+    },
+    {
+      label: "Breadth confirms",
+      text: Number.isFinite(breadthThreshold)
+        ? `NYSE High-Low breadth ≤ ${breadthThreshold}th percentile`
+        : (breadthTrigger?.label || "breadth deterioration becomes available and active"),
+    },
+  ];
+
+  setDecisionThesis(
+    thesisTitle,
+    thesisParts.join(" "),
+    thesisConfidence,
+    thesisEvidence,
+    thesisTriggers,
+    thesisState,
+  );
+
   setOverviewHealth(
     healthHasHardGap
       ? "Source issues"
