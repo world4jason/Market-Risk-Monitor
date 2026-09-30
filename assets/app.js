@@ -1139,16 +1139,16 @@ function renderOverview() {
   let thesisTitle;
   if (stressActive) {
     thesisTitle = active
-      ? "Stress is elevated and deleveraging signals are appearing"
-      : "Stress is elevated; deleveraging is not confirmed";
+      ? "Stress rising; deleveraging signals appearing"
+      : "Stress rising; deleveraging not confirmed";
   } else if (slowing) {
-    thesisTitle = "Leverage is rolling over; broad stress is not confirmed";
+    thesisTitle = "Leverage rolling over; stress not confirmed";
   } else if (leverageElevated) {
-    thesisTitle = "Leverage is stretched; broad stress is not confirmed";
+    thesisTitle = "Leverage stretched; stress not confirmed";
   } else if (stressUnknown) {
-    thesisTitle = "Known stress gauges are calm; confirmation is incomplete";
+    thesisTitle = "Known stress gauges calm; read incomplete";
   } else {
-    thesisTitle = "No broad stress confirmation in current evidence";
+    thesisTitle = "No broad stress confirmation";
   }
 
   const thesisParts = [];
@@ -1182,7 +1182,7 @@ function renderOverview() {
     thesisState = "watch";
   }
   if (healthNeedsRefresh) {
-    thesisConfidence += " · STALE DAILY DATA";
+    thesisConfidence += " · STALE DATA";
     if (thesisState === "normal") thesisState = "watch";
   }
 
