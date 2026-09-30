@@ -490,19 +490,32 @@ function formatRuleDetail(detail) {
 }
 
 
-function setOverviewCard(kind, headline, evidence, note, displayState = "normal") {
+function setSnapshotCard(kind, status, headline, facts = [], displayState = "normal") {
   const card = document.querySelector(`[data-overview-card="${kind}"]`);
-  const stateId = kind === "coverage" ? "evidence" : kind;
-  const stateEl = $(`#overview-${stateId}-state`);
-  const evidenceEl = $(`#overview-${stateId}-evidence`);
-  const noteEl = $(`#overview-${stateId}-note`);
-  const decisionEl = $(`#decision-${kind}-state`);
-  if (!card || !stateEl || !evidenceEl || !noteEl) return;
+  const statusEl = $(`#overview-${kind}-status`);
+  const valueEl = $(`#overview-${kind}-value`);
+  const factsEl = $(`#overview-${kind}-sub`);
+  if (!card || !statusEl || !valueEl || !factsEl) return;
+
   card.dataset.state = displayState;
+  statusEl.textContent = status;
+  valueEl.textContent = headline;
+
+  const compactFacts = facts.filter(Boolean).slice(0, 2);
+  factsEl.innerHTML = compactFacts.length
+    ? compactFacts.map((fact) => `<span>${escapeHtml(fact)}</span>`).join("")
+    : "<span>No current supporting observation</span>";
+}
+
+function setOverviewHealth(headline, detail, displayState = "normal") {
+  const strip = $("#overview-health-strip");
+  const stateEl = $("#overview-health-state");
+  const detailEl = $("#overview-health-detail");
+  if (!strip || !stateEl || !detailEl) return;
+
+  strip.dataset.state = displayState;
   stateEl.textContent = headline;
-  evidenceEl.innerHTML = evidence;
-  noteEl.textContent = note;
-  if (decisionEl) decisionEl.textContent = headline;
+  detailEl.textContent = detail;
 }
 
 
@@ -942,8 +955,8 @@ function renderOverview() {
   const marginYoy = state.metrics.get("finra_margin_debt_yoy_pct");
   const taiex = state.metrics.get("tw_taiex");
   const twBreadth = state.metrics.get("tw_advance_decline_pct");
-  const cbc = state.metrics.get("tw_cbc_rate");
 
+  // U.S. stress: plain-language state first, raw metrics second.
   const financialCondition = signalCondition("financial_conditions_tight");
   const vixStress = signalCondition("vix_stress");
   const expectedStressConditions = [financialCondition, vixStress];
@@ -954,172 +967,154 @@ function renderOverview() {
     expectedStressConditions.some((condition) => !condition) ||
     stressStatuses.some((status) => status === "unknown");
   const stressActive = stressStatuses.some((status) => status === "active");
-  const stressHeadline = stressUnknown
-    ? "U.S. stress evidence is incomplete"
-    : stressActive
-      ? "One or more current U.S. stress checks are elevated"
-      : "Current U.S. stress checks are not broadly elevated";
 
-  const stressEvidence = [];
+  const stressFacts = [];
   if (nfci) {
-    stressEvidence.push(`<strong>NFCI ${formatValue(nfci.latest?.value, nfci.metric.units)}</strong> · 0 is the historical-average reference; negative is looser than average.`);
+    const nfciValue = Number(nfci.latest?.value);
+    stressFacts.push(
+      Number.isFinite(nfciValue)
+        ? `Conditions ${nfciValue > 0 ? "tighter" : "looser"} than avg`
+        : "Financial conditions available",
+    );
   }
   if (vix) {
-    const p = percentilePresentation(vix);
-    stressEvidence.push(`<strong>VIX ${formatValue(vix.latest?.value, vix.metric.units)}</strong> · ${escapeHtml(overviewPercentileText(vix, p))}.`);
+    const percentile = percentilePresentation(vix);
+    stressFacts.push(
+      `VIX ${formatValue(vix.latest?.value, vix.metric.units)}${percentile.value !== "—" ? ` · ${percentile.value} pct` : ""}`,
+    );
   }
-  setOverviewCard(
+  setSnapshotCard(
     "stress",
-    stressHeadline,
-    stressEvidence.join("<br>") || "Current NFCI/VIX evidence is unavailable.",
-    stressUnknown
-      ? "At least one expected stress check is missing, unknown, stale, or errored; the overview does not convert partial evidence into a reassuring conclusion."
-      : "These measures describe current conditions; VIX and NFCI do not forecast market direction by themselves.",
-    stressUnknown ? "attention" : "normal"
+    stressUnknown ? "DATA GAP" : stressActive ? "ELEVATED" : "CLEAR",
+    stressUnknown ? "Incomplete read" : stressActive ? "Stress elevated" : "No broad stress",
+    stressFacts,
+    stressUnknown ? "gap" : stressActive ? "watch" : "normal",
   );
 
-  const marginPct = margin ? percentilePresentation(margin) : null;
+  // Leverage: distinguish a high level from a slowing growth impulse.
   const marginSignal = signalCondition("margin_debt_rollover");
   const marginStatus = marginSignal ? effectiveConditionStatus(marginSignal) : "unknown";
-  const momentumEvidence = marginMomentumEvidence(marginSignal);
   const yoy = Number(marginYoy?.latest?.value);
-  const leverageHeadline = margin && marginYoy
-    ? (marginStatus === "active" && Number.isFinite(yoy) && yoy > 0
-        ? "Leverage growth remains positive; its growth momentum is slowing"
-        : "Leverage level and growth are available for historical comparison")
-    : "Leverage evidence is incomplete";
-  const leverageEvidence = [];
+  const marginPct = margin ? percentilePresentation(margin) : null;
+  const leverageReady = Boolean(margin && marginYoy);
+  const leverageFacts = [];
   if (margin) {
-    const percentileText = marginPct ? overviewPercentileText(margin, marginPct) : "";
-    leverageEvidence.push(`<strong>${formatValue(margin.latest?.value, margin.metric.units)}</strong>${percentileText ? ` · ${escapeHtml(percentileText)}` : ""}.`);
+    leverageFacts.push(
+      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} pct (context)` : ""}`,
+    );
   }
   if (marginYoy) {
-    leverageEvidence.push(`<strong>YoY growth ${formatValue(marginYoy.latest?.value, "percent")}</strong>.`);
+    leverageFacts.push(`YoY ${formatValue(marginYoy.latest?.value, "percent")}`);
   }
-  if (momentumEvidence) {
-    leverageEvidence.push(`<strong>${escapeHtml(momentumEvidence)}</strong> · this is the active rollover evidence.`);
-  }
-  setOverviewCard(
+  const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;
+  setSnapshotCard(
     "leverage",
-    leverageHeadline,
-    leverageEvidence.join("<br>") || "FINRA margin data is unavailable.",
-    marginStatus === "active" && Number.isFinite(yoy) && yoy > 0
-      ? "The level is not described as falling: the active condition is the deceleration in YoY growth."
-      : "Level, year-over-year growth, and momentum are separate facts; no one of them is a BUY/SELL signal.",
-    margin && marginYoy ? (marginStatus === "active" ? "attention" : "normal") : "missing"
+    !leverageReady ? "DATA GAP" : slowing ? "WATCH" : "CONTEXT",
+    !leverageReady ? "Incomplete read" : slowing ? "Growth slowing" : "Growth available",
+    leverageFacts,
+    !leverageReady ? "gap" : slowing ? "watch" : "normal",
   );
 
+  // Deleveraging: counts remain transparent; no composite crash score is created.
   const conditions = (state.signals?.current?.conditions || []).map((condition) => ({
     ...condition,
-    displayStatus: effectiveConditionStatus(condition)
+    displayStatus: effectiveConditionStatus(condition),
   }));
-  const known = conditions.filter((c) => c.displayStatus !== "unknown").length;
-  const active = conditions.filter((c) => c.displayStatus === "active").length;
-  const unknown = conditions.filter((c) => c.displayStatus === "unknown").length;
+  const known = conditions.filter((condition) => condition.displayStatus !== "unknown").length;
+  const activeConditions = conditions.filter((condition) => condition.displayStatus === "active");
+  const active = activeConditions.length;
+  const unknown = conditions.filter((condition) => condition.displayStatus === "unknown").length;
   const total = conditions.length;
-  const activeNames = conditions
-    .filter((c) => c.displayStatus === "active")
-    .map((c) => signalBeginnerContext[c.id]?.plain_name || c.name);
-  const deleveragingHeadline = total
-    ? `${active} active / ${known} known / ${unknown} unknown`
-    : "Deleveraging checks are unavailable";
-  const deleveragingEvidence = total
-    ? `Known evidence: <strong>${known}/${total}</strong> · Active: <strong>${active}</strong> · Unknown: <strong>${unknown}</strong>${activeNames.length ? `.<br>Active now: ${escapeHtml(activeNames.join(", "))}.` : "."}`
-    : "No signal snapshot is available.";
-  setOverviewCard(
+  const activeName = activeConditions[0]
+    ? (activeConditions[0].id === "margin_debt_rollover"
+        ? "Margin momentum slowing"
+        : signalBeginnerContext[activeConditions[0].id]?.plain_name || activeConditions[0].name)
+    : null;
+
+  const deleveragingFacts = [];
+  if (activeName) deleveragingFacts.push(activeName);
+  if (total) deleveragingFacts.push(`${known}/${total} usable · ${unknown} unknown`);
+  setSnapshotCard(
     "deleveraging",
-    deleveragingHeadline,
-    deleveragingEvidence,
-    unknown
-      ? "Unavailable breadth checks remain unknown; they are not counted as inactive or safe."
-      : "Every check is shown independently; this is not a crash probability.",
-    total ? (unknown ? "attention" : "normal") : "missing"
+    !total ? "DATA GAP" : active ? `${active} ACTIVE` : unknown ? "PARTIAL" : "CLEAR",
+    !total ? "No signal read" : unknown ? "Evidence incomplete" : active ? "Deleveraging signs" : "No active checks",
+    deleveragingFacts,
+    !total ? "gap" : active ? "watch" : unknown ? "gap" : "normal",
   );
 
+  // Taiwan: currentness is more important than a stale directional interpretation.
   const taiexFreshness = effectiveFreshness(taiex).state;
   const breadth = taiwanBreadthState(twBreadth);
-  const taiexChange = taiex ? formatChange(recentChange(taiex)) : "—";
-  let taiwanHeadline;
-  if (!taiex) {
-    taiwanHeadline = "TAIEX price evidence is unavailable";
-  } else if (taiexFreshness !== "fresh") {
-    taiwanHeadline = `TAIEX data is ${taiexFreshness}; current-price evidence needs attention`;
-  } else if (breadth.state === "missing") {
-    taiwanHeadline = "TAIEX is current; breadth is unavailable";
-  } else if (breadth.state === "not_current") {
-    taiwanHeadline = `TAIEX is current; breadth data is ${breadth.freshness}`;
-  } else if (breadth.state === "snapshot_only") {
-    taiwanHeadline = "TAIEX is current; breadth has one published session";
-  } else if (breadth.state === "history_building") {
-    taiwanHeadline = "TAIEX is current; breadth history is accumulating";
-  } else {
-    taiwanHeadline = "Taiwan price and participation context are available";
-  }
-
-  const taiwanEvidence = [];
+  const taiwanFacts = [];
   if (taiex) {
-    const freshnessText = taiexFreshness === "fresh" ? "current" : taiexFreshness;
-    taiwanEvidence.push(`<strong>TAIEX ${formatValue(taiex.latest?.value, taiex.metric.units)}</strong> · last observation ${escapeHtml(taiexChange)} · ${escapeHtml(freshnessText)}.`);
+    taiwanFacts.push(`TAIEX ${formatValue(taiex.latest?.value, taiex.metric.units)}`);
   }
-  if (breadth.state === "missing") {
-    taiwanEvidence.push("TWSE A/D breadth is not available in the current published snapshot.");
-  } else if (twBreadth) {
-    taiwanEvidence.push(`<strong>A/D ${formatValue(twBreadth.latest?.value, "percent")}</strong> · ${breadth.observations} published session${breadth.observations === 1 ? "" : "s"} · ${escapeHtml(breadth.freshness)}.`);
-  }
-  if (cbc) {
-    const verified = String(cbc.latest?.fetched_at || "").slice(0, 10) || "unknown";
-    taiwanEvidence.push(`CBC rate <strong>${formatValue(cbc.latest?.value, "percent")}</strong> · effective since ${escapeHtml(cbc.latest?.as_of || "unknown")} · source verified ${escapeHtml(verified)}.`);
+  if (twBreadth && breadth.state !== "missing") {
+    taiwanFacts.push(
+      `A/D ${formatValue(twBreadth.latest?.value, "percent")} · ${breadth.observations} session${breadth.observations === 1 ? "" : "s"}`,
+    );
+  } else {
+    taiwanFacts.push("Breadth unavailable");
   }
 
-  let taiwanNote = "Price, participation, and policy context are shown separately.";
-  if (breadth.state === "snapshot_only") {
-    taiwanNote = "The breadth reading is a one-session participation snapshot; no breadth trend or percentile conclusion is supported yet.";
-  } else if (breadth.state === "history_building") {
-    taiwanNote = `${breadth.observations} breadth sessions are published, but the configured historical percentile still lacks sufficient observations.`;
-  } else if (breadth.state === "missing") {
-    taiwanNote = "Missing breadth is different from insufficient history: no participation conclusion is shown.";
-  } else if (breadth.state === "not_current") {
-    taiwanNote = "Breadth history exists, but its freshness problem is surfaced rather than treated as current.";
+  const taiwanMissing = !taiex || ["missing", "error"].includes(taiexFreshness);
+  const taiwanNeedsAttention =
+    !taiwanMissing &&
+    (taiexFreshness !== "fresh" ||
+      ["missing", "not_current", "snapshot_only", "history_building"].includes(breadth.state));
+  let taiwanStatus = "CURRENT";
+  let taiwanHeadline = "Market read available";
+  let taiwanState = "normal";
+  if (taiwanMissing) {
+    taiwanStatus = "DATA GAP";
+    taiwanHeadline = "No current read";
+    taiwanState = "gap";
+  } else if (taiexFreshness !== "fresh") {
+    taiwanStatus = String(taiexFreshness).toUpperCase();
+    taiwanHeadline = "Needs refresh";
+    taiwanState = "watch";
+  } else if (taiwanNeedsAttention) {
+    taiwanStatus = "PARTIAL";
+    taiwanHeadline = "Price current";
+    taiwanState = "watch";
   }
-
-  const taiwanDisplayState =
-    !taiex || taiexFreshness === "missing" || taiexFreshness === "error"
-      ? "missing"
-      : (taiexFreshness !== "fresh" || ["missing", "not_current", "snapshot_only", "history_building"].includes(breadth.state))
-        ? "attention"
-        : "normal";
-  setOverviewCard(
+  setSnapshotCard(
     "taiwan",
+    taiwanStatus,
     taiwanHeadline,
-    taiwanEvidence.join("<br>") || "Taiwan market evidence is unavailable.",
-    taiwanNote,
-    taiwanDisplayState
+    taiwanFacts,
+    taiwanState,
   );
 
+  // Data health is deliberately separated from market interpretation.
   const metrics = [...state.metrics.values()];
-  const notCurrent = metrics.filter((metric) => effectiveFreshness(metric).state !== "fresh");
-  const comparisonParts = [];
-  for (const metric of [nfci, vix, margin]) {
-    if (!metric) continue;
-    const p = percentilePresentation(metric);
-    if (p.value !== "—") {
-      const label = beginnerContext[metric.metric.id]?.plain_name || metric.metric.name;
-      comparisonParts.push(`${escapeHtml(label)}: <strong>${escapeHtml(p.value)}</strong> ${escapeHtml(p.label)}${escapeHtml(percentileContextSuffix(metric))}`);
-    }
+  const health = globalFreshnessSummary(metrics);
+  const snapshotDate = String(
+    state.catalog?.generated_at || state.refreshReport?.generated_at || "",
+  ).slice(0, 10);
+  const healthParts = [];
+  if (health.counts.error) healthParts.push(`${health.counts.error} error`);
+  if (health.counts.missing) healthParts.push(`${health.counts.missing} missing`);
+  if (health.counts.stale) healthParts.push(`${health.counts.stale} stale`);
+  if (health.counts.insufficient_data) {
+    healthParts.push(`${health.counts.insufficient_data} insufficient`);
   }
-  const coverageHeadline = total
-    ? `${unknown} of ${total} deleveraging checks unavailable; ${notCurrent.length} loaded metrics need health attention`
-    : (metrics.length
-        ? `${metrics.length} published metrics loaded; signal coverage unavailable`
-        : "Evidence coverage is unavailable");
-  setOverviewCard(
-    "coverage",
-    coverageHeadline,
-    comparisonParts.join("<br>") || "Historical comparison becomes available when sufficient published history exists.",
-    unknown
-      ? `Research views retain full history and event windows. ${unknown} of ${total} Deleveraging Watch checks are currently unavailable.`
-      : "Research views retain full history, event windows, source, coverage, and freshness.",
-    (notCurrent.length || unknown) ? "attention" : (metrics.length ? "normal" : "missing")
+  if (unknown) healthParts.push(`${unknown} unknown checks`);
+  if (snapshotDate) healthParts.push(`snapshot ${snapshotDate}`);
+
+  const healthHasHardGap = Boolean(health.counts.error || health.counts.missing);
+  const healthNeedsRefresh = Boolean(health.counts.stale);
+  const healthHasEvidenceGap = Boolean(unknown);
+  setOverviewHealth(
+    healthHasHardGap
+      ? "Source issues"
+      : healthNeedsRefresh
+        ? "Snapshot needs refresh"
+        : healthHasEvidenceGap
+          ? "Evidence gaps remain"
+          : "Snapshot current",
+    healthParts.join(" · ") || "No published metrics loaded",
+    healthHasHardGap ? "gap" : (healthNeedsRefresh || healthHasEvidenceGap) ? "watch" : "normal",
   );
 }
 
