@@ -721,7 +721,7 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   );
   assert.equal(
     runtime.dom.byId.get("overview-thesis-title").textContent,
-    "Leverage is rolling over; broad stress is not confirmed",
+    "Leverage rolling over; stress not confirmed",
   );
   assert.equal(
     runtime.dom.byId.get("overview-thesis-confidence").textContent,
