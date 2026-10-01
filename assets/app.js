@@ -2860,35 +2860,43 @@ function renderHistorySelector() {
   );
 
   if (!metrics.length) {
-    select.innerHTML = '<option value="">No metric data</option>';
+    select.innerHTML = `<option value="">${escapeHtml(t("research.noMetric"))}</option>`;
     $("#history-chart").innerHTML =
-      '<div class="empty-state compact">Historical series will appear here.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("research.historyPlaceholder"))}</div>`;
     return;
   }
 
+  const previous = select.dataset.initialized === "true" ? select.value : "";
   select.innerHTML = [
-    '<option value="">Select a metric to load history</option>',
+    `<option value="">${escapeHtml(t("history.selectMetric"))}</option>`,
     ...metrics.map(
       (m) =>
         `<option value="${escapeHtml(m.metric.id)}">${escapeHtml(m.metric.name)}</option>`,
     ),
   ].join("");
+  select.dataset.initialized = "true";
+  if (previous && metrics.some((m) => m.metric.id === previous)) {
+    select.value = previous;
+  }
 
   const rerender = async () => {
     if (!select.value) {
       $("#history-chart").innerHTML =
-        '<div class="empty-state compact">Select a metric to load its full history.</div>';
+        `<div class="empty-state compact">${escapeHtml(t("history.selectMetricPrompt"))}</div>`;
       return;
     }
     await renderHistory(select.value, mode.value);
   };
   select.onchange = rerender;
   mode.onchange = rerender;
-  $("#history-chart").innerHTML =
-    '<div class="empty-state compact">Select a metric to load its full history.</div>';
+  if (select.value) rerender();
+  else {
+    $("#history-chart").innerHTML =
+      `<div class="empty-state compact">${escapeHtml(t("history.selectMetricPrompt"))}</div>`;
+  }
 }
 
-async function renderHistory(id, mode = "absolute") {
+async async function renderHistory(id, mode = "absolute") {
   let metric;
   try {
     [metric] = await Promise.all([
@@ -2898,7 +2906,7 @@ async function renderHistory(id, mode = "absolute") {
   } catch (error) {
     console.warn("history load failed", id, error);
     $("#history-chart").innerHTML =
-      '<div class="empty-state compact">This metric history could not be loaded.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.loadFailed"))}</div>`;
     return;
   }
 
@@ -2924,9 +2932,11 @@ async function renderHistory(id, mode = "absolute") {
   if (percentileBlocked) {
     const reason = !eligibility.allowed
       ? eligibility.reason
-      : "the selected baseline is not declared point-in-time";
+      : (currentLocale === "zh-TW"
+          ? "所選基準未宣告為時點正確"
+          : "the selected baseline is not declared point-in-time");
     $("#history-chart").innerHTML =
-      `<div class="empty-state compact"><strong>Point-in-time historical view disabled.</strong><span>${escapeHtml(reason)}. Use Absolute level for retrospective history.</span></div>`;
+      `<div class="empty-state compact"><strong>${escapeHtml(t("history.pitDisabled"))}</strong><span>${escapeHtml(t("history.pitUseAbsolute", { reason }))}</span></div>`;
   } else {
     fullChart(view, $("#history-chart"));
   }
@@ -2940,7 +2950,7 @@ async function renderHistory(id, mode = "absolute") {
   $("#history-mode-label").innerHTML =
     `<i class="legend-dot"></i> ${escapeHtml(modeLabel)}`;
   $("#history-coverage").textContent =
-    `${metric.coverage.history_start} → ${metric.coverage.history_end} · ${available.length.toLocaleString()} usable observations`;
+    `${metric.coverage.history_start} → ${metric.coverage.history_end} · ${t("history.usable", { count: localNumber(available.length) })}`;
 
   renderEvents(metric);
 }
