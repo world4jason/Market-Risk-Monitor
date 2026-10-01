@@ -16,8 +16,8 @@ This project intentionally avoids hidden BUY / SELL logic. Current values are pa
 - GitHub Pages frontend
 - buildless HTML / CSS / browser JavaScript
 - static JSON metric snapshots
-- local or external-runner Python refresh pipeline
-- no GitHub Actions dependency
+- local or GitHub Actions Python refresh pipeline
+- scheduled + manually dispatchable data refresh; static Pages deployment remains buildless
 - point-in-time historical transforms with no-look-ahead rules
 
 See:
@@ -159,7 +159,7 @@ Validate all generated JSON artifacts:
 python scripts/validate_data.py
 ```
 
-Run the no-GHA static-site smoke check:
+Run the static-site smoke check:
 
 ```bash
 python scripts/site_smoke.py
@@ -173,7 +173,7 @@ python -m http.server 8000
 
 Then open `http://localhost:8000/`.
 
-## GitHub Pages without GHA
+## GitHub Pages + scheduled data refresh
 
 Repository Pages settings should use:
 
@@ -181,11 +181,19 @@ Repository Pages settings should use:
 - Branch: **main**
 - Folder: **/(root)**
 
-The root `.nojekyll` marker is committed. The deployed site is already publish-ready static content; no Actions build is required.
+The root `.nojekyll` marker is committed. The deployed site is already publish-ready static content; **no Actions build/deploy workflow is required**.
 
-Data refresh is intentionally separate from Pages publication. A successful refresh updates `data/generated/*.json`; after validation, those snapshots can be committed normally.
+Data refresh is separate from Pages publication. The repository includes `.github/workflows/refresh-public-snapshot.yml`, which runs `scripts/refresh_public_snapshot.py`, validates the result, and commits only `data/generated/` back to `main`. A push to `main` then causes the branch-based Pages site to serve the refreshed snapshot.
 
 ### Producing a release snapshot
+
+For the authoritative local/manual refresh, run:
+
+```bash
+python scripts/refresh_public_snapshot.py
+```
+
+The same command is used by GitHub Actions through both `workflow_dispatch` and weekday schedules at approximately 15:30 and 06:30 Asia/Taipei. The runner fetches all public prerequisites first, preserves the tracked CIER/NDC retention floor, uses `--clean-output`, runs the full deterministic test suite, validates artifacts and publishing policy, and restores the previous generated tree on failure.
 
 A published snapshot is **not** produced by `scripts/bootstrap_sources.py`,
 which defaults to including the TraderMonty moving-average breadth source. It
@@ -258,7 +266,7 @@ Current sequence:
 
 Completed:
 - benchmark research
-- no-GHA architecture
+- static Pages + scheduled refresh architecture
 - canonical data contract
 - point-in-time historical methodology
 - FRED / FINRA / Cboe VIX / Shiller ingestion adapters
