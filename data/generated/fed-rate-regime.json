@@ -18,14 +18,14 @@
       {
         "id": "fed_target_legacy",
         "as_of": "2008-12-15",
-        "snapshot_at": "2026-09-22T10:54:24.252339Z",
-        "content_digest": "sha256:dc21dae3f49ab72ee074e510fa5ad5a2a3d55116075eef2f4ab1415799a49e0f"
+        "snapshot_at": "2026-10-01T11:09:32.603134Z",
+        "content_digest": "sha256:94098cbc2da9471422c96800fa63d3a133dd8f88401dff070a6b361b8bedb93d"
       },
       {
         "id": "fed_target_upper",
-        "as_of": "2026-09-21",
-        "snapshot_at": "2026-09-22T10:54:24.252339Z",
-        "content_digest": "sha256:0d282218bd1270b9abdb6f56ab2f44712874596dbbdac548777022fadbdaa026"
+        "as_of": "2026-09-30",
+        "snapshot_at": "2026-10-01T11:09:32.603134Z",
+        "content_digest": "sha256:f303847203cf34201dbb1fe2ba49aabb85a518e74be6f6fb1c95d114377d623f"
       },
       {
         "id": "rate_rows",
@@ -34,7 +34,7 @@
         "content_digest": "sha256:6e8de4d67b1ffd3d61ee092317a72bd20f9456de748055d1fa19a326732f5ab6"
       }
     ],
-    "generated_at": "2026-09-22T10:54:24.252339Z",
+    "generated_at": "2026-10-01T11:09:32.603134Z",
     "parameters": {
       "name": "Fed Policy Rate Regime"
     }

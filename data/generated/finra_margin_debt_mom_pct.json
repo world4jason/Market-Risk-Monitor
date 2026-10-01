@@ -29,8 +29,8 @@
   "freshness": {
     "state": "fresh",
     "max_age_days": 70,
-    "age_days": 22,
-    "evaluated_at": "2026-09-22T10:54:31.276344Z",
+    "age_days": 31,
+    "evaluated_at": "2026-10-01T11:09:36.846242Z",
     "reason": null
   },
   "lineage": {
@@ -48,7 +48,7 @@
       "window_observations": null,
       "min_observations": 36,
       "point_in_time": false,
-      "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+      "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
     },
     {
       "id": "rolling-120m",
@@ -56,12 +56,12 @@
       "window_observations": 120,
       "min_observations": 36,
       "point_in_time": false,
-      "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+      "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
     }
   ],
   "latest": {
     "as_of": "2026-08-31",
-    "fetched_at": "2026-09-22T10:54:31.276344Z",
+    "fetched_at": "2026-10-01T11:09:36.846242Z",
     "value": 2.5830055213533543,
     "revision_tag": null
   },

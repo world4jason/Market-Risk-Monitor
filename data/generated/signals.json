@@ -25,41 +25,41 @@
       {
         "id": "finra_margin_debt_yoy_pct",
         "as_of": "2026-08-31",
-        "snapshot_at": "2026-09-22T10:54:31.276344Z",
-        "content_digest": "sha256:5f3deb084f75f36ecd798a14ef7eab81cf3f7c51f0f623ea94a6b1945421459d"
+        "snapshot_at": "2026-10-01T11:09:36.846242Z",
+        "content_digest": "sha256:df69449832a33ec358702a528d4983db3157840daf7ad8563e2e7198dd913239"
       },
       {
         "id": "nfci",
-        "as_of": "2026-09-11",
-        "snapshot_at": "2026-09-22T10:54:24.252339Z",
-        "content_digest": "sha256:608673c4be59fd9b69a18ba4de4f08cc081f659c1770047023f0a9cf130ec712"
+        "as_of": "2026-09-25",
+        "snapshot_at": "2026-10-01T11:09:32.603134Z",
+        "content_digest": "sha256:b1edba4e99424685aeba681b20b7d7a3cecd41c66e7c68e0581d1ca17cf4c7b0"
       },
       {
         "id": "nfci_risk",
-        "as_of": "2026-09-11",
-        "snapshot_at": "2026-09-22T10:54:24.252339Z",
-        "content_digest": "sha256:0c1d356ab8b7e0b826666466c3b574a810c6fc9e9abcbd048f54b0cd9775721f"
+        "as_of": "2026-09-25",
+        "snapshot_at": "2026-10-01T11:09:32.603134Z",
+        "content_digest": "sha256:1ff7a4f508b7890f0f6fcb81007d73cb9a8ae6106817f13d32a5c4a0f3cddaf8"
       },
       {
         "id": "shiller_real_tr_price",
         "as_of": "2026-08-01",
-        "snapshot_at": "2026-09-22T10:54:31.335508Z",
-        "content_digest": "sha256:fab1a44e29638243a3320d708630446ce0a8ed028bfec7955753842811a96be8"
+        "snapshot_at": "2026-10-01T11:09:36.907061Z",
+        "content_digest": "sha256:89a15e2b63fb729650447e7051010ae3430c69721cde86feb2a5a0622a9e7110"
       },
       {
         "id": "vix",
-        "as_of": "2026-09-21",
-        "snapshot_at": "2026-09-22T10:54:30.303885Z",
-        "content_digest": "sha256:829ea355cbc049121248e5f5140f0aa37c589ac19048ff43594ea18e329e181e"
+        "as_of": "2026-09-30",
+        "snapshot_at": "2026-10-01T11:09:35.960828Z",
+        "content_digest": "sha256:ef96aab7514aa14406c81fdbde8ee7c512f01c2624bfe31dd1388ce7725611f7"
       }
     ],
-    "generated_at": "2026-09-22T10:54:31.335508Z"
+    "generated_at": "2026-10-01T11:09:36.907061Z"
   },
   "name": "Deleveraging Watch",
   "description": "Transparent concurrent-deterioration checks. Conditions are descriptive confirmations, not crash predictions or trading signals.",
-  "generated_at": "2026-09-22T10:54:31.335508Z",
+  "generated_at": "2026-10-01T11:09:36.907061Z",
   "current": {
-    "as_of": "2026-09-22",
+    "as_of": "2026-10-01",
     "summary": {
       "active": 1,
       "inactive": 4,
@@ -120,22 +120,22 @@
               "status": "inactive",
               "metric": "nfci",
               "label": "NFCI ≥ 0 (tighter than historical average)",
-              "value": -0.56,
+              "value": -0.548,
               "threshold": 0,
               "periods": null,
-              "as_of": "2026-09-11",
-              "reason": "latest -0.56 ≥ 0"
+              "as_of": "2026-09-25",
+              "reason": "latest -0.548 ≥ 0"
             },
             {
               "type": "delta_periods_above",
               "status": "inactive",
               "metric": "nfci",
               "label": "13-week NFCI increase ≥ 0.5",
-              "value": -0.05500000000000005,
+              "value": -0.03400000000000003,
               "threshold": 0.5,
               "periods": 13,
-              "as_of": "2026-09-11",
-              "reason": "change -0.055 vs threshold 0.5"
+              "as_of": "2026-09-25",
+              "reason": "change -0.034 vs threshold 0.5"
             }
           ],
           "label": null
@@ -154,11 +154,11 @@
           "status": "inactive",
           "metric": "nfci_risk",
           "label": "NFCI risk strict-past percentile ≥ 90",
-          "value": 23.046471600688466,
+          "value": 22.927416580667355,
           "threshold": 90,
           "periods": null,
-          "as_of": "2026-09-11",
-          "reason": "strict-past percentile 23.05 vs threshold 90"
+          "as_of": "2026-09-25",
+          "reason": "strict-past percentile 22.93 vs threshold 90"
         },
         "metrics": [
           "nfci_risk"
@@ -174,11 +174,11 @@
           "status": "inactive",
           "metric": "vix",
           "label": "VIX strict-past percentile ≥ 90",
-          "value": 31.134109529969816,
+          "value": 41.68910912420554,
           "threshold": 90,
           "periods": null,
-          "as_of": "2026-09-21",
-          "reason": "strict-past percentile 31.13 vs threshold 90"
+          "as_of": "2026-09-30",
+          "reason": "strict-past percentile 41.69 vs threshold 90"
         },
         "metrics": [
           "vix"
@@ -7753,6 +7753,27 @@
     },
     {
       "date": "2026-09-30",
+      "summary": {
+        "active": 0,
+        "inactive": 1,
+        "unknown": 8,
+        "known": 1,
+        "total": 9
+      },
+      "conditions": {
+        "margin_debt_rollover": "unknown",
+        "financial_conditions_tight": "unknown",
+        "risk_subindex_extreme": "unknown",
+        "vix_stress": "inactive",
+        "market_trend_down": "unknown",
+        "high_low_breadth_collapse": "unknown",
+        "volume_breadth_collapse": "unknown",
+        "sp500_50dma_breadth_weak": "unknown",
+        "sp500_200dma_breadth_weak": "unknown"
+      }
+    },
+    {
+      "date": "2026-10-31",
       "summary": {
         "active": 0,
         "inactive": 1,

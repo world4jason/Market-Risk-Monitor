@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-09-26T04:49:42.079353Z",
+  "generated_at": "2026-10-01T11:09:36.942577Z",
   "metrics": [
     {
       "metric": {
@@ -31,14 +31,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 10000,
-        "age_days": 6490,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "age_days": 6499,
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
         "as_of": "2008-12-15",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
-        "value": 1,
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "value": 1.0,
         "revision_tag": null
       },
       "baselines": [
@@ -55,158 +55,158 @@
         "observation_count": 9577,
         "rolling_percentile": 8.293650793650794,
         "recent_change": {
-          "value": 0,
+          "value": 0.0,
           "comparison": "basis_points"
         },
         "preview_observations": [
           {
             "date": "2008-11-16",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-17",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-18",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-19",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-20",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-21",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-22",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-23",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-24",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-25",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-26",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-27",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-28",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-29",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-11-30",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-01",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-02",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-03",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-04",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-05",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-06",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-07",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-08",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-09",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-10",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-11",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-12",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-13",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-14",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
             "date": "2008-12-15",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           }
         ]
@@ -234,7 +234,7 @@
       },
       "coverage": {
         "history_start": "2008-12-16",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 1
       },
@@ -242,13 +242,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
-        "value": 4,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "value": 4.0,
         "revision_tag": null
       },
       "baselines": [
@@ -262,58 +262,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6489,
-        "rolling_percentile": 56.58730158730159,
+        "observation_count": 6498,
+        "rolling_percentile": 56.40873015873016,
         "recent_change": {
-          "value": 0,
+          "value": 0.0,
           "comparison": "basis_points"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-23",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-24",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-25",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-26",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-27",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-28",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-29",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-30",
-            "value": 3.75,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-31",
-            "value": 3.75,
-            "status": "observed"
-          },
           {
             "date": "2026-09-01",
             "value": 3.75,
@@ -396,27 +351,72 @@
           },
           {
             "date": "2026-09-17",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           },
           {
             "date": "2026-09-18",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           },
           {
             "date": "2026-09-19",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           },
           {
             "date": "2026-09-20",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           },
           {
             "date": "2026-09-21",
-            "value": 4,
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-25",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-26",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-27",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-28",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 4.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 4.0,
             "status": "observed"
           }
         ]
@@ -451,14 +451,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
-        "value": 207641,
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "value": 207641.0,
         "revision_tag": null
       },
       "baselines": [
@@ -468,7 +468,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -476,7 +476,7 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -489,152 +489,152 @@
         "preview_observations": [
           {
             "date": "2024-03-29",
-            "value": 166990,
+            "value": 166990.0,
             "status": "observed"
           },
           {
             "date": "2024-04-30",
-            "value": 161749,
+            "value": 161749.0,
             "status": "observed"
           },
           {
             "date": "2024-05-31",
-            "value": 155256,
+            "value": 155256.0,
             "status": "observed"
           },
           {
             "date": "2024-06-28",
-            "value": 157240,
+            "value": 157240.0,
             "status": "observed"
           },
           {
             "date": "2024-07-31",
-            "value": 154951,
+            "value": 154951.0,
             "status": "observed"
           },
           {
             "date": "2024-08-30",
-            "value": 148702,
+            "value": 148702.0,
             "status": "observed"
           },
           {
             "date": "2024-09-30",
-            "value": 167901,
+            "value": 167901.0,
             "status": "observed"
           },
           {
             "date": "2024-10-31",
-            "value": 173621,
+            "value": 173621.0,
             "status": "observed"
           },
           {
             "date": "2024-11-29",
-            "value": 170052,
+            "value": 170052.0,
             "status": "observed"
           },
           {
             "date": "2024-12-31",
-            "value": 181280,
+            "value": 181280.0,
             "status": "observed"
           },
           {
             "date": "2025-01-31",
-            "value": 178301,
+            "value": 178301.0,
             "status": "observed"
           },
           {
             "date": "2025-02-28",
-            "value": 183278,
+            "value": 183278.0,
             "status": "observed"
           },
           {
             "date": "2025-03-31",
-            "value": 189855,
+            "value": 189855.0,
             "status": "observed"
           },
           {
             "date": "2025-04-30",
-            "value": 187958,
+            "value": 187958.0,
             "status": "observed"
           },
           {
             "date": "2025-05-30",
-            "value": 187685,
+            "value": 187685.0,
             "status": "observed"
           },
           {
             "date": "2025-06-30",
-            "value": 200573,
+            "value": 200573.0,
             "status": "observed"
           },
           {
             "date": "2025-07-31",
-            "value": 194712,
+            "value": 194712.0,
             "status": "observed"
           },
           {
             "date": "2025-08-29",
-            "value": 188221,
+            "value": 188221.0,
             "status": "observed"
           },
           {
             "date": "2025-09-30",
-            "value": 204106,
+            "value": 204106.0,
             "status": "observed"
           },
           {
             "date": "2025-10-31",
-            "value": 197923,
+            "value": 197923.0,
             "status": "observed"
           },
           {
             "date": "2025-11-28",
-            "value": 202131,
+            "value": 202131.0,
             "status": "observed"
           },
           {
             "date": "2025-12-31",
-            "value": 211720,
+            "value": 211720.0,
             "status": "observed"
           },
           {
             "date": "2026-01-30",
-            "value": 203700,
+            "value": 203700.0,
             "status": "observed"
           },
           {
             "date": "2026-02-27",
-            "value": 205060,
+            "value": 205060.0,
             "status": "observed"
           },
           {
             "date": "2026-03-31",
-            "value": 221860,
+            "value": 221860.0,
             "status": "observed"
           },
           {
             "date": "2026-04-30",
-            "value": 217836,
+            "value": 217836.0,
             "status": "observed"
           },
           {
             "date": "2026-05-29",
-            "value": 206600,
+            "value": 206600.0,
             "status": "observed"
           },
           {
             "date": "2026-06-30",
-            "value": 217441,
+            "value": 217441.0,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": 205132,
+            "value": 205132.0,
             "status": "observed"
           },
           {
             "date": "2026-08-31",
-            "value": 207641,
+            "value": 207641.0,
             "status": "observed"
           }
         ]
@@ -669,14 +669,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
-        "value": 1453832,
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "value": 1453832.0,
         "revision_tag": null
       },
       "baselines": [
@@ -686,7 +686,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -694,7 +694,7 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -707,152 +707,152 @@
         "preview_observations": [
           {
             "date": "2024-03-29",
-            "value": 784136,
+            "value": 784136.0,
             "status": "observed"
           },
           {
             "date": "2024-04-30",
-            "value": 775464,
+            "value": 775464.0,
             "status": "observed"
           },
           {
             "date": "2024-05-31",
-            "value": 809431,
+            "value": 809431.0,
             "status": "observed"
           },
           {
             "date": "2024-06-28",
-            "value": 809322,
+            "value": 809322.0,
             "status": "observed"
           },
           {
             "date": "2024-07-31",
-            "value": 810835,
+            "value": 810835.0,
             "status": "observed"
           },
           {
             "date": "2024-08-30",
-            "value": 797162,
+            "value": 797162.0,
             "status": "observed"
           },
           {
             "date": "2024-09-30",
-            "value": 813211,
+            "value": 813211.0,
             "status": "observed"
           },
           {
             "date": "2024-10-31",
-            "value": 815369,
+            "value": 815369.0,
             "status": "observed"
           },
           {
             "date": "2024-11-29",
-            "value": 890852,
+            "value": 890852.0,
             "status": "observed"
           },
           {
             "date": "2024-12-31",
-            "value": 899168,
+            "value": 899168.0,
             "status": "observed"
           },
           {
             "date": "2025-01-31",
-            "value": 937253,
+            "value": 937253.0,
             "status": "observed"
           },
           {
             "date": "2025-02-28",
-            "value": 918144,
+            "value": 918144.0,
             "status": "observed"
           },
           {
             "date": "2025-03-31",
-            "value": 880316,
+            "value": 880316.0,
             "status": "observed"
           },
           {
             "date": "2025-04-30",
-            "value": 850558,
+            "value": 850558.0,
             "status": "observed"
           },
           {
             "date": "2025-05-30",
-            "value": 920960,
+            "value": 920960.0,
             "status": "observed"
           },
           {
             "date": "2025-06-30",
-            "value": 1007961,
+            "value": 1007961.0,
             "status": "observed"
           },
           {
             "date": "2025-07-31",
-            "value": 1022548,
+            "value": 1022548.0,
             "status": "observed"
           },
           {
             "date": "2025-08-29",
-            "value": 1059723,
+            "value": 1059723.0,
             "status": "observed"
           },
           {
             "date": "2025-09-30",
-            "value": 1126494,
+            "value": 1126494.0,
             "status": "observed"
           },
           {
             "date": "2025-10-31",
-            "value": 1183654,
+            "value": 1183654.0,
             "status": "observed"
           },
           {
             "date": "2025-11-28",
-            "value": 1214321,
+            "value": 1214321.0,
             "status": "observed"
           },
           {
             "date": "2025-12-31",
-            "value": 1225597,
+            "value": 1225597.0,
             "status": "observed"
           },
           {
             "date": "2026-01-30",
-            "value": 1279042,
+            "value": 1279042.0,
             "status": "observed"
           },
           {
             "date": "2026-02-27",
-            "value": 1253192,
+            "value": 1253192.0,
             "status": "observed"
           },
           {
             "date": "2026-03-31",
-            "value": 1220922,
+            "value": 1220922.0,
             "status": "observed"
           },
           {
             "date": "2026-04-30",
-            "value": 1304281,
+            "value": 1304281.0,
             "status": "observed"
           },
           {
             "date": "2026-05-29",
-            "value": 1415557,
+            "value": 1415557.0,
             "status": "observed"
           },
           {
             "date": "2026-06-30",
-            "value": 1502072,
+            "value": 1502072.0,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": 1417225,
+            "value": 1417225.0,
             "status": "observed"
           },
           {
             "date": "2026-08-31",
-            "value": 1453832,
+            "value": 1453832.0,
             "status": "observed"
           }
         ]
@@ -887,13 +887,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
         "value": 2.5830055213533543,
         "revision_tag": null
       },
@@ -904,7 +904,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -912,7 +912,7 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -1102,13 +1102,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
         "value": 37.18981280957383,
         "revision_tag": null
       },
@@ -1119,7 +1119,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -1127,7 +1127,7 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -1317,14 +1317,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
-        "value": 217499,
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "value": 217499.0,
         "revision_tag": null
       },
       "baselines": [
@@ -1334,7 +1334,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -1342,7 +1342,7 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -1355,152 +1355,152 @@
         "preview_observations": [
           {
             "date": "2024-03-29",
-            "value": 151339,
+            "value": 151339.0,
             "status": "observed"
           },
           {
             "date": "2024-04-30",
-            "value": 149855,
+            "value": 149855.0,
             "status": "observed"
           },
           {
             "date": "2024-05-31",
-            "value": 145072,
+            "value": 145072.0,
             "status": "observed"
           },
           {
             "date": "2024-06-28",
-            "value": 149714,
+            "value": 149714.0,
             "status": "observed"
           },
           {
             "date": "2024-07-31",
-            "value": 150738,
+            "value": 150738.0,
             "status": "observed"
           },
           {
             "date": "2024-08-30",
-            "value": 152107,
+            "value": 152107.0,
             "status": "observed"
           },
           {
             "date": "2024-09-30",
-            "value": 158358,
+            "value": 158358.0,
             "status": "observed"
           },
           {
             "date": "2024-10-31",
-            "value": 164813,
+            "value": 164813.0,
             "status": "observed"
           },
           {
             "date": "2024-11-29",
-            "value": 167223,
+            "value": 167223.0,
             "status": "observed"
           },
           {
             "date": "2024-12-31",
-            "value": 175795,
+            "value": 175795.0,
             "status": "observed"
           },
           {
             "date": "2025-01-31",
-            "value": 166346,
+            "value": 166346.0,
             "status": "observed"
           },
           {
             "date": "2025-02-28",
-            "value": 176051,
+            "value": 176051.0,
             "status": "observed"
           },
           {
             "date": "2025-03-31",
-            "value": 176161,
+            "value": 176161.0,
             "status": "observed"
           },
           {
             "date": "2025-04-30",
-            "value": 175824,
+            "value": 175824.0,
             "status": "observed"
           },
           {
             "date": "2025-05-30",
-            "value": 176698,
+            "value": 176698.0,
             "status": "observed"
           },
           {
             "date": "2025-06-30",
-            "value": 185584,
+            "value": 185584.0,
             "status": "observed"
           },
           {
             "date": "2025-07-31",
-            "value": 186672,
+            "value": 186672.0,
             "status": "observed"
           },
           {
             "date": "2025-08-29",
-            "value": 181563,
+            "value": 181563.0,
             "status": "observed"
           },
           {
             "date": "2025-09-30",
-            "value": 194884,
+            "value": 194884.0,
             "status": "observed"
           },
           {
             "date": "2025-10-31",
-            "value": 195376,
+            "value": 195376.0,
             "status": "observed"
           },
           {
             "date": "2025-11-28",
-            "value": 194418,
+            "value": 194418.0,
             "status": "observed"
           },
           {
             "date": "2025-12-31",
-            "value": 199762,
+            "value": 199762.0,
             "status": "observed"
           },
           {
             "date": "2026-01-30",
-            "value": 196911,
+            "value": 196911.0,
             "status": "observed"
           },
           {
             "date": "2026-02-27",
-            "value": 200047,
+            "value": 200047.0,
             "status": "observed"
           },
           {
             "date": "2026-03-31",
-            "value": 205600,
+            "value": 205600.0,
             "status": "observed"
           },
           {
             "date": "2026-04-30",
-            "value": 215445,
+            "value": 215445.0,
             "status": "observed"
           },
           {
             "date": "2026-05-29",
-            "value": 217256,
+            "value": 217256.0,
             "status": "observed"
           },
           {
             "date": "2026-06-30",
-            "value": 223412,
+            "value": 223412.0,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": 217305,
+            "value": 217305.0,
             "status": "observed"
           },
           {
             "date": "2026-08-31",
-            "value": 217499,
+            "value": 217499.0,
             "status": "observed"
           }
         ]
@@ -1535,14 +1535,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
-        "value": 425140,
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "value": 425140.0,
         "revision_tag": null
       },
       "baselines": [
@@ -1552,7 +1552,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -1560,7 +1560,7 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -1573,152 +1573,152 @@
         "preview_observations": [
           {
             "date": "2024-03-29",
-            "value": 318329,
+            "value": 318329.0,
             "status": "observed"
           },
           {
             "date": "2024-04-30",
-            "value": 311604,
+            "value": 311604.0,
             "status": "observed"
           },
           {
             "date": "2024-05-31",
-            "value": 300328,
+            "value": 300328.0,
             "status": "observed"
           },
           {
             "date": "2024-06-28",
-            "value": 306954,
+            "value": 306954.0,
             "status": "observed"
           },
           {
             "date": "2024-07-31",
-            "value": 305689,
+            "value": 305689.0,
             "status": "observed"
           },
           {
             "date": "2024-08-30",
-            "value": 300809,
+            "value": 300809.0,
             "status": "observed"
           },
           {
             "date": "2024-09-30",
-            "value": 326259,
+            "value": 326259.0,
             "status": "observed"
           },
           {
             "date": "2024-10-31",
-            "value": 338434,
+            "value": 338434.0,
             "status": "observed"
           },
           {
             "date": "2024-11-29",
-            "value": 337275,
+            "value": 337275.0,
             "status": "observed"
           },
           {
             "date": "2024-12-31",
-            "value": 357075,
+            "value": 357075.0,
             "status": "observed"
           },
           {
             "date": "2025-01-31",
-            "value": 344647,
+            "value": 344647.0,
             "status": "observed"
           },
           {
             "date": "2025-02-28",
-            "value": 359329,
+            "value": 359329.0,
             "status": "observed"
           },
           {
             "date": "2025-03-31",
-            "value": 366016,
+            "value": 366016.0,
             "status": "observed"
           },
           {
             "date": "2025-04-30",
-            "value": 363782,
+            "value": 363782.0,
             "status": "observed"
           },
           {
             "date": "2025-05-30",
-            "value": 364383,
+            "value": 364383.0,
             "status": "observed"
           },
           {
             "date": "2025-06-30",
-            "value": 386157,
+            "value": 386157.0,
             "status": "observed"
           },
           {
             "date": "2025-07-31",
-            "value": 381384,
+            "value": 381384.0,
             "status": "observed"
           },
           {
             "date": "2025-08-29",
-            "value": 369784,
+            "value": 369784.0,
             "status": "observed"
           },
           {
             "date": "2025-09-30",
-            "value": 398990,
+            "value": 398990.0,
             "status": "observed"
           },
           {
             "date": "2025-10-31",
-            "value": 393299,
+            "value": 393299.0,
             "status": "observed"
           },
           {
             "date": "2025-11-28",
-            "value": 396549,
+            "value": 396549.0,
             "status": "observed"
           },
           {
             "date": "2025-12-31",
-            "value": 411482,
+            "value": 411482.0,
             "status": "observed"
           },
           {
             "date": "2026-01-30",
-            "value": 400611,
+            "value": 400611.0,
             "status": "observed"
           },
           {
             "date": "2026-02-27",
-            "value": 405107,
+            "value": 405107.0,
             "status": "observed"
           },
           {
             "date": "2026-03-31",
-            "value": 427460,
+            "value": 427460.0,
             "status": "observed"
           },
           {
             "date": "2026-04-30",
-            "value": 433281,
+            "value": 433281.0,
             "status": "observed"
           },
           {
             "date": "2026-05-29",
-            "value": 423856,
+            "value": 423856.0,
             "status": "observed"
           },
           {
             "date": "2026-06-30",
-            "value": 440853,
+            "value": 440853.0,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": 422437,
+            "value": 422437.0,
             "status": "observed"
           },
           {
             "date": "2026-08-31",
-            "value": 425140,
+            "value": 425140.0,
             "status": "observed"
           }
         ]
@@ -1753,13 +1753,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 22,
-        "evaluated_at": "2026-09-22T10:54:31.276344Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-01T11:09:36.846242Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-09-22T10:54:31.276344Z",
+        "fetched_at": "2026-10-01T11:09:36.846242Z",
         "value": 3.419654701980524,
         "revision_tag": null
       },
@@ -1770,7 +1770,7 @@
           "window_observations": null,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -1778,12 +1778,12 @@
           "window_observations": 120,
           "min_observations": 36,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 356,
-        "rolling_percentile": 100,
+        "rolling_percentile": 100.0,
         "recent_change": {
           "value": 1.9307924528953802,
           "comparison": "percent_change"
@@ -1964,21 +1964,21 @@
       },
       "coverage": {
         "history_start": "1971-01-08",
-        "history_end": "2026-09-11",
+        "history_end": "2026-09-25",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 7
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 11,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "age_days": 6,
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-11",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
-        "value": -0.56,
+        "as_of": "2026-09-25",
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "value": -0.548,
         "revision_tag": null
       },
       "baselines": [
@@ -2000,161 +2000,161 @@
         }
       ],
       "summary": {
-        "observation_count": 2906,
-        "rolling_percentile": 26.73076923076923,
+        "observation_count": 2908,
+        "rolling_percentile": 34.13461538461539,
         "recent_change": {
-          "value": -0.0020000000000000018,
+          "value": 0.0050000000000000044,
           "comparison": "absolute"
         },
         "preview_observations": [
           {
-            "date": "2026-02-20",
-            "value": -0.524,
-            "status": "observed"
-          },
-          {
-            "date": "2026-02-27",
-            "value": -0.506,
-            "status": "observed"
-          },
-          {
             "date": "2026-03-06",
-            "value": -0.487,
+            "value": -0.49,
             "status": "observed"
           },
           {
             "date": "2026-03-13",
-            "value": -0.472,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-20",
-            "value": -0.463,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-27",
-            "value": -0.459,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-03",
-            "value": -0.464,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-10",
             "value": -0.474,
             "status": "observed"
           },
           {
+            "date": "2026-03-20",
+            "value": -0.464,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-27",
+            "value": -0.461,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-03",
+            "value": -0.465,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-10",
+            "value": -0.475,
+            "status": "observed"
+          },
+          {
             "date": "2026-04-17",
-            "value": -0.485,
+            "value": -0.487,
             "status": "observed"
           },
           {
             "date": "2026-04-24",
-            "value": -0.495,
+            "value": -0.498,
             "status": "observed"
           },
           {
             "date": "2026-05-01",
-            "value": -0.502,
+            "value": -0.505,
             "status": "observed"
           },
           {
             "date": "2026-05-08",
-            "value": -0.507,
+            "value": -0.51,
             "status": "observed"
           },
           {
             "date": "2026-05-15",
-            "value": -0.508,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-22",
-            "value": -0.507,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-29",
-            "value": -0.505,
-            "status": "observed"
-          },
-          {
-            "date": "2026-06-05",
-            "value": -0.505,
-            "status": "observed"
-          },
-          {
-            "date": "2026-06-12",
-            "value": -0.505,
-            "status": "observed"
-          },
-          {
-            "date": "2026-06-19",
-            "value": -0.507,
-            "status": "observed"
-          },
-          {
-            "date": "2026-06-26",
             "value": -0.511,
             "status": "observed"
           },
           {
+            "date": "2026-05-22",
+            "value": -0.511,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-29",
+            "value": -0.509,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-05",
+            "value": -0.509,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-12",
+            "value": -0.509,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-19",
+            "value": -0.511,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-26",
+            "value": -0.514,
+            "status": "observed"
+          },
+          {
             "date": "2026-07-03",
-            "value": -0.516,
+            "value": -0.52,
             "status": "observed"
           },
           {
             "date": "2026-07-10",
-            "value": -0.522,
+            "value": -0.526,
             "status": "observed"
           },
           {
             "date": "2026-07-17",
-            "value": -0.527,
+            "value": -0.531,
             "status": "observed"
           },
           {
             "date": "2026-07-24",
-            "value": -0.533,
-            "status": "observed"
-          },
-          {
-            "date": "2026-07-31",
             "value": -0.537,
             "status": "observed"
           },
           {
-            "date": "2026-08-07",
+            "date": "2026-07-31",
             "value": -0.542,
             "status": "observed"
           },
           {
+            "date": "2026-08-07",
+            "value": -0.548,
+            "status": "observed"
+          },
+          {
             "date": "2026-08-14",
-            "value": -0.547,
+            "value": -0.553,
             "status": "observed"
           },
           {
             "date": "2026-08-21",
-            "value": -0.551,
+            "value": -0.557,
             "status": "observed"
           },
           {
             "date": "2026-08-28",
-            "value": -0.555,
+            "value": -0.559,
             "status": "observed"
           },
           {
             "date": "2026-09-04",
-            "value": -0.558,
+            "value": -0.56,
             "status": "observed"
           },
           {
             "date": "2026-09-11",
-            "value": -0.56,
+            "value": -0.558,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": -0.553,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-25",
+            "value": -0.548,
             "status": "observed"
           }
         ]
@@ -2182,21 +2182,21 @@
       },
       "coverage": {
         "history_start": "1971-01-08",
-        "history_end": "2026-09-11",
+        "history_end": "2026-09-25",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 7
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 11,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "age_days": 6,
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-11",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
-        "value": -0.071,
+        "as_of": "2026-09-25",
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "value": -0.061,
         "revision_tag": null
       },
       "baselines": [
@@ -2210,161 +2210,161 @@
         }
       ],
       "summary": {
-        "observation_count": 2906,
-        "rolling_percentile": 21.53846153846154,
+        "observation_count": 2908,
+        "rolling_percentile": 26.923076923076923,
         "recent_change": {
-          "value": -0.001999999999999988,
+          "value": 0.0010000000000000009,
           "comparison": "absolute"
         },
         "preview_observations": [
           {
-            "date": "2026-02-20",
-            "value": -0.027,
-            "status": "observed"
-          },
-          {
-            "date": "2026-02-27",
-            "value": -0.019,
-            "status": "observed"
-          },
-          {
             "date": "2026-03-06",
-            "value": -0.011,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-13",
-            "value": -0.005,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-20",
-            "value": -0.001,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-27",
-            "value": -0.001,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-03",
-            "value": -0.004,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-10",
             "value": -0.009,
             "status": "observed"
           },
           {
+            "date": "2026-03-13",
+            "value": -0.002,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-20",
+            "value": 0.001,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-27",
+            "value": 0.001,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-03",
+            "value": -0.002,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-10",
+            "value": -0.007,
+            "status": "observed"
+          },
+          {
             "date": "2026-04-17",
-            "value": -0.015,
+            "value": -0.013,
             "status": "observed"
           },
           {
             "date": "2026-04-24",
-            "value": -0.021,
+            "value": -0.019,
             "status": "observed"
           },
           {
             "date": "2026-05-01",
-            "value": -0.026,
+            "value": -0.024,
             "status": "observed"
           },
           {
             "date": "2026-05-08",
-            "value": -0.03,
+            "value": -0.027,
             "status": "observed"
           },
           {
             "date": "2026-05-15",
-            "value": -0.032,
+            "value": -0.03,
             "status": "observed"
           },
           {
             "date": "2026-05-22",
-            "value": -0.033,
+            "value": -0.031,
             "status": "observed"
           },
           {
             "date": "2026-05-29",
-            "value": -0.033,
+            "value": -0.031,
             "status": "observed"
           },
           {
             "date": "2026-06-05",
-            "value": -0.033,
+            "value": -0.031,
             "status": "observed"
           },
           {
             "date": "2026-06-12",
-            "value": -0.033,
+            "value": -0.031,
             "status": "observed"
           },
           {
             "date": "2026-06-19",
-            "value": -0.034,
+            "value": -0.032,
             "status": "observed"
           },
           {
             "date": "2026-06-26",
-            "value": -0.036,
+            "value": -0.033,
             "status": "observed"
           },
           {
             "date": "2026-07-03",
-            "value": -0.038,
+            "value": -0.035,
             "status": "observed"
           },
           {
             "date": "2026-07-10",
-            "value": -0.042,
+            "value": -0.039,
             "status": "observed"
           },
           {
             "date": "2026-07-17",
-            "value": -0.046,
+            "value": -0.042,
             "status": "observed"
           },
           {
             "date": "2026-07-24",
-            "value": -0.05,
+            "value": -0.046,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": -0.054,
+            "value": -0.05,
             "status": "observed"
           },
           {
             "date": "2026-08-07",
-            "value": -0.057,
+            "value": -0.054,
             "status": "observed"
           },
           {
             "date": "2026-08-14",
-            "value": -0.061,
+            "value": -0.057,
             "status": "observed"
           },
           {
             "date": "2026-08-21",
-            "value": -0.064,
+            "value": -0.059,
             "status": "observed"
           },
           {
             "date": "2026-08-28",
-            "value": -0.067,
+            "value": -0.061,
             "status": "observed"
           },
           {
             "date": "2026-09-04",
-            "value": -0.069,
+            "value": -0.062,
             "status": "observed"
           },
           {
             "date": "2026-09-11",
-            "value": -0.071,
+            "value": -0.062,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": -0.062,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-25",
+            "value": -0.061,
             "status": "observed"
           }
         ]
@@ -2392,21 +2392,21 @@
       },
       "coverage": {
         "history_start": "1971-01-08",
-        "history_end": "2026-09-11",
+        "history_end": "2026-09-25",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 7
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 11,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "age_days": 6,
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-11",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
-        "value": -0.475,
+        "as_of": "2026-09-25",
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "value": -0.462,
         "revision_tag": null
       },
       "baselines": [
@@ -2420,161 +2420,161 @@
         }
       ],
       "summary": {
-        "observation_count": 2906,
-        "rolling_percentile": 88.75,
+        "observation_count": 2908,
+        "rolling_percentile": 88.9423076923077,
         "recent_change": {
           "value": 0.0050000000000000044,
           "comparison": "absolute"
         },
         "preview_observations": [
           {
-            "date": "2026-02-20",
-            "value": -0.563,
-            "status": "observed"
-          },
-          {
-            "date": "2026-02-27",
-            "value": -0.564,
-            "status": "observed"
-          },
-          {
             "date": "2026-03-06",
-            "value": -0.566,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-13",
-            "value": -0.567,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-20",
-            "value": -0.568,
-            "status": "observed"
-          },
-          {
-            "date": "2026-03-27",
-            "value": -0.569,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-03",
-            "value": -0.57,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-10",
-            "value": -0.57,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-17",
-            "value": -0.57,
-            "status": "observed"
-          },
-          {
-            "date": "2026-04-24",
-            "value": -0.57,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-01",
-            "value": -0.569,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-08",
-            "value": -0.567,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-15",
-            "value": -0.565,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-22",
             "value": -0.562,
             "status": "observed"
           },
           {
+            "date": "2026-03-13",
+            "value": -0.563,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-20",
+            "value": -0.565,
+            "status": "observed"
+          },
+          {
+            "date": "2026-03-27",
+            "value": -0.566,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-03",
+            "value": -0.567,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-10",
+            "value": -0.567,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-17",
+            "value": -0.567,
+            "status": "observed"
+          },
+          {
+            "date": "2026-04-24",
+            "value": -0.567,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-01",
+            "value": -0.566,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-08",
+            "value": -0.564,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-15",
+            "value": -0.562,
+            "status": "observed"
+          },
+          {
+            "date": "2026-05-22",
+            "value": -0.559,
+            "status": "observed"
+          },
+          {
             "date": "2026-05-29",
-            "value": -0.558,
+            "value": -0.555,
             "status": "observed"
           },
           {
             "date": "2026-06-05",
-            "value": -0.554,
+            "value": -0.551,
             "status": "observed"
           },
           {
             "date": "2026-06-12",
-            "value": -0.549,
+            "value": -0.546,
             "status": "observed"
           },
           {
             "date": "2026-06-19",
-            "value": -0.544,
+            "value": -0.541,
             "status": "observed"
           },
           {
             "date": "2026-06-26",
-            "value": -0.539,
+            "value": -0.536,
             "status": "observed"
           },
           {
             "date": "2026-07-03",
-            "value": -0.533,
+            "value": -0.53,
             "status": "observed"
           },
           {
             "date": "2026-07-10",
-            "value": -0.527,
+            "value": -0.524,
             "status": "observed"
           },
           {
             "date": "2026-07-17",
-            "value": -0.52,
+            "value": -0.518,
             "status": "observed"
           },
           {
             "date": "2026-07-24",
-            "value": -0.514,
+            "value": -0.511,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": -0.508,
+            "value": -0.505,
             "status": "observed"
           },
           {
             "date": "2026-08-07",
-            "value": -0.502,
+            "value": -0.499,
             "status": "observed"
           },
           {
             "date": "2026-08-14",
-            "value": -0.496,
+            "value": -0.493,
             "status": "observed"
           },
           {
             "date": "2026-08-21",
-            "value": -0.49,
+            "value": -0.487,
             "status": "observed"
           },
           {
             "date": "2026-08-28",
-            "value": -0.485,
+            "value": -0.482,
             "status": "observed"
           },
           {
             "date": "2026-09-04",
-            "value": -0.48,
+            "value": -0.477,
             "status": "observed"
           },
           {
             "date": "2026-09-11",
-            "value": -0.475,
+            "value": -0.472,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": -0.467,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-25",
+            "value": -0.462,
             "status": "observed"
           }
         ]
@@ -2602,20 +2602,20 @@
       },
       "coverage": {
         "history_start": "1971-01-08",
-        "history_end": "2026-09-11",
+        "history_end": "2026-09-25",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 7
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 11,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "age_days": 6,
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-11",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
+        "as_of": "2026-09-25",
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
         "value": -0.629,
         "revision_tag": null
       },
@@ -2630,160 +2630,160 @@
         }
       ],
       "summary": {
-        "observation_count": 2906,
-        "rolling_percentile": 27.01923076923077,
+        "observation_count": 2908,
+        "rolling_percentile": 33.07692307692308,
         "recent_change": {
-          "value": 0.0010000000000000009,
+          "value": 0.006000000000000005,
           "comparison": "absolute"
         },
         "preview_observations": [
           {
-            "date": "2026-02-20",
-            "value": -0.601,
-            "status": "observed"
-          },
-          {
-            "date": "2026-02-27",
-            "value": -0.58,
-            "status": "observed"
-          },
-          {
             "date": "2026-03-06",
-            "value": -0.559,
+            "value": -0.568,
             "status": "observed"
           },
           {
             "date": "2026-03-13",
-            "value": -0.54,
+            "value": -0.549,
             "status": "observed"
           },
           {
             "date": "2026-03-20",
-            "value": -0.529,
+            "value": -0.537,
             "status": "observed"
           },
           {
             "date": "2026-03-27",
-            "value": -0.524,
+            "value": -0.531,
             "status": "observed"
           },
           {
             "date": "2026-04-03",
-            "value": -0.527,
+            "value": -0.535,
             "status": "observed"
           },
           {
             "date": "2026-04-10",
-            "value": -0.538,
+            "value": -0.546,
             "status": "observed"
           },
           {
             "date": "2026-04-17",
-            "value": -0.552,
+            "value": -0.56,
             "status": "observed"
           },
           {
             "date": "2026-04-24",
-            "value": -0.566,
+            "value": -0.575,
             "status": "observed"
           },
           {
             "date": "2026-05-01",
-            "value": -0.579,
-            "status": "observed"
-          },
-          {
-            "date": "2026-05-08",
             "value": -0.588,
             "status": "observed"
           },
           {
+            "date": "2026-05-08",
+            "value": -0.598,
+            "status": "observed"
+          },
+          {
             "date": "2026-05-15",
-            "value": -0.593,
+            "value": -0.604,
             "status": "observed"
           },
           {
             "date": "2026-05-22",
-            "value": -0.595,
+            "value": -0.606,
             "status": "observed"
           },
           {
             "date": "2026-05-29",
-            "value": -0.595,
+            "value": -0.606,
             "status": "observed"
           },
           {
             "date": "2026-06-05",
-            "value": -0.593,
+            "value": -0.604,
             "status": "observed"
           },
           {
             "date": "2026-06-12",
-            "value": -0.592,
-            "status": "observed"
-          },
-          {
-            "date": "2026-06-19",
-            "value": -0.591,
-            "status": "observed"
-          },
-          {
-            "date": "2026-06-26",
-            "value": -0.592,
-            "status": "observed"
-          },
-          {
-            "date": "2026-07-03",
-            "value": -0.595,
-            "status": "observed"
-          },
-          {
-            "date": "2026-07-10",
-            "value": -0.599,
-            "status": "observed"
-          },
-          {
-            "date": "2026-07-17",
             "value": -0.603,
             "status": "observed"
           },
           {
+            "date": "2026-06-19",
+            "value": -0.603,
+            "status": "observed"
+          },
+          {
+            "date": "2026-06-26",
+            "value": -0.603,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-03",
+            "value": -0.606,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-10",
+            "value": -0.611,
+            "status": "observed"
+          },
+          {
+            "date": "2026-07-17",
+            "value": -0.614,
+            "status": "observed"
+          },
+          {
             "date": "2026-07-24",
-            "value": -0.608,
+            "value": -0.62,
             "status": "observed"
           },
           {
             "date": "2026-07-31",
-            "value": -0.613,
+            "value": -0.626,
             "status": "observed"
           },
           {
             "date": "2026-08-07",
-            "value": -0.618,
+            "value": -0.631,
             "status": "observed"
           },
           {
             "date": "2026-08-14",
-            "value": -0.623,
+            "value": -0.637,
             "status": "observed"
           },
           {
             "date": "2026-08-21",
-            "value": -0.627,
+            "value": -0.641,
             "status": "observed"
           },
           {
             "date": "2026-08-28",
-            "value": -0.629,
+            "value": -0.643,
             "status": "observed"
           },
           {
             "date": "2026-09-04",
-            "value": -0.63,
+            "value": -0.642,
             "status": "observed"
           },
           {
             "date": "2026-09-11",
+            "value": -0.639,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-18",
+            "value": -0.635,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-25",
             "value": -0.629,
             "status": "observed"
           }
@@ -2819,13 +2819,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 52,
-        "evaluated_at": "2026-09-22T10:54:31.335508Z",
+        "age_days": 61,
+        "evaluated_at": "2026-10-01T11:09:36.907061Z",
         "reason": "Current partial month intentionally excluded."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-09-22T10:54:31.335508Z",
+        "fetched_at": "2026-10-01T11:09:36.907061Z",
         "value": 41.11984417915712,
         "revision_tag": "partial-current-month-excluded"
       },
@@ -2836,7 +2836,7 @@
           "window_observations": null,
           "min_observations": 120,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -2844,12 +2844,12 @@
           "window_observations": 120,
           "min_observations": 60,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 1748,
-        "rolling_percentile": 100,
+        "rolling_percentile": 100.0,
         "recent_change": {
           "value": 2.7774204121256085,
           "comparison": "percent_change"
@@ -3037,13 +3037,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 52,
-        "evaluated_at": "2026-09-22T10:54:31.335508Z",
+        "age_days": 61,
+        "evaluated_at": "2026-10-01T11:09:36.907061Z",
         "reason": "Current partial month intentionally excluded."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-09-22T10:54:31.335508Z",
+        "fetched_at": "2026-10-01T11:09:36.907061Z",
         "value": 7711.323333333334,
         "revision_tag": "partial-current-month-excluded"
       },
@@ -3054,7 +3054,7 @@
           "window_observations": null,
           "min_observations": 120,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -3062,12 +3062,12 @@
           "window_observations": 120,
           "min_observations": 60,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 1868,
-        "rolling_percentile": 100,
+        "rolling_percentile": 100.0,
         "recent_change": {
           "value": 3.0741053122923967,
           "comparison": "percent_change"
@@ -3255,13 +3255,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 52,
-        "evaluated_at": "2026-09-22T10:54:31.335508Z",
+        "age_days": 61,
+        "evaluated_at": "2026-10-01T11:09:36.907061Z",
         "reason": "Current partial month intentionally excluded."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-09-22T10:54:31.335508Z",
+        "fetched_at": "2026-10-01T11:09:36.907061Z",
         "value": 5260117.469660418,
         "revision_tag": "partial-current-month-excluded"
       },
@@ -3272,7 +3272,7 @@
           "window_observations": null,
           "min_observations": 120,
           "point_in_time": false,
-          "notes": "Strict-past expanding baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Strict-past by observation order only; exact release timing is not retained, so this is not a canonical PIT baseline."
         },
         {
           "id": "rolling-120m",
@@ -3280,12 +3280,12 @@
           "window_observations": 120,
           "min_observations": 60,
           "point_in_time": false,
-          "notes": "Trailing ten-year monthly baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
+          "notes": "Trailing ten-year monthly baseline; exact release timing is not retained, so this is not a canonical PIT baseline."
         }
       ],
       "summary": {
         "observation_count": 1868,
-        "rolling_percentile": 100,
+        "rolling_percentile": 100.0,
         "recent_change": {
           "value": 3.0793531545878716,
           "comparison": "percent_change"
@@ -3471,7 +3471,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3479,13 +3479,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "evaluated_at": "2026-10-01T11:09:36.776330Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:31.187834Z",
-        "value": -14,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.776330Z",
+        "value": 641,
         "revision_tag": null
       },
       "baselines": [
@@ -3507,13 +3507,21 @@
         }
       ],
       "summary": {
-        "observation_count": 1,
+        "observation_count": 2,
         "rolling_percentile": null,
-        "recent_change": null,
+        "recent_change": {
+          "value": 655.0,
+          "comparison": "absolute"
+        },
         "preview_observations": [
           {
             "date": "2026-09-21",
             "value": -14,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 641,
             "status": "observed"
           }
         ]
@@ -3546,7 +3554,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3554,13 +3562,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "evaluated_at": "2026-10-01T11:09:36.776330Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:31.187834Z",
-        "value": -14,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.776330Z",
+        "value": 641.0,
         "revision_tag": null
       },
       "baselines": [
@@ -3582,13 +3590,21 @@
         }
       ],
       "summary": {
-        "observation_count": 1,
+        "observation_count": 2,
         "rolling_percentile": null,
-        "recent_change": null,
+        "recent_change": {
+          "value": 655.0,
+          "comparison": "absolute"
+        },
         "preview_observations": [
           {
             "date": "2026-09-21",
-            "value": -14,
+            "value": -14.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 641.0,
             "status": "observed"
           }
         ]
@@ -3621,7 +3637,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3629,13 +3645,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "evaluated_at": "2026-10-01T11:09:36.776330Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:31.187834Z",
-        "value": -1.4256619144602851,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.776330Z",
+        "value": 63.152709359605915,
         "revision_tag": null
       },
       "baselines": [
@@ -3657,13 +3673,21 @@
         }
       ],
       "summary": {
-        "observation_count": 1,
+        "observation_count": 2,
         "rolling_percentile": null,
-        "recent_change": null,
+        "recent_change": {
+          "value": 64.5783712740662,
+          "comparison": "percentage_points"
+        },
         "preview_observations": [
           {
             "date": "2026-09-21",
             "value": -1.4256619144602851,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 63.152709359605915,
             "status": "observed"
           }
         ]
@@ -3696,7 +3720,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3704,13 +3728,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "evaluated_at": "2026-10-01T11:09:36.776330Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:31.187834Z",
-        "value": 484,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.776330Z",
+        "value": 828,
         "revision_tag": null
       },
       "baselines": [
@@ -3732,13 +3756,21 @@
         }
       ],
       "summary": {
-        "observation_count": 1,
+        "observation_count": 2,
         "rolling_percentile": null,
-        "recent_change": null,
+        "recent_change": {
+          "value": 344.0,
+          "comparison": "absolute"
+        },
         "preview_observations": [
           {
             "date": "2026-09-21",
             "value": 484,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 828,
             "status": "observed"
           }
         ]
@@ -3778,25 +3810,25 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 914,
-        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "age_days": 923,
+        "evaluated_at": "2026-10-01T11:09:36.782815Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-09-22T10:54:31.193425Z",
-        "value": 25,
+        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "value": 25.0,
         "revision_tag": null
       },
       "baselines": [],
       "summary": {
         "observation_count": 42,
-        "rolling_percentile": 40,
+        "rolling_percentile": 40.0,
         "recent_change": null,
         "preview_observations": [
           {
             "date": "2006-12-29",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
@@ -3806,52 +3838,52 @@
           },
           {
             "date": "2007-06-22",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2007-09-21",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2007-12-21",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2008-03-28",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2008-06-27",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2008-09-26",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2008-10-09",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2008-10-30",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2008-11-10",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2008-12-12",
-            "value": -125,
+            "value": -125.0,
             "status": "observed"
           },
           {
@@ -3871,7 +3903,7 @@
           },
           {
             "date": "2010-10-01",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -3881,12 +3913,12 @@
           },
           {
             "date": "2011-04-01",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2011-07-01",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
@@ -3896,7 +3928,7 @@
           },
           {
             "date": "2015-12-18",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
@@ -3906,17 +3938,17 @@
           },
           {
             "date": "2016-07-01",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2020-03-20",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2022-03-18",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -3926,7 +3958,7 @@
           },
           {
             "date": "2022-09-23",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
@@ -3936,12 +3968,12 @@
           },
           {
             "date": "2023-03-24",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2024-03-22",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           }
         ]
@@ -3981,13 +4013,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 914,
-        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "age_days": 923,
+        "evaluated_at": "2026-10-01T11:09:36.782815Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "fetched_at": "2026-10-01T11:09:36.782815Z",
         "value": 12.5,
         "revision_tag": null
       },
@@ -4029,12 +4061,12 @@
           },
           {
             "date": "2008-06-27",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2008-09-26",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
@@ -4059,12 +4091,12 @@
           },
           {
             "date": "2009-01-08",
-            "value": -200,
+            "value": -200.0,
             "status": "observed"
           },
           {
             "date": "2009-02-19",
-            "value": -150,
+            "value": -150.0,
             "status": "observed"
           },
           {
@@ -4079,7 +4111,7 @@
           },
           {
             "date": "2010-12-31",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4099,7 +4131,7 @@
           },
           {
             "date": "2015-12-18",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
@@ -4114,12 +4146,12 @@
           },
           {
             "date": "2020-03-20",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2022-03-18",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4134,7 +4166,7 @@
           },
           {
             "date": "2022-12-16",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4184,20 +4216,20 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 914,
-        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "age_days": 923,
+        "evaluated_at": "2026-10-01T11:09:36.782815Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "fetched_at": "2026-10-01T11:09:36.782815Z",
         "value": 12.5,
         "revision_tag": null
       },
       "baselines": [],
       "summary": {
         "observation_count": 48,
-        "rolling_percentile": 35,
+        "rolling_percentile": 35.0,
         "recent_change": null,
         "preview_observations": [
           {
@@ -4207,32 +4239,32 @@
           },
           {
             "date": "2007-03-30",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2007-06-22",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2007-09-21",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2007-12-21",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2008-03-28",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2008-06-27",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4242,22 +4274,22 @@
           },
           {
             "date": "2008-10-09",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2008-10-30",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2008-11-10",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2008-12-12",
-            "value": -150,
+            "value": -150.0,
             "status": "observed"
           },
           {
@@ -4277,22 +4309,22 @@
           },
           {
             "date": "2010-10-01",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2010-12-31",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2011-04-01",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2011-07-01",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4302,27 +4334,27 @@
           },
           {
             "date": "2015-12-18",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2016-03-25",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2016-07-01",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2020-03-20",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2022-03-18",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4332,7 +4364,7 @@
           },
           {
             "date": "2022-09-23",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4342,7 +4374,7 @@
           },
           {
             "date": "2023-03-24",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4387,14 +4419,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 914,
-        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "age_days": 923,
+        "evaluated_at": "2026-10-01T11:09:36.782815Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-09-22T10:54:31.193425Z",
-        "value": 2,
+        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "value": 2.0,
         "revision_tag": null
       },
       "baselines": [],
@@ -4453,7 +4485,7 @@
           },
           {
             "date": "2008-10-30",
-            "value": 3,
+            "value": 3.0,
             "status": "observed"
           },
           {
@@ -4463,7 +4495,7 @@
           },
           {
             "date": "2008-12-12",
-            "value": 2,
+            "value": 2.0,
             "status": "observed"
           },
           {
@@ -4553,7 +4585,7 @@
           },
           {
             "date": "2024-03-22",
-            "value": 2,
+            "value": 2.0,
             "status": "observed"
           }
         ]
@@ -4593,13 +4625,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 914,
-        "evaluated_at": "2026-09-22T10:54:31.193425Z",
+        "age_days": 923,
+        "evaluated_at": "2026-10-01T11:09:36.782815Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-09-22T10:54:31.193425Z",
+        "fetched_at": "2026-10-01T11:09:36.782815Z",
         "value": 12.5,
         "revision_tag": null
       },
@@ -4621,7 +4653,7 @@
           },
           {
             "date": "2007-06-22",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4651,32 +4683,32 @@
           },
           {
             "date": "2008-10-09",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2008-10-30",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2008-11-10",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2008-12-12",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2009-01-08",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2009-02-19",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
@@ -4726,12 +4758,12 @@
           },
           {
             "date": "2020-03-20",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2022-03-18",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
@@ -4789,7 +4821,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -4797,13 +4829,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "evaluated_at": "2026-10-01T11:09:36.776330Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:31.187834Z",
-        "value": 498,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.776330Z",
+        "value": 187,
         "revision_tag": null
       },
       "baselines": [
@@ -4825,13 +4857,21 @@
         }
       ],
       "summary": {
-        "observation_count": 1,
+        "observation_count": 2,
         "rolling_percentile": null,
-        "recent_change": null,
+        "recent_change": {
+          "value": -311.0,
+          "comparison": "absolute"
+        },
         "preview_observations": [
           {
             "date": "2026-09-21",
             "value": 498,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 187,
             "status": "observed"
           }
         ]
@@ -4864,21 +4904,21 @@
       },
       "coverage": {
         "history_start": "2025-09-01",
-        "history_end": "2026-08-01",
+        "history_end": "2026-09-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 35
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 56,
-        "evaluated_at": "2026-09-26T04:49:42.079353Z",
+        "age_days": 30,
+        "evaluated_at": "2026-10-01T11:09:36.779446Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-08-01",
-        "fetched_at": "2026-09-26T04:49:42.079353Z",
-        "value": 62.5,
+        "as_of": "2026-09-01",
+        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "value": 63.4,
         "revision_tag": null
       },
       "baselines": [
@@ -4892,10 +4932,10 @@
         }
       ],
       "summary": {
-        "observation_count": 12,
+        "observation_count": 13,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 1.6260162601626105,
+          "value": 1.4399999999999968,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -4970,6 +5010,12 @@
             "value": 62.5,
             "status": "observed",
             "release_date": "2026-09-21"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 63.4,
+            "status": "observed",
+            "release_date": "2026-10-01"
           }
         ]
       }
@@ -5001,7 +5047,7 @@
       },
       "coverage": {
         "history_start": "2026-09-01",
-        "history_end": "2026-09-22",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -5009,13 +5055,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "evaluated_at": "2026-10-01T11:09:36.510093Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:30.867967Z",
-        "value": 866817533778,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.510093Z",
+        "value": 921492702613.0,
         "revision_tag": null
       },
       "baselines": [
@@ -5037,86 +5083,111 @@
         }
       ],
       "summary": {
-        "observation_count": 15,
+        "observation_count": 20,
         "rolling_percentile": null,
         "recent_change": {
-          "value": -24.11792806555203,
+          "value": 10.207323456175432,
           "comparison": "percent_change"
         },
         "preview_observations": [
           {
             "date": "2026-09-01",
-            "value": 1187571567117,
+            "value": 1187571567117.0,
             "status": "observed"
           },
           {
             "date": "2026-09-02",
-            "value": 976499979054,
+            "value": 976499979054.0,
             "status": "observed"
           },
           {
             "date": "2026-09-03",
-            "value": 993261606190,
+            "value": 993261606190.0,
             "status": "observed"
           },
           {
             "date": "2026-09-04",
-            "value": 858244966564,
+            "value": 858244966564.0,
             "status": "observed"
           },
           {
             "date": "2026-09-07",
-            "value": 997944843239,
+            "value": 997944843239.0,
             "status": "observed"
           },
           {
             "date": "2026-09-08",
-            "value": 922658079092,
+            "value": 922658079092.0,
             "status": "observed"
           },
           {
             "date": "2026-09-09",
-            "value": 815976678108,
+            "value": 815976678108.0,
             "status": "observed"
           },
           {
             "date": "2026-09-10",
-            "value": 750742811639,
+            "value": 750742811639.0,
             "status": "observed"
           },
           {
             "date": "2026-09-11",
-            "value": 762245189934,
+            "value": 762245189934.0,
             "status": "observed"
           },
           {
             "date": "2026-09-14",
-            "value": 665316266033,
+            "value": 665316266033.0,
             "status": "observed"
           },
           {
             "date": "2026-09-15",
-            "value": 634706804618,
+            "value": 634706804618.0,
             "status": "observed"
           },
           {
             "date": "2026-09-16",
-            "value": 675969528562,
+            "value": 675969528562.0,
             "status": "observed"
           },
           {
             "date": "2026-09-17",
-            "value": 866619179411,
+            "value": 866619179411.0,
             "status": "observed"
           },
           {
             "date": "2026-09-18",
-            "value": 1142321910407,
+            "value": 1142321910407.0,
             "status": "observed"
           },
           {
             "date": "2026-09-21",
-            "value": 866817533778,
+            "value": 866817533778.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 1078776313348.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 894650683140.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 775591428171.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 836144707733.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 921492702613.0,
             "status": "observed"
           }
         ]
@@ -5149,7 +5220,7 @@
       },
       "coverage": {
         "history_start": "2026-09-01",
-        "history_end": "2026-09-22",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -5157,13 +5228,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "evaluated_at": "2026-10-01T11:09:36.510093Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:30.867967Z",
-        "value": 10478763517,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.510093Z",
+        "value": 10656764192,
         "revision_tag": null
       },
       "baselines": [
@@ -5185,10 +5256,10 @@
         }
       ],
       "summary": {
-        "observation_count": 15,
+        "observation_count": 20,
         "rolling_percentile": null,
         "recent_change": {
-          "value": -13.05488315579948,
+          "value": 10.171676561573051,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -5266,6 +5337,31 @@
             "date": "2026-09-21",
             "value": 10478763517,
             "status": "observed"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 13191583700,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 10473893046,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 8626109510,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 9672871036,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 10656764192,
+            "status": "observed"
           }
         ]
       }
@@ -5297,7 +5393,7 @@
       },
       "coverage": {
         "history_start": "2025-08-01",
-        "history_end": "2026-07-01",
+        "history_end": "2026-08-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 90
       },
@@ -5305,13 +5401,13 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-09-26T04:49:42.079353Z",
+        "evaluated_at": "2026-10-01T11:09:36.779446Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
-        "as_of": "2026-07-01",
-        "fetched_at": "2026-09-26T04:49:42.079353Z",
-        "value": 106.8049537676424,
+        "as_of": "2026-08-01",
+        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "value": 106.4711496072298,
         "revision_tag": null
       },
       "baselines": [
@@ -5325,10 +5421,10 @@
         }
       ],
       "summary": {
-        "observation_count": 12,
+        "observation_count": 13,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 0.3581762978149827,
+          "value": 0.3610308140470808,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -5340,69 +5436,75 @@
           },
           {
             "date": "2025-09-01",
-            "value": 100.5386909509119,
+            "value": 100.2382080610724,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-10-01",
-            "value": 100.8071502316055,
+            "value": 100.4609735042264,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-11-01",
-            "value": 101.3059922159077,
+            "value": 100.9111537332426,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-12-01",
-            "value": 101.9677742538671,
+            "value": 101.522701419293,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-01-01",
-            "value": 102.8238047181887,
+            "value": 102.3257826108551,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-02-01",
-            "value": 103.7413367774932,
+            "value": 103.1911956959414,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-03-01",
-            "value": 104.6226688954975,
+            "value": 104.0245906044521,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-04-01",
-            "value": 105.3302958617588,
+            "value": 104.6907625047655,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-05-01",
-            "value": 105.9461305755344,
+            "value": 105.2713384360013,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-06-01",
-            "value": 106.423769051658,
+            "value": 105.7225372137442,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-07-01",
-            "value": 106.8049537676424,
+            "value": 106.0881387363426,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
+          },
+          {
+            "date": "2026-08-01",
+            "value": 106.4711496072298,
+            "status": "observed",
+            "release_date": "2026-10-01"
           }
         ]
       }
@@ -5434,7 +5536,7 @@
       },
       "coverage": {
         "history_start": "2025-08-01",
-        "history_end": "2026-07-01",
+        "history_end": "2026-08-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 90
       },
@@ -5442,13 +5544,13 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-09-26T04:49:42.079353Z",
+        "evaluated_at": "2026-10-01T11:09:36.779446Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
-        "as_of": "2026-07-01",
-        "fetched_at": "2026-09-26T04:49:42.079353Z",
-        "value": 104.7914087010663,
+        "as_of": "2026-08-01",
+        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "value": 105.7072020806007,
         "revision_tag": null
       },
       "baselines": [
@@ -5462,10 +5564,10 @@
         }
       ],
       "summary": {
-        "observation_count": 12,
+        "observation_count": 13,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 1.3682544250036566,
+          "value": 1.2708722294547448,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -5477,69 +5579,75 @@
           },
           {
             "date": "2025-09-01",
-            "value": 97.34403062863193,
+            "value": 96.98347056204703,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-10-01",
-            "value": 97.30985532507411,
+            "value": 96.89240722169527,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-11-01",
-            "value": 97.26188219121136,
+            "value": 96.80014970463557,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-12-01",
-            "value": 97.30465201204993,
+            "value": 96.80864208679121,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-01-01",
-            "value": 97.56339329023686,
+            "value": 97.04587193286915,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-02-01",
-            "value": 98.14736841179909,
+            "value": 97.62656448254984,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-03-01",
-            "value": 99.14853597267371,
+            "value": 98.63300923339453,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-04-01",
-            "value": 100.4938484661689,
+            "value": 100.0024181878572,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-05-01",
-            "value": 101.9604260022271,
+            "value": 101.5096698626755,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-06-01",
-            "value": 103.3769490216439,
+            "value": 102.9642451803923,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-07-01",
-            "value": 104.7914087010663,
+            "value": 104.3806572941273,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
+          },
+          {
+            "date": "2026-08-01",
+            "value": 105.7072020806007,
+            "status": "observed",
+            "release_date": "2026-10-01"
           }
         ]
       }
@@ -5571,7 +5679,7 @@
       },
       "coverage": {
         "history_start": "2025-08-01",
-        "history_end": "2026-07-01",
+        "history_end": "2026-08-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 90
       },
@@ -5579,13 +5687,13 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-09-26T04:49:42.079353Z",
+        "evaluated_at": "2026-10-01T11:09:36.779446Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
-        "as_of": "2026-07-01",
-        "fetched_at": "2026-09-26T04:49:42.079353Z",
-        "value": 104.6337282843642,
+        "as_of": "2026-08-01",
+        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "value": 104.408659877505,
         "revision_tag": null
       },
       "baselines": [
@@ -5599,10 +5707,10 @@
         }
       ],
       "summary": {
-        "observation_count": 12,
+        "observation_count": 13,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 0.717830539850195,
+          "value": 0.5109327504051464,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -5614,69 +5722,75 @@
           },
           {
             "date": "2025-09-01",
-            "value": 99.20435642816588,
+            "value": 99.09137977123152,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-10-01",
-            "value": 99.73076765089073,
+            "value": 99.60483533274125,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-11-01",
-            "value": 100.2764482415886,
+            "value": 100.1337275033714,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-12-01",
-            "value": 100.7756578443083,
+            "value": 100.6135831561503,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-01-01",
-            "value": 101.1443536019292,
+            "value": 100.9587291675792,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-02-01",
-            "value": 101.3946378079098,
+            "value": 101.177572793148,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-03-01",
-            "value": 101.8232329115334,
+            "value": 101.5602023327917,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-04-01",
-            "value": 102.4610897578671,
+            "value": 102.1297298672589,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-05-01",
-            "value": 103.1542179797833,
+            "value": 102.7224030978579,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-06-01",
-            "value": 103.8879885751358,
+            "value": 103.3155185611899,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-07-01",
-            "value": 104.6337282843642,
+            "value": 103.8779135965029,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
+          },
+          {
+            "date": "2026-08-01",
+            "value": 104.408659877505,
+            "status": "observed",
+            "release_date": "2026-10-01"
           }
         ]
       }
@@ -5708,7 +5822,7 @@
       },
       "coverage": {
         "history_start": "2025-08-01",
-        "history_end": "2026-07-01",
+        "history_end": "2026-08-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 90
       },
@@ -5716,12 +5830,12 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-09-26T04:49:42.079353Z",
+        "evaluated_at": "2026-10-01T11:09:36.779446Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
-        "as_of": "2026-07-01",
-        "fetched_at": "2026-09-26T04:49:42.079353Z",
+        "as_of": "2026-08-01",
+        "fetched_at": "2026-10-01T11:09:36.779446Z",
         "value": 41.0,
         "revision_tag": null
       },
@@ -5736,7 +5850,7 @@
         }
       ],
       "summary": {
-        "observation_count": 12,
+        "observation_count": 13,
         "rolling_percentile": null,
         "recent_change": {
           "value": 0.0,
@@ -5753,67 +5867,73 @@
             "date": "2025-09-01",
             "value": 34.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-10-01",
             "value": 35.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-11-01",
             "value": 37.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2025-12-01",
             "value": 38.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-01-01",
             "value": 39.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-02-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-03-01",
             "value": 39.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-04-01",
             "value": 40.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-05-01",
             "value": 39.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-06-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
           },
           {
             "date": "2026-07-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-09-26"
+            "release_date": "2026-10-01"
+          },
+          {
+            "date": "2026-08-01",
+            "value": 41.0,
+            "status": "observed",
+            "release_date": "2026-10-01"
           }
         ]
       }
@@ -5845,21 +5965,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-22",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 0,
-        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "age_days": 1,
+        "evaluated_at": "2026-10-01T11:09:36.510093Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-22",
-        "fetched_at": "2026-09-22T10:54:30.867967Z",
-        "value": 47800.17,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.510093Z",
+        "value": 47940.13,
         "revision_tag": null
       },
       "baselines": [
@@ -5881,33 +6001,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6869,
-        "rolling_percentile": 100,
+        "observation_count": 6873,
+        "rolling_percentile": 99.84126984126983,
         "recent_change": {
-          "value": 0.17043582786171463,
+          "value": 0.6469815644789767,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-12",
-            "value": 45518.07,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-13",
-            "value": 46021.48,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-14",
-            "value": 45811.01,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-17",
-            "value": 45857.27,
-            "status": "observed"
-          },
           {
             "date": "2026-08-18",
             "value": 45308.68,
@@ -6020,7 +6120,7 @@
           },
           {
             "date": "2026-09-17",
-            "value": 46288,
+            "value": 46288.0,
             "status": "observed"
           },
           {
@@ -6036,6 +6136,26 @@
           {
             "date": "2026-09-22",
             "value": 47800.17,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 48157.29,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 48024.6,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 47631.96,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 47940.13,
             "status": "observed"
           }
         ]
@@ -6068,21 +6188,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-22",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 0,
-        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "age_days": 1,
+        "evaluated_at": "2026-10-01T11:09:36.510093Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-22",
-        "fetched_at": "2026-09-22T10:54:30.867967Z",
-        "value": 48601.53,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.510093Z",
+        "value": 48379.71,
         "revision_tag": null
       },
       "baselines": [
@@ -6104,33 +6224,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6869,
-        "rolling_percentile": 100,
+        "observation_count": 6873,
+        "rolling_percentile": 99.92063492063492,
         "recent_change": {
-          "value": 1.7812199875269386,
+          "value": 0.6963869178832516,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-12",
-            "value": 45529.48,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-13",
-            "value": 46216.41,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-14",
-            "value": 46402.6,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-17",
-            "value": 46189.3,
-            "status": "observed"
-          },
           {
             "date": "2026-08-18",
             "value": 46064.09,
@@ -6260,6 +6360,26 @@
             "date": "2026-09-22",
             "value": 48601.53,
             "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 48341.56,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 48117.54,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 48045.13,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 48379.71,
+            "status": "observed"
           }
         ]
       }
@@ -6291,21 +6411,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-22",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 0,
-        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "age_days": 1,
+        "evaluated_at": "2026-10-01T11:09:36.510093Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-22",
-        "fetched_at": "2026-09-22T10:54:30.867967Z",
-        "value": 47800.17,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.510093Z",
+        "value": 47767.49,
         "revision_tag": null
       },
       "baselines": [
@@ -6327,33 +6447,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6869,
-        "rolling_percentile": 100,
+        "observation_count": 6873,
+        "rolling_percentile": 99.84126984126983,
         "recent_change": {
-          "value": 1.2558862718266006,
+          "value": 0.40863437712370665,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-12",
-            "value": 45175.7,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-13",
-            "value": 45676.54,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-14",
-            "value": 45798.31,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-17",
-            "value": 45765.07,
-            "status": "observed"
-          },
           {
             "date": "2026-08-18",
             "value": 45225.42,
@@ -6426,7 +6526,7 @@
           },
           {
             "date": "2026-09-07",
-            "value": 46724,
+            "value": 46724.0,
             "status": "observed"
           },
           {
@@ -6483,6 +6583,26 @@
             "date": "2026-09-22",
             "value": 47800.17,
             "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 47894.77,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 47754.72,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 47573.09,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 47767.49,
+            "status": "observed"
           }
         ]
       }
@@ -6514,21 +6634,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-22",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 0,
-        "evaluated_at": "2026-09-22T10:54:30.867967Z",
+        "age_days": 1,
+        "evaluated_at": "2026-10-01T11:09:36.510093Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-22",
-        "fetched_at": "2026-09-22T10:54:30.867967Z",
-        "value": 47981.04,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.510093Z",
+        "value": 47767.49,
         "revision_tag": null
       },
       "baselines": [
@@ -6550,33 +6670,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6869,
-        "rolling_percentile": 100,
+        "observation_count": 6873,
+        "rolling_percentile": 99.60317460317461,
         "recent_change": {
-          "value": 1.6390261675630624,
+          "value": -0.2222505837733313,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-12",
-            "value": 45175.7,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-13",
-            "value": 45676.54,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-14",
-            "value": 46103.81,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-17",
-            "value": 45841.17,
-            "status": "observed"
-          },
           {
             "date": "2026-08-18",
             "value": 45922.4,
@@ -6649,7 +6749,7 @@
           },
           {
             "date": "2026-09-07",
-            "value": 46724,
+            "value": 46724.0,
             "status": "observed"
           },
           {
@@ -6706,6 +6806,26 @@
             "date": "2026-09-22",
             "value": 47981.04,
             "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 47894.77,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 48075.39,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 47873.89,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 47767.49,
+            "status": "observed"
           }
         ]
       }
@@ -6737,7 +6857,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -6745,13 +6865,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:31.187834Z",
+        "evaluated_at": "2026-10-01T11:09:36.776330Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:31.187834Z",
-        "value": 95,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:36.776330Z",
+        "value": 65,
         "revision_tag": null
       },
       "baselines": [
@@ -6773,13 +6893,21 @@
         }
       ],
       "summary": {
-        "observation_count": 1,
+        "observation_count": 2,
         "rolling_percentile": null,
-        "recent_change": null,
+        "recent_change": {
+          "value": -30.0,
+          "comparison": "absolute"
+        },
         "preview_observations": [
           {
             "date": "2026-09-21",
             "value": 95,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 65,
             "status": "observed"
           }
         ]
@@ -6819,14 +6947,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 5,
-        "evaluated_at": "2026-09-22T10:54:31.364172Z",
+        "age_days": 14,
+        "evaluated_at": "2026-10-01T11:09:36.942577Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-09-22T10:54:31.364172Z",
-        "value": -50,
+        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "value": -50.0,
         "revision_tag": null
       },
       "baselines": [],
@@ -6837,152 +6965,152 @@
         "preview_observations": [
           {
             "date": "2017-03-16",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2017-06-15",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2017-12-14",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2018-03-22",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2018-06-14",
-            "value": 100,
+            "value": 100.0,
             "status": "observed"
           },
           {
             "date": "2018-09-27",
-            "value": 100,
+            "value": 100.0,
             "status": "observed"
           },
           {
             "date": "2018-12-20",
-            "value": 100,
+            "value": 100.0,
             "status": "observed"
           },
           {
             "date": "2019-08-01",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2019-09-19",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2019-10-31",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2020-03-04",
-            "value": -125,
+            "value": -125.0,
             "status": "observed"
           },
           {
             "date": "2020-03-16",
-            "value": -225,
+            "value": -225.0,
             "status": "observed"
           },
           {
             "date": "2022-03-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2022-05-05",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-06-16",
-            "value": 150,
+            "value": 150.0,
             "status": "observed"
           },
           {
             "date": "2022-07-28",
-            "value": 225,
+            "value": 225.0,
             "status": "observed"
           },
           {
             "date": "2022-09-22",
-            "value": 300,
+            "value": 300.0,
             "status": "observed"
           },
           {
             "date": "2022-11-03",
-            "value": 375,
+            "value": 375.0,
             "status": "observed"
           },
           {
             "date": "2022-12-15",
-            "value": 425,
+            "value": 425.0,
             "status": "observed"
           },
           {
             "date": "2023-02-02",
-            "value": 450,
+            "value": 450.0,
             "status": "observed"
           },
           {
             "date": "2023-03-23",
-            "value": 450,
+            "value": 450.0,
             "status": "observed"
           },
           {
             "date": "2023-05-04",
-            "value": 475,
+            "value": 475.0,
             "status": "observed"
           },
           {
             "date": "2023-07-27",
-            "value": 375,
+            "value": 375.0,
             "status": "observed"
           },
           {
             "date": "2024-09-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2024-11-08",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2024-12-19",
-            "value": -100,
+            "value": -100.0,
             "status": "observed"
           },
           {
             "date": "2025-09-18",
-            "value": -125,
+            "value": -125.0,
             "status": "observed"
           },
           {
             "date": "2025-10-30",
-            "value": -100,
+            "value": -100.0,
             "status": "observed"
           },
           {
             "date": "2025-12-11",
-            "value": -100,
+            "value": -100.0,
             "status": "observed"
           },
           {
             "date": "2026-09-17",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           }
         ]
@@ -7022,14 +7150,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 5,
-        "evaluated_at": "2026-09-22T10:54:31.364172Z",
+        "age_days": 14,
+        "evaluated_at": "2026-10-01T11:09:36.942577Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-09-22T10:54:31.364172Z",
-        "value": 25,
+        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "value": 25.0,
         "revision_tag": null
       },
       "baselines": [],
@@ -7040,152 +7168,152 @@
         "preview_observations": [
           {
             "date": "2017-03-16",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2017-06-15",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2017-12-14",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-03-22",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-06-14",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2018-09-27",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-12-20",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2019-08-01",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2019-09-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2019-10-31",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2020-03-04",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2020-03-16",
-            "value": -150,
+            "value": -150.0,
             "status": "observed"
           },
           {
             "date": "2022-03-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2022-05-05",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-06-16",
-            "value": 150,
+            "value": 150.0,
             "status": "observed"
           },
           {
             "date": "2022-07-28",
-            "value": 200,
+            "value": 200.0,
             "status": "observed"
           },
           {
             "date": "2022-09-22",
-            "value": 150,
+            "value": 150.0,
             "status": "observed"
           },
           {
             "date": "2022-11-03",
-            "value": 150,
+            "value": 150.0,
             "status": "observed"
           },
           {
             "date": "2022-12-15",
-            "value": 200,
+            "value": 200.0,
             "status": "observed"
           },
           {
             "date": "2023-02-02",
-            "value": 150,
+            "value": 150.0,
             "status": "observed"
           },
           {
             "date": "2023-03-23",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2023-05-04",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2023-07-27",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2024-09-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2024-11-08",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2024-12-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2025-09-18",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2025-10-30",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2025-12-11",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2026-09-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           }
         ]
@@ -7225,14 +7353,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 5,
-        "evaluated_at": "2026-09-22T10:54:31.364172Z",
+        "age_days": 14,
+        "evaluated_at": "2026-10-01T11:09:36.942577Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-09-22T10:54:31.364172Z",
-        "value": 25,
+        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "value": 25.0,
         "revision_tag": null
       },
       "baselines": [],
@@ -7243,152 +7371,152 @@
         "preview_observations": [
           {
             "date": "2017-03-16",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2017-06-15",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2017-12-14",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2018-03-22",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2018-06-14",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2018-09-27",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2018-12-20",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2019-08-01",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2019-09-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2019-10-31",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2020-03-04",
-            "value": -100,
+            "value": -100.0,
             "status": "observed"
           },
           {
             "date": "2020-03-16",
-            "value": -200,
+            "value": -200.0,
             "status": "observed"
           },
           {
             "date": "2022-03-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2022-05-05",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-06-16",
-            "value": 150,
+            "value": 150.0,
             "status": "observed"
           },
           {
             "date": "2022-07-28",
-            "value": 225,
+            "value": 225.0,
             "status": "observed"
           },
           {
             "date": "2022-09-22",
-            "value": 275,
+            "value": 275.0,
             "status": "observed"
           },
           {
             "date": "2022-11-03",
-            "value": 350,
+            "value": 350.0,
             "status": "observed"
           },
           {
             "date": "2022-12-15",
-            "value": 350,
+            "value": 350.0,
             "status": "observed"
           },
           {
             "date": "2023-02-02",
-            "value": 225,
+            "value": 225.0,
             "status": "observed"
           },
           {
             "date": "2023-03-23",
-            "value": 175,
+            "value": 175.0,
             "status": "observed"
           },
           {
             "date": "2023-05-04",
-            "value": 125,
+            "value": 125.0,
             "status": "observed"
           },
           {
             "date": "2023-07-27",
-            "value": 100,
+            "value": 100.0,
             "status": "observed"
           },
           {
             "date": "2024-09-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2024-11-08",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2024-12-19",
-            "value": -100,
+            "value": -100.0,
             "status": "observed"
           },
           {
             "date": "2025-09-18",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2025-10-30",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2025-12-11",
-            "value": -75,
+            "value": -75.0,
             "status": "observed"
           },
           {
             "date": "2026-09-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           }
         ]
@@ -7428,28 +7556,28 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 5,
-        "evaluated_at": "2026-09-22T10:54:31.364172Z",
+        "age_days": 14,
+        "evaluated_at": "2026-10-01T11:09:36.942577Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-09-22T10:54:31.364172Z",
-        "value": 4,
+        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "value": 4.0,
         "revision_tag": null
       },
       "baselines": [],
       "summary": {
         "observation_count": 186,
-        "rolling_percentile": 70,
+        "rolling_percentile": 70.0,
         "recent_change": {
-          "value": 25,
+          "value": 25.0,
           "comparison": "basis_points"
         },
         "preview_observations": [
           {
             "date": "2017-03-16",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
@@ -7469,7 +7597,7 @@
           },
           {
             "date": "2018-06-14",
-            "value": 2,
+            "value": 2.0,
             "status": "observed"
           },
           {
@@ -7489,7 +7617,7 @@
           },
           {
             "date": "2019-09-19",
-            "value": 2,
+            "value": 2.0,
             "status": "observed"
           },
           {
@@ -7514,7 +7642,7 @@
           },
           {
             "date": "2022-05-05",
-            "value": 1,
+            "value": 1.0,
             "status": "observed"
           },
           {
@@ -7534,7 +7662,7 @@
           },
           {
             "date": "2022-11-03",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           },
           {
@@ -7549,7 +7677,7 @@
           },
           {
             "date": "2023-03-23",
-            "value": 5,
+            "value": 5.0,
             "status": "observed"
           },
           {
@@ -7564,7 +7692,7 @@
           },
           {
             "date": "2024-09-19",
-            "value": 5,
+            "value": 5.0,
             "status": "observed"
           },
           {
@@ -7584,7 +7712,7 @@
           },
           {
             "date": "2025-10-30",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           },
           {
@@ -7594,7 +7722,7 @@
           },
           {
             "date": "2026-09-17",
-            "value": 4,
+            "value": 4.0,
             "status": "observed"
           }
         ]
@@ -7634,14 +7762,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 5,
-        "evaluated_at": "2026-09-22T10:54:31.364172Z",
+        "age_days": 14,
+        "evaluated_at": "2026-10-01T11:09:36.942577Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-09-22T10:54:31.364172Z",
-        "value": 25,
+        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "value": 25.0,
         "revision_tag": null
       },
       "baselines": [],
@@ -7652,152 +7780,152 @@
         "preview_observations": [
           {
             "date": "2017-03-16",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2017-06-15",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2017-12-14",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-03-22",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-06-14",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-09-27",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2018-12-20",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2019-08-01",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2019-09-19",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2019-10-31",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2020-03-04",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2020-03-16",
-            "value": -100,
+            "value": -100.0,
             "status": "observed"
           },
           {
             "date": "2022-03-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2022-05-05",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2022-06-16",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-07-28",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-09-22",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-11-03",
-            "value": 75,
+            "value": 75.0,
             "status": "observed"
           },
           {
             "date": "2022-12-15",
-            "value": 50,
+            "value": 50.0,
             "status": "observed"
           },
           {
             "date": "2023-02-02",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2023-03-23",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2023-05-04",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2023-07-27",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           },
           {
             "date": "2024-09-19",
-            "value": -50,
+            "value": -50.0,
             "status": "observed"
           },
           {
             "date": "2024-11-08",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2024-12-19",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2025-09-18",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2025-10-30",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2025-12-11",
-            "value": -25,
+            "value": -25.0,
             "status": "observed"
           },
           {
             "date": "2026-09-17",
-            "value": 25,
+            "value": 25.0,
             "status": "observed"
           }
         ]
@@ -7832,14 +7960,14 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 90,
-        "age_days": 52,
-        "evaluated_at": "2026-09-22T10:54:24.252339Z",
+        "age_days": 61,
+        "evaluated_at": "2026-10-01T11:09:32.603134Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-09-22T10:54:24.252339Z",
-        "value": 0,
+        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "value": 0.0,
         "revision_tag": null
       },
       "baselines": [
@@ -7848,8 +7976,8 @@
           "type": "none",
           "window_observations": null,
           "min_observations": 1,
-          "point_in_time": true,
-          "notes": "No percentile baseline."
+          "point_in_time": false,
+          "notes": "No percentile baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
         }
       ],
       "summary": {
@@ -7859,152 +7987,152 @@
         "preview_observations": [
           {
             "date": "2024-03-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-04-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-05-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-06-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-07-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-08-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-09-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-10-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-11-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2024-12-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-01-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-02-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-03-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-04-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-05-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-06-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-07-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-08-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-09-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-10-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-11-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2025-12-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-01-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-02-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-03-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-04-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-05-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-06-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-07-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           },
           {
             "date": "2026-08-01",
-            "value": 0,
+            "value": 0.0,
             "status": "observed"
           }
         ]
@@ -8032,7 +8160,7 @@
       },
       "coverage": {
         "history_start": "1990-01-02",
-        "history_end": "2026-09-21",
+        "history_end": "2026-09-30",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 1
       },
@@ -8040,13 +8168,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-09-22T10:54:30.303885Z",
+        "evaluated_at": "2026-10-01T11:09:35.960828Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-21",
-        "fetched_at": "2026-09-22T10:54:30.303885Z",
-        "value": 14.87,
+        "as_of": "2026-09-30",
+        "fetched_at": "2026-10-01T11:09:35.960828Z",
+        "value": 16.34,
         "revision_tag": null
       },
       "baselines": [
@@ -8068,48 +8196,13 @@
         }
       ],
       "summary": {
-        "observation_count": 9277,
-        "rolling_percentile": 32.26190476190476,
+        "observation_count": 9284,
+        "rolling_percentile": 44.464285714285715,
         "recent_change": {
-          "value": 0.4051316677920136,
+          "value": 1.8703241895261957,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-11",
-            "value": 15.28,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-12",
-            "value": 14.55,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-13",
-            "value": 14.63,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-14",
-            "value": 14.25,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-17",
-            "value": 15.19,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-18",
-            "value": 15.84,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-19",
-            "value": 14.89,
-            "status": "observed"
-          },
           {
             "date": "2026-08-20",
             "value": 16.01,
@@ -8223,6 +8316,41 @@
           {
             "date": "2026-09-21",
             "value": 14.87,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-22",
+            "value": 14.21,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-23",
+            "value": 15.18,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-24",
+            "value": 15.67,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-25",
+            "value": 14.87,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-28",
+            "value": 16.07,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-29",
+            "value": 16.04,
+            "status": "observed"
+          },
+          {
+            "date": "2026-09-30",
+            "value": 16.34,
             "status": "observed"
           }
         ]

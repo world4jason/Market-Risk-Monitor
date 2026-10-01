@@ -29,8 +29,8 @@
   "freshness": {
     "state": "fresh",
     "max_age_days": 90,
-    "age_days": 52,
-    "evaluated_at": "2026-09-22T10:54:24.252339Z",
+    "age_days": 61,
+    "evaluated_at": "2026-10-01T11:09:32.603134Z",
     "reason": null
   },
   "lineage": {
@@ -45,13 +45,13 @@
       "type": "none",
       "window_observations": null,
       "min_observations": 1,
-      "point_in_time": true,
-      "notes": "No percentile baseline."
+      "point_in_time": false,
+      "notes": "No percentile baseline. Exact historical release timing is not retained; not a canonical PIT baseline."
     }
   ],
   "latest": {
     "as_of": "2026-08-01",
-    "fetched_at": "2026-09-22T10:54:24.252339Z",
+    "fetched_at": "2026-10-01T11:09:32.603134Z",
     "value": 0.0,
     "revision_tag": null
   },
