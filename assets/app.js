@@ -11,6 +11,20 @@ const TAIWAN_CBC_RATE_REGIME_URL = "./data/generated/taiwan-cbc-rate-regime.json
 const FED_RATE_REGIME_URL = "./data/generated/fed-rate-regime.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
+const I18N = globalThis.MRMI18n;
+if (!I18N) throw new Error("MRM i18n runtime is not loaded");
+const {
+  t,
+  getLocale,
+  setLocale,
+  initLocale,
+  localeNumber,
+  localeDate,
+  localeOrdinal,
+  localizedMetricContext,
+  localizedSignalContext,
+} = I18N;
+
 let dialogInvoker = null;
 
 const state = {
@@ -178,6 +192,60 @@ const signalBeginnerContext = {
 function $(selector) {
   return document.querySelector(selector);
 }
+
+function metricContext(id) {
+  return localizedMetricContext(id, beginnerContext[id] || null);
+}
+
+function signalContext(id) {
+  return localizedSignalContext(id, signalBeginnerContext[id] || null);
+}
+
+function pillarLabel(id) {
+  return t(`pillar.${id}`) === `pillar.${id}` ? id : t(`pillar.${id}`);
+}
+
+function applyStaticTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+  });
+  document.querySelectorAll("[data-locale]").forEach((button) => {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.locale === getLocale()),
+    );
+  });
+}
+
+function rerenderLocalizedUi() {
+  applyStaticTranslations();
+  if (!state.catalog && !state.metrics.size) return;
+  renderOverview();
+  renderMetrics();
+  renderTrendParticipation();
+  renderTaiwanMarket();
+  renderSignals();
+  renderHistorySelector();
+  renderRegime();
+  renderCoverage();
+  updateGlobalFreshness();
+}
+
+function setupLanguage() {
+  initLocale();
+  applyStaticTranslations();
+  document.querySelectorAll("[data-locale]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.locale === getLocale()) return;
+      setLocale(button.dataset.locale);
+      rerenderLocalizedUi();
+    });
+  });
+}
+
 
 function isTaiwanMetric(metric) {
   return String(metric?.metric?.id || "").startsWith("tw_");
