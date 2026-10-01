@@ -3834,6 +3834,7 @@ async function loadData() {
   setupDeferredContextLoading();
 }
 
+initLocale();
 initTheme();
 setupDialogFocusManagement();
 $("#refresh-view").addEventListener("click", loadData);
