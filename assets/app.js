@@ -3608,10 +3608,10 @@ function renderSignals() {
 
   if (!snapshot?.current) {
     summaryEl.innerHTML =
-      '<div class="empty-state compact">Deleveraging Watch is unavailable in the current published snapshot.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("signals.noSnapshot"))}</div>`;
     grid.innerHTML = "";
     chart.innerHTML =
-      '<div class="empty-state compact">Historical signal state is unavailable.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("signals.noHistoricalState"))}</div>`;
     return;
   }
 
@@ -3629,10 +3629,10 @@ function renderSignals() {
 
   summaryEl.innerHTML = `
     <div class="signal-summary-main">
-      <strong>${summary.known} of ${summary.total} checks known</strong>
-      <span class="meta">· ${summary.active} active · ${summary.unknown} unavailable/unknown</span>
+      <strong>${escapeHtml(t("signals.known", { known: summary.known, total: summary.total }))}</strong>
+      <span class="meta">${escapeHtml(t("signals.summary", { active: summary.active, unknown: summary.unknown }))}</span>
     </div>
-    <span class="meta">Evaluated ${escapeHtml(snapshot.current.as_of || "—")} · unknown is not inactive</span>
+    <span class="meta">${escapeHtml(t("signals.evaluated", { date: snapshot.current.as_of || "—" }))}</span>
   `;
 
   grid.innerHTML = displayConditions
@@ -3641,13 +3641,13 @@ function renderSignals() {
       const details = flattenRuleDetails(condition.rules);
       const detailText = details.map(formatRuleDetail).join("<br>");
       const caveat = condition.displayStatus === "unknown"
-        ? "Required public evidence is unavailable; this remains unknown rather than safe."
+        ? t("signals.unknownCaveat")
         : (beginner.caveat || "");
       return `<article class="signal-card" data-status="${escapeHtml(condition.displayStatus)}">
-        <span class="signal-status">${escapeHtml(condition.displayStatus)}</span>
+        <span class="signal-status">${escapeHtml(statusLabel(condition.displayStatus))}</span>
         <h3>${escapeHtml(beginner.plain_name || condition.name)}</h3>
         <p>${escapeHtml(beginner.description || condition.description || "")}</p>
-        ${caveat ? `<p><strong>Caveat:</strong> ${escapeHtml(caveat)}</p>` : ""}
+        ${caveat ? `<p><strong>${escapeHtml(t("signals.caveat"))}</strong> ${escapeHtml(caveat)}</p>` : ""}
         <div class="signal-rule">${detailText}</div>
       </article>`;
     })
@@ -3660,7 +3660,7 @@ function renderSignalHistory(snapshot, element) {
   const history = snapshot.history || [];
   if (history.length < 2) {
     element.innerHTML =
-      '<div class="empty-state compact">Not enough historical signal states.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("signals.noHistory"))}</div>`;
     return;
   }
 
