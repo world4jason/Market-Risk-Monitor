@@ -3347,7 +3347,14 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     })
     .join("");
 
-  el.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(t("taiwan.eventTitle"))}">
+  const a11y = chartA11y(
+    el,
+    t("taiwan.eventTitle"),
+    currentLocale === "zh-TW"
+      ? `${metric.metric.name} 台灣事件比較，共 ${lines.length} 條事件路徑。`
+      : `${metric.metric.name} Taiwan event comparison with ${lines.length} event paths.`,
+  );
+  el.innerHTML = `${a11y.summaryHtml}<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
     <line class="gridline" x1="${left}" y1="${y(mode === "normalized" ? 100 : min)}" x2="${width - right}" y2="${y(mode === "normalized" ? 100 : min)}"/>
     <line class="gridline" x1="${zeroX}" y1="${top}" x2="${zeroX}" y2="${height - bottom}"/>
     ${paths}
