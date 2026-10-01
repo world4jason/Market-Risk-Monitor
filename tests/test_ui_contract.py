@@ -347,8 +347,8 @@ class UiContractTests(unittest.TestCase):
         dialog = extract_function(self.app, "openMetric")
 
         self.assertIn('polarity === "contextual"', suffix)
-        self.assertIn('parts.push("context only")', suffix)
-        self.assertIn("retrospective; not PIT/backtest-safe", suffix)
+        self.assertIn('parts.push(t("context.contextOnly"))', suffix)
+        self.assertIn('parts.push(t("context.retrospective"))', suffix)
         self.assertIn("percentileContextSuffix(metric)", card)
         self.assertIn('t("context.contextOnly")', overview)
         self.assertIn("percentileCaveatSentence(metric)", dialog)
@@ -411,8 +411,8 @@ class UiContractTests(unittest.TestCase):
     def test_deleveraging_unknown_remains_distinct_from_inactive(self) -> None:
         overview = extract_function(self.app, "renderOverview")
         signals = extract_function(self.app, "renderSignals")
-        self.assertIn("unavailable/unknown", signals)
-        self.assertIn("unknown is not inactive", signals)
+        self.assertIn('t("signals.summary"', signals)
+        self.assertIn('t("signals.evaluated"', signals)
         self.assertIn('t("overview.deleveraging.notConfirmed")', overview)
         self.assertIn('t("thesis.confidence.low")', overview)
         self.assertIn('t("overview.usable"', overview)
