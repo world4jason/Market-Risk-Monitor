@@ -352,8 +352,8 @@ class UiContractTests(unittest.TestCase):
         self.assertIn("percentileContextSuffix(metric)", card)
         self.assertIn('t("context.contextOnly")', overview)
         self.assertIn("percentileCaveatSentence(metric)", dialog)
-        self.assertIn("it is not a risk direction", caveat)
-        self.assertIn("not safe for historical PIT/backtest use", caveat)
+        self.assertIn('t("context.riskDirection")', caveat)
+        self.assertIn('t("context.notPit")', caveat)
 
     def test_breadth_beginner_copy_is_not_snapshot_specific(self) -> None:
         registry = extract_braced_block(self.app, "const beginnerContext =")
