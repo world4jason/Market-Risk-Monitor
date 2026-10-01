@@ -329,7 +329,9 @@ function freshnessBadge(metric) {
   const cls = ["fresh", "stale", "error", "missing"].includes(status)
     ? `badge-${status}`
     : "badge-neutral";
-  return `<span class="badge ${cls}">${escapeHtml(status.replaceAll("_", " "))}</span>`;
+  const key = `common.${status}`;
+  const label = t(key) === key ? status.replaceAll("_", " ") : t(key);
+  return `<span class="badge ${cls}">${escapeHtml(label)}</span>`;
 }
 
 function percentileRank(value, baseline) {
@@ -1031,7 +1033,7 @@ function metricCard(metric) {
   const title = context?.plain_name || metric.metric.name;
   const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
-  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(title)} details and history">
+  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="${escapeHtml(t("metric.open_aria", { name: title }))}">
     <div class="metric-card-top">
       <div>
         <p class="eyebrow">${escapeHtml(pillarLabel(metric.metric.pillar))}</p>
@@ -1042,17 +1044,16 @@ function metricCard(metric) {
     <div class="metric-value">${formatValue(metric.latest?.value, metric.metric.units)}</div>
     <div class="metric-unit">${escapeHtml(metricDateLine(metric))} · ${escapeHtml(metric.metric.units)}</div>
     <div class="metric-context">
-      <div class="context-chip"><strong>${cText}</strong><span>last observation</span></div>
+      <div class="context-chip"><strong>${cText}</strong><span>${escapeHtml(t("metric.last_observation"))}</span></div>
       <div class="context-chip"><strong>${p.value}</strong><span>${escapeHtml(p.label)}${contextOnly}</span></div>
     </div>
     ${sparkline(metric)}
     <div class="metric-card-bottom">
-      <span class="meta">${escapeHtml(metric.coverage?.history_start || "—")} → ${escapeHtml(metric.coverage?.history_end || "—")}</span>
-      <span class="meta">${context ? "Explain & view history ↗" : "Open history ↗"}</span>
+      <span class="meta">${escapeHtml(localeDate(metric.coverage?.history_start))} → ${escapeHtml(localeDate(metric.coverage?.history_end))}</span>
+      <span class="meta">${escapeHtml(t(context ? "metric.open_explain" : "metric.open_history"))}</span>
     </div>
   </article>`;
 }
-
 
 function renderOverview() {
   const nfci = state.metrics.get("nfci");
@@ -1371,7 +1372,7 @@ function renderMetrics() {
 
   if (!metrics.length) {
     grid.innerHTML =
-      '<div class="panel empty-state"><strong>Current U.S. snapshot is unavailable.</strong><span>No fixture or placeholder value is substituted for missing published data.</span></div>';
+      `<div class="panel empty-state"><strong>${escapeHtml(t("us.unavailable"))}</strong><span>${escapeHtml(t("metrics.no_placeholder"))}</span></div>`;
     return;
   }
 
