@@ -67,12 +67,15 @@ const pillarOrder = [
   "context",
 ];
 
-const historyModeLabels = {
-  absolute: "Absolute level",
-  pit_percentile: "Point-in-time percentile",
-  rolling_percentile: "Rolling percentile",
-  rate_change: "Rate of change",
-};
+function historyModeLabel(mode) {
+  const key = {
+    absolute: "research.absolute",
+    pit_percentile: "research.pit_percentile",
+    rolling_percentile: "research.rolling_percentile",
+    rate_change: "research.rate_change",
+  }[mode] || "research.absolute";
+  return t(key);
+}
 
 const beginnerContext = {
   nfci: {
@@ -1024,14 +1027,14 @@ function metricCard(metric) {
   const p = percentilePresentation(metric, pct);
   const change = recentChange(metric);
   const cText = formatChange(change);
-  const context = beginnerContext[metric.metric.id];
+  const context = metricContext(metric.metric.id);
   const title = context?.plain_name || metric.metric.name;
   const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
   return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(title)} details and history">
     <div class="metric-card-top">
       <div>
-        <p class="eyebrow">${escapeHtml(pillarLabels[metric.metric.pillar] || metric.metric.pillar)}</p>
+        <p class="eyebrow">${escapeHtml(pillarLabel(metric.metric.pillar))}</p>
         <h3>${escapeHtml(title)}</h3>
       </div>
       ${freshnessBadge(metric)}
@@ -1131,7 +1134,7 @@ function renderOverview() {
   const activeName = activeConditions[0]
     ? (activeConditions[0].id === "margin_debt_rollover"
         ? "Margin momentum slowing"
-        : signalBeginnerContext[activeConditions[0].id]?.plain_name || activeConditions[0].name)
+        : signalContext(activeConditions[0].id)?.plain_name || activeConditions[0].name)
     : null;
 
   const deleveragingFacts = [];
@@ -1844,7 +1847,7 @@ function renderCoverage() {
     .map(
       (m) => `<tr>
         <td>${escapeHtml(m.metric.name)}</td>
-        <td>${escapeHtml(pillarLabels[m.metric.pillar] || m.metric.pillar)}</td>
+        <td>${escapeHtml(pillarLabel(m.metric.pillar))}</td>
         <td>${escapeHtml(m.coverage.history_start || "—")} → ${escapeHtml(m.coverage.history_end || "—")}</td>
         <td>${escapeHtml(m.latest.as_of || "—")}</td>
         <td>${freshnessBadge(m)}</td>
@@ -2773,7 +2776,7 @@ function renderSignals() {
 
   grid.innerHTML = displayConditions
     .map((condition) => {
-      const beginner = signalBeginnerContext[condition.id] || {};
+      const beginner = signalContext(condition.id) || {};
       const details = flattenRuleDetails(condition.rules);
       const detailText = details.map(formatRuleDetail).join("<br>");
       const caveat = condition.displayStatus === "unknown"
