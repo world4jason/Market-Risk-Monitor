@@ -895,7 +895,13 @@ function setLocale(locale, { persist = true, rerender = true } = {}) {
 function initLocale() {
   const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
   const browserLocale = window.navigator?.language || window.navigator?.languages?.[0] || "en";
-  currentLocale = normalizeLocale(saved || browserLocale);
+  let requested = null;
+  try {
+    requested = new URL(window.location.href).searchParams.get("lang");
+  } catch {
+    requested = null;
+  }
+  currentLocale = normalizeLocale(requested || saved || browserLocale);
   applyStaticTranslations();
   $("#language-select")?.addEventListener("change", (event) => {
     setLocale(event.currentTarget.value);
