@@ -2652,18 +2652,15 @@ async function openMetric(id, invoker = document.activeElement) {
   if (!summary) return;
 
   const dialog = $("#metric-dialog");
-  const context = beginnerContext[id];
-  $("#dialog-pillar").textContent =
-    pillarLabels[summary.metric.pillar] || summary.metric.pillar;
+  const context = metricContext(id);
+  $("#dialog-pillar").textContent = pillarLabel(summary.metric.pillar);
   $("#dialog-title").textContent = context?.plain_name || summary.metric.name;
   $("#dialog-summary").innerHTML =
-    '<div class="detail-stat"><strong>Loading…</strong><span>Full metric history</span></div>';
+    `<div class="detail-stat"><strong>${escapeHtml(t("metric.loading"))}</strong><span>${escapeHtml(t("dialog.full_history"))}</span></div>`;
   $("#dialog-chart").innerHTML =
-    '<div class="empty-state compact">Loading full metric history…</div>';
+    `<div class="empty-state compact">${escapeHtml(t("dialog.loading_history"))}</div>`;
   $("#dialog-source").innerHTML = "";
-  if (invoker && typeof invoker.focus === "function") {
-    dialogInvoker = invoker;
-  }
+  if (invoker && typeof invoker.focus === "function") dialogInvoker = invoker;
   if (!dialog.open) {
     dialog.showModal();
     $("#dialog-close")?.focus();
@@ -2675,7 +2672,7 @@ async function openMetric(id, invoker = document.activeElement) {
   } catch (error) {
     console.warn("metric detail load failed", id, error);
     $("#dialog-chart").innerHTML =
-      '<div class="empty-state compact">Detailed history could not be loaded. The overview remains available.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("dialog.history_failed"))}</div>`;
     $("#dialog-source").textContent = String(error?.message || error);
     return;
   }
@@ -2685,16 +2682,19 @@ async function openMetric(id, invoker = document.activeElement) {
   const change = recentChange(metric);
   const related = relatedBreadthStats(metric);
   const dateLabel = context?.date_semantics === "effective_vs_verified"
-    ? "Effective/change date"
-    : "Source observation";
+    ? t("dialog.effective_date")
+    : t("dialog.source_observation");
   const baseStats = [
-    { value: formatValue(metric.latest.value, metric.metric.units), label: "Current value" },
-    { value: formatChange(change), label: "Last observation" },
+    { value: formatValue(metric.latest.value, metric.metric.units), label: t("dialog.current_value") },
+    { value: formatChange(change), label: t("dialog.last_observation") },
     { value: p.value, label: p.label },
-    { value: escapeHtml(metric.latest.as_of || "—"), label: dateLabel },
+    { value: escapeHtml(localeDate(metric.latest.as_of || "—")), label: dateLabel },
   ];
   const stats = related.length
-    ? related.map((item) => ({ value: item.value, label: `${item.label} · ${item.asOf}` }))
+    ? related.map((item) => ({
+        value: item.value,
+        label: `${item.label} · ${localeDate(item.asOf)}`,
+      }))
     : baseStats;
   $("#dialog-summary").innerHTML = stats
     .map((item) => `<div class="detail-stat"><strong>${item.value}</strong><span>${escapeHtml(item.label)}</span></div>`)
@@ -2703,18 +2703,20 @@ async function openMetric(id, invoker = document.activeElement) {
   fullChart(metric, $("#dialog-chart"), { height: 390 });
   const membershipContext =
     metric.source?.membership_mode
-      ? ` · membership: ${escapeHtml(metric.source.membership_mode)}`
+      ? ` · ${escapeHtml(t("dialog.membership"))}: ${escapeHtml(metric.source.membership_mode)}`
       : "";
   const verifiedLabel = context?.date_semantics === "effective_vs_verified"
-    ? "Source verified"
-    : "Snapshot fetched";
+    ? t("dialog.source_verified")
+    : t("dialog.snapshot_fetched");
+  const freshnessState = effectiveFreshness(metric).state;
+  const freshnessKey = `common.${freshnessState}`;
+  const freshnessLabel = t(freshnessKey) === freshnessKey ? freshnessState : t(freshnessKey);
   $("#dialog-source").innerHTML =
     `${metricContextGuide(metric)}
      ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)} ${escapeHtml(percentileCaveatSentence(metric))}</p>`}
-     <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
-     ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
+     <div class="source-meta">${escapeHtml(t("dialog.source"))}: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
+     ${escapeHtml(verifiedLabel)}: ${escapeHtml(metric.latest.fetched_at || "—")} · ${escapeHtml(t("lineage.freshness"))}: ${escapeHtml(freshnessLabel)} · ${escapeHtml(t("dialog.history_starts"))}: ${escapeHtml(localeDate(metric.coverage.history_start || "—"))}${membershipContext}</div>`;
 }
-
 
 function flattenRuleDetails(rule, out = []) {
   if (!rule) return out;
