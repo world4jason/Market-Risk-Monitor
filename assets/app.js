@@ -2396,7 +2396,7 @@ function renderTrendParticipation() {
     if (legend) legend.hidden = true;
     if (studyBlock) studyBlock.hidden = true;
     summaryEl.innerHTML =
-      '<div class="optional-state"><strong>Trend Participation — unavailable in the public release</strong><span>Point-in-time S&P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>';
+      `<div class="optional-state"><strong>${escapeHtml(t("trend.unavailableTitle"))}</strong><span>${escapeHtml(t("trend.unavailableDetail"))}</span></div>`;
     return;
   }
 
@@ -2410,15 +2410,18 @@ function renderTrendParticipation() {
     .map((horizon) => {
       const metric = metrics[horizon];
       if (!metric) {
-        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>not published</small></div>`;
+        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>${escapeHtml(t("trend.notPublished"))}</small></div>`;
       }
       const pct = rollingPercentile(metric);
       const eligibility = historicalAnalysisEligibility(metric);
       const context = !eligibility.allowed
-        ? `non-PIT history · ${eligibility.reason}`
+        ? t("trend.nonPit", { reason: eligibility.reason })
         : (pct == null
-            ? "historical percentile unavailable"
-            : `${ordinal(pct)} percentile vs ${rollingWindowLabel(metric)}`);
+            ? t("trend.percentileUnavailable")
+            : t("trend.percentileContext", {
+                percentile: ordinal(pct),
+                window: rollingWindowLabel(metric),
+              }));
       return `<button class="trend-stat" type="button" data-ma-metric="${metric.metric.id}">
         <span>${horizon}DMA</span>
         <strong>${formatValue(metric.latest?.value, "percent")}</strong>
@@ -2444,24 +2447,26 @@ function renderMaBreadthStudy() {
   if (!statusEl || !summaryEl || !bodyEl) return;
 
   if (!study) {
-    statusEl.textContent = "Study snapshot not loaded";
+    statusEl.textContent = t("trend.studyNotLoaded");
     summaryEl.innerHTML =
-      '<div class="empty-state compact">Build the study after loading point-in-time 50DMA breadth and SPX price history.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("trend.studyBuild"))}</div>`;
     bodyEl.innerHTML =
-      '<tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>';
+      `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("trend.noEpisodes"))}</td></tr>`;
     return;
   }
 
   if (study.status !== "ready") {
-    statusEl.textContent = study.status.replaceAll("_", " ");
-    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || "Event study is not canonical for this source.")}</div>`;
+    statusEl.textContent = statusLabel(study.status);
+    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || t("trend.studyNonCanonical"))}</div>`;
     bodyEl.innerHTML =
-      '<tr><td colspan="9" class="empty-cell">Canonical episode table unavailable for this source.</td></tr>';
+      `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("trend.studyCanonicalUnavailable"))}</td></tr>`;
     return;
   }
 
-  statusEl.textContent =
-    `${study.events?.length || 0} events · cooldown ${study.cooldown_sessions} sessions · descriptive only`;
+  statusEl.textContent = t("trend.studyStatus", {
+    events: study.events?.length || 0,
+    cooldown: study.cooldown_sessions,
+  });
 
   const preferred = (study.summaries || []).filter(
     (row) =>
@@ -2486,12 +2491,17 @@ function renderMaBreadthStudy() {
               ? "—"
               : `${row.median_max_adverse_excursion_pct.toFixed(2)}%`;
           return `<div class="ma-study-card">
-            <strong>Cross &lt; ${row.threshold}% · ${row.horizon}</strong>
-            <span>n=${row.sample_count} · median ${medianText} · positive ${hitText} · median MAE ${maeText}</span>
+            <strong>${currentLocale === "zh-TW" ? "跌破" : "Cross <"} ${row.threshold}% · ${row.horizon}</strong>
+            <span>${escapeHtml(t("trend.studySummary", {
+              n: row.sample_count,
+              median: medianText,
+              positive: hitText,
+              mae: maeText,
+            }))}</span>
           </div>`;
         })
         .join("")
-    : '<div class="empty-state compact">No completed forward-return windows yet.</div>';
+    : `<div class="empty-state compact">${escapeHtml(t("trend.noForwardWindows"))}</div>`;
 
   const formatReturn = (value) =>
     value == null ? "—" : `${value >= 0 ? "+" : ""}${Number(value).toFixed(2)}%`;
@@ -2511,10 +2521,10 @@ function renderMaBreadthStudy() {
           <td>${formatReturn(event.forward_returns_pct?.["1M"])}</td>
           <td>${formatReturn(event.forward_returns_pct?.["3M"])}</td>
           <td>${formatReturn(event.forward_returns_pct?.["6M"])}</td>
-          <td>${event.sessions_to_63d_low == null ? "—" : `${event.sessions_to_63d_low} sessions`}</td>
+          <td>${event.sessions_to_63d_low == null ? "—" : t("trend.sessions", { count: event.sessions_to_63d_low })}</td>
         </tr>`)
         .join("")
-    : '<tr><td colspan="9" class="empty-cell">No threshold-study episodes available.</td></tr>';
+    : `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("trend.noEpisodesAvailable"))}</td></tr>`;
 }
 
 function renderTrendParticipationChart() {
