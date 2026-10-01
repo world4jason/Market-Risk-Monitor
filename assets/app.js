@@ -2657,7 +2657,7 @@ function renderRegime() {
 
   if (!metrics.length) {
     grid.innerHTML =
-      '<div class="empty-state compact">Published U.S. metric health is unavailable.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("regime.usUnavailable"))}</div>`;
     if (details) details.open = true;
     return;
   }
@@ -2682,11 +2682,16 @@ function renderRegime() {
         (m) => effectiveFreshness(m).state !== "fresh",
       ).length;
       const current = metricsForPillar.length - notCurrent;
+      const metricWord = t(metricsForPillar.length === 1 ? "regime.metric.one" : "regime.metric.many");
 
       return `<div class="regime-cell">
         <p class="eyebrow">${escapeHtml(pillarLabel(pillar))}</p>
-        <div class="regime-value">${notCurrent ? `${notCurrent} not current` : "Data current"}</div>
-        <div class="regime-note">${current} of ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"} current</div>
+        <div class="regime-value">${escapeHtml(notCurrent ? t("regime.notCurrent", { count: notCurrent }) : t("health.dataCurrent"))}</div>
+        <div class="regime-note">${escapeHtml(t("regime.currentCount", {
+          current,
+          total: metricsForPillar.length,
+          metricWord,
+        }))}</div>
       </div>`;
     })
     .join("");
@@ -2700,7 +2705,7 @@ function renderCoverage() {
 
   if (!metrics.length) {
     tbody.innerHTML =
-      '<tr><td colspan="6" class="empty-cell">No generated metrics yet.</td></tr>';
+      `<tr><td colspan="6" class="empty-cell">${escapeHtml(t("lineage.noMetrics"))}</td></tr>`;
     return;
   }
 
