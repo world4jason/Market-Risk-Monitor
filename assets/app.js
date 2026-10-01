@@ -264,19 +264,27 @@ function formatValue(value, units) {
   const v = Number(value);
 
   if (units === "USD millions") {
-    if (Math.abs(v) >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}T`;
-    if (Math.abs(v) >= 1_000) return `$${(v / 1_000).toFixed(1)}B`;
-    return `$${v.toFixed(0)}M`;
+    if (Math.abs(v) >= 1_000_000) {
+      return `$${localeNumber(v / 1_000_000, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}T`;
+    }
+    if (Math.abs(v) >= 1_000) {
+      return `$${localeNumber(v / 1_000, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}B`;
+    }
+    return `$${localeNumber(v, { maximumFractionDigits: 0 })}M`;
   }
-  if (units === "percent") return `${v.toFixed(Math.abs(v) >= 10 ? 1 : 2)}%`;
-  if (units === "percentile") return ordinal(v);
-  if (units === "ratio") return `${v.toFixed(2)}×`;
-  if (units === "binary") return v ? "Yes" : "No";
-  if (units === "basis points") return `${v >= 0 ? "+" : ""}${v.toFixed(1)} bp`;
-  if (Math.abs(v) >= 1000) {
-    return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  if (units === "percent") {
+    const digits = Math.abs(v) >= 10 ? 1 : 2;
+    return `${localeNumber(v, { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
   }
-  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (units === "percentile") return localeOrdinal(v);
+  if (units === "ratio") return `${localeNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}×`;
+  if (units === "binary") return v ? t("common.yes") : t("common.no");
+  if (units === "basis points") {
+    return `${v >= 0 ? "+" : ""}${localeNumber(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} bp`;
+  }
+  return localeNumber(v, {
+    maximumFractionDigits: Math.abs(v) >= 1000 ? 1 : 2,
+  });
 }
 
 function effectiveFreshness(metric) {
@@ -343,21 +351,7 @@ function defaultRollingWindow(metric) {
 
 
 function ordinal(value) {
-  if (value == null || !Number.isFinite(Number(value))) return "—";
-  const n = Math.round(Number(value));
-  const mod100 = Math.abs(n) % 100;
-  const mod10 = Math.abs(n) % 10;
-  const suffix =
-    mod100 >= 11 && mod100 <= 13
-      ? "th"
-      : mod10 === 1
-        ? "st"
-        : mod10 === 2
-          ? "nd"
-          : mod10 === 3
-            ? "rd"
-            : "th";
-  return `${n}${suffix}`;
+  return localeOrdinal(value);
 }
 
 function rollingWindowLabel(metric) {
@@ -370,54 +364,60 @@ function rollingWindowLabel(metric) {
   if (frequency === "monthly") years = window / 12;
   if (years != null && Number.isFinite(years)) {
     const rounded = Math.max(1, Math.round(years));
-    return `last ${rounded} year${rounded === 1 ? "" : "s"}`;
+    return t("percentile.last_years", {
+      count: localeNumber(rounded),
+      unit: t(rounded === 1 ? "percentile.year" : "percentile.years"),
+    });
   }
-  return `last ${window.toLocaleString()} observations`;
+  return t("percentile.last_observations", { count: localeNumber(window) });
 }
 
 function percentilePresentation(metric, value = rollingPercentile(metric)) {
   if (value == null) {
     return {
       value: "—",
-      label: "not enough history for percentile",
-      sentence: "Historical percentile is not available for this comparison."
+      label: t("percentile.not_enough"),
+      sentence: t("percentile.unavailable_sentence"),
     };
   }
   const rounded = Math.round(value);
   const window = rollingWindowLabel(metric);
   return {
     value: ordinal(rounded),
-    label: `percentile vs ${window}`,
-    sentence: `Higher than about ${rounded}% of observations in the ${window} comparison window.`
+    label: t("percentile.vs", { window }),
+    sentence: t("percentile.sentence", {
+      percent: localeNumber(rounded),
+      window,
+    }),
   };
 }
 
 function metricDateLine(metric) {
-  const context = beginnerContext[metric?.metric?.id];
+  const context = metricContext(metric?.metric?.id);
   const asOf = metric?.latest?.as_of || "unknown";
   if (context?.date_semantics === "effective_vs_verified") {
     const verified = String(metric?.latest?.fetched_at || "").slice(0, 10) || "unknown";
-    return `effective since ${asOf} · source verified ${verified}`;
+    return `${t("common.effective_since", { date: localeDate(asOf) })} · ${t("common.source_verified", { date: localeDate(verified) })}`;
   }
-  return `as of ${asOf}`;
+  return t("common.as_of", { date: localeDate(asOf) });
 }
 
 function metricContextGuide(metric) {
-  const context = beginnerContext[metric?.metric?.id];
+  const context = metricContext(metric?.metric?.id);
   if (!context) return "";
   const reference = context.important_reference_level
-    ? `<dt>Reference</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
+    ? `<dt>${escapeHtml(t("guide.reference"))}</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
     : "";
   const caveat = dynamicMetricCaveat(metric) || context.important_caveat;
   return `<div class="context-guide">
     <h3>${escapeHtml(context.plain_name)}</h3>
     <p>${escapeHtml(context.what_it_measures)}</p>
     <dl>
-      <dt>Why it matters</dt><dd>${escapeHtml(context.why_it_matters)}</dd>
-      <dt>How to read</dt><dd>${escapeHtml(context.how_to_read)}</dd>
-      <dt>Direction</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
+      <dt>${escapeHtml(t("guide.why"))}</dt><dd>${escapeHtml(context.why_it_matters)}</dd>
+      <dt>${escapeHtml(t("guide.how"))}</dt><dd>${escapeHtml(context.how_to_read)}</dd>
+      <dt>${escapeHtml(t("guide.direction"))}</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
       ${reference}
-      <dt>Caveat</dt><dd>${escapeHtml(caveat)}</dd>
+      <dt>${escapeHtml(t("guide.caveat"))}</dt><dd>${escapeHtml(caveat)}</dd>
     </dl>
   </div>`;
 }
@@ -437,10 +437,10 @@ function usableObservationCount(metric) {
 function percentileContextSuffix(metric) {
   const parts = [];
   if (metric?.metric?.polarity === "contextual") {
-    parts.push("context only");
+    parts.push(t("context.only"));
   }
   if (rollingPercentileSemantics(metric) === "retrospective") {
-    parts.push("retrospective; not PIT/backtest-safe");
+    parts.push(t("context.retrospective"));
   }
   return parts.length ? ` · ${parts.join(" · ")}` : "";
 }
@@ -448,11 +448,17 @@ function percentileContextSuffix(metric) {
 function percentileCaveatSentence(metric) {
   const parts = [];
   if (metric?.metric?.polarity === "contextual") {
-    parts.push("This rank is context only; it is not a risk direction.");
+    parts.push(
+      getLocale() === "zh-TW"
+        ? "這個排名只供情境參考，不代表風險方向。"
+        : "This rank is context only; it is not a risk direction.",
+    );
   }
   if (rollingPercentileSemantics(metric) === "retrospective") {
     parts.push(
-      "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
+      getLocale() === "zh-TW"
+        ? "這是回溯性的目前排名，不適合歷史 PIT / 回測使用。"
+        : "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
     );
   }
   return parts.join(" ");
@@ -493,7 +499,10 @@ function marginMomentumEvidence(condition) {
     typeof periods !== "number" ||
     !Number.isFinite(periods)
   ) return null;
-  return `YoY growth slowed ${Math.abs(value).toFixed(1)} pp over ${periods} monthly observations`;
+  return t("margin.slowed_evidence", {
+    value: localeNumber(Math.abs(value), { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+    periods: localeNumber(periods),
+  });
 }
 
 function taiwanBreadthState(metric) {
@@ -522,41 +531,41 @@ function taiwanBreadthState(metric) {
 function dynamicMetricCaveat(metric) {
   if (metric?.metric?.id !== "tw_advance_decline_pct") return null;
   const breadth = taiwanBreadthState(metric);
-  if (breadth.state === "missing") {
-    return "No usable public breadth sessions are currently available.";
-  }
-  if (breadth.state === "snapshot_only") {
-    return "Only 1 published breadth session is available. This is a one-session participation snapshot, not a trend or percentile conclusion.";
-  }
+  if (breadth.state === "missing") return t("breadth.no_sessions");
+  if (breadth.state === "snapshot_only") return t("breadth.one_session");
   if (breadth.state === "history_building") {
-    return `${breadth.observations} published breadth sessions are available. Multi-session history is accumulating, but the configured historical percentile still lacks sufficient observations.`;
+    return t("breadth.history_building", { count: localeNumber(breadth.observations) });
   }
   if (breadth.state === "not_current") {
-    return `Published breadth history exists, but its current freshness state is ${breadth.freshness}; current trend interpretation needs caution.`;
+    return t("breadth.not_current", {
+      state: t(`common.${breadth.freshness}`),
+    });
   }
   return null;
 }
 
 function formatRuleDetail(detail) {
-  const parts = [`${detail.label}: ${detail.status}`];
-  if (
-    typeof detail.value === "number" &&
-    Number.isFinite(detail.value)
-  ) {
-    const value = detail.value;
+  const statusKey = `common.${String(detail.status || "unknown").replaceAll(" ", "_")}`;
+  const status = t(statusKey) === statusKey ? detail.status : t(statusKey);
+  const parts = [`${detail.label}: ${status}`];
+  if (typeof detail.value === "number" && Number.isFinite(detail.value)) {
     const unit =
       detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"
         ? " pp"
         : "";
-    parts.push(`observed ${value.toFixed(2)}${unit}`);
+    parts.push(
+      t("rule.observed", {
+        value: localeNumber(detail.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        unit,
+      }),
+    );
   }
-  if (detail.asOf) parts.push(`as of ${detail.asOf}`);
+  if (detail.asOf) parts.push(t("rule.as_of", { date: localeDate(detail.asOf) }));
   const line = escapeHtml(parts.join(" · "));
   return detail.reason
     ? `${line}<br><span class="signal-rule-reason">${escapeHtml(detail.reason)}</span>`
     : line;
 }
-
 
 function setSnapshotCard(kind, status, headline, facts = [], displayState = "normal") {
   const card = document.querySelector(`[data-overview-card="${kind}"]`);
@@ -572,7 +581,7 @@ function setSnapshotCard(kind, status, headline, facts = [], displayState = "nor
   const compactFacts = facts.filter(Boolean).slice(0, 2);
   factsEl.innerHTML = compactFacts.length
     ? compactFacts.map((fact) => `<span>${escapeHtml(fact)}</span>`).join("")
-    : "<span>No current supporting observation</span>";
+    : `<span>${escapeHtml(t("metric.no_support"))}</span>`;
 }
 
 function setOverviewHealth(headline, detail, displayState = "normal") {
@@ -610,9 +619,8 @@ function setDecisionThesis(title, summary, confidence, evidence = [], triggers =
     .filter((item) => item?.text)
     .slice(0, 3)
     .map((item) => `<div class="trigger-item"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.text)}</strong></div>`)
-    .join("") || '<span class="trigger-item">No configured escalation threshold is available.</span>';
+    .join("") || `<span class="trigger-item">${escapeHtml(t("rule.no_threshold"))}</span>`;
 }
-
 
 function observationAvailabilityDate(metric, observation) {
   if (observation?.availability_date) return observation.availability_date;
