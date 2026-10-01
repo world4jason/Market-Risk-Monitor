@@ -122,6 +122,7 @@ class UiContractTests(unittest.TestCase):
         cls.html = (ROOT / "index.html").read_text(encoding="utf-8")
         cls.app = (ROOT / "assets" / "app.js").read_text(encoding="utf-8")
         cls.styles = (ROOT / "assets" / "styles.css").read_text(encoding="utf-8")
+        cls.i18n = (ROOT / "assets" / "i18n.js").read_text(encoding="utf-8")
         cls.signals = json.loads(
             (ROOT / "data" / "generated" / "signals.json").read_text(encoding="utf-8")
         )
@@ -285,10 +286,10 @@ class UiContractTests(unittest.TestCase):
             overview,
         )
         freshness_guard = overview.index('taiexFreshness !== "fresh"')
-        refresh_wording = overview.index('taiwanHeadline = "No current call"')
+        refresh_wording = overview.index('taiwanHeadline = t("overview.no_current_call")')
         self.assertLess(freshness_guard, refresh_wording)
-        self.assertIn('taiwanStatus = String(taiexFreshness).toUpperCase()', overview)
-        self.assertIn('taiwanHeadline = "Market read available"', overview)
+        self.assertIn('const freshnessKey = `common.${taiexFreshness}`', overview)
+        self.assertIn('taiwanHeadline = t("overview.market_read")', overview)
 
     def test_missing_expected_stress_condition_cannot_render_reassuring_summary(self) -> None:
         overview = extract_function(self.app, "renderOverview")
@@ -300,10 +301,10 @@ class UiContractTests(unittest.TestCase):
             "expectedStressConditions.some((condition) => !condition)",
             overview,
         )
-        self.assertIn('stressUnknown ? "DATA GAP"', overview)
-        self.assertIn('stressUnknown ? "Known gauges calm"', overview)
-        self.assertIn('"Stress contained"', overview)
-        self.assertIn('"Known stress gauges are not elevated, but expected stress evidence is incomplete."', overview)
+        self.assertIn('stressUnknown ? "common.data_gap"', overview)
+        self.assertIn('stressUnknown ? "overview.known_gauges_calm"', overview)
+        self.assertIn('"overview.stress_contained"', overview)
+        self.assertIn('"thesis.stress_known_calm_partial"', overview)
 
     def test_margin_rollover_exposes_the_actual_positive_growth_deceleration_trigger(self) -> None:
         condition = next(
@@ -329,11 +330,11 @@ class UiContractTests(unittest.TestCase):
 
         self.assertIn('rule.metric === "finra_margin_debt_yoy_pct"', helper)
         self.assertIn('rule.type === "delta_periods_below"', helper)
-        self.assertIn("Math.abs(value).toFixed(1)", helper)
+        self.assertIn("localeNumber(Math.abs(value)", helper)
         self.assertIn('const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;', overview)
-        self.assertIn('slowing ? "High, growth slowing"', overview)
-        self.assertIn('"Leverage rolling over; stress not confirmed"', overview)
-        self.assertIn('YoY ${formatValue(marginYoy.latest?.value, "percent")}', overview)
+        self.assertIn('slowing ? "overview.high_growth_slowing"', overview)
+        self.assertIn('"thesis.leverage_rollover"', overview)
+        self.assertIn('"overview.yoy"', overview)
         self.assertIn("details.map(formatRuleDetail)", signals)
         self.assertIn("detail.reason", rule_detail)
 
@@ -347,10 +348,10 @@ class UiContractTests(unittest.TestCase):
         dialog = extract_function(self.app, "openMetric")
 
         self.assertIn('polarity === "contextual"', suffix)
-        self.assertIn('parts.push("context only")', suffix)
-        self.assertIn("retrospective; not PIT/backtest-safe", suffix)
+        self.assertIn('parts.push(t("context.only"))', suffix)
+        self.assertIn('parts.push(t("context.retrospective"))', suffix)
         self.assertIn("percentileContextSuffix(metric)", card)
-        self.assertIn('pct (context)', overview)
+        self.assertIn('"common.percentile_context"', overview)
         self.assertIn("percentileCaveatSentence(metric)", dialog)
         self.assertIn("it is not a risk direction", caveat)
         self.assertIn("not safe for historical PIT/backtest use", caveat)
@@ -363,7 +364,7 @@ class UiContractTests(unittest.TestCase):
 
         dynamic = extract_function(self.app, "dynamicMetricCaveat")
         self.assertIn('breadth.state === "snapshot_only"', dynamic)
-        self.assertIn("Only 1 published breadth session", dynamic)
+        self.assertIn('t("breadth.one_session")', dynamic)
         self.assertIn('breadth.state === "history_building"', dynamic)
 
     def test_optional_ma_family_is_compact_and_hidden_before_javascript_runs(self) -> None:
@@ -405,25 +406,30 @@ class UiContractTests(unittest.TestCase):
 
     def test_cbc_effective_and_verified_dates_remain_distinct(self) -> None:
         self.assertIn("effective_vs_verified", self.app)
-        self.assertIn("effective since", self.app)
-        self.assertIn("source verified", self.app)
+        self.assertIn('t("common.effective_since"', self.app)
+        self.assertIn('t("common.source_verified"', self.app)
 
     def test_deleveraging_unknown_remains_distinct_from_inactive(self) -> None:
         overview = extract_function(self.app, "renderOverview")
         signals = extract_function(self.app, "renderSignals")
-        self.assertIn("unavailable/unknown", signals)
-        self.assertIn("unknown is not inactive", signals)
-        self.assertIn('"Not confirmed"', overview)
-        self.assertIn('"LOW CONFIDENCE"', overview)
-        self.assertIn('${unknown} unknown', overview)
+        self.assertIn('"signal.summary_meta"', signals)
+        self.assertIn('"signal.evaluated"', signals)
+        self.assertIn('"overview.not_confirmed"', overview)
+        self.assertIn('"thesis.low"', overview)
+        self.assertIn('"overview.usable_unknown"', overview)
         self.assertIn('unknown ? "gap"', overview)
 
     def test_public_page_contains_no_operator_cli_recovery_commands(self) -> None:
         self.assertNotIn("python scripts/", self.html + "\n" + self.app)
 
-    def test_public_language_strategy_is_consistently_english(self) -> None:
-        self.assertNotIn("古往今來", self.html)
-        self.assertIn("RESEARCH HISTORY", self.html)
+    def test_public_language_strategy_supports_en_and_zh_tw(self) -> None:
+        self.assertIn('data-locale="en"', self.html)
+        self.assertIn('data-locale="zh-TW"', self.html)
+        self.assertIn('src="./assets/i18n.js"', self.html)
+        self.assertIn('"en"', self.i18n)
+        self.assertIn('"zh-TW"', self.i18n)
+        self.assertIn("現在最重要的是什麼", self.i18n)
+        self.assertIn('document.documentElement.lang = locale', self.i18n)
 
 
 if __name__ == "__main__":
