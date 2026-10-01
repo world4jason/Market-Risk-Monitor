@@ -26,7 +26,7 @@
         <button class="language-option" type="button" data-locale="en" aria-pressed="true">EN</button>
         <button class="language-option" type="button" data-locale="zh-TW" aria-pressed="false">中文</button>
       </div>
-      <span id="global-freshness" class="badge badge-neutral">Loading data…</span>
+      <span id="global-freshness" class="badge badge-neutral" data-i18n="common.loading_data">Loading data…</span>
       <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme" data-i18n-aria-label="theme.toggle">◐</button>
     </div>
   </header>
@@ -63,37 +63,37 @@
         <a class="snapshot-card" data-overview-card="stress" data-state="loading" href="#us-detail">
           <div class="snapshot-card-top">
             <span class="snapshot-kicker" data-i18n="card.us_stress">U.S. stress</span>
-            <span id="overview-stress-status" class="snapshot-status">Loading</span>
+            <span id="overview-stress-status" class="snapshot-status" data-i18n="common.loading">Loading</span>
           </div>
           <strong id="overview-stress-value" class="snapshot-value">—</strong>
-          <div id="overview-stress-sub" class="snapshot-facts"><span>Waiting for current evidence</span></div>
+          <div id="overview-stress-sub" class="snapshot-facts"><span data-i18n="overview.wait_current">Waiting for current evidence</span></div>
         </a>
 
         <a class="snapshot-card" data-overview-card="leverage" data-state="loading" href="#us-detail">
           <div class="snapshot-card-top">
             <span class="snapshot-kicker" data-i18n="card.leverage">Leverage</span>
-            <span id="overview-leverage-status" class="snapshot-status">Loading</span>
+            <span id="overview-leverage-status" class="snapshot-status" data-i18n="common.loading">Loading</span>
           </div>
           <strong id="overview-leverage-value" class="snapshot-value">—</strong>
-          <div id="overview-leverage-sub" class="snapshot-facts"><span>Waiting for FINRA evidence</span></div>
+          <div id="overview-leverage-sub" class="snapshot-facts"><span data-i18n="overview.wait_finra">Waiting for FINRA evidence</span></div>
         </a>
 
         <a class="snapshot-card" data-overview-card="deleveraging" data-state="loading" href="#signals-detail">
           <div class="snapshot-card-top">
             <span class="snapshot-kicker" data-i18n="card.deleveraging">Deleveraging</span>
-            <span id="overview-deleveraging-status" class="snapshot-status">Loading</span>
+            <span id="overview-deleveraging-status" class="snapshot-status" data-i18n="common.loading">Loading</span>
           </div>
           <strong id="overview-deleveraging-value" class="snapshot-value">—</strong>
-          <div id="overview-deleveraging-sub" class="snapshot-facts"><span>Waiting for signal coverage</span></div>
+          <div id="overview-deleveraging-sub" class="snapshot-facts"><span data-i18n="overview.wait_signal">Waiting for signal coverage</span></div>
         </a>
 
         <a class="snapshot-card" data-overview-card="taiwan" data-state="loading" href="#taiwan-detail">
           <div class="snapshot-card-top">
             <span class="snapshot-kicker" data-i18n="card.taiwan">Taiwan</span>
-            <span id="overview-taiwan-status" class="snapshot-status">Loading</span>
+            <span id="overview-taiwan-status" class="snapshot-status" data-i18n="common.loading">Loading</span>
           </div>
           <strong id="overview-taiwan-value" class="snapshot-value">—</strong>
-          <div id="overview-taiwan-sub" class="snapshot-facts"><span>Waiting for TAIEX evidence</span></div>
+          <div id="overview-taiwan-sub" class="snapshot-facts"><span data-i18n="overview.wait_taiwan">Waiting for TAIEX evidence</span></div>
         </a>
       </div>
 
@@ -125,8 +125,8 @@
       <p class="section-intro" data-i18n="us.intro">Lead conclusions are summarized above. Open any metric for the definition, reading guide, caveat, history, source, and freshness.</p>
       <div id="metric-grid" class="metric-grid">
         <div class="panel empty-state">
-          <strong>Current U.S. snapshot is unavailable.</strong>
-          <span>Source and freshness details will appear when a published snapshot is available.</span>
+          <strong data-i18n="us.unavailable">Current U.S. snapshot is unavailable.</strong>
+          <span data-i18n="us.unavailable_note">Source and freshness details will appear when a published snapshot is available.</span>
         </div>
       </div>
     </section>
@@ -150,16 +150,16 @@
       </div>
       <div id="trend-panel" class="panel trend-panel">
         <div id="ma-summary" class="trend-summary">
-          <div class="optional-state"><strong>Trend Participation — unavailable in the public release</strong><span>Point-in-time S&amp;P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>
+          <div class="optional-state"><strong data-i18n="breadth.unavailable">Trend Participation — unavailable in the public release</strong><span data-i18n="breadth.unavailable_note">Point-in-time S&amp;P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>
         </div>
         <div id="ma-chart" class="chart-frame" hidden>
-          <div class="empty-state compact">Trend Participation history will appear here when published.</div>
+          <div class="empty-state compact" data-i18n="breadth.history_wait">Trend Participation history will appear here when published.</div>
         </div>
         <div id="trend-legend" class="trend-legend" hidden>
           <span><i class="line-swatch line-20"></i>20DMA</span>
           <span><i class="line-swatch line-50"></i>50DMA</span>
           <span><i class="line-swatch line-200"></i>200DMA</span>
-          <span class="meta">Heuristic bands are optional and non-canonical.</span>
+          <span class="meta" data-i18n="breadth.heuristic_note">Heuristic bands are optional and non-canonical.</span>
         </div>
         <div id="ma-study-block" hidden>
           <div class="signal-history-header">
@@ -186,7 +186,7 @@
                 </tr>
               </thead>
               <tbody id="ma-study-body">
-                <tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>
+                <tr><td colspan="9" class="empty-cell" data-i18n="study.no_episodes">No threshold-study episodes loaded.</td></tr>
               </tbody>
             </table>
           </div>
@@ -208,7 +208,7 @@
       </div>
       <div class="panel taiwan-panel">
         <div id="tw-state-grid" class="regime-grid">
-          <div class="empty-state compact">Taiwan snapshots not loaded yet.</div>
+          <div class="empty-state compact" data-i18n="taiwan.not_loaded">Taiwan snapshots not loaded yet.</div>
         </div>
         <div id="tw-metric-grid" class="metric-grid taiwan-metric-grid"></div>
         <div class="signal-history-header">
@@ -216,10 +216,10 @@
             <p class="eyebrow">TAIEX</p>
             <h3 data-i18n="taiwan.price_participation">Price &amp; participation context</h3>
           </div>
-          <span id="tw-history-status" class="meta">Coverage unavailable</span>
+          <span id="tw-history-status" class="meta" data-i18n="taiwan.coverage_unavailable">Coverage unavailable</span>
         </div>
         <div id="tw-taiex-chart" class="chart-frame">
-          <div class="empty-state compact">TAIEX history will appear here.</div>
+          <div class="empty-state compact" data-i18n="taiwan.history_wait">TAIEX history will appear here.</div>
         </div>
         <div class="signal-history-header">
           <div>
@@ -239,9 +239,9 @@
         </div>
         <div id="tw-event-list" class="event-list"></div>
         <div id="tw-event-chart" class="chart-frame short">
-          <div class="empty-state compact">Taiwan event comparison will appear here.</div>
+          <div class="empty-state compact" data-i18n="taiwan.event_wait">Taiwan event comparison will appear here.</div>
         </div>
-        <p class="disclaimer">Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and proprietary Breadth 1/2/3 formulas are not reproduced or guessed.</p>
+        <p class="disclaimer" data-i18n="taiwan.disclaimer">Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and proprietary Breadth 1/2/3 formulas are not reproduced or guessed.</p>
       </div>
     </section>
 
@@ -255,7 +255,7 @@
       </div>
       <div class="panel signal-panel">
         <div id="signal-summary" class="signal-summary">
-          <div class="empty-state compact">Signal snapshot not available.</div>
+          <div class="empty-state compact" data-i18n="signals.unavailable">Signal snapshot not available.</div>
         </div>
         <div id="signal-grid" class="signal-grid"></div>
         <div class="signal-history-header">
@@ -266,9 +266,9 @@
           <span class="meta" data-i18n="signals.history_meta">Publication lag is respected in historical evaluation</span>
         </div>
         <div id="signal-history-chart" class="chart-frame short">
-          <div class="empty-state compact">Historical signal state will appear here.</div>
+          <div class="empty-state compact" data-i18n="signals.history_wait">Historical signal state will appear here.</div>
         </div>
-        <p class="disclaimer">This is not a crash probability or trading score. Each condition remains independently visible and auditable; no single condition creates a crisis label.</p>
+        <p class="disclaimer" data-i18n="signals.disclaimer">This is not a crash probability or trading score. Each condition remains independently visible and auditable; no single condition creates a crisis label.</p>
       </div>
     </section>
 
@@ -292,11 +292,11 @@
           </div>
         </div>
         <div id="history-chart" class="chart-frame">
-          <div class="empty-state compact">Historical series will appear here.</div>
+          <div class="empty-state compact" data-i18n="research.history_wait">Historical series will appear here.</div>
         </div>
         <div class="chart-legend">
           <span id="history-mode-label"><i class="legend-dot"></i> Absolute level</span>
-          <span id="history-coverage">Coverage unavailable</span>
+          <span id="history-coverage" data-i18n="taiwan.coverage_unavailable">Coverage unavailable</span>
         </div>
       </div>
 
@@ -309,9 +309,9 @@
         </div>
         <div id="event-list" class="event-list"></div>
         <div id="event-chart" class="chart-frame short">
-          <div class="empty-state compact">Select a metric with sufficient event history.</div>
+          <div class="empty-state compact" data-i18n="research.select_history">Select a metric with sufficient event history.</div>
         </div>
-        <p class="meta">Event paths are indexed to 100 at each anchor. Missing pre-history stays unavailable rather than being backfilled with a proxy.</p>
+        <p class="meta" data-i18n="research.event_note">Event paths are indexed to 100 at each anchor. Missing pre-history stays unavailable rather than being backfilled with a proxy.</p>
       </div>
     </section>
 
@@ -325,7 +325,7 @@
       </summary>
       <div class="panel hero-panel">
         <div id="regime-grid" class="regime-grid">
-          <div class="empty-state compact">Waiting for production snapshots.</div>
+          <div class="empty-state compact" data-i18n="data_health.wait">Waiting for production snapshots.</div>
         </div>
         <p class="disclaimer">Freshness and coverage only. This reports whether each pillar's data is current, not how risky the market is; there is no pillar-level risk score.</p>
       </div>
@@ -351,7 +351,7 @@
             </tr>
           </thead>
           <tbody id="coverage-body">
-            <tr><td colspan="6" class="empty-cell">No generated metrics yet.</td></tr>
+            <tr><td colspan="6" class="empty-cell" data-i18n="lineage.empty">No generated metrics yet.</td></tr>
           </tbody>
         </table>
       </div>
