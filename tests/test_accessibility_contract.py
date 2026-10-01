@@ -18,7 +18,7 @@ class AccessibilityContractTests(unittest.TestCase):
     def test_metric_cards_expose_button_equivalent_semantics(self) -> None:
         self.assertIn('role="button"', self.app)
         self.assertIn('tabindex="0"', self.app)
-        self.assertIn('aria-label="Open ${escapeHtml(title)} details and history"', self.app)
+        self.assertIn('t("metric.open_aria", { name: title })', self.app)
         self.assertIn('event.preventDefault()', self.app)
         self.assertIn('openMetric(card.dataset.metricId, card)', self.app)
 
@@ -34,7 +34,7 @@ class AccessibilityContractTests(unittest.TestCase):
             self.html,
         )
         self.assertIn('id="dialog-close"', self.html)
-        self.assertIn('aria-label="Close metric details"', self.html)
+        self.assertIn('data-i18n-aria-label="dialog.close"', self.html)
         self.assertIn("function setupDialogFocusManagement()", self.app)
         self.assertIn('dialog.addEventListener("close"', self.app)
         self.assertIn('$("#dialog-close")?.focus()', self.app)
