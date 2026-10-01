@@ -959,6 +959,7 @@ function escapeHtml(value) {
 function formatValue(value, units) {
   if (value == null || Number.isNaN(Number(value))) return "—";
   const v = Number(value);
+  const locale = currentLocale === "zh-TW" ? "zh-TW" : "en-US";
 
   if (units === "USD millions") {
     if (Math.abs(v) >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}T`;
@@ -968,12 +969,12 @@ function formatValue(value, units) {
   if (units === "percent") return `${v.toFixed(Math.abs(v) >= 10 ? 1 : 2)}%`;
   if (units === "percentile") return ordinal(v);
   if (units === "ratio") return `${v.toFixed(2)}×`;
-  if (units === "binary") return v ? "Yes" : "No";
+  if (units === "binary") return currentLocale === "zh-TW" ? (v ? "是" : "否") : (v ? "Yes" : "No");
   if (units === "basis points") return `${v >= 0 ? "+" : ""}${v.toFixed(1)} bp`;
   if (Math.abs(v) >= 1000) {
-    return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    return v.toLocaleString(locale, { maximumFractionDigits: 1 });
   }
-  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return v.toLocaleString(locale, { maximumFractionDigits: 2 });
 }
 
 function effectiveFreshness(metric) {
@@ -1042,6 +1043,7 @@ function defaultRollingWindow(metric) {
 function ordinal(value) {
   if (value == null || !Number.isFinite(Number(value))) return "—";
   const n = Math.round(Number(value));
+  if (currentLocale === "zh-TW") return `第 ${n} 百分位`;
   const mod100 = Math.abs(n) % 100;
   const mod10 = Math.abs(n) % 10;
   const suffix =
