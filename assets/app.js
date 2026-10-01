@@ -1573,7 +1573,7 @@ function renderTrendParticipation() {
     if (legend) legend.hidden = true;
     if (studyBlock) studyBlock.hidden = true;
     summaryEl.innerHTML =
-      '<div class="optional-state"><strong>Trend Participation — unavailable in the public release</strong><span>Point-in-time S&P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>';
+      `<div class="optional-state"><strong>${escapeHtml(t("breadth.unavailable"))}</strong><span>${escapeHtml(t("breadth.unavailable_note"))}</span></div>`;
     return;
   }
 
@@ -1587,19 +1587,22 @@ function renderTrendParticipation() {
     .map((horizon) => {
       const metric = metrics[horizon];
       if (!metric) {
-        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>not published</small></div>`;
+        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>${escapeHtml(t("trend.not_published"))}</small></div>`;
       }
       const pct = rollingPercentile(metric);
       const eligibility = historicalAnalysisEligibility(metric);
       const context = !eligibility.allowed
-        ? `non-PIT history · ${eligibility.reason}`
+        ? t("trend.non_pit", { reason: eligibility.reason })
         : (pct == null
-            ? "historical percentile unavailable"
-            : `${ordinal(pct)} percentile vs ${rollingWindowLabel(metric)}`);
+            ? t("trend.percentile_unavailable")
+            : t("trend.percentile", {
+                value: ordinal(pct),
+                window: rollingWindowLabel(metric),
+              }));
       return `<button class="trend-stat" type="button" data-ma-metric="${metric.metric.id}">
         <span>${horizon}DMA</span>
         <strong>${formatValue(metric.latest?.value, "percent")}</strong>
-        <small>${escapeHtml(context)} · ${escapeHtml(metric.latest?.as_of || "—")}</small>
+        <small>${escapeHtml(context)} · ${escapeHtml(localeDate(metric.latest?.as_of || "—"))}</small>
       </button>`;
     })
     .join("");
@@ -1617,28 +1620,33 @@ function renderMaBreadthStudy() {
   const summaryEl = $("#ma-study-summary");
   const bodyEl = $("#ma-study-body");
   const study = state.maBreadthStudy;
-
   if (!statusEl || !summaryEl || !bodyEl) return;
 
   if (!study) {
-    statusEl.textContent = "Study snapshot not loaded";
+    statusEl.textContent = t("study.not_loaded");
     summaryEl.innerHTML =
-      '<div class="empty-state compact">Build the study after loading point-in-time 50DMA breadth and SPX price history.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("study.build_after_pit"))}</div>`;
     bodyEl.innerHTML =
-      '<tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>';
+      `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("study.no_episodes"))}</td></tr>`;
     return;
   }
 
   if (study.status !== "ready") {
-    statusEl.textContent = study.status.replaceAll("_", " ");
-    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || "Event study is not canonical for this source.")}</div>`;
+    const statusKey = `common.${study.status}`;
+    statusEl.textContent = t(statusKey) === statusKey
+      ? study.status.replaceAll("_", " ")
+      : t(statusKey);
+    summaryEl.innerHTML =
+      `<div class="empty-state compact">${escapeHtml(study.reason || t("study.not_canonical"))}</div>`;
     bodyEl.innerHTML =
-      '<tr><td colspan="9" class="empty-cell">Canonical episode table unavailable for this source.</td></tr>';
+      `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("study.canonical_unavailable"))}</td></tr>`;
     return;
   }
 
-  statusEl.textContent =
-    `${study.events?.length || 0} events · cooldown ${study.cooldown_sessions} sessions · descriptive only`;
+  statusEl.textContent = t("study.ready_status", {
+    events: localeNumber(study.events?.length || 0),
+    cooldown: localeNumber(study.cooldown_sessions),
+  });
 
   const preferred = (study.summaries || []).filter(
     (row) =>
@@ -1647,51 +1655,45 @@ function renderMaBreadthStudy() {
       ["1M", "3M"].includes(row.horizon),
   );
 
+  const formatPct = (value, digits = 2) =>
+    value == null
+      ? "—"
+      : `${value >= 0 ? "+" : ""}${localeNumber(Number(value), {
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits,
+        })}%`;
+
   summaryEl.innerHTML = preferred.length
-    ? preferred
-        .map((row) => {
-          const medianText =
-            row.median_return_pct == null
-              ? "—"
-              : `${row.median_return_pct >= 0 ? "+" : ""}${row.median_return_pct.toFixed(2)}%`;
-          const hitText =
-            row.positive_hit_rate_pct == null
-              ? "—"
-              : `${row.positive_hit_rate_pct.toFixed(0)}%`;
-          const maeText =
-            row.median_max_adverse_excursion_pct == null
-              ? "—"
-              : `${row.median_max_adverse_excursion_pct.toFixed(2)}%`;
-          return `<div class="ma-study-card">
-            <strong>Cross &lt; ${row.threshold}% · ${row.horizon}</strong>
-            <span>n=${row.sample_count} · median ${medianText} · positive ${hitText} · median MAE ${maeText}</span>
-          </div>`;
-        })
-        .join("")
-    : '<div class="empty-state compact">No completed forward-return windows yet.</div>';
+    ? preferred.map((row) => `<div class="ma-study-card">
+        <strong>${escapeHtml(t("study.cross", {
+          threshold: localeNumber(row.threshold),
+          horizon: row.horizon,
+        }))}</strong>
+        <span>${escapeHtml(t("study.summary", {
+          count: localeNumber(row.sample_count),
+          median: formatPct(row.median_return_pct),
+          positive: row.positive_hit_rate_pct == null ? "—" : `${localeNumber(row.positive_hit_rate_pct, { maximumFractionDigits: 0 })}%`,
+          mae: row.median_max_adverse_excursion_pct == null
+            ? "—"
+            : `${localeNumber(row.median_max_adverse_excursion_pct, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`,
+        }))}</span>
+      </div>`).join("")
+    : `<div class="empty-state compact">${escapeHtml(t("study.no_completed"))}</div>`;
 
-  const formatReturn = (value) =>
-    value == null ? "—" : `${value >= 0 ? "+" : ""}${Number(value).toFixed(2)}%`;
-
-  const events = [...(study.events || [])].sort((a, b) =>
-    a.date.localeCompare(b.date),
-  );
-
+  const events = [...(study.events || [])].sort((a, b) => a.date.localeCompare(b.date));
   bodyEl.innerHTML = events.length
-    ? events
-        .map((event) => `<tr>
-          <td>${escapeHtml(event.date)}</td>
-          <td>${escapeHtml(event.direction)} ${Number(event.threshold).toFixed(0)}%</td>
-          <td>${Number(event.breadth_value).toFixed(2)}%</td>
-          <td>${formatValue(event.price, "index")}</td>
-          <td>${formatReturn(event.forward_returns_pct?.["1W"])}</td>
-          <td>${formatReturn(event.forward_returns_pct?.["1M"])}</td>
-          <td>${formatReturn(event.forward_returns_pct?.["3M"])}</td>
-          <td>${formatReturn(event.forward_returns_pct?.["6M"])}</td>
-          <td>${event.sessions_to_63d_low == null ? "—" : `${event.sessions_to_63d_low} sessions`}</td>
-        </tr>`)
-        .join("")
-    : '<tr><td colspan="9" class="empty-cell">No threshold-study episodes available.</td></tr>';
+    ? events.map((event) => `<tr>
+        <td>${escapeHtml(localeDate(event.date))}</td>
+        <td>${escapeHtml(event.direction)} ${localeNumber(Number(event.threshold), { maximumFractionDigits: 0 })}%</td>
+        <td>${localeNumber(Number(event.breadth_value), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</td>
+        <td>${formatValue(event.price, "index")}</td>
+        <td>${formatPct(event.forward_returns_pct?.["1W"])}</td>
+        <td>${formatPct(event.forward_returns_pct?.["1M"])}</td>
+        <td>${formatPct(event.forward_returns_pct?.["3M"])}</td>
+        <td>${formatPct(event.forward_returns_pct?.["6M"])}</td>
+        <td>${event.sessions_to_63d_low == null ? "—" : escapeHtml(t("study.sessions", { count: localeNumber(event.sessions_to_63d_low) }))}</td>
+      </tr>`).join("")
+    : `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("study.no_available"))}</td></tr>`;
 }
 
 function renderTrendParticipationChart() {
@@ -2027,24 +2029,24 @@ function renderHistorySelector() {
   );
 
   if (!metrics.length) {
-    select.innerHTML = '<option value="">No metric data</option>';
+    select.innerHTML = `<option value="">${escapeHtml(t("research.no_metric"))}</option>`;
     $("#history-chart").innerHTML =
-      '<div class="empty-state compact">Historical series will appear here.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("research.history_wait"))}</div>`;
     return;
   }
 
   select.innerHTML = [
-    '<option value="">Select a metric to load history</option>',
-    ...metrics.map(
-      (m) =>
-        `<option value="${escapeHtml(m.metric.id)}">${escapeHtml(m.metric.name)}</option>`,
-    ),
+    `<option value="">${escapeHtml(t("history.select_metric"))}</option>`,
+    ...metrics.map((m) => {
+      const name = metricContext(m.metric.id)?.plain_name || m.metric.name;
+      return `<option value="${escapeHtml(m.metric.id)}">${escapeHtml(name)}</option>`;
+    }),
   ].join("");
 
   const rerender = async () => {
     if (!select.value) {
       $("#history-chart").innerHTML =
-        '<div class="empty-state compact">Select a metric to load its full history.</div>';
+        `<div class="empty-state compact">${escapeHtml(t("history.select_metric_prompt"))}</div>`;
       return;
     }
     await renderHistory(select.value, mode.value);
@@ -2052,7 +2054,7 @@ function renderHistorySelector() {
   select.onchange = rerender;
   mode.onchange = rerender;
   $("#history-chart").innerHTML =
-    '<div class="empty-state compact">Select a metric to load its full history.</div>';
+    `<div class="empty-state compact">${escapeHtml(t("history.select_metric_prompt"))}</div>`;
 }
 
 async function renderHistory(id, mode = "absolute") {
@@ -2065,49 +2067,38 @@ async function renderHistory(id, mode = "absolute") {
   } catch (error) {
     console.warn("history load failed", id, error);
     $("#history-chart").innerHTML =
-      '<div class="empty-state compact">This metric history could not be loaded.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.load_failed"))}</div>`;
     return;
   }
 
-  const percentileMode =
-    mode === "pit_percentile" || mode === "rolling_percentile";
+  const percentileMode = mode === "pit_percentile" || mode === "rolling_percentile";
   const eligibility = historicalAnalysisEligibility(metric);
-  const baselineType =
-    mode === "rolling_percentile"
-      ? "rolling_percentile"
-      : "full_history_percentile";
-  const baseline = percentileMode
-    ? baselineConfig(metric, baselineType)
-    : null;
+  const baselineType = mode === "rolling_percentile" ? "rolling_percentile" : "full_history_percentile";
+  const baseline = percentileMode ? baselineConfig(metric, baselineType) : null;
   const percentileBlocked =
-    percentileMode &&
-    (
-      !eligibility.allowed ||
-      !baseline ||
-      baseline.point_in_time !== true
-    );
+    percentileMode && (!eligibility.allowed || !baseline || baseline.point_in_time !== true);
 
   const view = historyView(metric, mode);
   if (percentileBlocked) {
-    const reason = !eligibility.allowed
-      ? eligibility.reason
-      : "the selected baseline is not declared point-in-time";
+    const reason = !eligibility.allowed ? eligibility.reason : t("history.baseline_not_pit");
     $("#history-chart").innerHTML =
-      `<div class="empty-state compact"><strong>Point-in-time historical view disabled.</strong><span>${escapeHtml(reason)}. Use Absolute level for retrospective history.</span></div>`;
+      `<div class="empty-state compact"><strong>${escapeHtml(t("history.pit_disabled"))}</strong><span>${escapeHtml(t("history.absolute_hint", { reason }))}</span></div>`;
   } else {
     fullChart(view, $("#history-chart"));
   }
 
   const available = (view.observations || []).filter((o) => o.value != null);
-  const modeLabel =
-    mode === "rate_change"
-      ? rateOfChangePeriods(metric).label
-      : historyModeLabels[mode] || historyModeLabels.absolute;
+  const modeLabel = mode === "rate_change"
+    ? rateOfChangePeriods(metric).label
+    : historyModeLabel(mode);
 
   $("#history-mode-label").innerHTML =
     `<i class="legend-dot"></i> ${escapeHtml(modeLabel)}`;
-  $("#history-coverage").textContent =
-    `${metric.coverage.history_start} → ${metric.coverage.history_end} · ${available.length.toLocaleString()} usable observations`;
+  $("#history-coverage").textContent = t("history.usable_observations", {
+    start: localeDate(metric.coverage.history_start),
+    end: localeDate(metric.coverage.history_end),
+    count: localeNumber(available.length),
+  });
 
   renderEvents(metric);
 }
