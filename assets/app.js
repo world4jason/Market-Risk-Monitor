@@ -3113,6 +3113,7 @@ async function loadData() {
   setupDeferredContextLoading();
 }
 
+setupLanguage();
 initTheme();
 setupDialogFocusManagement();
 $("#refresh-view").addEventListener("click", loadData);
