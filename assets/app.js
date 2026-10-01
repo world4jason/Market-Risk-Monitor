@@ -1015,7 +1015,7 @@ function freshnessBadge(metric) {
   const cls = ["fresh", "stale", "error", "missing"].includes(status)
     ? `badge-${status}`
     : "badge-neutral";
-  return `<span class="badge ${cls}">${escapeHtml(status.replaceAll("_", " "))}</span>`;
+  return `<span class="badge ${cls}">${escapeHtml(statusLabel(status))}</span>`;
 }
 
 function percentileRank(value, baseline) {
@@ -1067,25 +1067,29 @@ function rollingWindowLabel(metric) {
   if (frequency === "monthly") years = window / 12;
   if (years != null && Number.isFinite(years)) {
     const rounded = Math.max(1, Math.round(years));
-    return `last ${rounded} year${rounded === 1 ? "" : "s"}`;
+    return t("window.lastYears", {
+      count: localNumber(rounded),
+      plural: currentLocale === "en" && rounded !== 1 ? "s" : "",
+    });
   }
-  return `last ${window.toLocaleString()} observations`;
+  return t("window.lastObservations", { count: localNumber(window) });
 }
 
 function percentilePresentation(metric, value = rollingPercentile(metric)) {
   if (value == null) {
     return {
       value: "—",
-      label: "not enough history for percentile",
-      sentence: "Historical percentile is not available for this comparison."
+      label: t("percentile.notEnough"),
+      sentence: t("percentile.unavailable"),
     };
   }
   const rounded = Math.round(value);
   const window = rollingWindowLabel(metric);
+  const displayRank = currentLocale === "zh-TW" ? `第 ${rounded} 百分位` : ordinal(rounded);
   return {
-    value: ordinal(rounded),
-    label: `percentile vs ${window}`,
-    sentence: `Higher than about ${rounded}% of observations in the ${window} comparison window.`
+    value: displayRank,
+    label: t("percentile.label", { window }),
+    sentence: t("percentile.sentence", { percent: rounded, window }),
   };
 }
 
@@ -1094,27 +1098,27 @@ function metricDateLine(metric) {
   const asOf = metric?.latest?.as_of || "unknown";
   if (context?.date_semantics === "effective_vs_verified") {
     const verified = String(metric?.latest?.fetched_at || "").slice(0, 10) || "unknown";
-    return `effective since ${asOf} · source verified ${verified}`;
+    return t("date.effectiveVerified", { asOf, verified });
   }
-  return `as of ${asOf}`;
+  return t("date.asOf", { asOf });
 }
 
 function metricContextGuide(metric) {
   const context = localizedBeginnerContext(metric?.metric?.id);
   if (!context) return "";
   const reference = context.important_reference_level
-    ? `<dt>Reference</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
+    ? `<dt>${escapeHtml(t("guide.reference"))}</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
     : "";
   const caveat = dynamicMetricCaveat(metric) || context.important_caveat;
   return `<div class="context-guide">
     <h3>${escapeHtml(context.plain_name)}</h3>
     <p>${escapeHtml(context.what_it_measures)}</p>
     <dl>
-      <dt>Why it matters</dt><dd>${escapeHtml(context.why_it_matters)}</dd>
-      <dt>How to read</dt><dd>${escapeHtml(context.how_to_read)}</dd>
-      <dt>Direction</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
+      <dt>${escapeHtml(t("guide.why"))}</dt><dd>${escapeHtml(context.why_it_matters)}</dd>
+      <dt>${escapeHtml(t("guide.how"))}</dt><dd>${escapeHtml(context.how_to_read)}</dd>
+      <dt>${escapeHtml(t("guide.direction"))}</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
       ${reference}
-      <dt>Caveat</dt><dd>${escapeHtml(caveat)}</dd>
+      <dt>${escapeHtml(t("guide.caveat"))}</dt><dd>${escapeHtml(caveat)}</dd>
     </dl>
   </div>`;
 }
@@ -1134,10 +1138,10 @@ function usableObservationCount(metric) {
 function percentileContextSuffix(metric) {
   const parts = [];
   if (metric?.metric?.polarity === "contextual") {
-    parts.push("context only");
+    parts.push(t("context.contextOnly"));
   }
   if (rollingPercentileSemantics(metric) === "retrospective") {
-    parts.push("retrospective; not PIT/backtest-safe");
+    parts.push(t("context.retrospective"));
   }
   return parts.length ? ` · ${parts.join(" · ")}` : "";
 }
@@ -1145,12 +1149,10 @@ function percentileContextSuffix(metric) {
 function percentileCaveatSentence(metric) {
   const parts = [];
   if (metric?.metric?.polarity === "contextual") {
-    parts.push("This rank is context only; it is not a risk direction.");
+    parts.push(t("context.riskDirection"));
   }
   if (rollingPercentileSemantics(metric) === "retrospective") {
-    parts.push(
-      "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
-    );
+    parts.push(t("context.notPit"));
   }
   return parts.join(" ");
 }
@@ -1190,7 +1192,10 @@ function marginMomentumEvidence(condition) {
     typeof periods !== "number" ||
     !Number.isFinite(periods)
   ) return null;
-  return `YoY growth slowed ${Math.abs(value).toFixed(1)} pp over ${periods} monthly observations`;
+  return t("margin.slowing", {
+    value: Math.abs(value).toFixed(1),
+    periods,
+  });
 }
 
 function taiwanBreadthState(metric) {
@@ -1220,22 +1225,22 @@ function dynamicMetricCaveat(metric) {
   if (metric?.metric?.id !== "tw_advance_decline_pct") return null;
   const breadth = taiwanBreadthState(metric);
   if (breadth.state === "missing") {
-    return "No usable public breadth sessions are currently available.";
+    return t("breadth.none");
   }
   if (breadth.state === "snapshot_only") {
-    return "Only 1 published breadth session is available. This is a one-session participation snapshot, not a trend or percentile conclusion.";
+    return t("breadth.oneSession");
   }
   if (breadth.state === "history_building") {
-    return `${breadth.observations} published breadth sessions are available. Multi-session history is accumulating, but the configured historical percentile still lacks sufficient observations.`;
+    return t("breadth.historyBuilding", { count: localNumber(breadth.observations) });
   }
   if (breadth.state === "not_current") {
-    return `Published breadth history exists, but its current freshness state is ${breadth.freshness}; current trend interpretation needs caution.`;
+    return t("breadth.notCurrent", { freshness: statusLabel(breadth.freshness) });
   }
   return null;
 }
 
 function formatRuleDetail(detail) {
-  const parts = [`${detail.label}: ${detail.status}`];
+  const parts = [`${detail.label}: ${statusLabel(detail.status)}`];
   if (
     typeof detail.value === "number" &&
     Number.isFinite(detail.value)
@@ -1243,11 +1248,11 @@ function formatRuleDetail(detail) {
     const value = detail.value;
     const unit =
       detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"
-        ? " pp"
+        ? (currentLocale === "zh-TW" ? " 個百分點" : " pp")
         : "";
-    parts.push(`observed ${value.toFixed(2)}${unit}`);
+    parts.push(t("rule.observed", { value: value.toFixed(2), unit }));
   }
-  if (detail.asOf) parts.push(`as of ${detail.asOf}`);
+  if (detail.asOf) parts.push(t("rule.asOf", { date: detail.asOf }));
   const line = escapeHtml(parts.join(" · "));
   return detail.reason
     ? `${line}<br><span class="signal-rule-reason">${escapeHtml(detail.reason)}</span>`
@@ -1269,7 +1274,7 @@ function setSnapshotCard(kind, status, headline, facts = [], displayState = "nor
   const compactFacts = facts.filter(Boolean).slice(0, 2);
   factsEl.innerHTML = compactFacts.length
     ? compactFacts.map((fact) => `<span>${escapeHtml(fact)}</span>`).join("")
-    : "<span>No current supporting observation</span>";
+    : `<span>${escapeHtml(t("snapshot.noSupport"))}</span>`;
 }
 
 function setOverviewHealth(headline, detail, displayState = "normal") {
@@ -1307,7 +1312,7 @@ function setDecisionThesis(title, summary, confidence, evidence = [], triggers =
     .filter((item) => item?.text)
     .slice(0, 3)
     .map((item) => `<div class="trigger-item"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.text)}</strong></div>`)
-    .join("") || '<span class="trigger-item">No configured escalation threshold is available.</span>';
+    .join("") || `<span class="trigger-item">${escapeHtml(t("trigger.none"))}</span>`;
 }
 
 
