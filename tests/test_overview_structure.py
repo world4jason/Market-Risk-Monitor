@@ -22,9 +22,9 @@ class OverviewStructureTests(unittest.TestCase):
         ):
             self.assertIn(f'id="{element_id}"', self.html)
         self.assertIn("function setDecisionThesis(", self.js)
-        self.assertIn("WHAT CHANGES THE CALL", self.html)
-        self.assertIn("Margin-debt YoY", self.js)
-        self.assertIn("NYSE High-Low breadth", self.js)
+        self.assertIn('data-i18n="thesis.changes"', self.html)
+        self.assertIn('"trigger.margin_rule"', self.js)
+        self.assertIn('"trigger.breadth_rule"', self.js)
 
     def test_first_screen_has_exactly_four_snapshot_cards(self):
         cards = re.findall(r'data-overview-card="([^"]+)"', self.html)
