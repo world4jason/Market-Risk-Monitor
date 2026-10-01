@@ -1,12 +1,12 @@
-# Architecture: GitHub Pages without GitHub Actions
+# Architecture: Static GitHub Pages + scheduled data refresh
 
 Issue: #3
 
 ## Constraint
 
-GitHub Actions is unavailable for this repository. The site therefore cannot depend on a custom Actions workflow for build, data refresh, or deployment.
+The website must remain a publish-ready static application served directly from `main/(root)`. Pages deployment therefore does **not** depend on a custom GitHub Actions build.
 
-GitHub Pages can publish directly from a branch. GitHub's Pages documentation also documents using a `.nojekyll` file to bypass Jekyll processing when Actions is unavailable/disabled and the repository already contains publish-ready static files.
+GitHub Actions is used only as a data-refresh runner. The scheduled/manual workflow executes the same Python release command available locally, validates the resulting snapshots, and commits approved `data/generated/` changes back to `main`.
 
 References:
 - https://docs.github.com/en/pages/quickstart
@@ -42,7 +42,7 @@ Target publishing source:
 - Branch: **main**
 - Folder: **/(root)**
 
-The repository contains publish-ready static files and a root `.nojekyll` marker. No custom GHA workflow is required.
+The repository contains publish-ready static files and a root `.nojekyll` marker. No custom GHA **deployment** workflow is required; the only allowed workflow refreshes data.
 
 ## Frontend choice: buildless static application
 
@@ -68,7 +68,7 @@ Why:
 - is easy to inspect/debug;
 - keeps the repo itself equal to the deployed artifact;
 - avoids a second "generated site" branch;
-- keeps the no-GHA constraint explicit.
+- keeps static deployment separate from scheduled data refresh.
 
 A chart library may be loaded from a public CDN initially, or vendored later if fully offline/reproducible rendering is desired.
 
@@ -130,37 +130,33 @@ data/generated/    canonical UI contract
 
 For sources whose terms discourage redistribution, store only the minimum permissible derived/current data or fetch them during a refresh run; document the restriction in the catalog.
 
-## Refresh strategy without GHA
+## Refresh strategy
 
-### v0.1: explicit refresh command
+### Authoritative refresh command
 
-A local or agent-operated refresh command updates data:
+Local/manual refresh:
 
 ```bash
-python scripts/refresh_data.py
-python scripts/validate_data.py
-git add data/
-git commit -m "data: refresh market snapshots"
-git push
+python scripts/refresh_public_snapshot.py
 ```
 
-The data pipeline must be deterministic and runnable outside GitHub.
+The command:
+1. rehydrates CIER/NDC rolling-window history from the tracked canonical audit;
+2. downloads FINRA/Shiller and current Taiwan macro/rate sources;
+3. executes the exact public-source allowlist with `--clean-output`;
+4. runs the deterministic unit suite, artifact validation, publishing-policy validation, and Pages smoke test;
+5. restores the previous `data/generated/` tree if any step fails.
 
-This is intentionally separate from Pages deployment:
-- Pages serves whatever valid snapshots are committed.
-- A refresh failure does not corrupt the currently deployed snapshots.
-- The UI uses metadata to show whether the last committed snapshot is stale.
+### GitHub Actions scheduler
 
-### Future: external scheduler adapter
+`.github/workflows/refresh-public-snapshot.yml` provides:
+- `workflow_dispatch` for manual one-click refresh;
+- weekday `07:30 UTC` (~15:30 Asia/Taipei) after TWSE close;
+- weekday `22:30 UTC` (~06:30 Asia/Taipei) after the U.S. cash session.
 
-A future scheduler may run the **same** refresh/validation command on any external runner and commit only changed snapshots through a GitHub App/PAT.
+The job uses `contents: write`, commits only changed `data/generated/` files, and never deploys/builds the site itself. A failed run produces no push.
 
-Examples of possible runners:
-- a small VPS cron job;
-- a Cloudflare/other scheduled service plus a compatible ingestion implementation;
-- a hosted CI system other than GitHub Actions.
-
-The frontend contract must not change when the runner changes.
+The data pipeline remains deterministic and runnable outside GitHub. Pages simply serves the newest valid snapshot already committed to `main`; the frontend contract does not depend on which runner produced it.
 
 ## Secrets
 
@@ -269,7 +265,7 @@ The stable boundary is the generated JSON data contract defined in #4. The front
 
 - GitHub Pages branch source documented.
 - Buildless frontend documented.
-- Refresh path works without GHA.
+- Refresh path works locally and through the scheduled GitHub Actions runner.
 - No secret reaches the browser.
 - Stale/error behavior is explicit.
 - Future external scheduling is an adapter, not a frontend rewrite.
