@@ -58,6 +58,35 @@ h3 { margin-bottom: 4px; font-size: 1rem; }
 .eyebrow { margin-bottom: 7px; font-size: .72rem; letter-spacing: .13em; font-weight: 800; color: var(--muted); }
 .meta { color: var(--muted); font-size: .82rem; margin: 0; }
 .header-actions { display: flex; gap: 10px; align-items: center; }
+
+.language-control {
+  display: inline-flex;
+  align-items: center;
+}
+.language-select {
+  min-height: 42px;
+  padding: 0 30px 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.language-select:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+html[lang="zh-TW"] body {
+  font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+html[lang="zh-TW"] .eyebrow,
+html[lang="zh-TW"] .snapshot-kicker,
+html[lang="zh-TW"] .thesis-label,
+html[lang="zh-TW"] .health-strip-label {
+  letter-spacing: .08em;
+}
 .icon-button, .text-button, .select-control { border: 1px solid var(--line); background: var(--panel); color: var(--text); }
 .icon-button { width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.1rem; }
 .text-button { border-radius: 10px; padding: 8px 11px; cursor: pointer; }
@@ -189,6 +218,7 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
 @media (max-width: 640px) {
   .site-header { align-items: flex-start; padding-top: 26px; }
   .header-actions { flex-direction: column-reverse; align-items: flex-end; }
+  .language-select { min-height: 38px; }
   .metric-grid, .regime-grid, .signal-grid, .trend-summary, .ma-study-grid, .taiwan-panel .regime-grid { grid-template-columns: 1fr; }
   .section-heading {
     align-items: flex-start;
