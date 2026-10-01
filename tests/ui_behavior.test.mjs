@@ -103,7 +103,7 @@ function buildRuntime(fetchImpl = async () => {
 }) {
   const dom = createDom();
   const logs = { errors: [], warnings: [] };
-  const bootstrap = APP_SOURCE.lastIndexOf("\ninitTheme();");
+  const bootstrap = APP_SOURCE.lastIndexOf("\nsetupLanguage();");
   assert.notEqual(bootstrap, -1, "app bootstrap marker missing");
   const exports = `
 globalThis.__MRM__ = {
@@ -166,6 +166,7 @@ globalThis.__MRM__ = {
     clearTimeout,
   };
   vm.createContext(sandbox);
+  vm.runInContext(I18N_SOURCE, sandbox, { filename: "assets/i18n.js" });
   vm.runInContext(APP_SOURCE.slice(0, bootstrap) + exports, sandbox, {
     filename: "assets/app.js",
   });
