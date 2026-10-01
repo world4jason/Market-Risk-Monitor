@@ -549,10 +549,32 @@ function dynamicMetricCaveat(metric) {
   return null;
 }
 
+function ruleTranslationKey(rule) {
+  const metric = rule?.metric;
+  const type = rule?.type;
+  if (metric === "finra_margin_debt_yoy_pct" && type === "latest_below") return "rule.margin_yoy_zero";
+  if (metric === "finra_margin_debt_yoy_pct" && type === "delta_periods_below") return "rule.margin_yoy_slow";
+  if (metric === "nfci" && type === "latest_above") return "rule.nfci_zero";
+  if (metric === "nfci" && type === "delta_periods_above") return "rule.nfci_tightening";
+  if (metric === "nfci_risk" && type === "percentile_above") return "rule.risk_p90";
+  if (metric === "vix" && type === "percentile_above") return "rule.vix_p90";
+  if (metric === "shiller_real_tr_price" && type === "return_periods_below") return "rule.market_6m";
+  if (metric === "nyse_high_low_pct" && type === "percentile_below") return "rule.high_low_p10";
+  if (metric === "mrm_mcclellan_volume_summation" && type === "percentile_below") return "rule.volume_p10";
+  if (metric === "sp500_above_50dma_pct" && type === "percentile_below") return "rule.sp500_50_p10";
+  if (metric === "sp500_above_200dma_pct" && type === "percentile_below") return "rule.sp500_200_p10";
+  return null;
+}
+
+function localizedRuleLabel(rule) {
+  const key = ruleTranslationKey(rule);
+  return key ? t(key) : (rule?.label || rule?.type || "rule");
+}
+
 function formatRuleDetail(detail) {
   const statusKey = `common.${String(detail.status || "unknown").replaceAll(" ", "_")}`;
   const status = t(statusKey) === statusKey ? detail.status : t(statusKey);
-  const parts = [`${detail.label}: ${status}`];
+  const parts = [`${localizedRuleLabel(detail)}: ${status}`];
   if (typeof detail.value === "number" && Number.isFinite(detail.value)) {
     const unit =
       detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"
@@ -1322,7 +1344,7 @@ function renderOverview() {
       label: t("trigger.breadth"),
       text: Number.isFinite(breadthThreshold)
         ? t("trigger.breadth_rule", { value: breadthThreshold })
-        : (breadthTrigger?.label || t("trigger.breadth_fallback")),
+        : (breadthTrigger ? localizedRuleLabel(breadthTrigger) : t("trigger.breadth_fallback")),
     },
   ];
 
