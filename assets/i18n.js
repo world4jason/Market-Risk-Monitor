@@ -1,0 +1,661 @@
+const STORAGE_KEY = "mrm-locale";
+export const SUPPORTED_LOCALES = ["en", "zh-TW"];
+
+const messages = {
+  en: {
+    "language.label": "Language",
+    "nav.overview": "Overview",
+    "nav.us": "U.S.",
+    "nav.taiwan": "Taiwan",
+    "nav.research": "Research",
+    "theme.toggle": "Toggle theme",
+    "header.eyebrow": "MULTI-MARKET STRESS & BREADTH",
+    "header.subtitle": "Market stress, leverage and breadth — current first, fully auditable underneath.",
+    "overview.eyebrow": "MARKET SNAPSHOT",
+    "overview.title": "What matters now",
+    "overview.meta": "Current evidence · select any card to inspect the underlying data",
+    "thesis.current_read": "CURRENT READ",
+    "thesis.loading_confidence": "Loading confidence",
+    "thesis.loading_title": "Building the market read…",
+    "thesis.loading_summary": "Combining stress, leverage and deleveraging evidence without a hidden composite score.",
+    "thesis.evidence_aria": "Evidence behind current read",
+    "thesis.changes": "WHAT CHANGES THE CALL",
+    "thesis.waiting": "Waiting for signal thresholds…",
+    "card.us_stress": "U.S. stress",
+    "card.leverage": "Leverage",
+    "card.deleveraging": "Deleveraging",
+    "card.taiwan": "Taiwan",
+    "common.loading": "Loading",
+    "common.data_gap": "DATA GAP",
+    "common.watch": "WATCH",
+    "common.clear": "CLEAR",
+    "common.partial": "PARTIAL",
+    "common.current": "CURRENT",
+    "common.stale": "STALE",
+    "common.context": "CONTEXT",
+    "common.elevated": "ELEVATED",
+    "common.unknown": "unknown",
+    "common.active": "active",
+    "common.inactive": "inactive",
+    "common.fresh": "fresh",
+    "common.missing": "missing",
+    "common.error": "error",
+    "common.insufficient_data": "insufficient data",
+    "common.yes": "Yes",
+    "common.no": "No",
+    "common.as_of": "as of {date}",
+    "common.source_verified": "source verified {date}",
+    "common.effective_since": "effective since {date}",
+    "common.observations": "{count} observations",
+    "health.label": "DATA HEALTH",
+    "health.loading": "Loading snapshot health…",
+    "health.checking": "Freshness and evidence coverage are being checked.",
+    "health.inspect": "Inspect health →",
+    "health.current": "Snapshot current",
+    "health.needs_refresh": "Snapshot needs refresh",
+    "health.evidence_gaps": "Evidence gaps remain",
+    "health.source_issues": "Source issues",
+    "health.no_snapshot": "No production snapshot",
+    "health.data_current": "Data current",
+    "health.stale_count": "{count} stale",
+    "health.unknown_checks": "{count} unknown checks",
+    "health.snapshot": "snapshot {date}",
+    "health.error_count": "{count} error",
+    "health.missing_count": "{count} missing",
+    "health.insufficient_count": "{count} insufficient",
+    "market.us": "U.S. MARKET",
+    "market.taiwan": "TAIWAN MARKET",
+    "us.detail": "U.S. DETAIL",
+    "us.metrics": "Current U.S. metrics",
+    "us.reload": "Reload snapshot",
+    "us.intro": "Lead conclusions are summarized above. Open any metric for the definition, reading guide, caveat, history, source, and freshness.",
+    "us.unavailable": "Current U.S. snapshot is unavailable.",
+    "us.unavailable_note": "Source and freshness details will appear when a published snapshot is available.",
+    "breadth.eyebrow": "BREADTH / PARTICIPATION",
+    "breadth.title": "Trend Participation",
+    "breadth.custom_bands": "Custom heuristic bands",
+    "breadth.spx_overlay": "SPX overlay",
+    "breadth.unavailable": "Trend Participation — unavailable in the public release",
+    "breadth.unavailable_note": "Point-in-time S&P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.",
+    "breadth.history_wait": "Trend Participation history will appear here when published.",
+    "breadth.heuristic_note": "Heuristic bands are optional and non-canonical.",
+    "study.eyebrow": "THRESHOLD STUDY",
+    "study.title": "<25% / <15% historical outcomes",
+    "study.not_loaded": "Study snapshot not loaded",
+    "study.no_episodes": "No threshold-study episodes loaded.",
+    "table.date": "Date",
+    "table.cross": "Cross",
+    "table.breadth": "Breadth",
+    "table.spx": "SPX",
+    "table.local_low": "63d local low",
+    "taiwan.detail": "TAIWAN DETAIL",
+    "taiwan.title": "Taiwan Market Regime",
+    "taiwan.official_first": "Official-source first",
+    "taiwan.not_loaded": "Taiwan snapshots not loaded yet.",
+    "taiwan.price_participation": "Price & participation context",
+    "taiwan.coverage_unavailable": "Coverage unavailable",
+    "taiwan.history_wait": "TAIEX history will appear here.",
+    "taiwan.event_windows": "TAIWAN EVENT WINDOWS",
+    "taiwan.historical_regime": "Historical regime comparison",
+    "taiwan.event_normalized": "Event-normalized",
+    "taiwan.raw_level": "Raw level",
+    "taiwan.pit_percentile": "Point-in-time percentile",
+    "taiwan.event_wait": "Taiwan event comparison will appear here.",
+    "taiwan.disclaimer": "Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and proprietary Breadth 1/2/3 formulas are not reproduced or guessed.",
+    "signals.eyebrow": "CONCURRENT DETERIORATION",
+    "signals.title": "Deleveraging Watch",
+    "signals.meta": "Transparent conditions · unknown ≠ safe",
+    "signals.unavailable": "Signal snapshot not available.",
+    "signals.history": "HISTORICAL BACKFILL",
+    "signals.history_title": "Active and unknown conditions over time",
+    "signals.history_meta": "Publication lag is respected in historical evaluation",
+    "signals.history_wait": "Historical signal state will appear here.",
+    "signals.disclaimer": "This is not a crash probability or trading score. Each condition remains independently visible and auditable; no single condition creates a crisis label.",
+    "research.eyebrow": "RESEARCH HISTORY",
+    "research.title": "Historical context",
+    "research.no_metric": "No metric data",
+    "research.absolute": "Absolute level",
+    "research.pit_percentile": "Point-in-time percentile",
+    "research.rolling_percentile": "Rolling percentile",
+    "research.rate_change": "Rate of change",
+    "research.history_wait": "Historical series will appear here.",
+    "research.event_windows": "EVENT WINDOWS",
+    "research.cycle": "Cycle comparison",
+    "research.select_history": "Select a metric with sufficient event history.",
+    "research.event_note": "Event paths are indexed to 100 at each anchor. Missing pre-history stays unavailable rather than being backfilled with a proxy.",
+    "data_health.title": "Snapshot health by pillar",
+    "data_health.not_loaded": "Snapshot not loaded",
+    "data_health.wait": "Waiting for production snapshots.",
+    "data_health.disclaimer": "Freshness and coverage only. This reports whether each pillar's data is current, not how risky the market is; there is no pillar-level risk score.",
+    "lineage.eyebrow": "DATA LINEAGE",
+    "lineage.title": "Coverage & freshness",
+    "lineage.metric": "Metric",
+    "lineage.pillar": "Pillar",
+    "lineage.coverage": "Coverage",
+    "lineage.as_of": "As of",
+    "lineage.freshness": "Freshness",
+    "lineage.source": "Source",
+    "lineage.empty": "No generated metrics yet.",
+    "dialog.metric": "Metric",
+    "dialog.close": "Close metric details",
+    "footer.methodology": "Methodology",
+    "footer.data_sources": "Data sources",
+    "footer.taiwan_sources": "Taiwan sources",
+    "guide.why": "Why it matters",
+    "guide.how": "How to read",
+    "guide.direction": "Direction",
+    "guide.reference": "Reference",
+    "guide.caveat": "Caveat",
+    "metric.last_observation": "last observation",
+    "metric.open_explain": "Explain & view history ↗",
+    "metric.open_history": "Open history ↗",
+    "metric.open_aria": "Open {name} details and history",
+    "percentile.not_enough": "not enough history for percentile",
+    "percentile.unavailable_sentence": "Historical percentile is not available for this comparison.",
+    "percentile.vs": "percentile vs {window}",
+    "percentile.sentence": "Higher than about {percent}% of observations in the {window} comparison window.",
+    "percentile.last_years": "last {count} {unit}",
+    "percentile.last_observations": "last {count} observations",
+    "percentile.year": "year",
+    "percentile.years": "years",
+    "context.only": "context only",
+    "context.retrospective": "retrospective; not PIT/backtest-safe",
+    "thesis.low": "LOW CONFIDENCE",
+    "thesis.medium": "MEDIUM CONFIDENCE",
+    "thesis.high": "HIGH CONFIDENCE",
+    "thesis.stale": "STALE DATA",
+    "thesis.stress_rising_delev": "Stress rising; deleveraging signals appearing",
+    "thesis.stress_rising_no_delev": "Stress rising; deleveraging not confirmed",
+    "thesis.leverage_rollover": "Leverage rolling over; stress not confirmed",
+    "thesis.leverage_stretched": "Leverage stretched; stress not confirmed",
+    "thesis.known_calm_incomplete": "Known stress gauges calm; read incomplete",
+    "thesis.no_stress_confirmation": "No broad stress confirmation",
+    "thesis.stress_elevated": "At least one current stress check is elevated.",
+    "thesis.stress_known_calm_partial": "Known stress gauges are not elevated, but expected stress evidence is incomplete.",
+    "thesis.stress_not_elevated": "Current NFCI/VIX stress checks are not elevated.",
+    "thesis.margin_slowing": "Margin debt is still {yoy} YoY while growth momentum is slowing.",
+    "thesis.margin_growth": "Margin debt growth is {yoy} YoY.",
+    "thesis.delev_coverage": "{known}/{total} deleveraging checks are usable; {active} {verb} active.",
+    "thesis.is": "is",
+    "thesis.are": "are",
+    "thesis.evidence_stress": "Stress: {state}",
+    "thesis.evidence_leverage": "Leverage: {rank} vs 10y{yoy}",
+    "thesis.evidence_delev": "Deleveraging: {active} active / {known} known",
+    "thesis.evidence_snapshot": "Snapshot: {date}",
+    "thesis.state_elevated": "elevated",
+    "thesis.state_partial_calm": "partial / known gauges calm",
+    "thesis.state_not_elevated": "not elevated",
+    "trigger.stress": "Stress confirms",
+    "trigger.rollover": "Rollover deepens",
+    "trigger.breadth": "Breadth confirms",
+    "trigger.stress_rule": "NFCI ≥ {nfci} or VIX ≥ {vix}th percentile",
+    "trigger.margin_rule": "Margin-debt YoY ≤ {value}%",
+    "trigger.breadth_rule": "NYSE High-Low breadth ≤ {value}th percentile",
+    "overview.known_gauges_calm": "Known gauges calm",
+    "overview.stress_elevated": "Stress elevated",
+    "overview.stress_contained": "Stress contained",
+    "overview.conditions_looser": "Conditions looser than avg",
+    "overview.conditions_tighter": "Conditions tighter than avg",
+    "overview.high_growth_slowing": "High, growth slowing",
+    "overview.leverage_context": "Leverage context",
+    "overview.no_signal_read": "No signal read",
+    "overview.not_confirmed": "Not confirmed",
+    "overview.delev_signs": "Deleveraging signs",
+    "overview.no_confirmation": "No confirmation",
+    "overview.no_current_call": "No current call",
+    "overview.market_read": "Market read available",
+    "overview.price_current": "Price current",
+    "overview.breadth_unavailable": "Breadth unavailable",
+    "overview.margin_momentum": "Margin momentum slowing",
+    "overview.usable_unknown": "{known}/{total} usable · {unknown} unknown",
+    "overview.sessions": "{count} {unit}",
+    "overview.session": "session",
+    "overview.sessions_plural": "sessions",
+    "signal.known_summary": "{known} of {total} checks known",
+    "signal.summary_meta": "· {active} active · {unknown} unavailable/unknown",
+    "signal.evaluated": "Evaluated {date} · unknown is not inactive",
+    "signal.caveat_unknown": "Required public evidence is unavailable; this remains unknown rather than safe.",
+    "signal.caveat_label": "Caveat:",
+    "source.provider": "Provider",
+    "source.dataset": "Dataset",
+    "source.coverage": "Coverage",
+    "source.latest": "Latest",
+    "source.freshness": "Freshness"
+  },
+  "zh-TW": {
+    "language.label": "語言",
+    "nav.overview": "總覽",
+    "nav.us": "美國",
+    "nav.taiwan": "台灣",
+    "nav.research": "研究",
+    "theme.toggle": "切換深淺色主題",
+    "header.eyebrow": "多市場壓力與市場廣度",
+    "header.subtitle": "市場壓力、槓桿與廣度：先看現在，再往下追溯所有依據。",
+    "overview.eyebrow": "市場快照",
+    "overview.title": "現在最重要的是什麼",
+    "overview.meta": "目前證據 · 點選卡片查看底層資料",
+    "thesis.current_read": "目前判讀",
+    "thesis.loading_confidence": "載入信心程度",
+    "thesis.loading_title": "正在建立市場判讀…",
+    "thesis.loading_summary": "整合市場壓力、槓桿與去槓桿證據，不使用隱藏綜合分數。",
+    "thesis.evidence_aria": "目前判讀的證據",
+    "thesis.changes": "什麼會改變目前判讀",
+    "thesis.waiting": "等待訊號門檻…",
+    "card.us_stress": "美國市場壓力",
+    "card.leverage": "槓桿",
+    "card.deleveraging": "去槓桿",
+    "card.taiwan": "台灣",
+    "common.loading": "載入中",
+    "common.data_gap": "資料不足",
+    "common.watch": "注意",
+    "common.clear": "未觸發",
+    "common.partial": "部分可用",
+    "common.current": "最新",
+    "common.stale": "資料過期",
+    "common.context": "情境",
+    "common.elevated": "偏高",
+    "common.unknown": "未知",
+    "common.active": "觸發",
+    "common.inactive": "未觸發",
+    "common.fresh": "最新",
+    "common.missing": "缺資料",
+    "common.error": "錯誤",
+    "common.insufficient_data": "資料不足",
+    "common.yes": "是",
+    "common.no": "否",
+    "common.as_of": "截至 {date}",
+    "common.source_verified": "來源驗證 {date}",
+    "common.effective_since": "自 {date} 生效",
+    "common.observations": "{count} 筆觀測",
+    "health.label": "資料健康度",
+    "health.loading": "正在檢查快照健康度…",
+    "health.checking": "正在檢查資料新鮮度與證據完整性。",
+    "health.inspect": "查看資料健康度 →",
+    "health.current": "快照為最新",
+    "health.needs_refresh": "快照需要更新",
+    "health.evidence_gaps": "仍有證據缺口",
+    "health.source_issues": "來源有問題",
+    "health.no_snapshot": "沒有正式快照",
+    "health.data_current": "資料為最新",
+    "health.stale_count": "{count} 項過期",
+    "health.unknown_checks": "{count} 個檢查未知",
+    "health.snapshot": "快照 {date}",
+    "health.error_count": "{count} 項錯誤",
+    "health.missing_count": "{count} 項缺資料",
+    "health.insufficient_count": "{count} 項資料不足",
+    "market.us": "美國市場",
+    "market.taiwan": "台灣市場",
+    "us.detail": "美國詳細資料",
+    "us.metrics": "目前美國市場指標",
+    "us.reload": "重新載入快照",
+    "us.intro": "上方先給結論；點開任何指標可查看定義、讀法、限制、歷史、來源與新鮮度。",
+    "us.unavailable": "目前沒有可用的美國市場快照。",
+    "us.unavailable_note": "有發布正式快照後，這裡會顯示來源與新鮮度。",
+    "breadth.eyebrow": "市場廣度 / 參與度",
+    "breadth.title": "趨勢參與度",
+    "breadth.custom_bands": "自訂參考區間",
+    "breadth.spx_overlay": "疊加 SPX",
+    "breadth.unavailable": "趨勢參與度 — 公開版目前無資料",
+    "breadth.unavailable_note": "目前沒有具備可接受再散布權利的 S&P 500 點時成分股移動平均廣度歷史。缺少廣度時，去槓桿檢查維持未知。",
+    "breadth.history_wait": "發布資料後會在此顯示趨勢參與歷史。",
+    "breadth.heuristic_note": "參考區間為選配，不屬於標準判讀。",
+    "study.eyebrow": "門檻研究",
+    "study.title": "<25% / <15% 歷史結果",
+    "study.not_loaded": "尚未載入研究快照",
+    "study.no_episodes": "尚未載入門檻事件。",
+    "table.date": "日期",
+    "table.cross": "穿越",
+    "table.breadth": "廣度",
+    "table.spx": "SPX",
+    "table.local_low": "63 日區間低點",
+    "taiwan.detail": "台灣詳細資料",
+    "taiwan.title": "台灣市場狀態",
+    "taiwan.official_first": "官方來源優先",
+    "taiwan.not_loaded": "尚未載入台灣市場快照。",
+    "taiwan.price_participation": "價格與市場參與度",
+    "taiwan.coverage_unavailable": "無涵蓋資訊",
+    "taiwan.history_wait": "TAIEX 歷史會顯示在這裡。",
+    "taiwan.event_windows": "台灣事件視窗",
+    "taiwan.historical_regime": "歷史市場狀態比較",
+    "taiwan.event_normalized": "事件標準化",
+    "taiwan.raw_level": "原始數值",
+    "taiwan.pit_percentile": "點時百分位",
+    "taiwan.event_wait": "台灣事件比較會顯示在這裡。",
+    "taiwan.disclaimer": "台灣市場廣度使用透明的 TWSE 股票家數。系統不重製也不猜測 MacroMicro/MM 或專有 Breadth 1/2/3 公式。",
+    "signals.eyebrow": "同步惡化",
+    "signals.title": "去槓桿觀察",
+    "signals.meta": "條件完全透明 · 未知不代表安全",
+    "signals.unavailable": "目前沒有訊號快照。",
+    "signals.history": "歷史回填",
+    "signals.history_title": "歷史上的觸發與未知條件",
+    "signals.history_meta": "歷史評估會尊重資料發布延遲",
+    "signals.history_wait": "歷史訊號狀態會顯示在這裡。",
+    "signals.disclaimer": "這不是崩盤機率或交易分數。每個條件都獨立顯示且可稽核；單一條件不會產生危機標籤。",
+    "research.eyebrow": "歷史研究",
+    "research.title": "歷史脈絡",
+    "research.no_metric": "沒有指標資料",
+    "research.absolute": "絕對值",
+    "research.pit_percentile": "點時百分位",
+    "research.rolling_percentile": "滾動百分位",
+    "research.rate_change": "變化率",
+    "research.history_wait": "歷史序列會顯示在這裡。",
+    "research.event_windows": "事件視窗",
+    "research.cycle": "週期比較",
+    "research.select_history": "請選擇具有足夠事件歷史的指標。",
+    "research.event_note": "每個事件路徑在錨點都標準化為 100。缺少的前期資料維持不可用，不用代理資料回填。",
+    "data_health.title": "各面向快照健康度",
+    "data_health.not_loaded": "尚未載入快照",
+    "data_health.wait": "等待正式快照。",
+    "data_health.disclaimer": "這裡只看資料新鮮度與涵蓋度，回答的是資料是否可用，不代表市場風險高低；系統沒有面向級風險分數。",
+    "lineage.eyebrow": "資料血緣",
+    "lineage.title": "涵蓋範圍與新鮮度",
+    "lineage.metric": "指標",
+    "lineage.pillar": "面向",
+    "lineage.coverage": "涵蓋範圍",
+    "lineage.as_of": "截至",
+    "lineage.freshness": "新鮮度",
+    "lineage.source": "來源",
+    "lineage.empty": "目前沒有產生任何指標。",
+    "dialog.metric": "指標",
+    "dialog.close": "關閉指標詳細資料",
+    "footer.methodology": "方法論",
+    "footer.data_sources": "資料來源",
+    "footer.taiwan_sources": "台灣資料來源",
+    "guide.why": "為什麼重要",
+    "guide.how": "怎麼看",
+    "guide.direction": "方向",
+    "guide.reference": "參考值",
+    "guide.caveat": "限制",
+    "metric.last_observation": "最新變化",
+    "metric.open_explain": "說明與歷史 ↗",
+    "metric.open_history": "查看歷史 ↗",
+    "metric.open_aria": "開啟 {name} 的詳細資料與歷史",
+    "percentile.not_enough": "歷史資料不足，無法計算百分位",
+    "percentile.unavailable_sentence": "目前無法提供這個比較的歷史百分位。",
+    "percentile.vs": "相對 {window} 的百分位",
+    "percentile.sentence": "高於 {window} 比較區間中約 {percent}% 的觀測值。",
+    "percentile.last_years": "近 {count} {unit}",
+    "percentile.last_observations": "近 {count} 筆觀測",
+    "percentile.year": "年",
+    "percentile.years": "年",
+    "context.only": "僅供情境參考",
+    "context.retrospective": "回溯比較；不適合 PIT / 回測",
+    "thesis.low": "低信心",
+    "thesis.medium": "中等信心",
+    "thesis.high": "高信心",
+    "thesis.stale": "資料過期",
+    "thesis.stress_rising_delev": "市場壓力升高，去槓桿訊號開始出現",
+    "thesis.stress_rising_no_delev": "市場壓力升高，但去槓桿尚未確認",
+    "thesis.leverage_rollover": "槓桿開始轉弱，但市場壓力尚未確認",
+    "thesis.leverage_stretched": "槓桿偏高，但市場壓力尚未確認",
+    "thesis.known_calm_incomplete": "已知壓力指標平靜，但證據仍不完整",
+    "thesis.no_stress_confirmation": "目前沒有廣泛市場壓力確認",
+    "thesis.stress_elevated": "至少一項目前市場壓力檢查已觸發。",
+    "thesis.stress_known_calm_partial": "已知市場壓力指標未升高，但預期的壓力證據並不完整。",
+    "thesis.stress_not_elevated": "目前 NFCI / VIX 壓力檢查均未觸發。",
+    "thesis.margin_slowing": "融資餘額年增率仍為 {yoy}，但成長動能正在放緩。",
+    "thesis.margin_growth": "融資餘額年增率為 {yoy}。",
+    "thesis.delev_coverage": "{known}/{total} 個去槓桿檢查可用；目前 {active} 個觸發。",
+    "thesis.is": "",
+    "thesis.are": "",
+    "thesis.evidence_stress": "壓力：{state}",
+    "thesis.evidence_leverage": "槓桿：近 10 年 {rank}{yoy}",
+    "thesis.evidence_delev": "去槓桿：{active} 個觸發 / {known} 個已知",
+    "thesis.evidence_snapshot": "快照：{date}",
+    "thesis.state_elevated": "偏高",
+    "thesis.state_partial_calm": "部分可用 / 已知指標平靜",
+    "thesis.state_not_elevated": "未升高",
+    "trigger.stress": "壓力確認",
+    "trigger.rollover": "槓桿轉弱加深",
+    "trigger.breadth": "廣度確認",
+    "trigger.stress_rule": "NFCI ≥ {nfci} 或 VIX ≥ 第 {vix} 百分位",
+    "trigger.margin_rule": "融資餘額年增率 ≤ {value}%",
+    "trigger.breadth_rule": "NYSE 高低點廣度 ≤ 第 {value} 百分位",
+    "overview.known_gauges_calm": "已知壓力指標平靜",
+    "overview.stress_elevated": "市場壓力偏高",
+    "overview.stress_contained": "市場壓力未擴散",
+    "overview.conditions_looser": "金融環境比平均寬鬆",
+    "overview.conditions_tighter": "金融環境比平均緊縮",
+    "overview.high_growth_slowing": "水位高，但成長放緩",
+    "overview.leverage_context": "槓桿情境",
+    "overview.no_signal_read": "無法判讀訊號",
+    "overview.not_confirmed": "尚未確認",
+    "overview.delev_signs": "出現去槓桿跡象",
+    "overview.no_confirmation": "未確認去槓桿",
+    "overview.no_current_call": "目前不做判讀",
+    "overview.market_read": "目前市場狀態可判讀",
+    "overview.price_current": "價格資料為最新",
+    "overview.breadth_unavailable": "市場廣度不可用",
+    "overview.margin_momentum": "融資成長動能放緩",
+    "overview.usable_unknown": "{known}/{total} 可用 · {unknown} 未知",
+    "overview.sessions": "{count} {unit}",
+    "overview.session": "個交易日",
+    "overview.sessions_plural": "個交易日",
+    "signal.known_summary": "{known}/{total} 個檢查有資料",
+    "signal.summary_meta": "· {active} 個觸發 · {unknown} 個不可用 / 未知",
+    "signal.evaluated": "評估日期 {date} · 未知不等於未觸發",
+    "signal.caveat_unknown": "必要的公開證據目前不可用，因此維持未知，不能解讀為安全。",
+    "signal.caveat_label": "限制：",
+    "source.provider": "提供者",
+    "source.dataset": "資料集",
+    "source.coverage": "涵蓋範圍",
+    "source.latest": "最新值",
+    "source.freshness": "新鮮度"
+  }
+};
+
+const metricContextZh = {
+  nfci: {
+    plain_name: "整體金融環境",
+    what_it_measures: "芝加哥聯準銀行 NFCI 綜合資金、信用、槓桿與風險狀況。",
+    why_it_matters: "金融條件收緊會提高借貸與承擔風險的成本。",
+    how_to_read: "0 是長期平均；負值代表比平均寬鬆，正值代表比平均緊縮。",
+    higher_lower_or_contextual: "越高通常代表金融環境越緊、壓力越大。",
+    important_reference_level: "0 = 指數長期平均。",
+    important_caveat: "NFCI 描述金融環境，不是股市方向預測。"
+  },
+  vix: {
+    plain_name: "市場波動壓力（VIX）",
+    what_it_measures: "VIX 反映 S&P 500 選擇權隱含的近期期望波動。",
+    why_it_matters: "快速升高通常代表不確定性與避險需求增加。",
+    how_to_read: "數值越高通常代表波動壓力越大；應搭配自身歷史分布解讀。",
+    higher_lower_or_contextual: "越高通常代表較高的波動壓力。",
+    important_reference_level: "以自身歷史分布比較，不使用單一永久門檻。",
+    important_caveat: "VIX 不是方向預測；單靠高低無法判斷股市接下來漲跌。"
+  },
+  finra_margin_debt: {
+    plain_name: "投資人融資餘額",
+    what_it_measures: "FINRA 公布的證券保證金帳戶借款總額。",
+    why_it_matters: "直接反映市場中以借款支撐的曝險，可用來觀察槓桿與風險偏好。",
+    how_to_read: "水位、年增率與成長動能要分開看；高水位可以同時伴隨成長放緩。",
+    higher_lower_or_contextual: "情境指標：水位越高代表未償融資越多，但方向與動能同樣重要。",
+    important_reference_level: "與自身歷史比較；沒有單一通用危險門檻。",
+    important_caveat: "高水位或上升本身不代表已去槓桿；要看到借款或其成長率真正轉弱。"
+  },
+  finra_margin_debt_yoy_pct: {
+    plain_name: "融資餘額年增率",
+    what_it_measures: "FINRA 融資餘額相對一年前同月的百分比變化。",
+    why_it_matters: "可把槓桿成長速度與絕對水位分開。",
+    how_to_read: "正值表示仍高於一年前；正值下降代表成長放緩，不代表餘額一定已下降。",
+    higher_lower_or_contextual: "情境指標：方向與成長率變化比單一高值更重要。",
+    important_reference_level: "0% 分隔年增與年減。",
+    important_caveat: "若水位本身沒有下降，不應把正成長放緩描述成『融資餘額正在下降』。"
+  },
+  tw_taiex: {
+    plain_name: "台灣加權股價指數（TAIEX）",
+    what_it_measures: "台灣證券交易所發行量加權股價指數的收盤水位。",
+    why_it_matters: "提供台灣市場風險與參與度判讀的價格背景。",
+    how_to_read: "應看變化與歷史比較，而不是只看絕對點數。",
+    higher_lower_or_contextual: "情境指標：指數絕對水位不是風險分數。",
+    important_reference_level: "沒有單一指數點位能區分安全或危險。",
+    important_caveat: "TAIEX 價格本身看不出漲跌是否由多數股票共同參與。"
+  },
+  tw_advance_decline_pct: {
+    plain_name: "台股每日市場參與度",
+    what_it_measures: "將 TWSE 上漲家數與下跌家數的差異，以實際有漲跌的股票家數標準化。",
+    why_it_matters: "可看出當日行情是廣泛參與，還是集中在少數股票。",
+    how_to_read: "正值表示上漲家數較多；負值表示下跌家數較多。",
+    higher_lower_or_contextual: "越低代表當日參與度較弱；要判讀趨勢仍需足夠歷史。",
+    important_reference_level: "0% = 上漲與下跌家數相同。",
+    important_caveat: "單日廣度只是一個交易日的參與快照；趨勢與百分位需要足夠歷史。"
+  },
+  tw_cbc_rate: {
+    plain_name: "台灣央行政策利率",
+    what_it_measures: "中央銀行政策利率水位與歷次變動。",
+    why_it_matters: "政策利率會影響融資條件、折現率與整體總經背景。",
+    how_to_read: "觀測日期是目前利率開始生效的日期；來源驗證日期則是系統最近檢查官方來源的時間。",
+    higher_lower_or_contextual: "情境指標：水位與變動速度比單純高低更重要。",
+    important_reference_level: "沒有單一政策利率水位能定義市場壓力。",
+    important_caveat: "若利率長期未變，生效日期較舊不等於資料過期；應同時看最近來源驗證日期。",
+    date_semantics: "effective_vs_verified"
+  }
+};
+
+const signalContextZh = {
+  margin_debt_rollover: {
+    plain_name: "融資槓桿成長動能放緩",
+    description: "當融資餘額年增率轉為非正值，或三個月內年增率減速至少 10 個百分點時觸發。",
+    caveat: "成長動能觸發不代表融資餘額水位已經下降；年增率仍可能為正。"
+  },
+  financial_conditions_tight: {
+    plain_name: "整體金融環境收緊",
+    description: "檢查 NFCI 是否高於 0，或約一季內有明顯收緊。",
+    caveat: "這只是金融環境檢查，不是市場方向預測。"
+  },
+  risk_subindex_extreme: {
+    plain_name: "金融風險分項異常偏高",
+    description: "檢查 NFCI risk subindex 是否達到嚴格過去資料的第 90 百分位以上。",
+    caveat: "百分位代表歷史排名，不代表未來報酬。"
+  },
+  vix_stress: {
+    plain_name: "波動壓力異常偏高",
+    description: "檢查 VIX 是否達到嚴格過去資料的第 90 百分位以上。",
+    caveat: "VIX 本身不能預測市場方向。"
+  },
+  market_trend_down: {
+    plain_name: "實質總報酬趨勢惡化",
+    description: "檢查 Shiller 實質總報酬價格是否低於六個月前。",
+    caveat: "這是描述性趨勢檢查，不是進出場規則。"
+  },
+  high_low_breadth_collapse: {
+    plain_name: "NYSE 高低點廣度異常偏弱",
+    description: "檢查標準化 NYSE 高低點廣度是否低於嚴格過去資料的第 10 百分位。",
+    caveat: "若公開資料不可用，狀態維持未知，不會被算成未觸發。"
+  },
+  volume_breadth_collapse: {
+    plain_name: "NYSE 成交量廣度異常偏弱",
+    description: "檢查 McClellan Volume Summation 是否低於嚴格過去資料的第 10 百分位。",
+    caveat: "若公開資料不可用，狀態維持未知，不會被算成未觸發。"
+  },
+  sp500_50dma_breadth_weak: {
+    plain_name: "S&P 500 50 日均線參與度異常偏弱",
+    description: "檢查點時 S&P 500 50DMA 廣度是否低於嚴格過去資料的第 10 百分位。",
+    caveat: "不可用或非 PIT 的歷史維持未知，不會被解讀為健康參與度。"
+  },
+  sp500_200dma_breadth_weak: {
+    plain_name: "S&P 500 200 日均線參與度異常偏弱",
+    description: "檢查點時 S&P 500 200DMA 廣度是否低於嚴格過去資料的第 10 百分位。",
+    caveat: "不可用或非 PIT 的歷史維持未知，不會被解讀為健康參與度。"
+  }
+};
+
+let locale = "en";
+
+export function normalizeLocale(value) {
+  const input = String(value || "").toLowerCase();
+  return input.startsWith("zh") ? "zh-TW" : "en";
+}
+
+export function resolveInitialLocale({
+  stored = null,
+  languages = [],
+  language = "",
+} = {}) {
+  if (stored && SUPPORTED_LOCALES.includes(stored)) return stored;
+  const preferred = [...languages, language].find(Boolean);
+  return normalizeLocale(preferred);
+}
+
+export function getLocale() {
+  return locale;
+}
+
+export function setLocale(next, { persist = true } = {}) {
+  locale = normalizeLocale(next);
+  if (persist && typeof localStorage !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, locale);
+  }
+  if (typeof document !== "undefined") {
+    document.documentElement.lang = locale;
+  }
+  return locale;
+}
+
+export function initLocale() {
+  let stored = null;
+  try {
+    stored = localStorage.getItem(STORAGE_KEY);
+  } catch (_) {}
+  return setLocale(
+    resolveInitialLocale({
+      stored,
+      languages: typeof navigator !== "undefined" ? navigator.languages || [] : [],
+      language: typeof navigator !== "undefined" ? navigator.language || "" : "",
+    }),
+    { persist: false },
+  );
+}
+
+export function t(key, vars = {}) {
+  const table = messages[locale] || messages.en;
+  let value = table[key] ?? messages.en[key] ?? key;
+  for (const [name, replacement] of Object.entries(vars)) {
+    value = value.replaceAll(`{${name}}`, String(replacement));
+  }
+  return value;
+}
+
+export function localeNumber(value, options = {}) {
+  return Number(value).toLocaleString(locale, options);
+}
+
+export function localeDate(value) {
+  if (!value) return "—";
+  const date = new Date(`${String(value).slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+export function localeOrdinal(value) {
+  if (value == null || !Number.isFinite(Number(value))) return "—";
+  const n = Math.round(Number(value));
+  if (locale === "zh-TW") return `第 ${localeNumber(n)}`;
+  const mod100 = Math.abs(n) % 100;
+  const mod10 = Math.abs(n) % 10;
+  const suffix =
+    mod100 >= 11 && mod100 <= 13
+      ? "th"
+      : mod10 === 1
+        ? "st"
+        : mod10 === 2
+          ? "nd"
+          : mod10 === 3
+            ? "rd"
+            : "th";
+  return `${n}${suffix}`;
+}
+
+export function localizedMetricContext(id, englishContext) {
+  if (locale !== "zh-TW") return englishContext;
+  return metricContextZh[id] || englishContext;
+}
+
+export function localizedSignalContext(id, englishContext) {
+  if (locale !== "zh-TW") return englishContext;
+  return signalContextZh[id] || englishContext;
+}
