@@ -2143,7 +2143,9 @@ function renderOverview() {
     {
       label: t("thesis.trigger.rollover"),
       text: marginTrigger
-        ? `Margin-debt YoY ≤ ${marginTrigger.threshold}%`
+        ? (currentLocale === "zh-TW"
+            ? `融資餘額 YoY ≤ ${marginTrigger.threshold}%`
+            : `Margin-debt YoY ≤ ${marginTrigger.threshold}%`)
         : t("thesis.trigger.marginFallback"),
     },
     {
