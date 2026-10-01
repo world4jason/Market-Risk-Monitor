@@ -108,6 +108,12 @@ function buildRuntime(fetchImpl = async () => {
   const exports = `
 globalThis.__MRM__ = {
   state,
+  t,
+  setLocale,
+  getLocale,
+  normalizeLocale,
+  statusLabel,
+  pillarLabel,
   effectiveFreshness,
   globalFreshnessSummary,
   formatValue,
@@ -717,7 +723,7 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
   );
   assert.match(
     runtime.dom.byId.get("overview-leverage-sub").innerHTML,
-    /pct \(context\)/,
+    /context only/,
   );
   assert.equal(
     runtime.dom.byId.get("overview-thesis-title").textContent,
@@ -735,6 +741,67 @@ test("overview executes partial-stress and positive-YoY rollover semantics", () 
     runtime.dom.byId.get("overview-thesis-summary").textContent,
     /2\/2 deleveraging checks are usable; 1 is active/,
   );
+});
+
+test("Traditional Chinese locale localizes dynamic decision support without refetch", () => {
+  const runtime = buildRuntime();
+  registerOverviewDom(runtime);
+
+  runtime.api.state.metrics.set(
+    "nfci",
+    summaryMetric({ id: "nfci", pillar: "financial_stress", latest: -0.56 }),
+  );
+  runtime.api.state.metrics.set(
+    "vix",
+    summaryMetric({ id: "vix", pillar: "volatility", latest: 14.87 }),
+  );
+  runtime.api.state.metrics.set(
+    "finra_margin_debt",
+    summaryMetric({
+      id: "finra_margin_debt",
+      pillar: "leverage",
+      units: "USD millions",
+      latest: 1453832,
+      percentile: 99,
+      availabilityBasis: "unknown",
+    }),
+  );
+  runtime.api.state.metrics.set(
+    "finra_margin_debt_yoy_pct",
+    summaryMetric({
+      id: "finra_margin_debt_yoy_pct",
+      pillar: "leverage",
+      units: "percent",
+      comparison: "percentage_points",
+      latest: 37.2,
+    }),
+  );
+  runtime.api.state.signals = {
+    current: {
+      conditions: [
+        { id: "vix_stress", status: "inactive", metrics: ["vix"] },
+        FIXTURE.margin_condition,
+      ],
+    },
+  };
+
+  runtime.api.setLocale("zh-TW", { persist: true, rerender: false });
+  runtime.api.renderOverview();
+
+  assert.equal(runtime.api.getLocale(), "zh-TW");
+  assert.equal(runtime.dom.document.documentElement.lang, "zh-TW");
+  assert.equal(runtime.api.pillarLabel("leverage"), "槓桿");
+  assert.equal(runtime.api.statusLabel("stale"), "過期");
+  assert.equal(
+    runtime.dom.byId.get("overview-thesis-title").textContent,
+    "槓桿開始轉弱，廣泛壓力尚未確認",
+  );
+  assert.match(
+    runtime.dom.byId.get("overview-thesis-summary").textContent,
+    /融資餘額 YoY 仍為 37\.2%/,
+  );
+  assert.equal(runtime.dom.byId.get("overview-leverage-value").textContent, "高槓桿，成長動能放慢");
+  assert.equal(runtime.dom.byId.get("overview-stress-status").textContent, "資料缺口");
 });
 
 test("metric dialog moves focus to close and returns it to the invoker", async () => {

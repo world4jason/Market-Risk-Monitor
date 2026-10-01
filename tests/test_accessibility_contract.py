@@ -18,7 +18,7 @@ class AccessibilityContractTests(unittest.TestCase):
     def test_metric_cards_expose_button_equivalent_semantics(self) -> None:
         self.assertIn('role="button"', self.app)
         self.assertIn('tabindex="0"', self.app)
-        self.assertIn('aria-label="Open ${escapeHtml(title)} details and history"', self.app)
+        self.assertIn('t("metric.openAria", { title })', self.app)
         self.assertIn('event.preventDefault()', self.app)
         self.assertIn('openMetric(card.dataset.metricId, card)', self.app)
 
@@ -42,6 +42,7 @@ class AccessibilityContractTests(unittest.TestCase):
     def test_controls_keep_programmatic_labels(self) -> None:
         for control_id in (
             "theme-toggle",
+            "language-select",
             "tw-event-metric",
             "tw-event-mode",
             "history-metric",

@@ -11,6 +11,903 @@ const TAIWAN_CBC_RATE_REGIME_URL = "./data/generated/taiwan-cbc-rate-regime.json
 const FED_RATE_REGIME_URL = "./data/generated/fed-rate-regime.json";
 const METRIC_BASE = new URL("./data/generated/", window.location.href);
 
+
+const SUPPORTED_LOCALES = ["en", "zh-TW"];
+const LOCALE_STORAGE_KEY = "mrm-locale";
+
+const messages = {
+  en: {
+    "meta.title": "Market Risk Monitor",
+    "meta.description": "Explainable U.S. and Taiwan market risk, breadth, macro, and historical context dashboard.",
+    "header.eyebrow": "MULTI-MARKET STRESS & BREADTH",
+    "header.subtitle": "Market stress, leverage and breadth — current first, fully auditable underneath.",
+    "nav.label": "Dashboard sections",
+    "nav.overview": "Overview",
+    "nav.us": "U.S.",
+    "nav.taiwan": "Taiwan",
+    "nav.research": "Research",
+    "controls.language": "Language",
+    "controls.theme": "Toggle theme",
+    "loading.data": "Loading data…",
+    "overview.eyebrow": "MARKET SNAPSHOT",
+    "overview.title": "What matters now",
+    "overview.meta": "Current evidence · select any card to inspect the underlying data",
+    "overview.currentRead": "CURRENT READ",
+    "overview.loadingConfidence": "Loading confidence",
+    "overview.buildingRead": "Building the market read…",
+    "overview.buildingSummary": "Combining stress, leverage and deleveraging evidence without a hidden composite score.",
+    "overview.changesCall": "WHAT CHANGES THE CALL",
+    "overview.waitingThresholds": "Waiting for signal thresholds…",
+    "overview.kicker.stress": "U.S. stress",
+    "overview.kicker.leverage": "Leverage",
+    "overview.kicker.deleveraging": "Deleveraging",
+    "overview.kicker.taiwan": "Taiwan",
+    "overview.loading": "Loading",
+    "overview.waiting.current": "Waiting for current evidence",
+    "overview.waiting.finra": "Waiting for FINRA evidence",
+    "overview.waiting.signal": "Waiting for signal coverage",
+    "overview.waiting.taiex": "Waiting for TAIEX evidence",
+    "health.label": "DATA HEALTH",
+    "health.loading": "Loading snapshot health…",
+    "health.checking": "Freshness and evidence coverage are being checked.",
+    "health.inspect": "Inspect health →",
+    "divider.us": "U.S. MARKET",
+    "divider.taiwan": "TAIWAN MARKET",
+    "us.eyebrow": "U.S. DETAIL",
+    "us.title": "Current U.S. metrics",
+    "us.reload": "Reload snapshot",
+    "us.intro": "Lead conclusions are summarized above. Open any metric for the definition, reading guide, caveat, history, source, and freshness.",
+    "us.unavailable": "Current U.S. snapshot is unavailable.",
+    "us.unavailableDetail": "Source and freshness details will appear when a published snapshot is available.",
+    "trend.eyebrow": "BREADTH / PARTICIPATION",
+    "trend.title": "Trend Participation",
+    "trend.customBands": "Custom heuristic bands",
+    "trend.spxOverlay": "SPX overlay",
+    "trend.unavailableTitle": "Trend Participation — unavailable in the public release",
+    "trend.unavailableDetail": "Point-in-time S&P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.",
+    "trend.historyPlaceholder": "Trend Participation history will appear here when published.",
+    "trend.heuristicNote": "Heuristic bands are optional and non-canonical.",
+    "trend.studyEyebrow": "THRESHOLD STUDY",
+    "trend.studyTitle": "<25% / <15% historical outcomes",
+    "trend.studyNotLoaded": "Study snapshot not loaded",
+    "trend.noEpisodes": "No threshold-study episodes loaded.",
+    "table.date": "Date",
+    "table.cross": "Cross",
+    "table.breadth": "Breadth",
+    "table.localLow": "63d local low",
+    "taiwan.eyebrow": "TAIWAN DETAIL",
+    "taiwan.title": "Taiwan Market Regime",
+    "taiwan.officialFirst": "Official-source first",
+    "taiwan.notLoaded": "Taiwan snapshots not loaded yet.",
+    "taiwan.priceContext": "Price & participation context",
+    "common.coverageUnavailable": "Coverage unavailable",
+    "taiwan.historyPlaceholder": "TAIEX history will appear here.",
+    "taiwan.eventEyebrow": "TAIWAN EVENT WINDOWS",
+    "taiwan.eventTitle": "Historical regime comparison",
+    "taiwan.eventMetricAria": "Taiwan event comparison metric",
+    "taiwan.eventModeAria": "Taiwan event comparison mode",
+    "mode.eventNormalized": "Event-normalized",
+    "mode.raw": "Raw level",
+    "mode.pitPercentile": "Point-in-time percentile",
+    "taiwan.eventPlaceholder": "Taiwan event comparison will appear here.",
+    "taiwan.disclaimer": "Taiwan breadth uses transparent TWSE stock counts. MacroMicro/MM and proprietary Breadth 1/2/3 formulas are not reproduced or guessed.",
+    "signals.eyebrow": "CONCURRENT DETERIORATION",
+    "signals.title": "Deleveraging Watch",
+    "signals.meta": "Transparent conditions · unknown ≠ safe",
+    "signals.unavailable": "Signal snapshot not available.",
+    "signals.historyEyebrow": "HISTORICAL BACKFILL",
+    "signals.historyTitle": "Active and unknown conditions over time",
+    "signals.publicationLag": "Publication lag is respected in historical evaluation",
+    "signals.historyPlaceholder": "Historical signal state will appear here.",
+    "signals.disclaimer": "This is not a crash probability or trading score. Each condition remains independently visible and auditable; no single condition creates a crisis label.",
+    "research.eyebrow": "RESEARCH HISTORY",
+    "research.title": "Historical context",
+    "research.metricAria": "Historical metric",
+    "research.modeAria": "Historical comparison mode",
+    "research.noMetric": "No metric data",
+    "mode.absolute": "Absolute level",
+    "mode.rollingPercentile": "Rolling percentile",
+    "mode.rateChange": "Rate of change",
+    "research.historyPlaceholder": "Historical series will appear here.",
+    "research.eventEyebrow": "EVENT WINDOWS",
+    "research.eventTitle": "Cycle comparison",
+    "research.eventPlaceholder": "Select a metric with sufficient event history.",
+    "research.eventMeta": "Event paths are indexed to 100 at each anchor. Missing pre-history stays unavailable rather than being backfilled with a proxy.",
+    "dataHealth.eyebrow": "DATA HEALTH",
+    "dataHealth.title": "Snapshot health by pillar",
+    "dataHealth.notLoaded": "Snapshot not loaded",
+    "dataHealth.waiting": "Waiting for production snapshots.",
+    "dataHealth.disclaimer": "Freshness and coverage only. This reports whether each pillar's data is current, not how risky the market is; there is no pillar-level risk score.",
+    "lineage.eyebrow": "DATA LINEAGE",
+    "lineage.title": "Coverage & freshness",
+    "table.metric": "Metric",
+    "table.pillar": "Pillar",
+    "table.coverage": "Coverage",
+    "table.asOf": "As of",
+    "table.freshness": "Freshness",
+    "table.source": "Source",
+    "lineage.noMetrics": "No generated metrics yet.",
+    "dialog.metric": "Metric",
+    "dialog.close": "Close metric details",
+    "footer.methodology": "Methodology",
+    "footer.dataSources": "Data sources",
+    "footer.taiwanSources": "Taiwan sources",
+    "pillar.leverage": "Leverage",
+    "pillar.financial_stress": "Financial stress",
+    "pillar.credit_risk": "Credit / risk",
+    "pillar.volatility": "Volatility",
+    "pillar.breadth": "Breadth / participation",
+    "pillar.market": "Market trend",
+    "pillar.valuation": "Valuation",
+    "pillar.context": "Context",
+    "status.fresh": "fresh",
+    "status.stale": "stale",
+    "status.error": "error",
+    "status.missing": "missing",
+    "status.insufficient_data": "insufficient data",
+    "status.unknown": "unknown",
+    "status.active": "active",
+    "status.inactive": "inactive",
+    "status.loading": "Loading",
+    "status.dataGap": "DATA GAP",
+    "status.elevated": "ELEVATED",
+    "status.clear": "CLEAR",
+    "status.watch": "WATCH",
+    "status.context": "CONTEXT",
+    "status.partial": "PARTIAL",
+    "status.current": "CURRENT",
+    "window.lastYears": "last {count} year{plural}",
+    "window.lastObservations": "last {count} observations",
+    "percentile.notEnough": "not enough history for percentile",
+    "percentile.unavailable": "Historical percentile is not available for this comparison.",
+    "percentile.label": "percentile vs {window}",
+    "percentile.sentence": "Higher than about {percent}% of observations in the {window} comparison window.",
+    "date.effectiveVerified": "effective since {asOf} · source verified {verified}",
+    "date.asOf": "as of {asOf}",
+    "guide.reference": "Reference",
+    "guide.why": "Why it matters",
+    "guide.how": "How to read",
+    "guide.direction": "Direction",
+    "guide.caveat": "Caveat",
+    "context.contextOnly": "context only",
+    "context.retrospective": "retrospective; not PIT/backtest-safe",
+    "context.riskDirection": "This rank is context only; it is not a risk direction.",
+    "context.notPit": "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
+    "breadth.none": "No usable public breadth sessions are currently available.",
+    "breadth.oneSession": "Only 1 published breadth session is available. This is a one-session participation snapshot, not a trend or percentile conclusion.",
+    "breadth.historyBuilding": "{count} published breadth sessions are available. Multi-session history is accumulating, but the configured historical percentile still lacks sufficient observations.",
+    "breadth.notCurrent": "Published breadth history exists, but its current freshness state is {freshness}; current trend interpretation needs caution.",
+    "margin.slowing": "YoY growth slowed {value} pp over {periods} monthly observations",
+    "rule.observed": "observed {value}{unit}",
+    "rule.asOf": "as of {date}",
+    "snapshot.noSupport": "No current supporting observation",
+    "trigger.none": "No configured escalation threshold is available.",
+    "overview.stress.knownCalm": "Known gauges calm",
+    "overview.stress.elevated": "Stress elevated",
+    "overview.stress.contained": "Stress contained",
+    "overview.stress.looser": "Conditions looser than avg",
+    "overview.stress.tighter": "Conditions tighter than avg",
+    "overview.stress.available": "Financial conditions available",
+    "overview.leverage.incomplete": "Incomplete read",
+    "overview.leverage.slowing": "High, growth slowing",
+    "overview.leverage.context": "Leverage context",
+    "overview.deleveraging.noRead": "No signal read",
+    "overview.deleveraging.notConfirmed": "Not confirmed",
+    "overview.deleveraging.signs": "Deleveraging signs",
+    "overview.deleveraging.noConfirmation": "No confirmation",
+    "overview.taiwan.available": "Market read available",
+    "overview.taiwan.noRead": "No current read",
+    "overview.taiwan.noCall": "No current call",
+    "overview.taiwan.priceCurrent": "Price current",
+    "overview.taiwan.breadthUnavailable": "Breadth unavailable",
+    "overview.marginMomentum": "Margin momentum slowing",
+    "overview.usable": "{known}/{total} usable · {unknown} unknown",
+    "overview.sessions": "{count} session{plural}",
+    "thesis.stressAndDeleveraging": "Stress rising; deleveraging signals appearing",
+    "thesis.stressNotConfirmed": "Stress rising; deleveraging not confirmed",
+    "thesis.rollover": "Leverage rolling over; stress not confirmed",
+    "thesis.stretched": "Leverage stretched; stress not confirmed",
+    "thesis.partial": "Known stress gauges calm; read incomplete",
+    "thesis.noBroadStress": "No broad stress confirmation",
+    "thesis.stressElevated": "At least one current stress check is elevated.",
+    "thesis.stressPartial": "Known stress gauges are not elevated, but expected stress evidence is incomplete.",
+    "thesis.stressCalm": "Current NFCI/VIX stress checks are not elevated.",
+    "thesis.marginSlowing": "Margin debt is still {yoy} YoY while growth momentum is slowing.",
+    "thesis.marginGrowth": "Margin debt growth is {yoy} YoY.",
+    "thesis.checks": "{known}/{total} deleveraging checks are usable; {active} {verb} active.",
+    "thesis.confidence.high": "HIGH CONFIDENCE",
+    "thesis.confidence.medium": "MEDIUM CONFIDENCE",
+    "thesis.confidence.low": "LOW CONFIDENCE",
+    "thesis.confidence.stale": "STALE DATA",
+    "thesis.evidence.stress": "Stress: {state}",
+    "thesis.evidence.stressElevated": "elevated",
+    "thesis.evidence.stressPartial": "partial / known gauges calm",
+    "thesis.evidence.stressCalm": "not elevated",
+    "thesis.evidence.leverage": "Leverage: {rank}{yoy}",
+    "thesis.evidence.deleveraging": "Deleveraging: {active} active / {known} known",
+    "thesis.evidence.snapshot": "Snapshot: {date}",
+    "thesis.trigger.stress": "Stress confirms",
+    "thesis.trigger.rollover": "Rollover deepens",
+    "thesis.trigger.breadth": "Breadth confirms",
+    "thesis.trigger.stressFallback": "configured NFCI / VIX stress threshold turns active",
+    "thesis.trigger.marginFallback": "margin-debt growth turns negative",
+    "thesis.trigger.breadthFallback": "breadth deterioration becomes available and active",
+    "health.noSnapshot": "No production snapshot",
+    "health.dataCurrent": "Data current",
+    "health.sourceIssues": "Source issues",
+    "health.needsRefresh": "Snapshot needs refresh",
+    "health.evidenceGaps": "Evidence gaps remain",
+    "health.snapshotCurrent": "Snapshot current",
+    "health.count.error": "{count} error",
+    "health.count.missing": "{count} missing",
+    "health.count.stale": "{count} stale",
+    "health.count.insufficient": "{count} insufficient data",
+    "health.count.unknownChecks": "{count} unknown checks",
+    "health.snapshotDate": "snapshot {date}",
+    "metric.openAria": "Open {title} details and history",
+    "metric.lastObservation": "last observation",
+    "metric.explainHistory": "Explain & view history ↗",
+    "metric.openHistory": "Open history ↗",
+    "metric.usUnavailable": "Current U.S. snapshot is unavailable.",
+    "metric.noPlaceholder": "No fixture or placeholder value is substituted for missing published data.",
+    "regime.usUnavailable": "Published U.S. metric health is unavailable.",
+    "regime.notCurrent": "{count} not current",
+    "regime.currentCount": "{current} of {total} {metricWord} current",
+    "regime.metric.one": "metric",
+    "regime.metric.many": "metrics",
+    "signals.known": "{known} of {total} checks known",
+    "signals.summary": "· {active} active · {unknown} unavailable/unknown",
+    "signals.evaluated": "Evaluated {date} · unknown is not inactive",
+    "signals.unknownCaveat": "Required public evidence is unavailable; this remains unknown rather than safe.",
+    "signals.caveat": "Caveat:",
+    "signals.noHistory": "Not enough historical signal states.",
+    "history.selectMetric": "Select a metric to load history",
+    "history.selectMetricPrompt": "Select a metric to load its full history.",
+    "history.loadFailed": "This metric history could not be loaded.",
+    "history.pitDisabled": "Point-in-time historical view disabled.",
+    "history.pitUseAbsolute": "{reason}. Use Absolute level for retrospective history.",
+    "history.usable": "{count} usable observations",
+    "history.eventUnavailable": "Event definitions or history unavailable.",
+    "history.eventDisabled": "Historical event comparison disabled.",
+    "history.eventRawAvailable": "{reason}. Raw absolute history remains available.",
+    "history.noPitEvent": "No point-in-time event history is available.",
+    "history.noEventCoverage": "No event has sufficient metric history.",
+    "history.notEnough": "Not enough observations for this view.",
+    "dialog.loading": "Loading…",
+    "dialog.fullHistory": "Full metric history",
+    "dialog.loadingHistory": "Loading full metric history…",
+    "dialog.loadFailed": "Detailed history could not be loaded. The overview remains available.",
+    "dialog.effectiveDate": "Effective/change date",
+    "dialog.sourceObservation": "Source observation",
+    "dialog.currentValue": "Current value",
+    "dialog.lastObservation": "Last observation"
+  },
+  "zh-TW": {
+    "meta.title": "市場風險監測儀表板",
+    "meta.description": "可解釋的美國與台灣市場風險、廣度、總經與歷史情境儀表板。",
+    "header.eyebrow": "多市場壓力與廣度",
+    "header.subtitle": "先看現在的市場壓力、槓桿與廣度；所有判斷都可往下追溯。",
+    "nav.label": "儀表板區段",
+    "nav.overview": "總覽",
+    "nav.us": "美國",
+    "nav.taiwan": "台灣",
+    "nav.research": "研究",
+    "controls.language": "語言",
+    "controls.theme": "切換明暗主題",
+    "loading.data": "載入資料中…",
+    "overview.eyebrow": "市場快照",
+    "overview.title": "現在最重要的是什麼",
+    "overview.meta": "目前證據 · 點選任一卡片可查看底層資料",
+    "overview.currentRead": "目前判讀",
+    "overview.loadingConfidence": "計算信心中",
+    "overview.buildingRead": "正在建立市場判讀…",
+    "overview.buildingSummary": "綜合壓力、槓桿與去槓桿證據，不使用隱藏綜合分數。",
+    "overview.changesCall": "哪些條件會改變判斷",
+    "overview.waitingThresholds": "等待訊號門檻…",
+    "overview.kicker.stress": "美國市場壓力",
+    "overview.kicker.leverage": "槓桿",
+    "overview.kicker.deleveraging": "去槓桿",
+    "overview.kicker.taiwan": "台灣",
+    "overview.loading": "載入中",
+    "overview.waiting.current": "等待目前證據",
+    "overview.waiting.finra": "等待 FINRA 資料",
+    "overview.waiting.signal": "等待訊號覆蓋",
+    "overview.waiting.taiex": "等待台股資料",
+    "health.label": "資料健康",
+    "health.loading": "檢查快照健康狀態…",
+    "health.checking": "正在檢查資料新鮮度與證據覆蓋。",
+    "health.inspect": "查看資料健康 →",
+    "divider.us": "美國市場",
+    "divider.taiwan": "台灣市場",
+    "us.eyebrow": "美國詳情",
+    "us.title": "目前美國市場指標",
+    "us.reload": "重新載入快照",
+    "us.intro": "上方先給結論。點開任何指標可查看定義、判讀方式、限制、歷史、來源與新鮮度。",
+    "us.unavailable": "目前沒有可用的美國市場快照。",
+    "us.unavailableDetail": "有已發布快照後，這裡會顯示來源與新鮮度細節。",
+    "trend.eyebrow": "廣度 / 參與度",
+    "trend.title": "趨勢參與度",
+    "trend.customBands": "自訂經驗門檻",
+    "trend.spxOverlay": "疊加 SPX",
+    "trend.unavailableTitle": "趨勢參與度 — 公開版目前不可用",
+    "trend.unavailableDetail": "目前沒有可合法公開再散布、且具時點正確性的 S&P 500 移動平均廣度歷史。缺失的廣度訊號在去槓桿監測中維持未知。",
+    "trend.historyPlaceholder": "發布後會在此顯示趨勢參與度歷史。",
+    "trend.heuristicNote": "經驗門檻為選配，並非正式判定標準。",
+    "trend.studyEyebrow": "門檻研究",
+    "trend.studyTitle": "<25% / <15% 歷史結果",
+    "trend.studyNotLoaded": "尚未載入研究快照",
+    "trend.noEpisodes": "尚未載入門檻研究事件。",
+    "table.date": "日期",
+    "table.cross": "穿越",
+    "table.breadth": "廣度",
+    "table.localLow": "63 日局部低點",
+    "taiwan.eyebrow": "台灣詳情",
+    "taiwan.title": "台灣市場狀態",
+    "taiwan.officialFirst": "官方來源優先",
+    "taiwan.notLoaded": "尚未載入台灣市場快照。",
+    "taiwan.priceContext": "價格與參與度",
+    "common.coverageUnavailable": "覆蓋資料不可用",
+    "taiwan.historyPlaceholder": "TAIEX 歷史會顯示於此。",
+    "taiwan.eventEyebrow": "台灣事件視窗",
+    "taiwan.eventTitle": "歷史狀態比較",
+    "taiwan.eventMetricAria": "台灣事件比較指標",
+    "taiwan.eventModeAria": "台灣事件比較模式",
+    "mode.eventNormalized": "事件標準化",
+    "mode.raw": "原始數值",
+    "mode.pitPercentile": "時點正確百分位",
+    "taiwan.eventPlaceholder": "台灣事件比較會顯示於此。",
+    "taiwan.disclaimer": "台灣廣度使用透明的 TWSE 股票家數。未重製或猜測 MacroMicro/MM 與專有 Breadth 1/2/3 公式。",
+    "signals.eyebrow": "同步惡化",
+    "signals.title": "去槓桿監測",
+    "signals.meta": "透明條件 · 未知不等於安全",
+    "signals.unavailable": "目前沒有可用的訊號快照。",
+    "signals.historyEyebrow": "歷史回填",
+    "signals.historyTitle": "有效與未知條件的歷史變化",
+    "signals.publicationLag": "歷史評估會尊重資料發布延遲",
+    "signals.historyPlaceholder": "歷史訊號狀態會顯示於此。",
+    "signals.disclaimer": "這不是崩盤機率或交易分數。每個條件都獨立顯示且可稽核；單一條件不會產生危機標籤。",
+    "research.eyebrow": "歷史研究",
+    "research.title": "歷史情境",
+    "research.metricAria": "歷史指標",
+    "research.modeAria": "歷史比較模式",
+    "research.noMetric": "沒有指標資料",
+    "mode.absolute": "絕對數值",
+    "mode.rollingPercentile": "滾動百分位",
+    "mode.rateChange": "變化率",
+    "research.historyPlaceholder": "歷史序列會顯示於此。",
+    "research.eventEyebrow": "事件視窗",
+    "research.eventTitle": "週期比較",
+    "research.eventPlaceholder": "請選擇具有足夠歷史資料的指標。",
+    "research.eventMeta": "每個事件路徑都以錨點標準化為 100。事件前資料不足時維持不可用，不以代理值補齊。",
+    "dataHealth.eyebrow": "資料健康",
+    "dataHealth.title": "各構面快照健康狀態",
+    "dataHealth.notLoaded": "尚未載入快照",
+    "dataHealth.waiting": "等待正式環境快照。",
+    "dataHealth.disclaimer": "這裡只顯示新鮮度與覆蓋狀態，代表資料是否夠新，不代表市場風險高低；沒有構面級風險分數。",
+    "lineage.eyebrow": "資料血緣",
+    "lineage.title": "覆蓋範圍與新鮮度",
+    "table.metric": "指標",
+    "table.pillar": "構面",
+    "table.coverage": "歷史覆蓋",
+    "table.asOf": "截至",
+    "table.freshness": "新鮮度",
+    "table.source": "來源",
+    "lineage.noMetrics": "尚無產生的指標。",
+    "dialog.metric": "指標",
+    "dialog.close": "關閉指標詳情",
+    "footer.methodology": "方法論",
+    "footer.dataSources": "資料來源",
+    "footer.taiwanSources": "台灣資料來源",
+    "pillar.leverage": "槓桿",
+    "pillar.financial_stress": "金融壓力",
+    "pillar.credit_risk": "信用 / 風險",
+    "pillar.volatility": "波動",
+    "pillar.breadth": "廣度 / 參與度",
+    "pillar.market": "市場趨勢",
+    "pillar.valuation": "估值",
+    "pillar.context": "情境",
+    "status.fresh": "最新",
+    "status.stale": "過期",
+    "status.error": "錯誤",
+    "status.missing": "缺失",
+    "status.insufficient_data": "資料不足",
+    "status.unknown": "未知",
+    "status.active": "觸發",
+    "status.inactive": "未觸發",
+    "status.loading": "載入中",
+    "status.dataGap": "資料缺口",
+    "status.elevated": "偏高",
+    "status.clear": "未升高",
+    "status.watch": "留意",
+    "status.context": "情境",
+    "status.partial": "部分資料",
+    "status.current": "最新",
+    "window.lastYears": "近 {count} 年",
+    "window.lastObservations": "近 {count} 筆觀測",
+    "percentile.notEnough": "歷史不足，無法計算百分位",
+    "percentile.unavailable": "此比較目前無法提供歷史百分位。",
+    "percentile.label": "相較{window}百分位",
+    "percentile.sentence": "高於{window}比較視窗中約 {percent}% 的觀測。",
+    "date.effectiveVerified": "自 {asOf} 起生效 · 來源驗證於 {verified}",
+    "date.asOf": "截至 {asOf}",
+    "guide.reference": "參考值",
+    "guide.why": "為什麼重要",
+    "guide.how": "如何判讀",
+    "guide.direction": "方向",
+    "guide.caveat": "限制",
+    "context.contextOnly": "僅供情境參考",
+    "context.retrospective": "回顧性；不可直接用於 PIT / 回測",
+    "context.riskDirection": "此排名僅供情境參考，不代表風險方向。",
+    "context.notPit": "這是回顧性的當前排名，不可安全地用於歷史 PIT / 回測。",
+    "breadth.none": "目前沒有可用的公開廣度資料。",
+    "breadth.oneSession": "目前只有 1 個已發布的廣度交易日。這只是單日參與度快照，不足以判斷趨勢或百分位。",
+    "breadth.historyBuilding": "目前已有 {count} 個廣度交易日，歷史正逐步累積，但仍不足以計算設定的歷史百分位。",
+    "breadth.notCurrent": "已有廣度歷史，但目前新鮮度為 {freshness}；現況趨勢判讀需保守。",
+    "margin.slowing": "YoY 成長率在 {periods} 個月內下降 {value} 個百分點",
+    "rule.observed": "觀測值 {value}{unit}",
+    "rule.asOf": "截至 {date}",
+    "snapshot.noSupport": "目前沒有可用的支持證據",
+    "trigger.none": "目前沒有可用的升級門檻。",
+    "overview.stress.knownCalm": "已知壓力指標平靜",
+    "overview.stress.elevated": "壓力升高",
+    "overview.stress.contained": "未見廣泛壓力",
+    "overview.stress.looser": "金融環境較長期平均寬鬆",
+    "overview.stress.tighter": "金融環境較長期平均緊",
+    "overview.stress.available": "金融環境資料可用",
+    "overview.leverage.incomplete": "判讀不完整",
+    "overview.leverage.slowing": "高槓桿，成長動能放慢",
+    "overview.leverage.context": "槓桿情境可用",
+    "overview.deleveraging.noRead": "無法判讀訊號",
+    "overview.deleveraging.notConfirmed": "尚未確認",
+    "overview.deleveraging.signs": "出現去槓桿跡象",
+    "overview.deleveraging.noConfirmation": "尚無確認訊號",
+    "overview.taiwan.available": "市場判讀可用",
+    "overview.taiwan.noRead": "目前無法判讀",
+    "overview.taiwan.noCall": "目前不做判斷",
+    "overview.taiwan.priceCurrent": "價格資料最新",
+    "overview.taiwan.breadthUnavailable": "廣度不可用",
+    "overview.marginMomentum": "融資槓桿動能放慢",
+    "overview.usable": "{known}/{total} 可用 · {unknown} 未知",
+    "overview.sessions": "{count} 個交易日",
+    "thesis.stressAndDeleveraging": "壓力升高，去槓桿訊號開始出現",
+    "thesis.stressNotConfirmed": "壓力升高，但去槓桿尚未確認",
+    "thesis.rollover": "槓桿開始轉弱，廣泛壓力尚未確認",
+    "thesis.stretched": "槓桿偏高，廣泛壓力尚未確認",
+    "thesis.partial": "已知壓力指標平靜，但判讀仍不完整",
+    "thesis.noBroadStress": "目前證據未確認廣泛市場壓力",
+    "thesis.stressElevated": "至少一項目前壓力條件已升高。",
+    "thesis.stressPartial": "已知壓力指標未升高，但部分預期壓力證據缺失。",
+    "thesis.stressCalm": "目前 NFCI / VIX 壓力條件未升高。",
+    "thesis.marginSlowing": "融資餘額 YoY 仍為 {yoy}，但成長動能正在放慢。",
+    "thesis.marginGrowth": "融資餘額 YoY 成長為 {yoy}。",
+    "thesis.checks": "{known}/{total} 項去槓桿條件可用；其中 {active} 項觸發。",
+    "thesis.confidence.high": "高信心",
+    "thesis.confidence.medium": "中等信心",
+    "thesis.confidence.low": "低信心",
+    "thesis.confidence.stale": "資料已過期",
+    "thesis.evidence.stress": "壓力：{state}",
+    "thesis.evidence.stressElevated": "升高",
+    "thesis.evidence.stressPartial": "部分資料 / 已知指標平靜",
+    "thesis.evidence.stressCalm": "未升高",
+    "thesis.evidence.leverage": "槓桿：{rank}{yoy}",
+    "thesis.evidence.deleveraging": "去槓桿：{active} 項觸發 / {known} 項已知",
+    "thesis.evidence.snapshot": "快照：{date}",
+    "thesis.trigger.stress": "壓力確認",
+    "thesis.trigger.rollover": "槓桿轉弱加深",
+    "thesis.trigger.breadth": "廣度確認",
+    "thesis.trigger.stressFallback": "NFCI / VIX 壓力條件觸發",
+    "thesis.trigger.marginFallback": "融資餘額 YoY 轉為負成長",
+    "thesis.trigger.breadthFallback": "廣度惡化資料可用並觸發",
+    "health.noSnapshot": "沒有正式環境快照",
+    "health.dataCurrent": "資料皆為最新",
+    "health.sourceIssues": "來源異常",
+    "health.needsRefresh": "快照需要更新",
+    "health.evidenceGaps": "仍有證據缺口",
+    "health.snapshotCurrent": "快照為最新",
+    "health.count.error": "{count} 錯誤",
+    "health.count.missing": "{count} 缺失",
+    "health.count.stale": "{count} 過期",
+    "health.count.insufficient": "{count} 資料不足",
+    "health.count.unknownChecks": "{count} 項未知條件",
+    "health.snapshotDate": "快照 {date}",
+    "metric.openAria": "開啟 {title} 的詳情與歷史",
+    "metric.lastObservation": "最近一期變化",
+    "metric.explainHistory": "說明與歷史 ↗",
+    "metric.openHistory": "查看歷史 ↗",
+    "metric.usUnavailable": "目前沒有可用的美國市場快照。",
+    "metric.noPlaceholder": "缺少已發布資料時，不會用 fixture 或硬編碼數值補位。",
+    "regime.usUnavailable": "目前無法取得美國指標健康狀態。",
+    "regime.notCurrent": "{count} 項非最新",
+    "regime.currentCount": "{current}/{total} 項指標為最新",
+    "regime.metric.one": "指標",
+    "regime.metric.many": "指標",
+    "signals.known": "{known}/{total} 項條件已知",
+    "signals.summary": "· {active} 項觸發 · {unknown} 項不可用 / 未知",
+    "signals.evaluated": "評估日期 {date} · 未知不等於未觸發",
+    "signals.unknownCaveat": "所需公開證據目前不可用，因此維持未知，不視為安全。",
+    "signals.caveat": "限制：",
+    "signals.noHistory": "歷史訊號狀態不足。",
+    "history.selectMetric": "選擇指標以載入歷史",
+    "history.selectMetricPrompt": "請選擇一個指標以載入完整歷史。",
+    "history.loadFailed": "此指標的歷史資料無法載入。",
+    "history.pitDisabled": "時點正確的歷史視圖已停用。",
+    "history.pitUseAbsolute": "{reason}。若要回顧歷史，請改用絕對數值。",
+    "history.usable": "{count} 筆可用觀測",
+    "history.eventUnavailable": "事件定義或歷史資料不可用。",
+    "history.eventDisabled": "歷史事件比較已停用。",
+    "history.eventRawAvailable": "{reason}。仍可查看原始的回顧性歷史。",
+    "history.noPitEvent": "目前沒有可用的時點正確事件歷史。",
+    "history.noEventCoverage": "沒有事件具備足夠的指標歷史。",
+    "history.notEnough": "此視圖的觀測資料不足。",
+    "dialog.loading": "載入中…",
+    "dialog.fullHistory": "完整指標歷史",
+    "dialog.loadingHistory": "載入完整指標歷史中…",
+    "dialog.loadFailed": "詳細歷史無法載入；總覽仍可使用。",
+    "dialog.effectiveDate": "生效 / 變更日期",
+    "dialog.sourceObservation": "來源觀測日期",
+    "dialog.currentValue": "目前數值",
+    "dialog.lastObservation": "最近一期"
+  }
+};
+
+
+Object.assign(messages.en, {
+  "taiwan.coreUnavailable": "Core Taiwan snapshot unavailable",
+  "taiwan.noPlaceholder": "No placeholder data is shown. Source and freshness details remain available when a published snapshot exists.",
+  "taiwan.historyUnavailable": "TAIEX history is unavailable in the current published snapshot.",
+  "taiwan.price": "Price",
+  "taiwan.breadth": "Breadth",
+  "taiwan.macroCycle": "Macro cycle",
+  "taiwan.rates": "Rates",
+  "taiwan.unavailable": "Unavailable",
+  "taiwan.adNotPublished": "Official A/D breadth not published",
+  "taiwan.adSnapshot": "A-D snapshot · 1 session only · no trend inference",
+  "taiwan.adBuilding": "A-D % · {count} sessions · history accumulating",
+  "taiwan.adHistory": "A-D history exists · {freshness}",
+  "taiwan.adSessions": "A-D % · {count} sessions",
+  "taiwan.lastKnown": "last known {regime} {date}",
+  "taiwan.noKnownRegime": "no known regime yet",
+  "taiwan.notPublished": "Not published",
+  "taiwan.inputs": "{known}/{total} inputs · {lastKnown}",
+  "taiwan.scoreConfidence": "score {score} · confidence {confidence}%",
+  "taiwan.macroSummaryUnavailable": "{count} public macro metrics; regime summary unavailable",
+  "taiwan.macroFamilyUnavailable": "Taiwan macro/regime family is not included in this public release",
+  "taiwan.inputsLoaded": "Inputs loaded",
+  "taiwan.cbcMetrics": "{count} CBC rate metrics",
+  "taiwan.cbcNotPublished": "CBC rate history not published",
+  "taiwan.observations": "{count} observations · {freshness}",
+  "taiwan.historyOnDemand": "TAIEX history is available on demand.",
+  "taiwan.loadHistory": "Load TAIEX history",
+  "taiwan.historyLoadFailed": "TAIEX history could not be loaded. Current summary data remains available.",
+  "taiwan.snapshotUnavailable": "TAIEX snapshot is unavailable in the current release.",
+  "taiwan.taiexUnavailable": "TAIEX unavailable",
+  "trend.notPublished": "not published",
+  "trend.nonPit": "non-PIT history · {reason}",
+  "trend.percentileUnavailable": "historical percentile unavailable",
+  "trend.percentileContext": "{percentile} percentile vs {window}",
+  "trend.studyBuild": "Build the study after loading point-in-time 50DMA breadth and SPX price history.",
+  "trend.studyNonCanonical": "Event study is not canonical for this source.",
+  "trend.studyCanonicalUnavailable": "Canonical episode table unavailable for this source.",
+  "trend.studyStatus": "{events} events · cooldown {cooldown} sessions · descriptive only",
+  "trend.noForwardWindows": "No completed forward-return windows yet.",
+  "trend.studySummary": "n={n} · median {median} · positive {positive} · median MAE {mae}",
+  "trend.sessions": "{count} sessions",
+  "trend.noEpisodesAvailable": "No threshold-study episodes available.",
+  "trend.historyOnDemand": "Trend Participation history is available on demand.",
+  "trend.loadHistory": "Load breadth history",
+  "trend.notEnoughHistory": "Not enough moving-average breadth history.",
+  "signals.noSnapshot": "Deleveraging Watch is unavailable in the current published snapshot.",
+  "signals.noHistoricalState": "Historical signal state is unavailable.",
+  "history.noTaiwan": "No Taiwan history",
+  "history.selectTaiwan": "Select a Taiwan metric",
+  "history.taiwanLoadFailed": "This Taiwan metric history could not be loaded.",
+  "history.taiwanEventUnavailable": "Taiwan event definitions or metric history unavailable.",
+  "history.taiwanPitDisabled": "Point-in-time Taiwan event comparison disabled.",
+  "history.taiwanRawAvailable": "{reason}. Raw retrospective history remains available.",
+  "history.taiwanPitPercentileDisabled": "Point-in-time percentile mode is disabled because no eligible PIT percentile baseline is declared.",
+  "history.taiwanNotEnough": "Not enough Taiwan history for this comparison mode.",
+  "dialog.historyLabel": "History",
+  "dialog.source": "Source",
+  "dialog.coverage": "Coverage",
+  "dialog.freshness": "Freshness",
+  "dialog.latestFetch": "Latest fetch",
+  "dialog.provider": "Provider"
+});
+Object.assign(messages["zh-TW"], {
+  "taiwan.coreUnavailable": "台灣核心快照不可用",
+  "taiwan.noPlaceholder": "不顯示替代或假資料；有已發布快照時仍可查看來源與新鮮度。",
+  "taiwan.historyUnavailable": "目前發布快照中沒有可用的 TAIEX 歷史。",
+  "taiwan.price": "價格",
+  "taiwan.breadth": "廣度",
+  "taiwan.macroCycle": "總經週期",
+  "taiwan.rates": "利率",
+  "taiwan.unavailable": "不可用",
+  "taiwan.adNotPublished": "尚未發布官方 A/D 廣度",
+  "taiwan.adSnapshot": "A-D 單日快照 · 僅 1 日 · 不推論趨勢",
+  "taiwan.adBuilding": "A-D % · {count} 日 · 歷史累積中",
+  "taiwan.adHistory": "A-D 歷史存在 · {freshness}",
+  "taiwan.adSessions": "A-D % · {count} 日",
+  "taiwan.lastKnown": "上次已知 {regime} · {date}",
+  "taiwan.noKnownRegime": "尚無已知狀態",
+  "taiwan.notPublished": "尚未發布",
+  "taiwan.inputs": "{known}/{total} 個輸入 · {lastKnown}",
+  "taiwan.scoreConfidence": "分數 {score} · 信心 {confidence}%",
+  "taiwan.macroSummaryUnavailable": "已有 {count} 個公開總經指標；狀態摘要不可用",
+  "taiwan.macroFamilyUnavailable": "公開版目前未包含台灣總經 / 狀態資料族",
+  "taiwan.inputsLoaded": "輸入已載入",
+  "taiwan.cbcMetrics": "{count} 個央行利率指標",
+  "taiwan.cbcNotPublished": "尚未發布央行利率歷史",
+  "taiwan.observations": "{count} 筆觀測 · {freshness}",
+  "taiwan.historyOnDemand": "TAIEX 完整歷史可按需載入。",
+  "taiwan.loadHistory": "載入 TAIEX 歷史",
+  "taiwan.historyLoadFailed": "TAIEX 歷史載入失敗；目前摘要仍可使用。",
+  "taiwan.snapshotUnavailable": "目前版本沒有可用的 TAIEX 快照。",
+  "taiwan.taiexUnavailable": "TAIEX 不可用",
+  "trend.notPublished": "尚未發布",
+  "trend.nonPit": "非 PIT 歷史 · {reason}",
+  "trend.percentileUnavailable": "歷史百分位不可用",
+  "trend.percentileContext": "{percentile} · 相較{window}",
+  "trend.studyBuild": "載入具時點正確性的 50DMA 廣度與 SPX 價格歷史後即可建立研究。",
+  "trend.studyNonCanonical": "此來源不符合正式事件研究要求。",
+  "trend.studyCanonicalUnavailable": "此來源無法提供正式事件表。",
+  "trend.studyStatus": "{events} 個事件 · 冷卻 {cooldown} 個交易日 · 僅描述性",
+  "trend.noForwardWindows": "尚無完成的前瞻報酬視窗。",
+  "trend.studySummary": "n={n} · 中位數 {median} · 正報酬 {positive} · 中位 MAE {mae}",
+  "trend.sessions": "{count} 個交易日",
+  "trend.noEpisodesAvailable": "目前沒有可用的門檻研究事件。",
+  "trend.historyOnDemand": "趨勢參與度完整歷史可按需載入。",
+  "trend.loadHistory": "載入廣度歷史",
+  "trend.notEnoughHistory": "移動平均廣度歷史不足。",
+  "signals.noSnapshot": "目前發布快照中沒有可用的去槓桿監測。",
+  "signals.noHistoricalState": "歷史訊號狀態不可用。",
+  "history.noTaiwan": "沒有台灣歷史資料",
+  "history.selectTaiwan": "選擇台灣指標",
+  "history.taiwanLoadFailed": "此台灣指標歷史無法載入。",
+  "history.taiwanEventUnavailable": "台灣事件定義或指標歷史不可用。",
+  "history.taiwanPitDisabled": "時點正確的台灣事件比較已停用。",
+  "history.taiwanRawAvailable": "{reason}。仍可查看原始回顧性歷史。",
+  "history.taiwanPitPercentileDisabled": "未宣告合格的 PIT 百分位基準，因此停用時點正確百分位模式。",
+  "history.taiwanNotEnough": "此比較模式的台灣歷史不足。",
+  "dialog.historyLabel": "歷史",
+  "dialog.source": "來源",
+  "dialog.coverage": "覆蓋",
+  "dialog.freshness": "新鮮度",
+  "dialog.latestFetch": "最近抓取",
+  "dialog.provider": "提供者"
+});
+
+const beginnerContextZhTW = {
+  nfci: {
+    plain_name: "廣義金融環境",
+    what_it_measures: "Chicago Fed NFCI 將資金、信用、槓桿與風險條件整合為一個廣義金融環境指數。",
+    why_it_matters: "金融環境轉緊時，家庭、企業與投資人取得資金或承擔風險的難度通常會上升。",
+    how_to_read: "0 是長期平均。負值代表金融環境比平均寬鬆；正值代表比平均緊。",
+    higher_lower_or_contextual: "越高通常代表金融環境越緊、壓力越大；越低則越寬鬆。",
+    important_reference_level: "0 = 指數長期平均。",
+    important_caveat: "NFCI 描述目前金融環境，本身不預測市場方向。"
+  },
+  vix: {
+    plain_name: "美股預期波動（VIX）",
+    what_it_measures: "VIX 反映選擇權市場對 S&P 500 未來約 30 天波動度的隱含預期。",
+    why_it_matters: "VIX 急升通常伴隨不確定性與避險需求提高。",
+    how_to_read: "數值越高通常代表預期波動越大；越低代表預期波動較小。",
+    higher_lower_or_contextual: "越高通常代表波動壓力較大。",
+    important_reference_level: "應與自身歷史分布比較，而不是只看單一固定門檻。",
+    important_caveat: "VIX 不是方向預測。單看 VIX 高低無法判斷股市接下來漲跌。"
+  },
+  finra_margin_debt: {
+    plain_name: "投資人融資負債",
+    what_it_measures: "FINRA 公布的證券融資帳戶客戶欠款總額。",
+    why_it_matters: "這是市場融資曝險的直接衡量，可作為槓桿與風險偏好的重要情境。",
+    how_to_read: "應分開看絕對水位、YoY 成長與成長動能。高水位可以同時伴隨成長放慢。",
+    higher_lower_or_contextual: "屬於情境指標：更高代表融資借款更多，但方向與動能也很重要。",
+    important_reference_level: "與自身歷史比較；沒有單一通用危險門檻。",
+    important_caveat: "融資水位高或仍在上升，不代表已經去槓桿。需要看到借款或其成長真正轉弱。"
+  },
+  finra_margin_debt_yoy_pct: {
+    plain_name: "融資餘額年增率",
+    what_it_measures: "FINRA 融資餘額相較一年前同月的百分比變化。",
+    why_it_matters: "可將槓桿成長速度與絕對金額水位分開觀察。",
+    how_to_read: "正值代表融資餘額仍高於一年前；正成長下降代表成長放慢，不代表融資餘額本身一定下降。",
+    higher_lower_or_contextual: "屬於情境指標：成長率的方向與變化比單純高低更重要。",
+    important_reference_level: "0% 是 YoY 成長與 YoY 衰退的分界。",
+    important_caveat: "若絕對水位沒有下降，不應把正成長放慢描述成『融資餘額正在下降』。"
+  },
+  tw_taiex: {
+    plain_name: "台灣加權指數（TAIEX）",
+    what_it_measures: "台灣證券交易所發行量加權股價指數的收盤水位。",
+    why_it_matters: "提供台灣市場風險與參與度判讀的整體價格背景。",
+    how_to_read: "應看變化與歷史比較，而不是只看指數絕對點位。",
+    higher_lower_or_contextual: "屬於情境指標：絕對點位本身不是風險分數。",
+    important_reference_level: "沒有單一點位能區分安全與危險。",
+    important_caveat: "只看 TAIEX 無法知道漲跌是否由多數股票共同參與。"
+  },
+  tw_advance_decline_pct: {
+    plain_name: "台股每日市場參與度",
+    what_it_measures: "TWSE 上漲家數與下跌家數的差異，並以有漲跌的股票數標準化。",
+    why_it_matters: "可觀察當日市場漲跌是廣泛參與，還是集中在少數股票。",
+    how_to_read: "正值代表上漲家數多於下跌；負值代表下跌家數較多。",
+    higher_lower_or_contextual: "越低代表當日參與度越弱；趨勢判讀仍需要足夠歷史。",
+    important_reference_level: "0% = 上漲與下跌家數相同。",
+    important_caveat: "單日廣度只是一個參與度快照；趨勢與百分位需要足夠的已發布歷史。"
+  },
+  tw_cbc_rate: {
+    plain_name: "台灣央行政策利率",
+    what_it_measures: "台灣央行政策利率的有效水位與歷次變動。",
+    why_it_matters: "政策利率會影響融資環境、折現率與整體總經背景。",
+    how_to_read: "觀測日期代表目前利率何時生效；來源驗證日期代表系統最近何時重新確認官方來源。",
+    higher_lower_or_contextual: "屬於情境指標：利率水位與調整速度通常比單純高低更重要。",
+    important_reference_level: "沒有單一政策利率水位能定義市場壓力。",
+    important_caveat: "若利率長期未調整，生效日期很舊不代表資料過期；應同時看最近來源驗證日期。",
+    date_semantics: "effective_vs_verified"
+  }
+};
+
+const signalBeginnerContextZhTW = {
+  margin_debt_rollover: {
+    plain_name: "融資槓桿動能放慢",
+    description: "當融資餘額 YoY 成長不再為正，或 YoY 成長率在三個月內下降至少 10 個百分點時觸發。",
+    caveat: "動能條件觸發不代表融資餘額絕對水位已經下降；YoY 仍可能維持正成長。"
+  },
+  financial_conditions_tight: {
+    plain_name: "廣義金融環境轉緊",
+    description: "檢查 NFCI 是否高於 0，或約一季內出現明顯收緊。",
+    caveat: "這只是金融環境的一項檢查，不是市場方向預測。"
+  },
+  risk_subindex_extreme: {
+    plain_name: "金融風險子指數異常偏高",
+    description: "檢查 NFCI risk 子指數是否達到嚴格歷史時點的第 90 百分位以上。",
+    caveat: "百分位只描述歷史排名，不代表未來報酬。"
+  },
+  vix_stress: {
+    plain_name: "波動壓力異常偏高",
+    description: "檢查 VIX 是否達到嚴格歷史時點的第 90 百分位以上。",
+    caveat: "VIX 本身不預測市場方向。"
+  },
+  market_trend_down: {
+    plain_name: "實質總報酬趨勢惡化",
+    description: "檢查 Shiller 實質總報酬價格是否低於六個月前。",
+    caveat: "這是描述性趨勢條件，不是進出場時點規則。"
+  },
+  high_low_breadth_collapse: {
+    plain_name: "NYSE 高低點廣度異常偏弱",
+    description: "檢查標準化 NYSE 高低點廣度是否低於嚴格歷史時點的第 10 百分位。",
+    caveat: "若公開資料不可用，狀態維持未知，不會當作未觸發。"
+  },
+  volume_breadth_collapse: {
+    plain_name: "NYSE 成交量廣度異常偏弱",
+    description: "檢查 McClellan Volume Summation 是否低於嚴格歷史時點的第 10 百分位。",
+    caveat: "若公開資料不可用，狀態維持未知，不會當作未觸發。"
+  },
+  sp500_50dma_breadth_weak: {
+    plain_name: "S&P 500 50 日線參與度異常偏弱",
+    description: "檢查具時點正確性的 S&P 500 50DMA 廣度是否低於嚴格歷史時點的第 10 百分位。",
+    caveat: "資料不可用或非 PIT 歷史時維持未知，不會被解讀為健康參與度。"
+  },
+  sp500_200dma_breadth_weak: {
+    plain_name: "S&P 500 200 日線參與度異常偏弱",
+    description: "檢查具時點正確性的 S&P 500 200DMA 廣度是否低於嚴格歷史時點的第 10 百分位。",
+    caveat: "資料不可用或非 PIT 歷史時維持未知，不會被解讀為健康參與度。"
+  }
+};
+
+let currentLocale = "en";
+
+function normalizeLocale(locale) {
+  const value = String(locale || "").trim();
+  if (value.toLowerCase().startsWith("zh")) return "zh-TW";
+  return "en";
+}
+
+function interpolate(message, values = {}) {
+  return String(message).replace(/\{(\w+)\}/g, (_, key) =>
+    values[key] === undefined || values[key] === null ? "" : String(values[key]),
+  );
+}
+
+function t(key, values = {}) {
+  const table = messages[currentLocale] || messages.en;
+  const fallback = messages.en[key] || key;
+  return interpolate(table[key] || fallback, values);
+}
+
+function getLocale() {
+  return currentLocale;
+}
+
+function localNumber(value) {
+  return Number(value).toLocaleString(currentLocale === "zh-TW" ? "zh-TW" : "en-US");
+}
+
+function localizedBeginnerContext(id) {
+  const base = beginnerContext[id];
+  if (!base) return null;
+  if (currentLocale !== "zh-TW") return base;
+  return { ...base, ...(beginnerContextZhTW[id] || {}) };
+}
+
+function localizedSignalContext(id) {
+  const base = signalBeginnerContext[id] || {};
+  if (currentLocale !== "zh-TW") return base;
+  return { ...base, ...(signalBeginnerContextZhTW[id] || {}) };
+}
+
+function pillarLabel(pillar) {
+  return t("pillar." + pillar) || pillar;
+}
+
+function historyModeLabel(mode) {
+  const key = {
+    absolute: "mode.absolute",
+    pit_percentile: "mode.pitPercentile",
+    rolling_percentile: "mode.rollingPercentile",
+    rate_change: "mode.rateChange",
+  }[mode] || "mode.absolute";
+  return t(key);
+}
+
+function statusLabel(status) {
+  return t("status." + String(status || "unknown").replaceAll(" ", "_"));
+}
+
+function applyStaticTranslations() {
+  if (!document?.documentElement) return;
+  document.documentElement.lang = currentLocale;
+  document.title = t("meta.title");
+  const description = document.querySelector?.('meta[name="description"]');
+  if (description) description.setAttribute("content", t("meta.description"));
+
+  document.querySelectorAll?.("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll?.("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+  });
+
+  const selector = $("#language-select");
+  if (selector) selector.value = currentLocale;
+}
+
+function rerenderLocalizedUi() {
+  renderOverview();
+  renderMetrics();
+  renderTrendParticipation();
+  renderTaiwanMarket();
+  renderSignals();
+  renderHistorySelector();
+  renderRegime();
+  renderCoverage();
+  updateGlobalFreshness();
+}
+
+function setLocale(locale, { persist = true, rerender = true } = {}) {
+  currentLocale = normalizeLocale(locale);
+  if (persist) localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
+  applyStaticTranslations();
+  if (rerender) rerenderLocalizedUi();
+  if (typeof CustomEvent !== "undefined") {
+    window.dispatchEvent?.(new CustomEvent("mrm:localechange", {
+      detail: { locale: currentLocale },
+    }));
+  }
+}
+
+function initLocale() {
+  const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
+  const browserLocale = window.navigator?.language || window.navigator?.languages?.[0] || "en";
+  let requested = null;
+  try {
+    requested = new URL(window.location.href).searchParams.get("lang");
+  } catch {
+    requested = null;
+  }
+  currentLocale = normalizeLocale(requested || saved || browserLocale);
+  applyStaticTranslations();
+  $("#language-select")?.addEventListener("change", (event) => {
+    setLocale(event.currentTarget.value);
+  });
+}
+
 let dialogInvoker = null;
 
 const state = {
@@ -194,6 +1091,7 @@ function escapeHtml(value) {
 function formatValue(value, units) {
   if (value == null || Number.isNaN(Number(value))) return "—";
   const v = Number(value);
+  const locale = currentLocale === "zh-TW" ? "zh-TW" : "en-US";
 
   if (units === "USD millions") {
     if (Math.abs(v) >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}T`;
@@ -203,12 +1101,12 @@ function formatValue(value, units) {
   if (units === "percent") return `${v.toFixed(Math.abs(v) >= 10 ? 1 : 2)}%`;
   if (units === "percentile") return ordinal(v);
   if (units === "ratio") return `${v.toFixed(2)}×`;
-  if (units === "binary") return v ? "Yes" : "No";
+  if (units === "binary") return currentLocale === "zh-TW" ? (v ? "是" : "否") : (v ? "Yes" : "No");
   if (units === "basis points") return `${v >= 0 ? "+" : ""}${v.toFixed(1)} bp`;
   if (Math.abs(v) >= 1000) {
-    return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    return v.toLocaleString(locale, { maximumFractionDigits: 1 });
   }
-  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return v.toLocaleString(locale, { maximumFractionDigits: 2 });
 }
 
 function effectiveFreshness(metric) {
@@ -250,7 +1148,7 @@ function freshnessBadge(metric) {
   const cls = ["fresh", "stale", "error", "missing"].includes(status)
     ? `badge-${status}`
     : "badge-neutral";
-  return `<span class="badge ${cls}">${escapeHtml(status.replaceAll("_", " "))}</span>`;
+  return `<span class="badge ${cls}">${escapeHtml(statusLabel(status))}</span>`;
 }
 
 function percentileRank(value, baseline) {
@@ -277,6 +1175,7 @@ function defaultRollingWindow(metric) {
 function ordinal(value) {
   if (value == null || !Number.isFinite(Number(value))) return "—";
   const n = Math.round(Number(value));
+  if (currentLocale === "zh-TW") return `第 ${n} 百分位`;
   const mod100 = Math.abs(n) % 100;
   const mod10 = Math.abs(n) % 10;
   const suffix =
@@ -302,54 +1201,58 @@ function rollingWindowLabel(metric) {
   if (frequency === "monthly") years = window / 12;
   if (years != null && Number.isFinite(years)) {
     const rounded = Math.max(1, Math.round(years));
-    return `last ${rounded} year${rounded === 1 ? "" : "s"}`;
+    return t("window.lastYears", {
+      count: localNumber(rounded),
+      plural: currentLocale === "en" && rounded !== 1 ? "s" : "",
+    });
   }
-  return `last ${window.toLocaleString()} observations`;
+  return t("window.lastObservations", { count: localNumber(window) });
 }
 
 function percentilePresentation(metric, value = rollingPercentile(metric)) {
   if (value == null) {
     return {
       value: "—",
-      label: "not enough history for percentile",
-      sentence: "Historical percentile is not available for this comparison."
+      label: t("percentile.notEnough"),
+      sentence: t("percentile.unavailable"),
     };
   }
   const rounded = Math.round(value);
   const window = rollingWindowLabel(metric);
+  const displayRank = currentLocale === "zh-TW" ? `第 ${rounded} 百分位` : ordinal(rounded);
   return {
-    value: ordinal(rounded),
-    label: `percentile vs ${window}`,
-    sentence: `Higher than about ${rounded}% of observations in the ${window} comparison window.`
+    value: displayRank,
+    label: t("percentile.label", { window }),
+    sentence: t("percentile.sentence", { percent: rounded, window }),
   };
 }
 
 function metricDateLine(metric) {
-  const context = beginnerContext[metric?.metric?.id];
+  const context = localizedBeginnerContext(metric?.metric?.id);
   const asOf = metric?.latest?.as_of || "unknown";
   if (context?.date_semantics === "effective_vs_verified") {
     const verified = String(metric?.latest?.fetched_at || "").slice(0, 10) || "unknown";
-    return `effective since ${asOf} · source verified ${verified}`;
+    return t("date.effectiveVerified", { asOf, verified });
   }
-  return `as of ${asOf}`;
+  return t("date.asOf", { asOf });
 }
 
 function metricContextGuide(metric) {
-  const context = beginnerContext[metric?.metric?.id];
+  const context = localizedBeginnerContext(metric?.metric?.id);
   if (!context) return "";
   const reference = context.important_reference_level
-    ? `<dt>Reference</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
+    ? `<dt>${escapeHtml(t("guide.reference"))}</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
     : "";
   const caveat = dynamicMetricCaveat(metric) || context.important_caveat;
   return `<div class="context-guide">
     <h3>${escapeHtml(context.plain_name)}</h3>
     <p>${escapeHtml(context.what_it_measures)}</p>
     <dl>
-      <dt>Why it matters</dt><dd>${escapeHtml(context.why_it_matters)}</dd>
-      <dt>How to read</dt><dd>${escapeHtml(context.how_to_read)}</dd>
-      <dt>Direction</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
+      <dt>${escapeHtml(t("guide.why"))}</dt><dd>${escapeHtml(context.why_it_matters)}</dd>
+      <dt>${escapeHtml(t("guide.how"))}</dt><dd>${escapeHtml(context.how_to_read)}</dd>
+      <dt>${escapeHtml(t("guide.direction"))}</dt><dd>${escapeHtml(context.higher_lower_or_contextual)}</dd>
       ${reference}
-      <dt>Caveat</dt><dd>${escapeHtml(caveat)}</dd>
+      <dt>${escapeHtml(t("guide.caveat"))}</dt><dd>${escapeHtml(caveat)}</dd>
     </dl>
   </div>`;
 }
@@ -369,10 +1272,10 @@ function usableObservationCount(metric) {
 function percentileContextSuffix(metric) {
   const parts = [];
   if (metric?.metric?.polarity === "contextual") {
-    parts.push("context only");
+    parts.push(t("context.contextOnly"));
   }
   if (rollingPercentileSemantics(metric) === "retrospective") {
-    parts.push("retrospective; not PIT/backtest-safe");
+    parts.push(t("context.retrospective"));
   }
   return parts.length ? ` · ${parts.join(" · ")}` : "";
 }
@@ -380,12 +1283,10 @@ function percentileContextSuffix(metric) {
 function percentileCaveatSentence(metric) {
   const parts = [];
   if (metric?.metric?.polarity === "contextual") {
-    parts.push("This rank is context only; it is not a risk direction.");
+    parts.push(t("context.riskDirection"));
   }
   if (rollingPercentileSemantics(metric) === "retrospective") {
-    parts.push(
-      "This is a retrospective current rank and is not safe for historical PIT/backtest use.",
-    );
+    parts.push(t("context.notPit"));
   }
   return parts.join(" ");
 }
@@ -425,7 +1326,10 @@ function marginMomentumEvidence(condition) {
     typeof periods !== "number" ||
     !Number.isFinite(periods)
   ) return null;
-  return `YoY growth slowed ${Math.abs(value).toFixed(1)} pp over ${periods} monthly observations`;
+  return t("margin.slowing", {
+    value: Math.abs(value).toFixed(1),
+    periods,
+  });
 }
 
 function taiwanBreadthState(metric) {
@@ -455,22 +1359,22 @@ function dynamicMetricCaveat(metric) {
   if (metric?.metric?.id !== "tw_advance_decline_pct") return null;
   const breadth = taiwanBreadthState(metric);
   if (breadth.state === "missing") {
-    return "No usable public breadth sessions are currently available.";
+    return t("breadth.none");
   }
   if (breadth.state === "snapshot_only") {
-    return "Only 1 published breadth session is available. This is a one-session participation snapshot, not a trend or percentile conclusion.";
+    return t("breadth.oneSession");
   }
   if (breadth.state === "history_building") {
-    return `${breadth.observations} published breadth sessions are available. Multi-session history is accumulating, but the configured historical percentile still lacks sufficient observations.`;
+    return t("breadth.historyBuilding", { count: localNumber(breadth.observations) });
   }
   if (breadth.state === "not_current") {
-    return `Published breadth history exists, but its current freshness state is ${breadth.freshness}; current trend interpretation needs caution.`;
+    return t("breadth.notCurrent", { freshness: statusLabel(breadth.freshness) });
   }
   return null;
 }
 
 function formatRuleDetail(detail) {
-  const parts = [`${detail.label}: ${detail.status}`];
+  const parts = [`${detail.label}: ${statusLabel(detail.status)}`];
   if (
     typeof detail.value === "number" &&
     Number.isFinite(detail.value)
@@ -478,11 +1382,11 @@ function formatRuleDetail(detail) {
     const value = detail.value;
     const unit =
       detail.type === "delta_periods_below" && detail.metric === "finra_margin_debt_yoy_pct"
-        ? " pp"
+        ? (currentLocale === "zh-TW" ? " 個百分點" : " pp")
         : "";
-    parts.push(`observed ${value.toFixed(2)}${unit}`);
+    parts.push(t("rule.observed", { value: value.toFixed(2), unit }));
   }
-  if (detail.asOf) parts.push(`as of ${detail.asOf}`);
+  if (detail.asOf) parts.push(t("rule.asOf", { date: detail.asOf }));
   const line = escapeHtml(parts.join(" · "));
   return detail.reason
     ? `${line}<br><span class="signal-rule-reason">${escapeHtml(detail.reason)}</span>`
@@ -504,7 +1408,7 @@ function setSnapshotCard(kind, status, headline, facts = [], displayState = "nor
   const compactFacts = facts.filter(Boolean).slice(0, 2);
   factsEl.innerHTML = compactFacts.length
     ? compactFacts.map((fact) => `<span>${escapeHtml(fact)}</span>`).join("")
-    : "<span>No current supporting observation</span>";
+    : `<span>${escapeHtml(t("snapshot.noSupport"))}</span>`;
 }
 
 function setOverviewHealth(headline, detail, displayState = "normal") {
@@ -542,7 +1446,7 @@ function setDecisionThesis(title, summary, confidence, evidence = [], triggers =
     .filter((item) => item?.text)
     .slice(0, 3)
     .map((item) => `<div class="trigger-item"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.text)}</strong></div>`)
-    .join("") || '<span class="trigger-item">No configured escalation threshold is available.</span>';
+    .join("") || `<span class="trigger-item">${escapeHtml(t("trigger.none"))}</span>`;
 }
 
 
@@ -948,14 +1852,14 @@ function metricCard(metric) {
   const p = percentilePresentation(metric, pct);
   const change = recentChange(metric);
   const cText = formatChange(change);
-  const context = beginnerContext[metric.metric.id];
+  const context = localizedBeginnerContext(metric.metric.id);
   const title = context?.plain_name || metric.metric.name;
   const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
-  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(title)} details and history">
+  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="${escapeHtml(t("metric.openAria", { title }))}">
     <div class="metric-card-top">
       <div>
-        <p class="eyebrow">${escapeHtml(pillarLabels[metric.metric.pillar] || metric.metric.pillar)}</p>
+        <p class="eyebrow">${escapeHtml(pillarLabel(metric.metric.pillar))}</p>
         <h3>${escapeHtml(title)}</h3>
       </div>
       ${freshnessBadge(metric)}
@@ -963,13 +1867,13 @@ function metricCard(metric) {
     <div class="metric-value">${formatValue(metric.latest?.value, metric.metric.units)}</div>
     <div class="metric-unit">${escapeHtml(metricDateLine(metric))} · ${escapeHtml(metric.metric.units)}</div>
     <div class="metric-context">
-      <div class="context-chip"><strong>${cText}</strong><span>last observation</span></div>
+      <div class="context-chip"><strong>${cText}</strong><span>${escapeHtml(t("metric.lastObservation"))}</span></div>
       <div class="context-chip"><strong>${p.value}</strong><span>${escapeHtml(p.label)}${contextOnly}</span></div>
     </div>
     ${sparkline(metric)}
     <div class="metric-card-bottom">
       <span class="meta">${escapeHtml(metric.coverage?.history_start || "—")} → ${escapeHtml(metric.coverage?.history_end || "—")}</span>
-      <span class="meta">${context ? "Explain & view history ↗" : "Open history ↗"}</span>
+      <span class="meta">${escapeHtml(context ? t("metric.explainHistory") : t("metric.openHistory"))}</span>
     </div>
   </article>`;
 }
@@ -983,7 +1887,6 @@ function renderOverview() {
   const taiex = state.metrics.get("tw_taiex");
   const twBreadth = state.metrics.get("tw_advance_decline_pct");
 
-  // U.S. stress: plain-language state first, raw metrics second.
   const financialCondition = signalCondition("financial_conditions_tight");
   const vixStress = signalCondition("vix_stress");
   const expectedStressConditions = [financialCondition, vixStress];
@@ -1000,25 +1903,24 @@ function renderOverview() {
     const nfciValue = Number(nfci.latest?.value);
     stressFacts.push(
       Number.isFinite(nfciValue)
-        ? `Conditions ${nfciValue > 0 ? "tighter" : "looser"} than avg`
-        : "Financial conditions available",
+        ? t(nfciValue > 0 ? "overview.stress.tighter" : "overview.stress.looser")
+        : t("overview.stress.available"),
     );
   }
   if (vix) {
     const percentile = percentilePresentation(vix);
     stressFacts.push(
-      `VIX ${formatValue(vix.latest?.value, vix.metric.units)}${percentile.value !== "—" ? ` · ${percentile.value} pct` : ""}`,
+      `VIX ${formatValue(vix.latest?.value, vix.metric.units)}${percentile.value !== "—" ? ` · ${percentile.value}` : ""}`,
     );
   }
   setSnapshotCard(
     "stress",
-    stressUnknown ? "DATA GAP" : stressActive ? "ELEVATED" : "CLEAR",
-    stressUnknown ? "Known gauges calm" : stressActive ? "Stress elevated" : "Stress contained",
+    stressUnknown ? t("status.dataGap") : stressActive ? t("status.elevated") : t("status.clear"),
+    stressUnknown ? t("overview.stress.knownCalm") : stressActive ? t("overview.stress.elevated") : t("overview.stress.contained"),
     stressFacts,
     stressUnknown ? "gap" : stressActive ? "watch" : "normal",
   );
 
-  // Leverage: distinguish a high level from a slowing growth impulse.
   const marginSignal = signalCondition("margin_debt_rollover");
   const marginStatus = marginSignal ? effectiveConditionStatus(marginSignal) : "unknown";
   const yoy = Number(marginYoy?.latest?.value);
@@ -1027,7 +1929,7 @@ function renderOverview() {
   const leverageFacts = [];
   if (margin) {
     leverageFacts.push(
-      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} pct (context)` : ""}`,
+      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} (${t("context.contextOnly")})` : ""}`,
     );
   }
   if (marginYoy) {
@@ -1036,13 +1938,12 @@ function renderOverview() {
   const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;
   setSnapshotCard(
     "leverage",
-    !leverageReady ? "DATA GAP" : slowing ? "WATCH" : "CONTEXT",
-    !leverageReady ? "Incomplete read" : slowing ? "High, growth slowing" : "Leverage context",
+    !leverageReady ? t("status.dataGap") : slowing ? t("status.watch") : t("status.context"),
+    !leverageReady ? t("overview.leverage.incomplete") : slowing ? t("overview.leverage.slowing") : t("overview.leverage.context"),
     leverageFacts,
     !leverageReady ? "gap" : slowing ? "watch" : "normal",
   );
 
-  // Deleveraging: counts remain transparent; no composite crash score is created.
   const conditions = (state.signals?.current?.conditions || []).map((condition) => ({
     ...condition,
     displayStatus: effectiveConditionStatus(condition),
@@ -1054,22 +1955,35 @@ function renderOverview() {
   const total = conditions.length;
   const activeName = activeConditions[0]
     ? (activeConditions[0].id === "margin_debt_rollover"
-        ? "Margin momentum slowing"
-        : signalBeginnerContext[activeConditions[0].id]?.plain_name || activeConditions[0].name)
+        ? t("overview.marginMomentum")
+        : localizedSignalContext(activeConditions[0].id)?.plain_name || activeConditions[0].name)
     : null;
 
   const deleveragingFacts = [];
   if (activeName) deleveragingFacts.push(activeName);
-  if (total) deleveragingFacts.push(`${known}/${total} usable · ${unknown} unknown`);
+  if (total) {
+    deleveragingFacts.push(t("overview.usable", { known, total, unknown }));
+  }
   setSnapshotCard(
     "deleveraging",
-    !total ? "DATA GAP" : active ? `${active} ACTIVE` : unknown ? "PARTIAL" : "CLEAR",
-    !total ? "No signal read" : (active && unknown) ? "Not confirmed" : active ? "Deleveraging signs" : "No confirmation",
+    !total
+      ? t("status.dataGap")
+      : active
+        ? `${active} ${currentLocale === "zh-TW" ? "項觸發" : "ACTIVE"}`
+        : unknown
+          ? t("status.partial")
+          : t("status.clear"),
+    !total
+      ? t("overview.deleveraging.noRead")
+      : (active && unknown)
+        ? t("overview.deleveraging.notConfirmed")
+        : active
+          ? t("overview.deleveraging.signs")
+          : t("overview.deleveraging.noConfirmation"),
     deleveragingFacts,
     !total ? "gap" : active ? "watch" : unknown ? "gap" : "normal",
   );
 
-  // Taiwan: currentness is more important than a stale directional interpretation.
   const taiexFreshness = effectiveFreshness(taiex).state;
   const breadth = taiwanBreadthState(twBreadth);
   const taiwanFacts = [];
@@ -1078,10 +1992,13 @@ function renderOverview() {
   }
   if (twBreadth && breadth.state !== "missing") {
     taiwanFacts.push(
-      `A/D ${formatValue(twBreadth.latest?.value, "percent")} · ${breadth.observations} session${breadth.observations === 1 ? "" : "s"}`,
+      `A/D ${formatValue(twBreadth.latest?.value, "percent")} · ${t("overview.sessions", {
+        count: localNumber(breadth.observations),
+        plural: currentLocale === "en" && breadth.observations !== 1 ? "s" : "",
+      })}`,
     );
   } else {
-    taiwanFacts.push("Breadth unavailable");
+    taiwanFacts.push(t("overview.taiwan.breadthUnavailable"));
   }
 
   const taiwanMissing = !taiex || ["missing", "error"].includes(taiexFreshness);
@@ -1089,20 +2006,20 @@ function renderOverview() {
     !taiwanMissing &&
     (taiexFreshness !== "fresh" ||
       ["missing", "not_current", "snapshot_only", "history_building"].includes(breadth.state));
-  let taiwanStatus = "CURRENT";
-  let taiwanHeadline = "Market read available";
+  let taiwanStatus = t("status.current");
+  let taiwanHeadline = t("overview.taiwan.available");
   let taiwanState = "normal";
   if (taiwanMissing) {
-    taiwanStatus = "DATA GAP";
-    taiwanHeadline = "No current read";
+    taiwanStatus = t("status.dataGap");
+    taiwanHeadline = t("overview.taiwan.noRead");
     taiwanState = "gap";
   } else if (taiexFreshness !== "fresh") {
-    taiwanStatus = String(taiexFreshness).toUpperCase();
-    taiwanHeadline = "No current call";
+    taiwanStatus = statusLabel(taiexFreshness).toUpperCase();
+    taiwanHeadline = t("overview.taiwan.noCall");
     taiwanState = "watch";
   } else if (taiwanNeedsAttention) {
-    taiwanStatus = "PARTIAL";
-    taiwanHeadline = "Price current";
+    taiwanStatus = t("status.partial");
+    taiwanHeadline = t("overview.taiwan.priceCurrent");
     taiwanState = "watch";
   }
   setSnapshotCard(
@@ -1113,86 +2030,99 @@ function renderOverview() {
     taiwanState,
   );
 
-  // Data health is deliberately separated from market interpretation.
   const metrics = [...state.metrics.values()];
   const health = globalFreshnessSummary(metrics);
   const snapshotDate = String(
     state.catalog?.generated_at || state.refreshReport?.generated_at || "",
   ).slice(0, 10);
   const healthParts = [];
-  if (health.counts.error) healthParts.push(`${health.counts.error} error`);
-  if (health.counts.missing) healthParts.push(`${health.counts.missing} missing`);
-  if (health.counts.stale) healthParts.push(`${health.counts.stale} stale`);
+  if (health.counts.error) healthParts.push(t("health.count.error", { count: health.counts.error }));
+  if (health.counts.missing) healthParts.push(t("health.count.missing", { count: health.counts.missing }));
+  if (health.counts.stale) healthParts.push(t("health.count.stale", { count: health.counts.stale }));
   if (health.counts.insufficient_data) {
-    healthParts.push(`${health.counts.insufficient_data} insufficient`);
+    healthParts.push(t("health.count.insufficient", { count: health.counts.insufficient_data }));
   }
-  if (unknown) healthParts.push(`${unknown} unknown checks`);
-  if (snapshotDate) healthParts.push(`snapshot ${snapshotDate}`);
+  if (unknown) healthParts.push(t("health.count.unknownChecks", { count: unknown }));
+  if (snapshotDate) healthParts.push(t("health.snapshotDate", { date: snapshotDate }));
 
   const healthHasHardGap = Boolean(health.counts.error || health.counts.missing);
   const healthNeedsRefresh = Boolean(health.counts.stale);
   const healthHasEvidenceGap = Boolean(unknown);
   const marginRank = margin ? rollingPercentile(margin) : null;
   const leverageElevated = Number.isFinite(marginRank) && marginRank >= 90;
-  const momentumEvidence = marginMomentumEvidence(marginSignal);
 
   let thesisTitle;
   if (stressActive) {
     thesisTitle = active
-      ? "Stress rising; deleveraging signals appearing"
-      : "Stress rising; deleveraging not confirmed";
+      ? t("thesis.stressAndDeleveraging")
+      : t("thesis.stressNotConfirmed");
   } else if (slowing) {
-    thesisTitle = "Leverage rolling over; stress not confirmed";
+    thesisTitle = t("thesis.rollover");
   } else if (leverageElevated) {
-    thesisTitle = "Leverage stretched; stress not confirmed";
+    thesisTitle = t("thesis.stretched");
   } else if (stressUnknown) {
-    thesisTitle = "Known stress gauges calm; read incomplete";
+    thesisTitle = t("thesis.partial");
   } else {
-    thesisTitle = "No broad stress confirmation";
+    thesisTitle = t("thesis.noBroadStress");
   }
 
   const thesisParts = [];
   if (stressActive) {
-    thesisParts.push("At least one current stress check is elevated.");
+    thesisParts.push(t("thesis.stressElevated"));
   } else if (stressUnknown) {
-    thesisParts.push("Known stress gauges are not elevated, but expected stress evidence is incomplete.");
+    thesisParts.push(t("thesis.stressPartial"));
   } else {
-    thesisParts.push("Current NFCI/VIX stress checks are not elevated.");
+    thesisParts.push(t("thesis.stressCalm"));
   }
   if (Number.isFinite(yoy)) {
     thesisParts.push(
       slowing
-        ? `Margin debt is still ${formatValue(yoy, "percent")} YoY while growth momentum is slowing.`
-        : `Margin debt growth is ${formatValue(yoy, "percent")} YoY.`,
+        ? t("thesis.marginSlowing", { yoy: formatValue(yoy, "percent") })
+        : t("thesis.marginGrowth", { yoy: formatValue(yoy, "percent") }),
     );
   }
   if (total) {
-    thesisParts.push(
-      `${known}/${total} deleveraging checks are usable; ${active} ${active === 1 ? "is" : "are"} active.`,
-    );
+    thesisParts.push(t("thesis.checks", {
+      known,
+      total,
+      active,
+      verb: active === 1 ? "is" : "are",
+    }));
   }
 
-  let thesisConfidence = "HIGH CONFIDENCE";
+  let thesisConfidence = t("thesis.confidence.high");
   let thesisState = "normal";
   if (!total || unknown >= Math.ceil(Math.max(total, 1) / 2) || stressUnknown) {
-    thesisConfidence = "LOW CONFIDENCE";
+    thesisConfidence = t("thesis.confidence.low");
     thesisState = "gap";
   } else if (unknown || healthNeedsRefresh) {
-    thesisConfidence = "MEDIUM CONFIDENCE";
+    thesisConfidence = t("thesis.confidence.medium");
     thesisState = "watch";
   }
   if (healthNeedsRefresh) {
-    thesisConfidence += " · STALE DATA";
+    thesisConfidence += ` · ${t("thesis.confidence.stale")}`;
     if (thesisState === "normal") thesisState = "watch";
   }
 
+  const stressEvidenceState = stressActive
+    ? t("thesis.evidence.stressElevated")
+    : stressUnknown
+      ? t("thesis.evidence.stressPartial")
+      : t("thesis.evidence.stressCalm");
+  const leverageRank = Number.isFinite(marginRank)
+    ? (currentLocale === "zh-TW"
+        ? `${formatValue(marginRank, "percentile")}（近 10 年）`
+        : `${formatValue(marginRank, "percentile")} vs 10y`)
+    : (currentLocale === "zh-TW" ? "資料可用" : "available");
+  const leverageYoy = Number.isFinite(yoy)
+    ? ` · YoY ${formatValue(yoy, "percent")}`
+    : "";
+
   const thesisEvidence = [
-    `Stress: ${stressActive ? "elevated" : stressUnknown ? "partial / known gauges calm" : "not elevated"}`,
-    margin
-      ? `Leverage: ${Number.isFinite(marginRank) ? `${formatValue(marginRank, "percentile")} vs 10y` : "available"}${Number.isFinite(yoy) ? ` · YoY ${formatValue(yoy, "percent")}` : ""}`
-      : "Leverage: unavailable",
-    total ? `Deleveraging: ${active} active / ${known} known` : "Deleveraging: unavailable",
-    snapshotDate ? `Snapshot: ${snapshotDate}` : null,
+    t("thesis.evidence.stress", { state: stressEvidenceState }),
+    margin ? t("thesis.evidence.leverage", { rank: leverageRank, yoy: leverageYoy }) : null,
+    total ? t("thesis.evidence.deleveraging", { active, known }) : null,
+    snapshotDate ? t("thesis.evidence.snapshot", { date: snapshotDate }) : null,
   ];
 
   const nfciTrigger = findRuleLeaf(financialCondition, (rule) => rule.type === "latest_above");
@@ -1203,22 +2133,28 @@ function renderOverview() {
   const breadthThreshold = Number(breadthTrigger?.threshold);
   const thesisTriggers = [
     {
-      label: "Stress confirms",
+      label: t("thesis.trigger.stress"),
       text: nfciTrigger && vixTrigger
-        ? `NFCI ≥ ${nfciTrigger.threshold} or VIX ≥ ${vixTrigger.threshold}th percentile`
-        : "configured NFCI / VIX stress threshold turns active",
+        ? (currentLocale === "zh-TW"
+            ? `NFCI ≥ ${nfciTrigger.threshold} 或 VIX ≥ 第 ${vixTrigger.threshold} 百分位`
+            : `NFCI ≥ ${nfciTrigger.threshold} or VIX ≥ ${vixTrigger.threshold}th percentile`)
+        : t("thesis.trigger.stressFallback"),
     },
     {
-      label: "Rollover deepens",
+      label: t("thesis.trigger.rollover"),
       text: marginTrigger
-        ? `Margin-debt YoY ≤ ${marginTrigger.threshold}%`
-        : "margin-debt growth turns negative",
+        ? (currentLocale === "zh-TW"
+            ? `融資餘額 YoY ≤ ${marginTrigger.threshold}%`
+            : `Margin-debt YoY ≤ ${marginTrigger.threshold}%`)
+        : t("thesis.trigger.marginFallback"),
     },
     {
-      label: "Breadth confirms",
+      label: t("thesis.trigger.breadth"),
       text: Number.isFinite(breadthThreshold)
-        ? `NYSE High-Low breadth ≤ ${breadthThreshold}th percentile`
-        : (breadthTrigger?.label || "breadth deterioration becomes available and active"),
+        ? (currentLocale === "zh-TW"
+            ? `NYSE 高低點廣度 ≤ 第 ${breadthThreshold} 百分位`
+            : `NYSE High-Low breadth ≤ ${breadthThreshold}th percentile`)
+        : t("thesis.trigger.breadthFallback"),
     },
   ];
 
@@ -1233,13 +2169,13 @@ function renderOverview() {
 
   setOverviewHealth(
     healthHasHardGap
-      ? "Source issues"
+      ? t("health.sourceIssues")
       : healthNeedsRefresh
-        ? "Snapshot needs refresh"
+        ? t("health.needsRefresh")
         : healthHasEvidenceGap
-          ? "Evidence gaps remain"
-          : "Snapshot current",
-    healthParts.join(" · ") || "No published metrics loaded",
+          ? t("health.evidenceGaps")
+          : t("health.snapshotCurrent"),
+    healthParts.join(" · ") || t("health.noSnapshot"),
     healthHasHardGap ? "gap" : (healthNeedsRefresh || healthHasEvidenceGap) ? "watch" : "normal",
   );
 }
@@ -1269,7 +2205,7 @@ function renderMetrics() {
 
   if (!metrics.length) {
     grid.innerHTML =
-      '<div class="panel empty-state"><strong>Current U.S. snapshot is unavailable.</strong><span>No fixture or placeholder value is substituted for missing published data.</span></div>';
+      `<div class="panel empty-state"><strong>${escapeHtml(t("metric.usUnavailable"))}</strong><span>${escapeHtml(t("metric.noPlaceholder"))}</span></div>`;
     return;
   }
 
@@ -1294,11 +2230,11 @@ function renderTaiwanMarket() {
 
   if (!metrics.length) {
     stateGrid.innerHTML =
-      '<div class="optional-state"><strong>Core Taiwan snapshot unavailable</strong><span>No placeholder data is shown. Source and freshness details remain available when a published snapshot exists.</span></div>';
+      `<div class="optional-state"><strong>${escapeHtml(t("taiwan.coreUnavailable"))}</strong><span>${escapeHtml(t("taiwan.noPlaceholder"))}</span></div>`;
     grid.innerHTML = "";
     chart.innerHTML =
-      '<div class="empty-state compact">TAIEX history is unavailable in the current published snapshot.</div>';
-    status.textContent = "Coverage unavailable";
+      `<div class="empty-state compact">${escapeHtml(t("taiwan.historyUnavailable"))}</div>`;
+    status.textContent = t("common.coverageUnavailable");
     return;
   }
 
@@ -1313,8 +2249,8 @@ function renderTaiwanMarket() {
   const macroCurrent = state.taiwanMacroRegime?.current || null;
   const macroLastKnown = state.taiwanMacroRegime?.latest_known || null;
   const macroLastKnownNote = macroLastKnown
-    ? `last known ${macroLastKnown.regime} ${macroLastKnown.date}`
-    : "no known regime yet";
+    ? t("taiwan.lastKnown", { regime: macroLastKnown.regime, date: macroLastKnown.date })
+    : t("taiwan.noKnownRegime");
   const rateMetrics = metrics.filter((m) =>
     m.metric.id.startsWith("tw_cbc_"),
   );
@@ -1325,49 +2261,58 @@ function renderTaiwanMarket() {
     <div class="regime-note">${escapeHtml(note)}</div>
   </div>`;
 
-  let breadthValue = "Unavailable";
-  let breadthNote = "Official A/D breadth not published";
+  let breadthValue = t("taiwan.unavailable");
+  let breadthNote = t("taiwan.adNotPublished");
   if (adPct && breadth.state !== "missing") {
     breadthValue = formatValue(adPct.latest?.value, "percent");
     if (breadth.state === "snapshot_only") {
-      breadthNote = "A-D snapshot · 1 session only · no trend inference";
+      breadthNote = t("taiwan.adSnapshot");
     } else if (breadth.state === "history_building") {
-      breadthNote = `A-D % · ${breadth.observations.toLocaleString()} sessions · history accumulating`;
+      breadthNote = t("taiwan.adBuilding", { count: localNumber(breadth.observations) });
     } else if (breadth.state === "not_current") {
-      breadthNote = `A-D history exists · ${breadth.freshness}`;
+      breadthNote = t("taiwan.adHistory", { freshness: statusLabel(breadth.freshness) });
     } else {
-      breadthNote = `A-D % · ${breadth.observations.toLocaleString()} sessions`;
+      breadthNote = t("taiwan.adSessions", { count: localNumber(breadth.observations) });
     }
   }
 
   stateGrid.innerHTML = [
     statusCell(
-      "Price",
-      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : "Unavailable",
+      t("taiwan.price"),
+      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : t("taiwan.unavailable"),
       taiex
-        ? `TAIEX · ${taiex.latest?.as_of || "—"} · ${taiexFreshness}`
-        : "TAIEX not published",
+        ? `TAIEX · ${taiex.latest?.as_of || "—"} · ${statusLabel(taiexFreshness)}`
+        : t("taiwan.notPublished"),
     ),
-    statusCell("Breadth", breadthValue, breadthNote),
+    statusCell(t("taiwan.breadth"), breadthValue, breadthNote),
     statusCell(
-      "Macro cycle",
-      macroCurrent ? String(macroCurrent.regime || "Unknown") : "Not published",
+      t("taiwan.macroCycle"),
+      macroCurrent ? String(macroCurrent.regime || t("status.unknown")) : t("taiwan.notPublished"),
       macroCurrent
         ? (macroCurrent.score === null || macroCurrent.score === undefined
-            ? `${macroCurrent.known_components}/${macroCurrent.total_components} inputs · ${macroLastKnownNote}`
-            : `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`)
+            ? t("taiwan.inputs", {
+                known: macroCurrent.known_components,
+                total: macroCurrent.total_components,
+                lastKnown: macroLastKnownNote,
+              })
+            : t("taiwan.scoreConfidence", {
+                score: Number(macroCurrent.score).toFixed(2),
+                confidence: Math.round(Number(macroCurrent.confidence) * 100),
+              }))
         : (macroMetrics.length
-            ? `${macroMetrics.length} public macro metrics; regime summary unavailable`
-            : "Taiwan macro/regime family is not included in this public release"),
+            ? t("taiwan.macroSummaryUnavailable", { count: macroMetrics.length })
+            : t("taiwan.macroFamilyUnavailable")),
     ),
     statusCell(
-      "Rates",
+      t("taiwan.rates"),
       state.taiwanCbcRateRegime?.current?.regime
         ? String(state.taiwanCbcRateRegime.current.regime)
-        : (rateMetrics.length ? "Inputs loaded" : "Unknown"),
+        : (rateMetrics.length ? t("taiwan.inputsLoaded") : t("status.unknown")),
       state.taiwanCbcRateRegime?.current
-        ? `CBC ${formatValue(state.taiwanCbcRateRegime.current.rate, "percent")} · 6M ${formatValue(state.taiwanCbcRateRegime.current.change_6m_bp, "basis points")} · Fed ${state.fedRateRegime?.current?.regime || "unknown"}`
-        : (rateMetrics.length ? `${rateMetrics.length} CBC rate metrics` : "CBC rate history not published"),
+        ? `CBC ${formatValue(state.taiwanCbcRateRegime.current.rate, "percent")} · 6M ${formatValue(state.taiwanCbcRateRegime.current.change_6m_bp, "basis points")} · Fed ${state.fedRateRegime?.current?.regime || t("status.unknown")}`
+        : (rateMetrics.length
+            ? t("taiwan.cbcMetrics", { count: rateMetrics.length })
+            : t("taiwan.cbcNotPublished")),
     ),
   ].join("");
 
@@ -1395,29 +2340,32 @@ function renderTaiwanMarket() {
   if (taiex) {
     const observationCount = usableObservationCount(taiex);
     status.textContent =
-      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${observationCount.toLocaleString()} observations · ${taiexFreshness}`;
+      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${t("taiwan.observations", {
+        count: localNumber(observationCount),
+        freshness: statusLabel(taiexFreshness),
+      })}`;
     if (Array.isArray(taiex.observations)) {
       fullChart(taiex, chart);
     } else {
       chart.innerHTML =
-        '<div class="empty-state compact"><strong>TAIEX history is available on demand.</strong><button id="tw-load-history" class="text-button" type="button">Load TAIEX history</button></div>';
+        `<div class="empty-state compact"><strong>${escapeHtml(t("taiwan.historyOnDemand"))}</strong><button id="tw-load-history" class="text-button" type="button">${escapeHtml(t("taiwan.loadHistory"))}</button></div>`;
       $("#tw-load-history")?.addEventListener("click", async (event) => {
         event.currentTarget.disabled = true;
-        event.currentTarget.textContent = "Loading…";
+        event.currentTarget.textContent = t("dialog.loading");
         try {
           await ensureMetricLoaded("tw_taiex");
           renderTaiwanMarket();
         } catch (error) {
           console.warn("TAIEX history load failed", error);
           chart.innerHTML =
-            '<div class="empty-state compact">TAIEX history could not be loaded. Current summary data remains available.</div>';
+            `<div class="empty-state compact">${escapeHtml(t("taiwan.historyLoadFailed"))}</div>`;
         }
       });
     }
   } else {
     chart.innerHTML =
-      '<div class="empty-state compact">TAIEX snapshot is unavailable in the current release.</div>';
-    status.textContent = "TAIEX unavailable";
+      `<div class="empty-state compact">${escapeHtml(t("taiwan.snapshotUnavailable"))}</div>`;
+    status.textContent = t("taiwan.taiexUnavailable");
   }
 
   renderTaiwanEventSelector();
@@ -1448,7 +2396,7 @@ function renderTrendParticipation() {
     if (legend) legend.hidden = true;
     if (studyBlock) studyBlock.hidden = true;
     summaryEl.innerHTML =
-      '<div class="optional-state"><strong>Trend Participation — unavailable in the public release</strong><span>Point-in-time S&P 500 moving-average breadth history with acceptable redistribution rights is not currently published. Missing breadth remains unknown in Deleveraging Watch.</span></div>';
+      `<div class="optional-state"><strong>${escapeHtml(t("trend.unavailableTitle"))}</strong><span>${escapeHtml(t("trend.unavailableDetail"))}</span></div>`;
     return;
   }
 
@@ -1462,15 +2410,18 @@ function renderTrendParticipation() {
     .map((horizon) => {
       const metric = metrics[horizon];
       if (!metric) {
-        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>not published</small></div>`;
+        return `<div class="trend-stat missing"><span>${horizon}DMA</span><strong>—</strong><small>${escapeHtml(t("trend.notPublished"))}</small></div>`;
       }
       const pct = rollingPercentile(metric);
       const eligibility = historicalAnalysisEligibility(metric);
       const context = !eligibility.allowed
-        ? `non-PIT history · ${eligibility.reason}`
+        ? t("trend.nonPit", { reason: eligibility.reason })
         : (pct == null
-            ? "historical percentile unavailable"
-            : `${ordinal(pct)} percentile vs ${rollingWindowLabel(metric)}`);
+            ? t("trend.percentileUnavailable")
+            : t("trend.percentileContext", {
+                percentile: ordinal(pct),
+                window: rollingWindowLabel(metric),
+              }));
       return `<button class="trend-stat" type="button" data-ma-metric="${metric.metric.id}">
         <span>${horizon}DMA</span>
         <strong>${formatValue(metric.latest?.value, "percent")}</strong>
@@ -1496,24 +2447,26 @@ function renderMaBreadthStudy() {
   if (!statusEl || !summaryEl || !bodyEl) return;
 
   if (!study) {
-    statusEl.textContent = "Study snapshot not loaded";
+    statusEl.textContent = t("trend.studyNotLoaded");
     summaryEl.innerHTML =
-      '<div class="empty-state compact">Build the study after loading point-in-time 50DMA breadth and SPX price history.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("trend.studyBuild"))}</div>`;
     bodyEl.innerHTML =
-      '<tr><td colspan="9" class="empty-cell">No threshold-study episodes loaded.</td></tr>';
+      `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("trend.noEpisodes"))}</td></tr>`;
     return;
   }
 
   if (study.status !== "ready") {
-    statusEl.textContent = study.status.replaceAll("_", " ");
-    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || "Event study is not canonical for this source.")}</div>`;
+    statusEl.textContent = statusLabel(study.status);
+    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(study.reason || t("trend.studyNonCanonical"))}</div>`;
     bodyEl.innerHTML =
-      '<tr><td colspan="9" class="empty-cell">Canonical episode table unavailable for this source.</td></tr>';
+      `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("trend.studyCanonicalUnavailable"))}</td></tr>`;
     return;
   }
 
-  statusEl.textContent =
-    `${study.events?.length || 0} events · cooldown ${study.cooldown_sessions} sessions · descriptive only`;
+  statusEl.textContent = t("trend.studyStatus", {
+    events: study.events?.length || 0,
+    cooldown: study.cooldown_sessions,
+  });
 
   const preferred = (study.summaries || []).filter(
     (row) =>
@@ -1538,12 +2491,17 @@ function renderMaBreadthStudy() {
               ? "—"
               : `${row.median_max_adverse_excursion_pct.toFixed(2)}%`;
           return `<div class="ma-study-card">
-            <strong>Cross &lt; ${row.threshold}% · ${row.horizon}</strong>
-            <span>n=${row.sample_count} · median ${medianText} · positive ${hitText} · median MAE ${maeText}</span>
+            <strong>${currentLocale === "zh-TW" ? "跌破" : "Cross <"} ${row.threshold}% · ${row.horizon}</strong>
+            <span>${escapeHtml(t("trend.studySummary", {
+              n: row.sample_count,
+              median: medianText,
+              positive: hitText,
+              mae: maeText,
+            }))}</span>
           </div>`;
         })
         .join("")
-    : '<div class="empty-state compact">No completed forward-return windows yet.</div>';
+    : `<div class="empty-state compact">${escapeHtml(t("trend.noForwardWindows"))}</div>`;
 
   const formatReturn = (value) =>
     value == null ? "—" : `${value >= 0 ? "+" : ""}${Number(value).toFixed(2)}%`;
@@ -1563,10 +2521,10 @@ function renderMaBreadthStudy() {
           <td>${formatReturn(event.forward_returns_pct?.["1M"])}</td>
           <td>${formatReturn(event.forward_returns_pct?.["3M"])}</td>
           <td>${formatReturn(event.forward_returns_pct?.["6M"])}</td>
-          <td>${event.sessions_to_63d_low == null ? "—" : `${event.sessions_to_63d_low} sessions`}</td>
+          <td>${event.sessions_to_63d_low == null ? "—" : t("trend.sessions", { count: event.sessions_to_63d_low })}</td>
         </tr>`)
         .join("")
-    : '<tr><td colspan="9" class="empty-cell">No threshold-study episodes available.</td></tr>';
+    : `<tr><td colspan="9" class="empty-cell">${escapeHtml(t("trend.noEpisodesAvailable"))}</td></tr>`;
 }
 
 function renderTrendParticipationChart() {
@@ -1717,7 +2675,7 @@ function renderRegime() {
 
   if (!metrics.length) {
     grid.innerHTML =
-      '<div class="empty-state compact">Published U.S. metric health is unavailable.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("regime.usUnavailable"))}</div>`;
     if (details) details.open = true;
     return;
   }
@@ -1742,11 +2700,16 @@ function renderRegime() {
         (m) => effectiveFreshness(m).state !== "fresh",
       ).length;
       const current = metricsForPillar.length - notCurrent;
+      const metricWord = t(metricsForPillar.length === 1 ? "regime.metric.one" : "regime.metric.many");
 
       return `<div class="regime-cell">
-        <p class="eyebrow">${escapeHtml(pillarLabels[pillar] || pillar)}</p>
-        <div class="regime-value">${notCurrent ? `${notCurrent} not current` : "Data current"}</div>
-        <div class="regime-note">${current} of ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"} current</div>
+        <p class="eyebrow">${escapeHtml(pillarLabel(pillar))}</p>
+        <div class="regime-value">${escapeHtml(notCurrent ? t("regime.notCurrent", { count: notCurrent }) : t("health.dataCurrent"))}</div>
+        <div class="regime-note">${escapeHtml(t("regime.currentCount", {
+          current,
+          total: metricsForPillar.length,
+          metricWord,
+        }))}</div>
       </div>`;
     })
     .join("");
@@ -1760,7 +2723,7 @@ function renderCoverage() {
 
   if (!metrics.length) {
     tbody.innerHTML =
-      '<tr><td colspan="6" class="empty-cell">No generated metrics yet.</td></tr>';
+      `<tr><td colspan="6" class="empty-cell">${escapeHtml(t("lineage.noMetrics"))}</td></tr>`;
     return;
   }
 
@@ -1768,7 +2731,7 @@ function renderCoverage() {
     .map(
       (m) => `<tr>
         <td>${escapeHtml(m.metric.name)}</td>
-        <td>${escapeHtml(pillarLabels[m.metric.pillar] || m.metric.pillar)}</td>
+        <td>${escapeHtml(pillarLabel(m.metric.pillar))}</td>
         <td>${escapeHtml(m.coverage.history_start || "—")} → ${escapeHtml(m.coverage.history_end || "—")}</td>
         <td>${escapeHtml(m.latest.as_of || "—")}</td>
         <td>${freshnessBadge(m)}</td>
@@ -1915,32 +2878,40 @@ function renderHistorySelector() {
   );
 
   if (!metrics.length) {
-    select.innerHTML = '<option value="">No metric data</option>';
+    select.innerHTML = `<option value="">${escapeHtml(t("research.noMetric"))}</option>`;
     $("#history-chart").innerHTML =
-      '<div class="empty-state compact">Historical series will appear here.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("research.historyPlaceholder"))}</div>`;
     return;
   }
 
+  const previous = select.dataset.initialized === "true" ? select.value : "";
   select.innerHTML = [
-    '<option value="">Select a metric to load history</option>',
+    `<option value="">${escapeHtml(t("history.selectMetric"))}</option>`,
     ...metrics.map(
       (m) =>
         `<option value="${escapeHtml(m.metric.id)}">${escapeHtml(m.metric.name)}</option>`,
     ),
   ].join("");
+  select.dataset.initialized = "true";
+  if (previous && metrics.some((m) => m.metric.id === previous)) {
+    select.value = previous;
+  }
 
   const rerender = async () => {
     if (!select.value) {
       $("#history-chart").innerHTML =
-        '<div class="empty-state compact">Select a metric to load its full history.</div>';
+        `<div class="empty-state compact">${escapeHtml(t("history.selectMetricPrompt"))}</div>`;
       return;
     }
     await renderHistory(select.value, mode.value);
   };
   select.onchange = rerender;
   mode.onchange = rerender;
-  $("#history-chart").innerHTML =
-    '<div class="empty-state compact">Select a metric to load its full history.</div>';
+  if (select.value) rerender();
+  else {
+    $("#history-chart").innerHTML =
+      `<div class="empty-state compact">${escapeHtml(t("history.selectMetricPrompt"))}</div>`;
+  }
 }
 
 async function renderHistory(id, mode = "absolute") {
@@ -1953,7 +2924,7 @@ async function renderHistory(id, mode = "absolute") {
   } catch (error) {
     console.warn("history load failed", id, error);
     $("#history-chart").innerHTML =
-      '<div class="empty-state compact">This metric history could not be loaded.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.loadFailed"))}</div>`;
     return;
   }
 
@@ -1979,9 +2950,11 @@ async function renderHistory(id, mode = "absolute") {
   if (percentileBlocked) {
     const reason = !eligibility.allowed
       ? eligibility.reason
-      : "the selected baseline is not declared point-in-time";
+      : (currentLocale === "zh-TW"
+          ? "所選基準未宣告為時點正確"
+          : "the selected baseline is not declared point-in-time");
     $("#history-chart").innerHTML =
-      `<div class="empty-state compact"><strong>Point-in-time historical view disabled.</strong><span>${escapeHtml(reason)}. Use Absolute level for retrospective history.</span></div>`;
+      `<div class="empty-state compact"><strong>${escapeHtml(t("history.pitDisabled"))}</strong><span>${escapeHtml(t("history.pitUseAbsolute", { reason }))}</span></div>`;
   } else {
     fullChart(view, $("#history-chart"));
   }
@@ -1990,12 +2963,12 @@ async function renderHistory(id, mode = "absolute") {
   const modeLabel =
     mode === "rate_change"
       ? rateOfChangePeriods(metric).label
-      : historyModeLabels[mode] || historyModeLabels.absolute;
+      : historyModeLabel(mode);
 
   $("#history-mode-label").innerHTML =
     `<i class="legend-dot"></i> ${escapeHtml(modeLabel)}`;
   $("#history-coverage").textContent =
-    `${metric.coverage.history_start} → ${metric.coverage.history_end} · ${available.length.toLocaleString()} usable observations`;
+    `${metric.coverage.history_start} → ${metric.coverage.history_end} · ${t("history.usable", { count: localNumber(available.length) })}`;
 
   renderEvents(metric);
 }
@@ -2188,14 +3161,14 @@ function renderTaiwanEventSelector() {
     .sort((a, b) => a.metric.name.localeCompare(b.metric.name));
 
   if (!metrics.length) {
-    select.innerHTML = '<option value="">No Taiwan history</option>';
+    select.innerHTML = `<option value="">${escapeHtml(t("history.noTaiwan"))}</option>`;
     renderTaiwanEvents(null, mode.value);
     return;
   }
 
   const previous = select.dataset.initialized === "true" ? select.value : "";
   select.innerHTML = [
-    '<option value="">Select a Taiwan metric</option>',
+    `<option value="">${escapeHtml(t("history.selectTaiwan"))}</option>`,
     ...metrics.map(
       (metric) =>
         `<option value="${escapeHtml(metric.metric.id)}">${escapeHtml(metric.metric.name)}</option>`,
@@ -2221,7 +3194,7 @@ function renderTaiwanEventSelector() {
       console.warn("Taiwan history load failed", select.value, error);
       $("#tw-event-list").innerHTML = "";
       $("#tw-event-chart").innerHTML =
-        '<div class="empty-state compact">This Taiwan metric history could not be loaded.</div>';
+        `<div class="empty-state compact">${escapeHtml(t("history.taiwanLoadFailed"))}</div>`;
     }
   };
   select.onchange = rerender;
@@ -2239,15 +3212,16 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   if (!metric || !state.taiwanEvents.length) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Taiwan event definitions or metric history unavailable.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.taiwanEventUnavailable"))}</div>`;
     return;
   }
 
   const eligibility = historicalAnalysisEligibility(metric);
   if (!eligibility.allowed && mode !== "raw") {
     list.innerHTML = "";
+    const reason = eligibility.reason || t("status.unknown");
     el.innerHTML =
-      `<div class="empty-state compact"><strong>Point-in-time Taiwan event comparison disabled.</strong><span>${escapeHtml(eligibility.reason)}. Raw retrospective history remains available.</span></div>`;
+      `<div class="empty-state compact"><strong>${escapeHtml(t("history.taiwanPitDisabled"))}</strong><span>${escapeHtml(t("history.taiwanRawAvailable", { reason }))}</span></div>`;
     return;
   }
   if (
@@ -2256,7 +3230,7 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   ) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Point-in-time percentile mode is disabled because no eligible PIT percentile baseline is declared.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.taiwanPitPercentileDisabled"))}</div>`;
     return;
   }
 
@@ -2282,14 +3256,12 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   if (obs.length < 2) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Not enough Taiwan history for this comparison mode.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.taiwanNotEnough"))}</div>`;
     return;
   }
 
   const coverageStart = Date.parse(
-    mode === "raw"
-      ? metric.coverage.history_start
-      : (obs[0].availability_date || obs[0].date),
+    obs[0].availability_date || obs[0].date,
   );
   const colors = [
     "#5dc2aa",
@@ -2304,10 +3276,10 @@ function renderTaiwanEvents(metric, mode = "normalized") {
 
   list.innerHTML = state.taiwanEvents
     .map((event, index) => {
-      const anchorDate = event.anchor_date || metric.latest.as_of;
-      const unavailable =
-        !anchorDate || Date.parse(anchorDate) < coverageStart;
-      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}"><i class="event-dot" style="background:${colors[index % colors.length]}"></i>${escapeHtml(event.name)}</span>`;
+      const anchor = event.anchor_date || metric.latest.as_of;
+      const unavailable = !anchor || Date.parse(anchor) < coverageStart;
+      const color = colors[index % colors.length];
+      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}"><i class="event-dot" style="background:${color}"></i>${escapeHtml(event.name)}</span>`;
     })
     .join("");
 
@@ -2315,13 +3287,10 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   state.taiwanEvents.forEach((event, index) => {
     const anchor = event.anchor_date || metric.latest.as_of;
     if (!anchor || Date.parse(anchor) < coverageStart) return;
-
     const anchorIdx = observationOnOrBeforeIndex(obs, anchor);
     if (anchorIdx < 0) return;
-
     const anchorValue = Number(obs[anchorIdx].value);
-    if (!Number.isFinite(anchorValue)) return;
-    if (mode === "normalized" && anchorValue === 0) return;
+    if (!Number.isFinite(anchorValue) || anchorValue === 0) return;
 
     const anchorDate = new Date(
       `${obs[anchorIdx].availability_date || obs[anchorIdx].date}T00:00:00Z`,
@@ -2331,52 +3300,45 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     const points = [];
 
     for (const item of obs) {
-      const offset = monthOffset(
-        anchorDate,
-        new Date(
-          `${item.availability_date || item.date}T00:00:00Z`,
-        ),
+      const dt = new Date(
+        `${item.availability_date || item.date}T00:00:00Z`,
       );
+      const offset = monthOffset(anchorDate, dt);
       if (offset < -pre || offset > post) continue;
-
       const raw = Number(item.value);
-      points.push({
-        offset,
-        value:
-          mode === "normalized"
-            ? (raw / anchorValue) * 100
-            : raw,
-      });
+      const plotted = mode === "normalized" ? (raw / anchorValue) * 100 : raw;
+      points.push({ offset, value: plotted });
     }
 
     if (points.length > 1) {
       lines.push({
         name: event.name,
         points,
+        color: colors[index % colors.length],
         pre,
         post,
-        color: colors[index % colors.length],
       });
     }
   });
 
   if (!lines.length) {
     el.innerHTML =
-      '<div class="empty-state compact">This Taiwan metric has no usable coverage for the configured events.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.noEventCoverage"))}</div>`;
     return;
   }
 
   const width = 720;
   const height = 250;
-  const left = 52;
+  const left = 42;
   const right = 16;
   const top = 18;
   const bottom = 34;
   const minOffset = Math.min(...lines.map((line) => -line.pre));
   const maxOffset = Math.max(...lines.map((line) => line.post));
-  const values = lines.flatMap((line) => line.points.map((point) => point.value));
-  let min = Math.min(...values);
-  let max = Math.max(...values);
+  const allValues = lines.flatMap((line) => line.points.map((p) => p.value));
+
+  let min = Math.min(...allValues);
+  let max = Math.max(...allValues);
   if (min === max) {
     min -= 1;
     max += 1;
@@ -2389,10 +3351,11 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   const y = (value) =>
     top + ((max - value) / (max - min)) * (height - top - bottom);
 
+  const zeroX = x(0);
   const paths = lines
     .map((line) => {
-      const d = [...line.points]
-        .sort((a, b) => a.offset - b.offset)
+      const sorted = [...line.points].sort((a, b) => a.offset - b.offset);
+      const d = sorted
         .map(
           (point, index) =>
             `${index ? "L" : "M"} ${x(point.offset).toFixed(1)} ${y(point.value).toFixed(1)}`,
@@ -2402,37 +3365,19 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     })
     .join("");
 
-  const referenceValue = mode === "normalized" ? 100 : null;
-  const referenceLine =
-    referenceValue != null && referenceValue >= min && referenceValue <= max
-      ? `<line class="gridline" x1="${left}" y1="${y(referenceValue)}" x2="${width - right}" y2="${y(referenceValue)}"/>`
-      : "";
-
-  const unit =
-    mode === "normalized"
-      ? "index=100"
-      : mode === "pit_percentile"
-        ? "percentile"
-        : eventMetric.metric.units;
-
-  const taiwanEndpoints = lines
-    .map((line) => {
-      const endpoint = [...line.points].sort((a, b) => a.offset - b.offset).at(-1);
-      return `${line.name}: ${endpoint.value.toFixed(1)} ${unit} at T${endpoint.offset >= 0 ? "+" : ""}${endpoint.offset}m`;
-    })
-    .join("; ");
   const a11y = chartA11y(
     el,
-    `${metric.metric.name} Taiwan historical event comparison`,
-    `${metric.metric.name} Taiwan event comparison in ${unit}. ${lines.length} event paths from T${minOffset} to T+${maxOffset} months. Endpoints: ${taiwanEndpoints}.`,
+    t("taiwan.eventTitle"),
+    currentLocale === "zh-TW"
+      ? `${metric.metric.name} 台灣事件比較，共 ${lines.length} 條事件路徑。`
+      : `${metric.metric.name} Taiwan event comparison with ${lines.length} event paths.`,
   );
   el.innerHTML = `${a11y.summaryHtml}<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
-    ${referenceLine}
-    <line class="gridline" x1="${x(0)}" y1="${top}" x2="${x(0)}" y2="${height - bottom}"/>
+    <line class="gridline" x1="${left}" y1="${y(mode === "normalized" ? 100 : min)}" x2="${width - right}" y2="${y(mode === "normalized" ? 100 : min)}"/>
+    <line class="gridline" x1="${zeroX}" y1="${top}" x2="${zeroX}" y2="${height - bottom}"/>
     ${paths}
-    <text x="${left - 5}" y="${top + 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="9">${escapeHtml(unit)}</text>
     <text x="${left}" y="${height - 10}" fill="currentColor" opacity=".55" font-size="10">T${minOffset}m</text>
-    <text x="${x(0)}" y="${height - 10}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="10">Anchor</text>
+    <text x="${zeroX}" y="${height - 10}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="10">T0</text>
     <text x="${width - right}" y="${height - 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">T+${maxOffset}m</text>
   </svg>`;
 }
@@ -2562,14 +3507,13 @@ async function openMetric(id, invoker = document.activeElement) {
   if (!summary) return;
 
   const dialog = $("#metric-dialog");
-  const context = beginnerContext[id];
-  $("#dialog-pillar").textContent =
-    pillarLabels[summary.metric.pillar] || summary.metric.pillar;
+  const context = localizedBeginnerContext(id);
+  $("#dialog-pillar").textContent = pillarLabel(summary.metric.pillar);
   $("#dialog-title").textContent = context?.plain_name || summary.metric.name;
   $("#dialog-summary").innerHTML =
-    '<div class="detail-stat"><strong>Loading…</strong><span>Full metric history</span></div>';
+    `<div class="detail-stat"><strong>${escapeHtml(t("dialog.loading"))}</strong><span>${escapeHtml(t("dialog.fullHistory"))}</span></div>`;
   $("#dialog-chart").innerHTML =
-    '<div class="empty-state compact">Loading full metric history…</div>';
+    `<div class="empty-state compact">${escapeHtml(t("dialog.loadingHistory"))}</div>`;
   $("#dialog-source").innerHTML = "";
   if (invoker && typeof invoker.focus === "function") {
     dialogInvoker = invoker;
@@ -2585,7 +3529,7 @@ async function openMetric(id, invoker = document.activeElement) {
   } catch (error) {
     console.warn("metric detail load failed", id, error);
     $("#dialog-chart").innerHTML =
-      '<div class="empty-state compact">Detailed history could not be loaded. The overview remains available.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("dialog.loadFailed"))}</div>`;
     $("#dialog-source").textContent = String(error?.message || error);
     return;
   }
@@ -2595,11 +3539,11 @@ async function openMetric(id, invoker = document.activeElement) {
   const change = recentChange(metric);
   const related = relatedBreadthStats(metric);
   const dateLabel = context?.date_semantics === "effective_vs_verified"
-    ? "Effective/change date"
-    : "Source observation";
+    ? t("dialog.effectiveDate")
+    : t("dialog.sourceObservation");
   const baseStats = [
-    { value: formatValue(metric.latest.value, metric.metric.units), label: "Current value" },
-    { value: formatChange(change), label: "Last observation" },
+    { value: formatValue(metric.latest.value, metric.metric.units), label: t("dialog.currentValue") },
+    { value: formatChange(change), label: t("dialog.lastObservation") },
     { value: p.value, label: p.label },
     { value: escapeHtml(metric.latest.as_of || "—"), label: dateLabel },
   ];
@@ -2613,16 +3557,21 @@ async function openMetric(id, invoker = document.activeElement) {
   fullChart(metric, $("#dialog-chart"), { height: 390 });
   const membershipContext =
     metric.source?.membership_mode
-      ? ` · membership: ${escapeHtml(metric.source.membership_mode)}`
+      ? (currentLocale === "zh-TW"
+          ? ` · 成分股模式：${escapeHtml(metric.source.membership_mode)}`
+          : ` · membership: ${escapeHtml(metric.source.membership_mode)}`)
       : "";
   const verifiedLabel = context?.date_semantics === "effective_vs_verified"
-    ? "Source verified"
-    : "Snapshot fetched";
+    ? (currentLocale === "zh-TW" ? "來源驗證" : "Source verified")
+    : (currentLocale === "zh-TW" ? "快照抓取" : "Snapshot fetched");
+  const sourceLabel = t("dialog.source");
+  const freshnessLabel = t("dialog.freshness");
+  const coverageLabel = t("dialog.coverage");
   $("#dialog-source").innerHTML =
     `${metricContextGuide(metric)}
      ${pct == null ? "" : `<p class="meta">${escapeHtml(p.sentence)} ${escapeHtml(percentileCaveatSentence(metric))}</p>`}
-     <div class="source-meta">Source: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
-     ${verifiedLabel}: ${escapeHtml(metric.latest.fetched_at || "—")} · freshness: ${escapeHtml(effectiveFreshness(metric).state)} · history starts: ${escapeHtml(metric.coverage.history_start || "—")}${membershipContext}</div>`;
+     <div class="source-meta">${escapeHtml(sourceLabel)}: <a class="source-link" href="${escapeHtml(metric.source.url)}" target="_blank" rel="noopener">${escapeHtml(metric.source.provider)} — ${escapeHtml(metric.source.dataset)}</a><br>
+     ${escapeHtml(verifiedLabel)}: ${escapeHtml(metric.latest.fetched_at || "—")} · ${escapeHtml(freshnessLabel)}: ${escapeHtml(statusLabel(effectiveFreshness(metric).state))} · ${escapeHtml(coverageLabel)}: ${escapeHtml(metric.coverage.history_start || "—")} → ${escapeHtml(metric.coverage.history_end || "—")}${membershipContext}</div>`;
 }
 
 
@@ -2668,10 +3617,10 @@ function renderSignals() {
 
   if (!snapshot?.current) {
     summaryEl.innerHTML =
-      '<div class="empty-state compact">Deleveraging Watch is unavailable in the current published snapshot.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("signals.noSnapshot"))}</div>`;
     grid.innerHTML = "";
     chart.innerHTML =
-      '<div class="empty-state compact">Historical signal state is unavailable.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("signals.noHistoricalState"))}</div>`;
     return;
   }
 
@@ -2689,25 +3638,25 @@ function renderSignals() {
 
   summaryEl.innerHTML = `
     <div class="signal-summary-main">
-      <strong>${summary.known} of ${summary.total} checks known</strong>
-      <span class="meta">· ${summary.active} active · ${summary.unknown} unavailable/unknown</span>
+      <strong>${escapeHtml(t("signals.known", { known: summary.known, total: summary.total }))}</strong>
+      <span class="meta">${escapeHtml(t("signals.summary", { active: summary.active, unknown: summary.unknown }))}</span>
     </div>
-    <span class="meta">Evaluated ${escapeHtml(snapshot.current.as_of || "—")} · unknown is not inactive</span>
+    <span class="meta">${escapeHtml(t("signals.evaluated", { date: snapshot.current.as_of || "—" }))}</span>
   `;
 
   grid.innerHTML = displayConditions
     .map((condition) => {
-      const beginner = signalBeginnerContext[condition.id] || {};
+      const beginner = localizedSignalContext(condition.id) || {};
       const details = flattenRuleDetails(condition.rules);
       const detailText = details.map(formatRuleDetail).join("<br>");
       const caveat = condition.displayStatus === "unknown"
-        ? "Required public evidence is unavailable; this remains unknown rather than safe."
+        ? t("signals.unknownCaveat")
         : (beginner.caveat || "");
       return `<article class="signal-card" data-status="${escapeHtml(condition.displayStatus)}">
-        <span class="signal-status">${escapeHtml(condition.displayStatus)}</span>
+        <span class="signal-status">${escapeHtml(statusLabel(condition.displayStatus))}</span>
         <h3>${escapeHtml(beginner.plain_name || condition.name)}</h3>
         <p>${escapeHtml(beginner.description || condition.description || "")}</p>
-        ${caveat ? `<p><strong>Caveat:</strong> ${escapeHtml(caveat)}</p>` : ""}
+        ${caveat ? `<p><strong>${escapeHtml(t("signals.caveat"))}</strong> ${escapeHtml(caveat)}</p>` : ""}
         <div class="signal-rule">${detailText}</div>
       </article>`;
     })
@@ -2720,7 +3669,7 @@ function renderSignalHistory(snapshot, element) {
   const history = snapshot.history || [];
   if (history.length < 2) {
     element.innerHTML =
-      '<div class="empty-state compact">Not enough historical signal states.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("signals.noHistory"))}</div>`;
     return;
   }
 
@@ -2808,24 +3757,22 @@ function globalFreshnessSummary(metrics) {
     return {
       counts,
       className: "badge badge-missing",
-      text: "No production snapshot",
+      text: t("health.noSnapshot"),
     };
   }
 
   const parts = [
-    counts.error ? `${counts.error} error` : "",
-    counts.missing ? `${counts.missing} missing` : "",
-    counts.stale ? `${counts.stale} stale` : "",
-    counts.insufficient_data
-      ? `${counts.insufficient_data} insufficient data`
-      : "",
+    counts.error ? t("health.count.error", { count: counts.error }) : "",
+    counts.missing ? t("health.count.missing", { count: counts.missing }) : "",
+    counts.stale ? t("health.count.stale", { count: counts.stale }) : "",
+    counts.insufficient_data ? t("health.count.insufficient", { count: counts.insufficient_data }) : "",
   ].filter(Boolean);
 
   if (!parts.length) {
     return {
       counts,
       className: "health-passive",
-      text: "Data current",
+      text: t("health.dataCurrent"),
     };
   }
 
@@ -3034,6 +3981,7 @@ async function loadData() {
   setupDeferredContextLoading();
 }
 
+initLocale();
 initTheme();
 setupDialogFocusManagement();
 $("#refresh-view").addEventListener("click", loadData);
