@@ -1387,6 +1387,18 @@ function renderTaiwanMarket() {
   const status = $("#tw-history-status");
   if (!grid || !stateGrid || !chart || !status) return;
 
+  const regimeLabel = (value) => {
+    const raw = String(value || "unknown");
+    const key = `regime.${raw.toLowerCase()}`;
+    const translated = t(key);
+    return translated === key ? raw : translated;
+  };
+  const freshnessLabel = (value) => {
+    const key = `common.${value || "unknown"}`;
+    const translated = t(key);
+    return translated === key ? String(value || t("common.unknown")) : translated;
+  };
+
   const metrics = [...state.metrics.values()]
     .filter(isTaiwanMetric)
     .sort(
@@ -1397,11 +1409,11 @@ function renderTaiwanMarket() {
 
   if (!metrics.length) {
     stateGrid.innerHTML =
-      '<div class="optional-state"><strong>Core Taiwan snapshot unavailable</strong><span>No placeholder data is shown. Source and freshness details remain available when a published snapshot exists.</span></div>';
+      `<div class="optional-state"><strong>${escapeHtml(t("taiwan.core_unavailable"))}</strong><span>${escapeHtml(t("taiwan.no_placeholder"))}</span></div>`;
     grid.innerHTML = "";
     chart.innerHTML =
-      '<div class="empty-state compact">TAIEX history is unavailable in the current published snapshot.</div>';
-    status.textContent = "Coverage unavailable";
+      `<div class="empty-state compact">${escapeHtml(t("taiwan.history_unavailable"))}</div>`;
+    status.textContent = t("taiwan.coverage_unavailable");
     return;
   }
 
@@ -1416,11 +1428,12 @@ function renderTaiwanMarket() {
   const macroCurrent = state.taiwanMacroRegime?.current || null;
   const macroLastKnown = state.taiwanMacroRegime?.latest_known || null;
   const macroLastKnownNote = macroLastKnown
-    ? `last known ${macroLastKnown.regime} ${macroLastKnown.date}`
-    : "no known regime yet";
-  const rateMetrics = metrics.filter((m) =>
-    m.metric.id.startsWith("tw_cbc_"),
-  );
+    ? t("taiwan.last_known", {
+        regime: regimeLabel(macroLastKnown.regime),
+        date: localeDate(macroLastKnown.date),
+      })
+    : t("taiwan.no_known_regime");
+  const rateMetrics = metrics.filter((m) => m.metric.id.startsWith("tw_cbc_"));
 
   const statusCell = (label, value, note) => `<div class="regime-cell">
     <p class="eyebrow">${escapeHtml(label)}</p>
@@ -1428,49 +1441,58 @@ function renderTaiwanMarket() {
     <div class="regime-note">${escapeHtml(note)}</div>
   </div>`;
 
-  let breadthValue = "Unavailable";
-  let breadthNote = "Official A/D breadth not published";
+  let breadthValue = t("taiwan.unavailable");
+  let breadthNote = t("taiwan.ad_not_published");
   if (adPct && breadth.state !== "missing") {
     breadthValue = formatValue(adPct.latest?.value, "percent");
     if (breadth.state === "snapshot_only") {
-      breadthNote = "A-D snapshot · 1 session only · no trend inference";
+      breadthNote = t("taiwan.ad_snapshot");
     } else if (breadth.state === "history_building") {
-      breadthNote = `A-D % · ${breadth.observations.toLocaleString()} sessions · history accumulating`;
+      breadthNote = t("taiwan.ad_building", { count: localeNumber(breadth.observations) });
     } else if (breadth.state === "not_current") {
-      breadthNote = `A-D history exists · ${breadth.freshness}`;
+      breadthNote = t("taiwan.ad_history_state", { state: freshnessLabel(breadth.freshness) });
     } else {
-      breadthNote = `A-D % · ${breadth.observations.toLocaleString()} sessions`;
+      breadthNote = t("taiwan.ad_sessions", { count: localeNumber(breadth.observations) });
     }
   }
 
   stateGrid.innerHTML = [
     statusCell(
-      "Price",
-      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : "Unavailable",
+      t("taiwan.price"),
+      taiex ? formatValue(taiex.latest?.value, taiex.metric.units) : t("taiwan.unavailable"),
       taiex
-        ? `TAIEX · ${taiex.latest?.as_of || "—"} · ${taiexFreshness}`
-        : "TAIEX not published",
+        ? `TAIEX · ${localeDate(taiex.latest?.as_of || "—")} · ${freshnessLabel(taiexFreshness)}`
+        : t("taiwan.not_published"),
     ),
-    statusCell("Breadth", breadthValue, breadthNote),
+    statusCell(t("taiwan.breadth"), breadthValue, breadthNote),
     statusCell(
-      "Macro cycle",
-      macroCurrent ? String(macroCurrent.regime || "Unknown") : "Not published",
+      t("taiwan.macro_cycle"),
+      macroCurrent ? regimeLabel(macroCurrent.regime) : t("taiwan.not_published"),
       macroCurrent
         ? (macroCurrent.score === null || macroCurrent.score === undefined
-            ? `${macroCurrent.known_components}/${macroCurrent.total_components} inputs · ${macroLastKnownNote}`
-            : `score ${Number(macroCurrent.score).toFixed(2)} · confidence ${Math.round(Number(macroCurrent.confidence) * 100)}%`)
+            ? t("taiwan.inputs", {
+                known: localeNumber(macroCurrent.known_components),
+                total: localeNumber(macroCurrent.total_components),
+                note: macroLastKnownNote,
+              })
+            : t("taiwan.score_confidence", {
+                score: localeNumber(Number(macroCurrent.score), { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                confidence: localeNumber(Math.round(Number(macroCurrent.confidence) * 100)),
+              }))
         : (macroMetrics.length
-            ? `${macroMetrics.length} public macro metrics; regime summary unavailable`
-            : "Taiwan macro/regime family is not included in this public release"),
+            ? t("taiwan.public_macro", { count: localeNumber(macroMetrics.length) })
+            : t("taiwan.macro_not_in_release")),
     ),
     statusCell(
-      "Rates",
+      t("taiwan.rates"),
       state.taiwanCbcRateRegime?.current?.regime
-        ? String(state.taiwanCbcRateRegime.current.regime)
-        : (rateMetrics.length ? "Inputs loaded" : "Unknown"),
+        ? regimeLabel(state.taiwanCbcRateRegime.current.regime)
+        : (rateMetrics.length ? t("taiwan.inputs_loaded") : t("regime.unknown")),
       state.taiwanCbcRateRegime?.current
-        ? `CBC ${formatValue(state.taiwanCbcRateRegime.current.rate, "percent")} · 6M ${formatValue(state.taiwanCbcRateRegime.current.change_6m_bp, "basis points")} · Fed ${state.fedRateRegime?.current?.regime || "unknown"}`
-        : (rateMetrics.length ? `${rateMetrics.length} CBC rate metrics` : "CBC rate history not published"),
+        ? `CBC ${formatValue(state.taiwanCbcRateRegime.current.rate, "percent")} · 6M ${formatValue(state.taiwanCbcRateRegime.current.change_6m_bp, "basis points")} · Fed ${regimeLabel(state.fedRateRegime?.current?.regime)}`
+        : (rateMetrics.length
+            ? t("taiwan.cbc_metrics", { count: localeNumber(rateMetrics.length) })
+            : t("taiwan.cbc_not_published")),
     ),
   ].join("");
 
@@ -1488,39 +1510,39 @@ function renderTaiwanMarket() {
     "tw_cbc_rate",
     "tw_cbc_change_6m_bp",
   ];
-  const preferred = preferredIds
-    .map((id) => state.metrics.get(id))
-    .filter(Boolean);
-
+  const preferred = preferredIds.map((id) => state.metrics.get(id)).filter(Boolean);
   grid.innerHTML = preferred.map(metricCard).join("");
   bindMetricCardInteractions(grid);
 
   if (taiex) {
     const observationCount = usableObservationCount(taiex);
-    status.textContent =
-      `${taiex.coverage.history_start} → ${taiex.coverage.history_end} · ${observationCount.toLocaleString()} observations · ${taiexFreshness}`;
+    status.textContent = t("history.usable_observations", {
+      start: localeDate(taiex.coverage.history_start),
+      end: localeDate(taiex.coverage.history_end),
+      count: localeNumber(observationCount),
+    }) + ` · ${freshnessLabel(taiexFreshness)}`;
     if (Array.isArray(taiex.observations)) {
       fullChart(taiex, chart);
     } else {
       chart.innerHTML =
-        '<div class="empty-state compact"><strong>TAIEX history is available on demand.</strong><button id="tw-load-history" class="text-button" type="button">Load TAIEX history</button></div>';
+        `<div class="empty-state compact"><strong>${escapeHtml(t("taiwan.history_on_demand"))}</strong><button id="tw-load-history" class="text-button" type="button">${escapeHtml(t("taiwan.load_history"))}</button></div>`;
       $("#tw-load-history")?.addEventListener("click", async (event) => {
         event.currentTarget.disabled = true;
-        event.currentTarget.textContent = "Loading…";
+        event.currentTarget.textContent = t("metric.loading");
         try {
           await ensureMetricLoaded("tw_taiex");
           renderTaiwanMarket();
         } catch (error) {
           console.warn("TAIEX history load failed", error);
           chart.innerHTML =
-            '<div class="empty-state compact">TAIEX history could not be loaded. Current summary data remains available.</div>';
+            `<div class="empty-state compact">${escapeHtml(t("taiwan.history_failed"))}</div>`;
         }
       });
     }
   } else {
     chart.innerHTML =
-      '<div class="empty-state compact">TAIEX snapshot is unavailable in the current release.</div>';
-    status.textContent = "TAIEX unavailable";
+      `<div class="empty-state compact">${escapeHtml(t("taiwan.snapshot_unavailable"))}</div>`;
+    status.textContent = t("taiwan.unavailable_short");
   }
 
   renderTaiwanEventSelector();
