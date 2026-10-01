@@ -87,6 +87,14 @@ html[lang="zh-TW"] .thesis-label,
 html[lang="zh-TW"] .health-strip-label {
   letter-spacing: .08em;
 }
+
+html[lang="zh-TW"] .decision-thesis h3,
+html[lang="zh-TW"] .snapshot-value {
+  white-space: normal;
+  word-break: break-all;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
 .icon-button, .text-button, .select-control { border: 1px solid var(--line); background: var(--panel); color: var(--text); }
 .icon-button { width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.1rem; }
 .text-button { border-radius: 10px; padding: 8px 11px; cursor: pointer; }
@@ -831,6 +839,10 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
     margin-top: 12px;
     max-width: none;
     font-size: 1.65rem;
+  }
+  html[lang="zh-TW"] .decision-thesis h3 {
+    font-size: 1.52rem;
+    line-height: 1.16;
   }
   #overview-thesis-summary { font-size: .78rem; }
   .trigger-list { grid-template-columns: minmax(0, 1fr); }
