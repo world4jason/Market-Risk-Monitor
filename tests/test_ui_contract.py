@@ -391,7 +391,8 @@ class UiContractTests(unittest.TestCase):
     def test_percentiles_name_comparison_window_and_use_real_ordinals(self) -> None:
         self.assertIn("function ordinal(", self.app)
         self.assertIn("function rollingWindowLabel(", self.app)
-        self.assertIn("percentile vs", self.app)
+        self.assertIn('"percentile.vs"', self.app)
+        self.assertIn('"percentile.vs"', self.i18n)
         self.assertNotIn("rolling history percentile", self.app)
 
     def test_taiwan_macro_unknown_never_formats_null_as_zero(self) -> None:
