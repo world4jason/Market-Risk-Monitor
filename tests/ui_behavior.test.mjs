@@ -7,7 +7,9 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const APP_PATH = path.join(ROOT, "assets", "app.js");
+const I18N_PATH = path.join(ROOT, "assets", "i18n.js");
 const FIXTURE_PATH = path.join(ROOT, "tests", "fixtures", "ui_behavior.json");
+const I18N_SOURCE = fs.readFileSync(I18N_PATH, "utf8");
 const APP_SOURCE = fs.readFileSync(APP_PATH, "utf8");
 const FIXTURE = JSON.parse(fs.readFileSync(FIXTURE_PATH, "utf8"));
 
