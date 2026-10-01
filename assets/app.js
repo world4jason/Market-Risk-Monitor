@@ -1722,7 +1722,7 @@ function metricCard(metric) {
   const title = context?.plain_name || metric.metric.name;
   const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
-  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(title)} details and history">
+  return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="${escapeHtml(t("metric.openAria", { title }))}">
     <div class="metric-card-top">
       <div>
         <p class="eyebrow">${escapeHtml(pillarLabel(metric.metric.pillar))}</p>
@@ -1733,13 +1733,13 @@ function metricCard(metric) {
     <div class="metric-value">${formatValue(metric.latest?.value, metric.metric.units)}</div>
     <div class="metric-unit">${escapeHtml(metricDateLine(metric))} · ${escapeHtml(metric.metric.units)}</div>
     <div class="metric-context">
-      <div class="context-chip"><strong>${cText}</strong><span>last observation</span></div>
+      <div class="context-chip"><strong>${cText}</strong><span>${escapeHtml(t("metric.lastObservation"))}</span></div>
       <div class="context-chip"><strong>${p.value}</strong><span>${escapeHtml(p.label)}${contextOnly}</span></div>
     </div>
     ${sparkline(metric)}
     <div class="metric-card-bottom">
       <span class="meta">${escapeHtml(metric.coverage?.history_start || "—")} → ${escapeHtml(metric.coverage?.history_end || "—")}</span>
-      <span class="meta">${context ? "Explain & view history ↗" : "Open history ↗"}</span>
+      <span class="meta">${escapeHtml(context ? t("metric.explainHistory") : t("metric.openHistory"))}</span>
     </div>
   </article>`;
 }
@@ -1753,7 +1753,6 @@ function renderOverview() {
   const taiex = state.metrics.get("tw_taiex");
   const twBreadth = state.metrics.get("tw_advance_decline_pct");
 
-  // U.S. stress: plain-language state first, raw metrics second.
   const financialCondition = signalCondition("financial_conditions_tight");
   const vixStress = signalCondition("vix_stress");
   const expectedStressConditions = [financialCondition, vixStress];
@@ -1770,25 +1769,24 @@ function renderOverview() {
     const nfciValue = Number(nfci.latest?.value);
     stressFacts.push(
       Number.isFinite(nfciValue)
-        ? `Conditions ${nfciValue > 0 ? "tighter" : "looser"} than avg`
-        : "Financial conditions available",
+        ? t(nfciValue > 0 ? "overview.stress.tighter" : "overview.stress.looser")
+        : t("overview.stress.available"),
     );
   }
   if (vix) {
     const percentile = percentilePresentation(vix);
     stressFacts.push(
-      `VIX ${formatValue(vix.latest?.value, vix.metric.units)}${percentile.value !== "—" ? ` · ${percentile.value} pct` : ""}`,
+      `VIX ${formatValue(vix.latest?.value, vix.metric.units)}${percentile.value !== "—" ? ` · ${percentile.value}` : ""}`,
     );
   }
   setSnapshotCard(
     "stress",
-    stressUnknown ? "DATA GAP" : stressActive ? "ELEVATED" : "CLEAR",
-    stressUnknown ? "Known gauges calm" : stressActive ? "Stress elevated" : "Stress contained",
+    stressUnknown ? t("status.dataGap") : stressActive ? t("status.elevated") : t("status.clear"),
+    stressUnknown ? t("overview.stress.knownCalm") : stressActive ? t("overview.stress.elevated") : t("overview.stress.contained"),
     stressFacts,
     stressUnknown ? "gap" : stressActive ? "watch" : "normal",
   );
 
-  // Leverage: distinguish a high level from a slowing growth impulse.
   const marginSignal = signalCondition("margin_debt_rollover");
   const marginStatus = marginSignal ? effectiveConditionStatus(marginSignal) : "unknown";
   const yoy = Number(marginYoy?.latest?.value);
@@ -1797,7 +1795,7 @@ function renderOverview() {
   const leverageFacts = [];
   if (margin) {
     leverageFacts.push(
-      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} pct (context)` : ""}`,
+      `${formatValue(margin.latest?.value, margin.metric.units)}${marginPct?.value && marginPct.value !== "—" ? ` · ${marginPct.value} (${t("context.contextOnly")})` : ""}`,
     );
   }
   if (marginYoy) {
@@ -1806,13 +1804,12 @@ function renderOverview() {
   const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;
   setSnapshotCard(
     "leverage",
-    !leverageReady ? "DATA GAP" : slowing ? "WATCH" : "CONTEXT",
-    !leverageReady ? "Incomplete read" : slowing ? "High, growth slowing" : "Leverage context",
+    !leverageReady ? t("status.dataGap") : slowing ? t("status.watch") : t("status.context"),
+    !leverageReady ? t("overview.leverage.incomplete") : slowing ? t("overview.leverage.slowing") : t("overview.leverage.context"),
     leverageFacts,
     !leverageReady ? "gap" : slowing ? "watch" : "normal",
   );
 
-  // Deleveraging: counts remain transparent; no composite crash score is created.
   const conditions = (state.signals?.current?.conditions || []).map((condition) => ({
     ...condition,
     displayStatus: effectiveConditionStatus(condition),
@@ -1824,22 +1821,35 @@ function renderOverview() {
   const total = conditions.length;
   const activeName = activeConditions[0]
     ? (activeConditions[0].id === "margin_debt_rollover"
-        ? "Margin momentum slowing"
+        ? t("overview.marginMomentum")
         : localizedSignalContext(activeConditions[0].id)?.plain_name || activeConditions[0].name)
     : null;
 
   const deleveragingFacts = [];
   if (activeName) deleveragingFacts.push(activeName);
-  if (total) deleveragingFacts.push(`${known}/${total} usable · ${unknown} unknown`);
+  if (total) {
+    deleveragingFacts.push(t("overview.usable", { known, total, unknown }));
+  }
   setSnapshotCard(
     "deleveraging",
-    !total ? "DATA GAP" : active ? `${active} ACTIVE` : unknown ? "PARTIAL" : "CLEAR",
-    !total ? "No signal read" : (active && unknown) ? "Not confirmed" : active ? "Deleveraging signs" : "No confirmation",
+    !total
+      ? t("status.dataGap")
+      : active
+        ? `${active} ${currentLocale === "zh-TW" ? "項觸發" : "ACTIVE"}`
+        : unknown
+          ? t("status.partial")
+          : t("status.clear"),
+    !total
+      ? t("overview.deleveraging.noRead")
+      : (active && unknown)
+        ? t("overview.deleveraging.notConfirmed")
+        : active
+          ? t("overview.deleveraging.signs")
+          : t("overview.deleveraging.noConfirmation"),
     deleveragingFacts,
     !total ? "gap" : active ? "watch" : unknown ? "gap" : "normal",
   );
 
-  // Taiwan: currentness is more important than a stale directional interpretation.
   const taiexFreshness = effectiveFreshness(taiex).state;
   const breadth = taiwanBreadthState(twBreadth);
   const taiwanFacts = [];
@@ -1848,10 +1858,13 @@ function renderOverview() {
   }
   if (twBreadth && breadth.state !== "missing") {
     taiwanFacts.push(
-      `A/D ${formatValue(twBreadth.latest?.value, "percent")} · ${breadth.observations} session${breadth.observations === 1 ? "" : "s"}`,
+      `A/D ${formatValue(twBreadth.latest?.value, "percent")} · ${t("overview.sessions", {
+        count: localNumber(breadth.observations),
+        plural: currentLocale === "en" && breadth.observations !== 1 ? "s" : "",
+      })}`,
     );
   } else {
-    taiwanFacts.push("Breadth unavailable");
+    taiwanFacts.push(t("overview.taiwan.breadthUnavailable"));
   }
 
   const taiwanMissing = !taiex || ["missing", "error"].includes(taiexFreshness);
@@ -1859,20 +1872,20 @@ function renderOverview() {
     !taiwanMissing &&
     (taiexFreshness !== "fresh" ||
       ["missing", "not_current", "snapshot_only", "history_building"].includes(breadth.state));
-  let taiwanStatus = "CURRENT";
-  let taiwanHeadline = "Market read available";
+  let taiwanStatus = t("status.current");
+  let taiwanHeadline = t("overview.taiwan.available");
   let taiwanState = "normal";
   if (taiwanMissing) {
-    taiwanStatus = "DATA GAP";
-    taiwanHeadline = "No current read";
+    taiwanStatus = t("status.dataGap");
+    taiwanHeadline = t("overview.taiwan.noRead");
     taiwanState = "gap";
   } else if (taiexFreshness !== "fresh") {
-    taiwanStatus = String(taiexFreshness).toUpperCase();
-    taiwanHeadline = "No current call";
+    taiwanStatus = statusLabel(taiexFreshness).toUpperCase();
+    taiwanHeadline = t("overview.taiwan.noCall");
     taiwanState = "watch";
   } else if (taiwanNeedsAttention) {
-    taiwanStatus = "PARTIAL";
-    taiwanHeadline = "Price current";
+    taiwanStatus = t("status.partial");
+    taiwanHeadline = t("overview.taiwan.priceCurrent");
     taiwanState = "watch";
   }
   setSnapshotCard(
@@ -1883,86 +1896,99 @@ function renderOverview() {
     taiwanState,
   );
 
-  // Data health is deliberately separated from market interpretation.
   const metrics = [...state.metrics.values()];
   const health = globalFreshnessSummary(metrics);
   const snapshotDate = String(
     state.catalog?.generated_at || state.refreshReport?.generated_at || "",
   ).slice(0, 10);
   const healthParts = [];
-  if (health.counts.error) healthParts.push(`${health.counts.error} error`);
-  if (health.counts.missing) healthParts.push(`${health.counts.missing} missing`);
-  if (health.counts.stale) healthParts.push(`${health.counts.stale} stale`);
+  if (health.counts.error) healthParts.push(t("health.count.error", { count: health.counts.error }));
+  if (health.counts.missing) healthParts.push(t("health.count.missing", { count: health.counts.missing }));
+  if (health.counts.stale) healthParts.push(t("health.count.stale", { count: health.counts.stale }));
   if (health.counts.insufficient_data) {
-    healthParts.push(`${health.counts.insufficient_data} insufficient`);
+    healthParts.push(t("health.count.insufficient", { count: health.counts.insufficient_data }));
   }
-  if (unknown) healthParts.push(`${unknown} unknown checks`);
-  if (snapshotDate) healthParts.push(`snapshot ${snapshotDate}`);
+  if (unknown) healthParts.push(t("health.count.unknownChecks", { count: unknown }));
+  if (snapshotDate) healthParts.push(t("health.snapshotDate", { date: snapshotDate }));
 
   const healthHasHardGap = Boolean(health.counts.error || health.counts.missing);
   const healthNeedsRefresh = Boolean(health.counts.stale);
   const healthHasEvidenceGap = Boolean(unknown);
   const marginRank = margin ? rollingPercentile(margin) : null;
   const leverageElevated = Number.isFinite(marginRank) && marginRank >= 90;
-  const momentumEvidence = marginMomentumEvidence(marginSignal);
 
   let thesisTitle;
   if (stressActive) {
     thesisTitle = active
-      ? "Stress rising; deleveraging signals appearing"
-      : "Stress rising; deleveraging not confirmed";
+      ? t("thesis.stressAndDeleveraging")
+      : t("thesis.stressNotConfirmed");
   } else if (slowing) {
-    thesisTitle = "Leverage rolling over; stress not confirmed";
+    thesisTitle = t("thesis.rollover");
   } else if (leverageElevated) {
-    thesisTitle = "Leverage stretched; stress not confirmed";
+    thesisTitle = t("thesis.stretched");
   } else if (stressUnknown) {
-    thesisTitle = "Known stress gauges calm; read incomplete";
+    thesisTitle = t("thesis.partial");
   } else {
-    thesisTitle = "No broad stress confirmation";
+    thesisTitle = t("thesis.noBroadStress");
   }
 
   const thesisParts = [];
   if (stressActive) {
-    thesisParts.push("At least one current stress check is elevated.");
+    thesisParts.push(t("thesis.stressElevated"));
   } else if (stressUnknown) {
-    thesisParts.push("Known stress gauges are not elevated, but expected stress evidence is incomplete.");
+    thesisParts.push(t("thesis.stressPartial"));
   } else {
-    thesisParts.push("Current NFCI/VIX stress checks are not elevated.");
+    thesisParts.push(t("thesis.stressCalm"));
   }
   if (Number.isFinite(yoy)) {
     thesisParts.push(
       slowing
-        ? `Margin debt is still ${formatValue(yoy, "percent")} YoY while growth momentum is slowing.`
-        : `Margin debt growth is ${formatValue(yoy, "percent")} YoY.`,
+        ? t("thesis.marginSlowing", { yoy: formatValue(yoy, "percent") })
+        : t("thesis.marginGrowth", { yoy: formatValue(yoy, "percent") }),
     );
   }
   if (total) {
-    thesisParts.push(
-      `${known}/${total} deleveraging checks are usable; ${active} ${active === 1 ? "is" : "are"} active.`,
-    );
+    thesisParts.push(t("thesis.checks", {
+      known,
+      total,
+      active,
+      verb: active === 1 ? "is" : "are",
+    }));
   }
 
-  let thesisConfidence = "HIGH CONFIDENCE";
+  let thesisConfidence = t("thesis.confidence.high");
   let thesisState = "normal";
   if (!total || unknown >= Math.ceil(Math.max(total, 1) / 2) || stressUnknown) {
-    thesisConfidence = "LOW CONFIDENCE";
+    thesisConfidence = t("thesis.confidence.low");
     thesisState = "gap";
   } else if (unknown || healthNeedsRefresh) {
-    thesisConfidence = "MEDIUM CONFIDENCE";
+    thesisConfidence = t("thesis.confidence.medium");
     thesisState = "watch";
   }
   if (healthNeedsRefresh) {
-    thesisConfidence += " · STALE DATA";
+    thesisConfidence += ` · ${t("thesis.confidence.stale")}`;
     if (thesisState === "normal") thesisState = "watch";
   }
 
+  const stressEvidenceState = stressActive
+    ? t("thesis.evidence.stressElevated")
+    : stressUnknown
+      ? t("thesis.evidence.stressPartial")
+      : t("thesis.evidence.stressCalm");
+  const leverageRank = Number.isFinite(marginRank)
+    ? (currentLocale === "zh-TW"
+        ? `${formatValue(marginRank, "percentile")}（近 10 年）`
+        : `${formatValue(marginRank, "percentile")} vs 10y`)
+    : (currentLocale === "zh-TW" ? "資料可用" : "available");
+  const leverageYoy = Number.isFinite(yoy)
+    ? ` · YoY ${formatValue(yoy, "percent")}`
+    : "";
+
   const thesisEvidence = [
-    `Stress: ${stressActive ? "elevated" : stressUnknown ? "partial / known gauges calm" : "not elevated"}`,
-    margin
-      ? `Leverage: ${Number.isFinite(marginRank) ? `${formatValue(marginRank, "percentile")} vs 10y` : "available"}${Number.isFinite(yoy) ? ` · YoY ${formatValue(yoy, "percent")}` : ""}`
-      : "Leverage: unavailable",
-    total ? `Deleveraging: ${active} active / ${known} known` : "Deleveraging: unavailable",
-    snapshotDate ? `Snapshot: ${snapshotDate}` : null,
+    t("thesis.evidence.stress", { state: stressEvidenceState }),
+    margin ? t("thesis.evidence.leverage", { rank: leverageRank, yoy: leverageYoy }) : null,
+    total ? t("thesis.evidence.deleveraging", { active, known }) : null,
+    snapshotDate ? t("thesis.evidence.snapshot", { date: snapshotDate }) : null,
   ];
 
   const nfciTrigger = findRuleLeaf(financialCondition, (rule) => rule.type === "latest_above");
@@ -1973,22 +1999,26 @@ function renderOverview() {
   const breadthThreshold = Number(breadthTrigger?.threshold);
   const thesisTriggers = [
     {
-      label: "Stress confirms",
+      label: t("thesis.trigger.stress"),
       text: nfciTrigger && vixTrigger
-        ? `NFCI ≥ ${nfciTrigger.threshold} or VIX ≥ ${vixTrigger.threshold}th percentile`
-        : "configured NFCI / VIX stress threshold turns active",
+        ? (currentLocale === "zh-TW"
+            ? `NFCI ≥ ${nfciTrigger.threshold} 或 VIX ≥ 第 ${vixTrigger.threshold} 百分位`
+            : `NFCI ≥ ${nfciTrigger.threshold} or VIX ≥ ${vixTrigger.threshold}th percentile`)
+        : t("thesis.trigger.stressFallback"),
     },
     {
-      label: "Rollover deepens",
+      label: t("thesis.trigger.rollover"),
       text: marginTrigger
         ? `Margin-debt YoY ≤ ${marginTrigger.threshold}%`
-        : "margin-debt growth turns negative",
+        : t("thesis.trigger.marginFallback"),
     },
     {
-      label: "Breadth confirms",
+      label: t("thesis.trigger.breadth"),
       text: Number.isFinite(breadthThreshold)
-        ? `NYSE High-Low breadth ≤ ${breadthThreshold}th percentile`
-        : (breadthTrigger?.label || "breadth deterioration becomes available and active"),
+        ? (currentLocale === "zh-TW"
+            ? `NYSE 高低點廣度 ≤ 第 ${breadthThreshold} 百分位`
+            : `NYSE High-Low breadth ≤ ${breadthThreshold}th percentile`)
+        : t("thesis.trigger.breadthFallback"),
     },
   ];
 
@@ -2003,13 +2033,13 @@ function renderOverview() {
 
   setOverviewHealth(
     healthHasHardGap
-      ? "Source issues"
+      ? t("health.sourceIssues")
       : healthNeedsRefresh
-        ? "Snapshot needs refresh"
+        ? t("health.needsRefresh")
         : healthHasEvidenceGap
-          ? "Evidence gaps remain"
-          : "Snapshot current",
-    healthParts.join(" · ") || "No published metrics loaded",
+          ? t("health.evidenceGaps")
+          : t("health.snapshotCurrent"),
+    healthParts.join(" · ") || t("health.noSnapshot"),
     healthHasHardGap ? "gap" : (healthNeedsRefresh || healthHasEvidenceGap) ? "watch" : "normal",
   );
 }
@@ -2039,7 +2069,7 @@ function renderMetrics() {
 
   if (!metrics.length) {
     grid.innerHTML =
-      '<div class="panel empty-state"><strong>Current U.S. snapshot is unavailable.</strong><span>No fixture or placeholder value is substituted for missing published data.</span></div>';
+      `<div class="panel empty-state"><strong>${escapeHtml(t("metric.usUnavailable"))}</strong><span>${escapeHtml(t("metric.noPlaceholder"))}</span></div>`;
     return;
   }
 
@@ -3578,24 +3608,22 @@ function globalFreshnessSummary(metrics) {
     return {
       counts,
       className: "badge badge-missing",
-      text: "No production snapshot",
+      text: t("health.noSnapshot"),
     };
   }
 
   const parts = [
-    counts.error ? `${counts.error} error` : "",
-    counts.missing ? `${counts.missing} missing` : "",
-    counts.stale ? `${counts.stale} stale` : "",
-    counts.insufficient_data
-      ? `${counts.insufficient_data} insufficient data`
-      : "",
+    counts.error ? t("health.count.error", { count: counts.error }) : "",
+    counts.missing ? t("health.count.missing", { count: counts.missing }) : "",
+    counts.stale ? t("health.count.stale", { count: counts.stale }) : "",
+    counts.insufficient_data ? t("health.count.insufficient", { count: counts.insufficient_data }) : "",
   ].filter(Boolean);
 
   if (!parts.length) {
     return {
       counts,
       className: "health-passive",
-      text: "Data current",
+      text: t("health.dataCurrent"),
     };
   }
 
