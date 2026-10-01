@@ -2896,7 +2896,7 @@ function renderHistorySelector() {
   }
 }
 
-async async function renderHistory(id, mode = "absolute") {
+async function renderHistory(id, mode = "absolute") {
   let metric;
   try {
     [metric] = await Promise.all([
