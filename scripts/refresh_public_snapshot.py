@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import json
 import shutil
 import subprocess
 import sys
@@ -23,6 +25,57 @@ FRED_PUBLIC_IDS = [
     "fed_target_legacy",
     "fed_target_upper",
 ]
+
+MACRO_FIELDS = [
+    "date",
+    "provider",
+    "series_id",
+    "value",
+    "unit",
+    "release_date",
+    "source_url",
+]
+
+
+def write_macro_seed(path: Path, rows: list[dict]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=MACRO_FIELDS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(
+            {field: row.get(field, "") for field in MACRO_FIELDS}
+            for row in sorted(rows, key=lambda item: (item["date"], item["series_id"]))
+        )
+    tmp.replace(path)
+
+
+def seed_macro_retention_floor(
+    output_dir: Path,
+    *,
+    cier_path: Path,
+    ndc_path: Path,
+) -> None:
+    """Seed rolling-window bootstraps from the tracked canonical audit.
+
+    GitHub-hosted runners start with an empty .cache. CIER and NDC expose
+    rolling windows, so a clean cache would otherwise forget the oldest
+    retained month on every run. The committed audit is the durable retention
+    floor; live bootstraps merge their new windows on top of it.
+    """
+    audit_path = output_dir / "taiwan-macro-audit.json"
+    if not audit_path.exists():
+        return
+
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    rows = audit.get("rows", [])
+    cier_rows = [row for row in rows if row.get("provider") == "CIER"]
+    ndc_rows = [row for row in rows if row.get("provider") == "NDC"]
+
+    if cier_rows:
+        write_macro_seed(cier_path, cier_rows)
+    if ndc_rows:
+        write_macro_seed(ndc_path, ndc_rows)
 
 
 def run(*args: str) -> None:
@@ -67,6 +120,14 @@ def main() -> None:
     cier_path = ROOT / ".cache" / "taiwan-macro" / "cier-pmi.csv"
     ndc_path = ROOT / ".cache" / "taiwan-macro" / "ndc-business-cycle.csv"
     cbc_path = ROOT / ".cache" / "taiwan-rates" / "cbc-rates.csv"
+
+    # Rehydrate rolling-window retention from the tracked canonical audit.
+    # Hosted runners are ephemeral, while CIER/NDC history must accumulate.
+    seed_macro_retention_floor(
+        output_dir,
+        cier_path=cier_path,
+        ndc_path=ndc_path,
+    )
 
     # Prefetch every file-based dependency before the release mutates the
     # tracked output tree. A source failure here leaves the published snapshot
