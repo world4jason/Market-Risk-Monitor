@@ -285,10 +285,10 @@ class UiContractTests(unittest.TestCase):
             overview,
         )
         freshness_guard = overview.index('taiexFreshness !== "fresh"')
-        refresh_wording = overview.index('taiwanHeadline = "No current call"')
+        refresh_wording = overview.index('taiwanHeadline = t("overview.taiwan.noCall")')
         self.assertLess(freshness_guard, refresh_wording)
-        self.assertIn('taiwanStatus = String(taiexFreshness).toUpperCase()', overview)
-        self.assertIn('taiwanHeadline = "Market read available"', overview)
+        self.assertIn('taiwanStatus = statusLabel(taiexFreshness).toUpperCase()', overview)
+        self.assertIn('taiwanHeadline = t("overview.taiwan.available")', overview)
 
     def test_missing_expected_stress_condition_cannot_render_reassuring_summary(self) -> None:
         overview = extract_function(self.app, "renderOverview")
@@ -300,10 +300,10 @@ class UiContractTests(unittest.TestCase):
             "expectedStressConditions.some((condition) => !condition)",
             overview,
         )
-        self.assertIn('stressUnknown ? "DATA GAP"', overview)
-        self.assertIn('stressUnknown ? "Known gauges calm"', overview)
-        self.assertIn('"Stress contained"', overview)
-        self.assertIn('"Known stress gauges are not elevated, but expected stress evidence is incomplete."', overview)
+        self.assertIn('stressUnknown ? t("status.dataGap")', overview)
+        self.assertIn('stressUnknown ? t("overview.stress.knownCalm")', overview)
+        self.assertIn('t("overview.stress.contained")', overview)
+        self.assertIn('t("thesis.stressPartial")', overview)
 
     def test_margin_rollover_exposes_the_actual_positive_growth_deceleration_trigger(self) -> None:
         condition = next(
@@ -331,8 +331,8 @@ class UiContractTests(unittest.TestCase):
         self.assertIn('rule.type === "delta_periods_below"', helper)
         self.assertIn("Math.abs(value).toFixed(1)", helper)
         self.assertIn('const slowing = marginStatus === "active" && Number.isFinite(yoy) && yoy > 0;', overview)
-        self.assertIn('slowing ? "High, growth slowing"', overview)
-        self.assertIn('"Leverage rolling over; stress not confirmed"', overview)
+        self.assertIn('slowing ? t("overview.leverage.slowing")', overview)
+        self.assertIn('t("thesis.rollover")', overview)
         self.assertIn('YoY ${formatValue(marginYoy.latest?.value, "percent")}', overview)
         self.assertIn("details.map(formatRuleDetail)", signals)
         self.assertIn("detail.reason", rule_detail)
@@ -350,7 +350,7 @@ class UiContractTests(unittest.TestCase):
         self.assertIn('parts.push("context only")', suffix)
         self.assertIn("retrospective; not PIT/backtest-safe", suffix)
         self.assertIn("percentileContextSuffix(metric)", card)
-        self.assertIn('pct (context)', overview)
+        self.assertIn('t("context.contextOnly")', overview)
         self.assertIn("percentileCaveatSentence(metric)", dialog)
         self.assertIn("it is not a risk direction", caveat)
         self.assertIn("not safe for historical PIT/backtest use", caveat)
@@ -363,7 +363,7 @@ class UiContractTests(unittest.TestCase):
 
         dynamic = extract_function(self.app, "dynamicMetricCaveat")
         self.assertIn('breadth.state === "snapshot_only"', dynamic)
-        self.assertIn("Only 1 published breadth session", dynamic)
+        self.assertIn('t("breadth.oneSession")', dynamic)
         self.assertIn('breadth.state === "history_building"', dynamic)
 
     def test_optional_ma_family_is_compact_and_hidden_before_javascript_runs(self) -> None:
@@ -413,17 +413,20 @@ class UiContractTests(unittest.TestCase):
         signals = extract_function(self.app, "renderSignals")
         self.assertIn("unavailable/unknown", signals)
         self.assertIn("unknown is not inactive", signals)
-        self.assertIn('"Not confirmed"', overview)
-        self.assertIn('"LOW CONFIDENCE"', overview)
-        self.assertIn('${unknown} unknown', overview)
+        self.assertIn('t("overview.deleveraging.notConfirmed")', overview)
+        self.assertIn('t("thesis.confidence.low")', overview)
+        self.assertIn('t("overview.usable"', overview)
         self.assertIn('unknown ? "gap"', overview)
 
     def test_public_page_contains_no_operator_cli_recovery_commands(self) -> None:
         self.assertNotIn("python scripts/", self.html + "\n" + self.app)
 
-    def test_public_language_strategy_is_consistently_english(self) -> None:
-        self.assertNotIn("古往今來", self.html)
-        self.assertIn("RESEARCH HISTORY", self.html)
+    def test_public_language_strategy_supports_english_and_traditional_chinese(self) -> None:
+        self.assertIn('const SUPPORTED_LOCALES = ["en", "zh-TW"]', self.app)
+        self.assertIn('"zh-TW": {', self.app)
+        self.assertIn('id="language-select"', self.html)
+        self.assertIn('data-i18n="research.eyebrow"', self.html)
+        self.assertIn('document.documentElement.lang = currentLocale', self.app)
 
 
 if __name__ == "__main__":
