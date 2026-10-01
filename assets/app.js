@@ -3085,11 +3085,11 @@ async function loadData() {
     }
 
     $("#data-generated").textContent = overview.generated_at
-      ? `Overview generated ${overview.generated_at}`
-      : "Overview snapshot loaded";
+      ? t("data_health.generated", { date: overview.generated_at })
+      : t("data_health.loaded");
   } catch (error) {
     console.error(error);
-    $("#data-generated").textContent = "Snapshot load failed";
+    $("#data-generated").textContent = t("data_health.failed");
   }
 
   renderOverview();
