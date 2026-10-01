@@ -217,8 +217,20 @@ footer { padding: 34px 0 46px; display: flex; gap: 18px; color: var(--muted); fo
 }
 @media (max-width: 640px) {
   .site-header { align-items: flex-start; padding-top: 26px; }
-  .header-actions { flex-direction: column-reverse; align-items: flex-end; }
+  .site-header {
+    flex-wrap: wrap;
+  }
+  .header-actions {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+  }
   .language-select { min-height: 38px; }
+  .header-actions #global-freshness {
+    margin-left: auto;
+  }
   .metric-grid, .regime-grid, .signal-grid, .trend-summary, .ma-study-grid, .taiwan-panel .regime-grid { grid-template-columns: 1fr; }
   .section-heading {
     align-items: flex-start;
