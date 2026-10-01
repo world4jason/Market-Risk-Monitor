@@ -1012,7 +1012,7 @@ def build_catalog(output_dir: Path) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Refresh Market Risk Monitor static snapshots without GitHub Actions."
+            "Refresh Market Risk Monitor static snapshots from selected sources."
         )
     )
     parser.add_argument(

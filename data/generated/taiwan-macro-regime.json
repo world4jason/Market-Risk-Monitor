@@ -19,30 +19,30 @@
     "inputs": [
       {
         "id": "tw_manufacturing_pmi",
-        "as_of": "2026-08-01",
-        "snapshot_at": "2026-09-21T00:00:00Z",
-        "content_digest": "sha256:278c5fee526e827ca0cda6a5abee7ad2b111b0faa304cda33a9aa2c05e36da3b"
+        "as_of": "2026-09-01",
+        "snapshot_at": "2026-10-01T00:00:00Z",
+        "content_digest": "sha256:cfc721435aab38caaa438bf85570b27c693d57523a28c5b253699bf4379c460b"
       },
       {
         "id": "tw_ndc_coincident_index",
-        "as_of": "2026-07-01",
-        "snapshot_at": "2026-09-26T00:00:00Z",
-        "content_digest": "sha256:773c6f28d6719aed4824994847f6ef163615c4c05c31a8672fb1f2438d57d90f"
+        "as_of": "2026-08-01",
+        "snapshot_at": "2026-10-01T00:00:00Z",
+        "content_digest": "sha256:f313750724ed9012cf0c819f1dee8512fcbb4f59df69ba0e8475225264a654b0"
       },
       {
         "id": "tw_ndc_leading_index",
-        "as_of": "2026-07-01",
-        "snapshot_at": "2026-09-26T00:00:00Z",
-        "content_digest": "sha256:f5b823432aae174ab2279b8578f67fe6de490dc63b8cab80ca7160c85189bfcf"
+        "as_of": "2026-08-01",
+        "snapshot_at": "2026-10-01T00:00:00Z",
+        "content_digest": "sha256:1ad93e28cd57f38b85f0c28ca7bd60292c8619548ee17ee61fab7d1266552a7d"
       },
       {
         "id": "tw_ndc_monitoring_score",
-        "as_of": "2026-07-01",
-        "snapshot_at": "2026-09-26T00:00:00Z",
-        "content_digest": "sha256:96a4e05b6698258056d8ac15d83165f03973ab4fa440aabc7787fbc3d4702af9"
+        "as_of": "2026-08-01",
+        "snapshot_at": "2026-10-01T00:00:00Z",
+        "content_digest": "sha256:3b21f50cdcdc34dbba7654c3ee950f2bfaeaceecb5c923497fa0ad6fb30e0959"
       }
     ],
-    "generated_at": "2026-09-26T00:00:00Z"
+    "generated_at": "2026-10-01T00:00:00Z"
   },
   "name": "MRM Taiwan Macro Regime",
   "description": "Transparent public-input regime; does not reproduce MacroMicro/MM.",
@@ -63,16 +63,16 @@
     ]
   },
   "current": {
-    "date": "2026-08-01",
+    "date": "2026-09-01",
     "score": null,
     "known_components": 1,
     "total_components": 4,
     "confidence": 0.25,
-    "available_on": "2026-09-21",
+    "available_on": "2026-10-01",
     "components": {
       "tw_manufacturing_pmi": {
         "vote": 1.0,
-        "raw_rule_value": "62.5"
+        "raw_rule_value": "63.4"
       },
       "tw_ndc_leading_index": {
         "vote": null,
@@ -93,24 +93,24 @@
     "ndc_monitoring_light": null
   },
   "latest_known": {
-    "date": "2026-07-01",
+    "date": "2026-08-01",
     "score": 1.0,
     "known_components": 3,
     "total_components": 4,
     "confidence": 0.75,
-    "available_on": "2026-09-26",
+    "available_on": "2026-10-01",
     "components": {
       "tw_manufacturing_pmi": {
         "vote": 1.0,
-        "raw_rule_value": "61.5"
+        "raw_rule_value": "62.5"
       },
       "tw_ndc_leading_index": {
         "vote": 1.0,
-        "raw_rule_value": "2.173"
+        "raw_rule_value": "1.686"
       },
       "tw_ndc_coincident_index": {
         "vote": 1.0,
-        "raw_rule_value": "1.475"
+        "raw_rule_value": "1.2"
       },
       "tw_manufacturing_production": {
         "vote": null,
@@ -219,7 +219,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -227,11 +227,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.488"
+          "raw_rule_value": "1.345"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "0.8127"
+          "raw_rule_value": "0.4178"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -249,7 +249,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -257,11 +257,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.571"
+          "raw_rule_value": "1.522"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.429"
+          "raw_rule_value": "1.284"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -279,7 +279,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -287,11 +287,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.414"
+          "raw_rule_value": "1.354"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.017"
+          "raw_rule_value": "1.865"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -309,7 +309,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -317,11 +317,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.118"
+          "raw_rule_value": "1.044"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.435"
+          "raw_rule_value": "2.28"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -339,7 +339,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -347,11 +347,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.048"
+          "raw_rule_value": "0.9466"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.655"
+          "raw_rule_value": "2.502"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -369,7 +369,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -377,11 +377,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.317"
+          "raw_rule_value": "1.171"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.506"
+          "raw_rule_value": "2.365"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -399,7 +399,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -407,11 +407,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.76"
+          "raw_rule_value": "1.545"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.205"
+          "raw_rule_value": "2.08"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -429,7 +429,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -437,11 +437,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.065"
+          "raw_rule_value": "1.755"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.801"
+          "raw_rule_value": "1.698"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -459,7 +459,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-09-26",
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -467,11 +467,11 @@
         },
         "tw_ndc_leading_index": {
           "vote": 1.0,
-          "raw_rule_value": "2.173"
+          "raw_rule_value": "1.748"
         },
         "tw_ndc_coincident_index": {
           "vote": 1.0,
-          "raw_rule_value": "1.475"
+          "raw_rule_value": "1.397"
         },
         "tw_manufacturing_production": {
           "vote": null,
@@ -485,15 +485,45 @@
     },
     {
       "date": "2026-08-01",
-      "score": null,
-      "known_components": 1,
+      "score": 1.0,
+      "known_components": 3,
       "total_components": 4,
-      "confidence": 0.25,
-      "available_on": "2026-09-21",
+      "confidence": 0.75,
+      "available_on": "2026-10-01",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
           "raw_rule_value": "62.5"
+        },
+        "tw_ndc_leading_index": {
+          "vote": 1.0,
+          "raw_rule_value": "1.686"
+        },
+        "tw_ndc_coincident_index": {
+          "vote": 1.0,
+          "raw_rule_value": "1.2"
+        },
+        "tw_manufacturing_production": {
+          "vote": null,
+          "raw_rule_value": null
+        }
+      },
+      "score_momentum": 0.0,
+      "regime": "expansion",
+      "ndc_monitoring_score": 41.0,
+      "ndc_monitoring_light": "red"
+    },
+    {
+      "date": "2026-09-01",
+      "score": null,
+      "known_components": 1,
+      "total_components": 4,
+      "confidence": 0.25,
+      "available_on": "2026-10-01",
+      "components": {
+        "tw_manufacturing_pmi": {
+          "vote": 1.0,
+          "raw_rule_value": "63.4"
         },
         "tw_ndc_leading_index": {
           "vote": null,

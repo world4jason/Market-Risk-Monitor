@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T10:54:33.228741Z",
+  "generated_at": "2026-10-01T11:09:40.981415Z",
   "results": [
     {
       "metric": "nfci",
@@ -100,6 +100,31 @@
       "metric": "tw_advance_decline_line",
       "status": "updated",
       "path": "data/generated/tw_advance_decline_line.json"
+    },
+    {
+      "metric": "tw_manufacturing_pmi",
+      "status": "updated",
+      "path": "data/generated/tw_manufacturing_pmi.json"
+    },
+    {
+      "metric": "tw_ndc_coincident_index",
+      "status": "updated",
+      "path": "data/generated/tw_ndc_coincident_index.json"
+    },
+    {
+      "metric": "tw_ndc_lagging_index",
+      "status": "updated",
+      "path": "data/generated/tw_ndc_lagging_index.json"
+    },
+    {
+      "metric": "tw_ndc_leading_index",
+      "status": "updated",
+      "path": "data/generated/tw_ndc_leading_index.json"
+    },
+    {
+      "metric": "tw_ndc_monitoring_score",
+      "status": "updated",
+      "path": "data/generated/tw_ndc_monitoring_score.json"
     },
     {
       "metric": "tw_cbc_rate",
