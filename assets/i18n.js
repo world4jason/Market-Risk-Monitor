@@ -1,5 +1,5 @@
 const STORAGE_KEY = "mrm-locale";
-export const SUPPORTED_LOCALES = ["en", "zh-TW"];
+const SUPPORTED_LOCALES = ["en", "zh-TW"];
 
 const messages = {
   en: {
@@ -561,12 +561,12 @@ const signalContextZh = {
 
 let locale = "en";
 
-export function normalizeLocale(value) {
+function normalizeLocale(value) {
   const input = String(value || "").toLowerCase();
   return input.startsWith("zh") ? "zh-TW" : "en";
 }
 
-export function resolveInitialLocale({
+function resolveInitialLocale({
   stored = null,
   languages = [],
   language = "",
@@ -576,11 +576,11 @@ export function resolveInitialLocale({
   return normalizeLocale(preferred);
 }
 
-export function getLocale() {
+function getLocale() {
   return locale;
 }
 
-export function setLocale(next, { persist = true } = {}) {
+function setLocale(next, { persist = true } = {}) {
   locale = normalizeLocale(next);
   if (persist && typeof localStorage !== "undefined") {
     localStorage.setItem(STORAGE_KEY, locale);
@@ -591,7 +591,7 @@ export function setLocale(next, { persist = true } = {}) {
   return locale;
 }
 
-export function initLocale() {
+function initLocale() {
   let stored = null;
   try {
     stored = localStorage.getItem(STORAGE_KEY);
@@ -606,7 +606,7 @@ export function initLocale() {
   );
 }
 
-export function t(key, vars = {}) {
+function t(key, vars = {}) {
   const table = messages[locale] || messages.en;
   let value = table[key] ?? messages.en[key] ?? key;
   for (const [name, replacement] of Object.entries(vars)) {
@@ -615,11 +615,11 @@ export function t(key, vars = {}) {
   return value;
 }
 
-export function localeNumber(value, options = {}) {
+function localeNumber(value, options = {}) {
   return Number(value).toLocaleString(locale, options);
 }
 
-export function localeDate(value) {
+function localeDate(value) {
   if (!value) return "—";
   const date = new Date(`${String(value).slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(date.getTime())) return String(value);
@@ -631,7 +631,7 @@ export function localeDate(value) {
   }).format(date);
 }
 
-export function localeOrdinal(value) {
+function localeOrdinal(value) {
   if (value == null || !Number.isFinite(Number(value))) return "—";
   const n = Math.round(Number(value));
   if (locale === "zh-TW") return `第 ${localeNumber(n)}`;
@@ -650,12 +650,28 @@ export function localeOrdinal(value) {
   return `${n}${suffix}`;
 }
 
-export function localizedMetricContext(id, englishContext) {
+function localizedMetricContext(id, englishContext) {
   if (locale !== "zh-TW") return englishContext;
   return metricContextZh[id] || englishContext;
 }
 
-export function localizedSignalContext(id, englishContext) {
+function localizedSignalContext(id, englishContext) {
   if (locale !== "zh-TW") return englishContext;
   return signalContextZh[id] || englishContext;
 }
+
+
+globalThis.MRMI18n = Object.freeze({
+  SUPPORTED_LOCALES,
+  normalizeLocale,
+  resolveInitialLocale,
+  getLocale,
+  setLocale,
+  initLocale,
+  t,
+  localeNumber,
+  localeDate,
+  localeOrdinal,
+  localizedMetricContext,
+  localizedSignalContext,
+});
