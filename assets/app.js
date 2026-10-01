@@ -1090,7 +1090,7 @@ function percentilePresentation(metric, value = rollingPercentile(metric)) {
 }
 
 function metricDateLine(metric) {
-  const context = beginnerContext[metric?.metric?.id];
+  const context = localizedBeginnerContext(metric?.metric?.id);
   const asOf = metric?.latest?.as_of || "unknown";
   if (context?.date_semantics === "effective_vs_verified") {
     const verified = String(metric?.latest?.fetched_at || "").slice(0, 10) || "unknown";
@@ -1100,7 +1100,7 @@ function metricDateLine(metric) {
 }
 
 function metricContextGuide(metric) {
-  const context = beginnerContext[metric?.metric?.id];
+  const context = localizedBeginnerContext(metric?.metric?.id);
   if (!context) return "";
   const reference = context.important_reference_level
     ? `<dt>Reference</dt><dd>${escapeHtml(context.important_reference_level)}</dd>`
@@ -1713,14 +1713,14 @@ function metricCard(metric) {
   const p = percentilePresentation(metric, pct);
   const change = recentChange(metric);
   const cText = formatChange(change);
-  const context = beginnerContext[metric.metric.id];
+  const context = localizedBeginnerContext(metric.metric.id);
   const title = context?.plain_name || metric.metric.name;
   const contextOnly = pct != null ? percentileContextSuffix(metric) : "";
 
   return `<article class="panel metric-card" data-metric-id="${escapeHtml(metric.metric.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(title)} details and history">
     <div class="metric-card-top">
       <div>
-        <p class="eyebrow">${escapeHtml(pillarLabels[metric.metric.pillar] || metric.metric.pillar)}</p>
+        <p class="eyebrow">${escapeHtml(pillarLabel(metric.metric.pillar))}</p>
         <h3>${escapeHtml(title)}</h3>
       </div>
       ${freshnessBadge(metric)}
@@ -1820,7 +1820,7 @@ function renderOverview() {
   const activeName = activeConditions[0]
     ? (activeConditions[0].id === "margin_debt_rollover"
         ? "Margin momentum slowing"
-        : signalBeginnerContext[activeConditions[0].id]?.plain_name || activeConditions[0].name)
+        : localizedSignalContext(activeConditions[0].id)?.plain_name || activeConditions[0].name)
     : null;
 
   const deleveragingFacts = [];
@@ -2509,7 +2509,7 @@ function renderRegime() {
       const current = metricsForPillar.length - notCurrent;
 
       return `<div class="regime-cell">
-        <p class="eyebrow">${escapeHtml(pillarLabels[pillar] || pillar)}</p>
+        <p class="eyebrow">${escapeHtml(pillarLabel(pillar))}</p>
         <div class="regime-value">${notCurrent ? `${notCurrent} not current` : "Data current"}</div>
         <div class="regime-note">${current} of ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"} current</div>
       </div>`;
@@ -2533,7 +2533,7 @@ function renderCoverage() {
     .map(
       (m) => `<tr>
         <td>${escapeHtml(m.metric.name)}</td>
-        <td>${escapeHtml(pillarLabels[m.metric.pillar] || m.metric.pillar)}</td>
+        <td>${escapeHtml(pillarLabel(m.metric.pillar))}</td>
         <td>${escapeHtml(m.coverage.history_start || "—")} → ${escapeHtml(m.coverage.history_end || "—")}</td>
         <td>${escapeHtml(m.latest.as_of || "—")}</td>
         <td>${freshnessBadge(m)}</td>
@@ -2755,7 +2755,7 @@ async function renderHistory(id, mode = "absolute") {
   const modeLabel =
     mode === "rate_change"
       ? rateOfChangePeriods(metric).label
-      : historyModeLabels[mode] || historyModeLabels.absolute;
+      : historyModeLabel(mode);
 
   $("#history-mode-label").innerHTML =
     `<i class="legend-dot"></i> ${escapeHtml(modeLabel)}`;
@@ -3327,9 +3327,9 @@ async function openMetric(id, invoker = document.activeElement) {
   if (!summary) return;
 
   const dialog = $("#metric-dialog");
-  const context = beginnerContext[id];
+  const context = localizedBeginnerContext(id);
   $("#dialog-pillar").textContent =
-    pillarLabels[summary.metric.pillar] || summary.metric.pillar;
+    pillarLabel(summary.metric.pillar);
   $("#dialog-title").textContent = context?.plain_name || summary.metric.name;
   $("#dialog-summary").innerHTML =
     '<div class="detail-stat"><strong>Loading…</strong><span>Full metric history</span></div>';
@@ -3462,7 +3462,7 @@ function renderSignals() {
 
   grid.innerHTML = displayConditions
     .map((condition) => {
-      const beginner = signalBeginnerContext[condition.id] || {};
+      const beginner = localizedSignalContext(condition.id) || {};
       const details = flattenRuleDetails(condition.rules);
       const detailText = details.map(formatRuleDetail).join("<br>");
       const caveat = condition.displayStatus === "unknown"
