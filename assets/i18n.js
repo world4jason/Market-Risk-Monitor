@@ -78,7 +78,7 @@ const messages = {
     "health.snapshot": "snapshot {date}",
     "health.error_count": "{count} error",
     "health.missing_count": "{count} missing",
-    "health.insufficient_count": "{count} insufficient",
+    "health.insufficient_count": "{count} insufficient data",
     "market.us": "U.S. MARKET",
     "market.taiwan": "TAIWAN MARKET",
     "us.detail": "U.S. DETAIL",
