@@ -8,27 +8,12 @@ command; a PR description is not documentation.
 ## The release command
 
 ```bash
-python scripts/bootstrap_taiwan_taiex.py
-python scripts/bootstrap_cier_pmi.py
-python scripts/bootstrap_ndc_business_cycle.py
-
-python scripts/refresh_data.py --clean-output \
-  --fred-id nfci --fred-id nfci_risk --fred-id nfci_credit \
-  --fred-id nfci_nonfinancial_leverage --fred-id us_recession \
-  --fred-id fed_target_legacy --fred-id fed_target_upper \
-  --cboe-vix \
-  --finra-file <margin-statistics.xlsx> \
-  --shiller-file <ie_data.xls> \
-  --twse-current \
-  --taiwan-macro-file .cache/taiwan-macro/cier-pmi.csv \
-  --taiwan-macro-file .cache/taiwan-macro/ndc-business-cycle.csv \
-  --cbc-rate-file <cbc-rates.csv>
-
-python scripts/build_signals.py
-python scripts/validate_data.py
-python scripts/check_publish_policy.py
-python scripts/site_smoke.py
+python scripts/refresh_public_snapshot.py
 ```
+
+This is the authoritative command used both locally and by `.github/workflows/refresh-public-snapshot.yml`. It prefetches every file-based dependency before mutating tracked outputs, rehydrates rolling CIER/NDC source windows from the committed macro audit, runs the explicit public-source allowlist with `--clean-output`, executes tests/validation/publishing-policy/site-smoke gates, and restores the previous generated tree on failure.
+
+The workflow exposes `workflow_dispatch` and runs twice on weekdays: ~15:30 and ~06:30 Asia/Taipei. It commits only changed `data/generated/` files after every gate succeeds.
 
 FINRA and Shiller workbooks are downloaded by `scripts/bootstrap_sources.py`.
 The release does **not** use that script, because it defaults to including the
@@ -117,7 +102,7 @@ This is stronger than grepping for `redistribution: "restricted"`: it also rejec
 ## Publishing
 
 Pages serves `main` at `/(root)`; see
-[GitHub Pages without GHA](../README.md#github-pages-without-gha). Merging the
+[GitHub Pages + scheduled data refresh](../README.md#github-pages--scheduled-data-refresh). Merging the
 snapshot to `main` rebuilds the site.
 
 ## Retention and subsequent refreshes
@@ -129,5 +114,5 @@ The long-term decision from #44 is **tracked snapshots on `main`** for source fa
 - `validate_data.py`, `check_publish_policy.py`, and `site_smoke.py` must pass before generated files are committed.
 - Restricted/local-only inputs may exist in a developer's separate local output directory, but never in the tracked public release tree.
 - Each accepted refresh replaces the tracked snapshot set on `main`; Git history is the retention/audit trail.
-- We do not add a data branch or scheduler dependency while Pages deliberately serves `main/(root)` without GitHub Actions.
+- Pages deliberately remains branch-based at `main/(root)`. GitHub Actions is a refresh runner only; it does not build or deploy the site.
 - If repository/Pages visibility or a source license changes, update the dated policy review and machine-readable config before publishing.
