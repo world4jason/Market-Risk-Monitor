@@ -3143,14 +3143,14 @@ function renderTaiwanEventSelector() {
     .sort((a, b) => a.metric.name.localeCompare(b.metric.name));
 
   if (!metrics.length) {
-    select.innerHTML = '<option value="">No Taiwan history</option>';
+    select.innerHTML = `<option value="">${escapeHtml(t("history.noTaiwan"))}</option>`;
     renderTaiwanEvents(null, mode.value);
     return;
   }
 
   const previous = select.dataset.initialized === "true" ? select.value : "";
   select.innerHTML = [
-    '<option value="">Select a Taiwan metric</option>',
+    `<option value="">${escapeHtml(t("history.selectTaiwan"))}</option>`,
     ...metrics.map(
       (metric) =>
         `<option value="${escapeHtml(metric.metric.id)}">${escapeHtml(metric.metric.name)}</option>`,
@@ -3176,7 +3176,7 @@ function renderTaiwanEventSelector() {
       console.warn("Taiwan history load failed", select.value, error);
       $("#tw-event-list").innerHTML = "";
       $("#tw-event-chart").innerHTML =
-        '<div class="empty-state compact">This Taiwan metric history could not be loaded.</div>';
+        `<div class="empty-state compact">${escapeHtml(t("history.taiwanLoadFailed"))}</div>`;
     }
   };
   select.onchange = rerender;
@@ -3194,15 +3194,16 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   if (!metric || !state.taiwanEvents.length) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Taiwan event definitions or metric history unavailable.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.taiwanEventUnavailable"))}</div>`;
     return;
   }
 
   const eligibility = historicalAnalysisEligibility(metric);
   if (!eligibility.allowed && mode !== "raw") {
     list.innerHTML = "";
+    const reason = eligibility.reason || t("status.unknown");
     el.innerHTML =
-      `<div class="empty-state compact"><strong>Point-in-time Taiwan event comparison disabled.</strong><span>${escapeHtml(eligibility.reason)}. Raw retrospective history remains available.</span></div>`;
+      `<div class="empty-state compact"><strong>${escapeHtml(t("history.taiwanPitDisabled"))}</strong><span>${escapeHtml(t("history.taiwanRawAvailable", { reason }))}</span></div>`;
     return;
   }
   if (
@@ -3211,7 +3212,7 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   ) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Point-in-time percentile mode is disabled because no eligible PIT percentile baseline is declared.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.taiwanPitPercentileDisabled"))}</div>`;
     return;
   }
 
@@ -3237,14 +3238,12 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   if (obs.length < 2) {
     list.innerHTML = "";
     el.innerHTML =
-      '<div class="empty-state compact">Not enough Taiwan history for this comparison mode.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.taiwanNotEnough"))}</div>`;
     return;
   }
 
   const coverageStart = Date.parse(
-    mode === "raw"
-      ? metric.coverage.history_start
-      : (obs[0].availability_date || obs[0].date),
+    obs[0].availability_date || obs[0].date,
   );
   const colors = [
     "#5dc2aa",
@@ -3259,10 +3258,10 @@ function renderTaiwanEvents(metric, mode = "normalized") {
 
   list.innerHTML = state.taiwanEvents
     .map((event, index) => {
-      const anchorDate = event.anchor_date || metric.latest.as_of;
-      const unavailable =
-        !anchorDate || Date.parse(anchorDate) < coverageStart;
-      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}"><i class="event-dot" style="background:${colors[index % colors.length]}"></i>${escapeHtml(event.name)}</span>`;
+      const anchor = event.anchor_date || metric.latest.as_of;
+      const unavailable = !anchor || Date.parse(anchor) < coverageStart;
+      const color = colors[index % colors.length];
+      return `<span class="event-pill ${unavailable ? "unavailable" : ""}" title="${escapeHtml(event.notes || "")}"><i class="event-dot" style="background:${color}"></i>${escapeHtml(event.name)}</span>`;
     })
     .join("");
 
@@ -3270,13 +3269,10 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   state.taiwanEvents.forEach((event, index) => {
     const anchor = event.anchor_date || metric.latest.as_of;
     if (!anchor || Date.parse(anchor) < coverageStart) return;
-
     const anchorIdx = observationOnOrBeforeIndex(obs, anchor);
     if (anchorIdx < 0) return;
-
     const anchorValue = Number(obs[anchorIdx].value);
-    if (!Number.isFinite(anchorValue)) return;
-    if (mode === "normalized" && anchorValue === 0) return;
+    if (!Number.isFinite(anchorValue) || anchorValue === 0) return;
 
     const anchorDate = new Date(
       `${obs[anchorIdx].availability_date || obs[anchorIdx].date}T00:00:00Z`,
@@ -3286,52 +3282,45 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     const points = [];
 
     for (const item of obs) {
-      const offset = monthOffset(
-        anchorDate,
-        new Date(
-          `${item.availability_date || item.date}T00:00:00Z`,
-        ),
+      const dt = new Date(
+        `${item.availability_date || item.date}T00:00:00Z`,
       );
+      const offset = monthOffset(anchorDate, dt);
       if (offset < -pre || offset > post) continue;
-
       const raw = Number(item.value);
-      points.push({
-        offset,
-        value:
-          mode === "normalized"
-            ? (raw / anchorValue) * 100
-            : raw,
-      });
+      const plotted = mode === "normalized" ? (raw / anchorValue) * 100 : raw;
+      points.push({ offset, value: plotted });
     }
 
     if (points.length > 1) {
       lines.push({
         name: event.name,
         points,
+        color: colors[index % colors.length],
         pre,
         post,
-        color: colors[index % colors.length],
       });
     }
   });
 
   if (!lines.length) {
     el.innerHTML =
-      '<div class="empty-state compact">This Taiwan metric has no usable coverage for the configured events.</div>';
+      `<div class="empty-state compact">${escapeHtml(t("history.noEventCoverage"))}</div>`;
     return;
   }
 
   const width = 720;
   const height = 250;
-  const left = 52;
+  const left = 42;
   const right = 16;
   const top = 18;
   const bottom = 34;
   const minOffset = Math.min(...lines.map((line) => -line.pre));
   const maxOffset = Math.max(...lines.map((line) => line.post));
-  const values = lines.flatMap((line) => line.points.map((point) => point.value));
-  let min = Math.min(...values);
-  let max = Math.max(...values);
+  const allValues = lines.flatMap((line) => line.points.map((p) => p.value));
+
+  let min = Math.min(...allValues);
+  let max = Math.max(...allValues);
   if (min === max) {
     min -= 1;
     max += 1;
@@ -3344,10 +3333,11 @@ function renderTaiwanEvents(metric, mode = "normalized") {
   const y = (value) =>
     top + ((max - value) / (max - min)) * (height - top - bottom);
 
+  const zeroX = x(0);
   const paths = lines
     .map((line) => {
-      const d = [...line.points]
-        .sort((a, b) => a.offset - b.offset)
+      const sorted = [...line.points].sort((a, b) => a.offset - b.offset);
+      const d = sorted
         .map(
           (point, index) =>
             `${index ? "L" : "M"} ${x(point.offset).toFixed(1)} ${y(point.value).toFixed(1)}`,
@@ -3357,37 +3347,12 @@ function renderTaiwanEvents(metric, mode = "normalized") {
     })
     .join("");
 
-  const referenceValue = mode === "normalized" ? 100 : null;
-  const referenceLine =
-    referenceValue != null && referenceValue >= min && referenceValue <= max
-      ? `<line class="gridline" x1="${left}" y1="${y(referenceValue)}" x2="${width - right}" y2="${y(referenceValue)}"/>`
-      : "";
-
-  const unit =
-    mode === "normalized"
-      ? "index=100"
-      : mode === "pit_percentile"
-        ? "percentile"
-        : eventMetric.metric.units;
-
-  const taiwanEndpoints = lines
-    .map((line) => {
-      const endpoint = [...line.points].sort((a, b) => a.offset - b.offset).at(-1);
-      return `${line.name}: ${endpoint.value.toFixed(1)} ${unit} at T${endpoint.offset >= 0 ? "+" : ""}${endpoint.offset}m`;
-    })
-    .join("; ");
-  const a11y = chartA11y(
-    el,
-    `${metric.metric.name} Taiwan historical event comparison`,
-    `${metric.metric.name} Taiwan event comparison in ${unit}. ${lines.length} event paths from T${minOffset} to T+${maxOffset} months. Endpoints: ${taiwanEndpoints}.`,
-  );
-  el.innerHTML = `${a11y.summaryHtml}<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" ${a11y.svgAttrs}>
-    ${referenceLine}
-    <line class="gridline" x1="${x(0)}" y1="${top}" x2="${x(0)}" y2="${height - bottom}"/>
+  el.innerHTML = `<svg class="history-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(t("taiwan.eventTitle"))}">
+    <line class="gridline" x1="${left}" y1="${y(mode === "normalized" ? 100 : min)}" x2="${width - right}" y2="${y(mode === "normalized" ? 100 : min)}"/>
+    <line class="gridline" x1="${zeroX}" y1="${top}" x2="${zeroX}" y2="${height - bottom}"/>
     ${paths}
-    <text x="${left - 5}" y="${top + 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="9">${escapeHtml(unit)}</text>
     <text x="${left}" y="${height - 10}" fill="currentColor" opacity=".55" font-size="10">T${minOffset}m</text>
-    <text x="${x(0)}" y="${height - 10}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="10">Anchor</text>
+    <text x="${zeroX}" y="${height - 10}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="10">T0</text>
     <text x="${width - right}" y="${height - 10}" text-anchor="end" fill="currentColor" opacity=".55" font-size="10">T+${maxOffset}m</text>
   </svg>`;
 }
