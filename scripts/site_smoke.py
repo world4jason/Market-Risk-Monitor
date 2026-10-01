@@ -29,8 +29,19 @@ def main() -> None:
             fail(f"required static asset missing: {path.relative_to(ROOT)}")
 
     workflows = ROOT / ".github" / "workflows"
-    if workflows.exists() and any(workflows.iterdir()):
-        fail("GitHub Actions workflow files exist, but this project is intentionally no-GHA")
+    allowed_workflows = {"refresh-public-snapshot.yml"}
+    if workflows.exists():
+        workflow_files = {
+            path.name
+            for path in workflows.iterdir()
+            if path.is_file()
+        }
+        unexpected = sorted(workflow_files - allowed_workflows)
+        if unexpected:
+            fail(
+                "unexpected GitHub Actions workflows may change the static "
+                f"Pages architecture: {unexpected}"
+            )
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     app = (ROOT / "assets" / "app.js").read_text(encoding="utf-8")
@@ -59,7 +70,7 @@ def main() -> None:
             fail(f"catalog path is not project-relative: {metric.get('id')}={path}")
 
     print("OK static GitHub Pages smoke checks")
-    print("Pages source must be configured manually as: main / (root)")
+    print("Pages source remains: main / (root); Actions refreshes data only")
 
 
 if __name__ == "__main__":
