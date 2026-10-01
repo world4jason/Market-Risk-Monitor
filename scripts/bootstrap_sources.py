@@ -80,7 +80,7 @@ def run(cmd: list[str]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Bootstrap official market-risk source files and run the no-GHA refresh pipeline."
+            "Bootstrap official market-risk source files and run the refresh pipeline."
         )
     )
     parser.add_argument(
