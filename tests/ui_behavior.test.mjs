@@ -172,7 +172,13 @@ globalThis.__MRM__ = {
   vm.runInContext(APP_SOURCE.slice(0, bootstrap) + exports, sandbox, {
     filename: "assets/app.js",
   });
-  return { api: sandbox.__MRM__, dom, logs };
+  return {
+    api: sandbox.__MRM__,
+    i18n: sandbox.MRMI18n,
+    sandbox,
+    dom,
+    logs,
+  };
 }
 function summaryMetric({
   id,
@@ -262,6 +268,48 @@ function registerOverviewDom(runtime) {
   runtime.dom.register("overview-thesis-evidence");
   runtime.dom.register("overview-thesis-triggers");
 }
+
+test("i18n resolves, persists, updates lang, and rerenders representative UI", () => {
+  const runtime = buildRuntime();
+  const { i18n, sandbox, dom, api } = runtime;
+
+  assert.equal(
+    i18n.resolveInitialLocale({ languages: ["zh-Hant-TW", "en-US"] }),
+    "zh-TW",
+  );
+  assert.equal(
+    i18n.resolveInitialLocale({ stored: "en", languages: ["zh-TW"] }),
+    "en",
+  );
+
+  i18n.setLocale("zh-TW");
+  assert.equal(i18n.getLocale(), "zh-TW");
+  assert.equal(sandbox.localStorage.getItem("mrm-locale"), "zh-TW");
+  assert.equal(dom.document.documentElement.lang, "zh-TW");
+  assert.equal(i18n.t("overview.title"), "現在最重要的是什麼");
+  assert.equal(i18n.localeOrdinal(99), "第 99");
+
+  const grid = dom.register("metric-grid");
+  api.state.metrics.set(
+    "finra_margin_debt",
+    summaryMetric({
+      id: "finra_margin_debt",
+      pillar: "leverage",
+      units: "USD millions",
+      polarity: "contextual",
+      latest: 1453832,
+      percentile: 99,
+      availabilityBasis: "unknown",
+    }),
+  );
+  api.renderMetrics();
+  assert.match(grid.innerHTML, /投資人融資餘額/);
+  assert.match(grid.innerHTML, /槓桿/);
+
+  i18n.setLocale("en");
+  api.renderMetrics();
+  assert.match(grid.innerHTML, /Investor margin debt/);
+});
 
 test("freshness matrix and preserved-refresh errors use production semantics", () => {
   const runtime = buildRuntime();
