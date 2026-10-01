@@ -1817,42 +1817,36 @@ function renderRegime() {
   const metrics = [...state.metrics.values()].filter(
     (m) => m.metric.pillar !== "context" && !isTaiwanMetric(m),
   );
-
   if (!metrics.length) {
-    grid.innerHTML =
-      '<div class="empty-state compact">Published U.S. metric health is unavailable.</div>';
+    grid.innerHTML = `<div class="empty-state compact">${escapeHtml(t("regime.us_unavailable"))}</div>`;
     if (details) details.open = true;
     return;
   }
-
   const byPillar = new Map();
   for (const metric of metrics) {
-    if (!byPillar.has(metric.metric.pillar)) {
-      byPillar.set(metric.metric.pillar, []);
-    }
+    if (!byPillar.has(metric.metric.pillar)) byPillar.set(metric.metric.pillar, []);
     byPillar.get(metric.metric.pillar).push(metric);
   }
-
   const bad = metrics.filter((metric) => effectiveFreshness(metric).state !== "fresh");
   if (details) details.open = bad.length > 0;
-
   grid.innerHTML = pillarOrder
     .filter((pillar) => byPillar.has(pillar))
     .slice(0, 6)
     .map((pillar) => {
       const metricsForPillar = byPillar.get(pillar);
-      const notCurrent = metricsForPillar.filter(
-        (m) => effectiveFreshness(m).state !== "fresh",
-      ).length;
+      const notCurrent = metricsForPillar.filter((m) => effectiveFreshness(m).state !== "fresh").length;
       const current = metricsForPillar.length - notCurrent;
-
+      const unit = t(metricsForPillar.length === 1 ? "regime.metric" : "regime.metrics");
       return `<div class="regime-cell">
-        <p class="eyebrow">${escapeHtml(pillarLabels[pillar] || pillar)}</p>
-        <div class="regime-value">${notCurrent ? `${notCurrent} not current` : "Data current"}</div>
-        <div class="regime-note">${current} of ${metricsForPillar.length} metric${metricsForPillar.length === 1 ? "" : "s"} current</div>
+        <p class="eyebrow">${escapeHtml(pillarLabel(pillar))}</p>
+        <div class="regime-value">${escapeHtml(notCurrent ? t("regime.not_current", { count: localeNumber(notCurrent) }) : t("regime.current"))}</div>
+        <div class="regime-note">${escapeHtml(t("regime.current_count", {
+          current: localeNumber(current),
+          total: localeNumber(metricsForPillar.length),
+          unit,
+        }))}</div>
       </div>`;
-    })
-    .join("");
+    }).join("");
 }
 
 function renderCoverage() {
@@ -1860,25 +1854,18 @@ function renderCoverage() {
   const metrics = [...state.metrics.values()].sort((a, b) =>
     a.metric.name.localeCompare(b.metric.name),
   );
-
   if (!metrics.length) {
-    tbody.innerHTML =
-      '<tr><td colspan="6" class="empty-cell">No generated metrics yet.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-cell">${escapeHtml(t("lineage.empty"))}</td></tr>`;
     return;
   }
-
-  tbody.innerHTML = metrics
-    .map(
-      (m) => `<tr>
-        <td>${escapeHtml(m.metric.name)}</td>
-        <td>${escapeHtml(pillarLabel(m.metric.pillar))}</td>
-        <td>${escapeHtml(m.coverage.history_start || "—")} → ${escapeHtml(m.coverage.history_end || "—")}</td>
-        <td>${escapeHtml(m.latest.as_of || "—")}</td>
-        <td>${freshnessBadge(m)}</td>
-        <td><a class="source-link" href="${escapeHtml(m.source.url)}" target="_blank" rel="noopener">${escapeHtml(m.source.provider)}</a></td>
-      </tr>`,
-    )
-    .join("");
+  tbody.innerHTML = metrics.map((m) => `<tr>
+    <td>${escapeHtml(metricContext(m.metric.id)?.plain_name || m.metric.name)}</td>
+    <td>${escapeHtml(pillarLabel(m.metric.pillar))}</td>
+    <td>${escapeHtml(localeDate(m.coverage.history_start))} → ${escapeHtml(localeDate(m.coverage.history_end))}</td>
+    <td>${escapeHtml(localeDate(m.latest.as_of))}</td>
+    <td>${freshnessBadge(m)}</td>
+    <td><a class="source-link" href="${escapeHtml(m.source.url)}" target="_blank" rel="noopener">${escapeHtml(m.source.provider)}</a></td>
+  </tr>`).join("");
 }
 
 function recessionIntervals() {
@@ -2768,54 +2755,45 @@ function renderSignals() {
   const grid = $("#signal-grid");
   const chart = $("#signal-history-chart");
   const snapshot = state.signals;
-
   if (!snapshot?.current) {
-    summaryEl.innerHTML =
-      '<div class="empty-state compact">Deleveraging Watch is unavailable in the current published snapshot.</div>';
+    summaryEl.innerHTML = `<div class="empty-state compact">${escapeHtml(t("signals.current_unavailable"))}</div>`;
     grid.innerHTML = "";
-    chart.innerHTML =
-      '<div class="empty-state compact">Historical signal state is unavailable.</div>';
+    chart.innerHTML = `<div class="empty-state compact">${escapeHtml(t("signals.history_unavailable"))}</div>`;
     return;
   }
-
   const displayConditions = (snapshot.current.conditions || []).map((condition) => ({
     ...condition,
     displayStatus: effectiveConditionStatus(condition),
   }));
   const summary = {
-    active: displayConditions.filter((c) => c.displayStatus === "active").length,
-    inactive: displayConditions.filter((c) => c.displayStatus === "inactive").length,
-    unknown: displayConditions.filter((c) => c.displayStatus === "unknown").length,
+    active: displayConditions.filter((item) => item.displayStatus === "active").length,
+    inactive: displayConditions.filter((item) => item.displayStatus === "inactive").length,
+    unknown: displayConditions.filter((item) => item.displayStatus === "unknown").length,
     total: displayConditions.length,
   };
   summary.known = summary.active + summary.inactive;
-
   summaryEl.innerHTML = `
     <div class="signal-summary-main">
-      <strong>${summary.known} of ${summary.total} checks known</strong>
-      <span class="meta">· ${summary.active} active · ${summary.unknown} unavailable/unknown</span>
+      <strong>${escapeHtml(t("signal.known_summary", { known: localeNumber(summary.known), total: localeNumber(summary.total) }))}</strong>
+      <span class="meta">${escapeHtml(t("signal.summary_meta", { active: localeNumber(summary.active), unknown: localeNumber(summary.unknown) }))}</span>
     </div>
-    <span class="meta">Evaluated ${escapeHtml(snapshot.current.as_of || "—")} · unknown is not inactive</span>
+    <span class="meta">${escapeHtml(t("signal.evaluated", { date: localeDate(snapshot.current.as_of || "—") }))}</span>
   `;
-
-  grid.innerHTML = displayConditions
-    .map((condition) => {
-      const beginner = signalContext(condition.id) || {};
-      const details = flattenRuleDetails(condition.rules);
-      const detailText = details.map(formatRuleDetail).join("<br>");
-      const caveat = condition.displayStatus === "unknown"
-        ? "Required public evidence is unavailable; this remains unknown rather than safe."
-        : (beginner.caveat || "");
-      return `<article class="signal-card" data-status="${escapeHtml(condition.displayStatus)}">
-        <span class="signal-status">${escapeHtml(condition.displayStatus)}</span>
-        <h3>${escapeHtml(beginner.plain_name || condition.name)}</h3>
-        <p>${escapeHtml(beginner.description || condition.description || "")}</p>
-        ${caveat ? `<p><strong>Caveat:</strong> ${escapeHtml(caveat)}</p>` : ""}
-        <div class="signal-rule">${detailText}</div>
-      </article>`;
-    })
-    .join("");
-
+  grid.innerHTML = displayConditions.map((condition) => {
+    const beginner = signalContext(condition.id) || {};
+    const details = flattenRuleDetails(condition.rules);
+    const detailText = details.map(formatRuleDetail).join("<br>");
+    const caveat = condition.displayStatus === "unknown" ? t("signal.caveat_unknown") : (beginner.caveat || "");
+    const statusKey = `common.${condition.displayStatus}`;
+    const statusLabel = t(statusKey) === statusKey ? condition.displayStatus : t(statusKey);
+    return `<article class="signal-card" data-status="${escapeHtml(condition.displayStatus)}">
+      <span class="signal-status">${escapeHtml(statusLabel)}</span>
+      <h3>${escapeHtml(beginner.plain_name || condition.name)}</h3>
+      <p>${escapeHtml(beginner.description || condition.description || "")}</p>
+      ${caveat ? `<p><strong>${escapeHtml(t("signal.caveat_label"))}</strong> ${escapeHtml(caveat)}</p>` : ""}
+      <div class="signal-rule">${detailText}</div>
+    </article>`;
+  }).join("");
   renderSignalHistory(snapshot, chart);
 }
 
@@ -2893,51 +2871,25 @@ function renderSignalHistory(snapshot, element) {
 }
 
 function globalFreshnessSummary(metrics) {
-  const counts = {
-    fresh: 0,
-    stale: 0,
-    missing: 0,
-    error: 0,
-    insufficient_data: 0,
-  };
-
+  const counts = { fresh: 0, stale: 0, missing: 0, error: 0, insufficient_data: 0 };
   for (const metric of metrics) {
     const freshness = effectiveFreshness(metric).state;
     if (freshness in counts) counts[freshness] += 1;
     else counts.error += 1;
   }
-
   if (!metrics.length) {
-    return {
-      counts,
-      className: "badge badge-missing",
-      text: "No production snapshot",
-    };
+    return { counts, className: "badge badge-missing", text: t("health.no_snapshot") };
   }
-
   const parts = [
-    counts.error ? `${counts.error} error` : "",
-    counts.missing ? `${counts.missing} missing` : "",
-    counts.stale ? `${counts.stale} stale` : "",
-    counts.insufficient_data
-      ? `${counts.insufficient_data} insufficient data`
-      : "",
+    counts.error ? t("health.error_count", { count: localeNumber(counts.error) }) : "",
+    counts.missing ? t("health.missing_count", { count: localeNumber(counts.missing) }) : "",
+    counts.stale ? t("health.stale_count", { count: localeNumber(counts.stale) }) : "",
+    counts.insufficient_data ? t("health.insufficient_count", { count: localeNumber(counts.insufficient_data) }) : "",
   ].filter(Boolean);
-
-  if (!parts.length) {
-    return {
-      counts,
-      className: "health-passive",
-      text: "Data current",
-    };
-  }
-
+  if (!parts.length) return { counts, className: "health-passive", text: t("health.data_current") };
   return {
     counts,
-    className:
-      counts.error || counts.missing
-        ? "badge badge-error"
-        : "badge badge-stale",
+    className: counts.error || counts.missing ? "badge badge-error" : "badge badge-stale",
     text: parts.join(" · "),
   };
 }
