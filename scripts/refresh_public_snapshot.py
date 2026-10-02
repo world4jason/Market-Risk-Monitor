@@ -36,6 +36,15 @@ MACRO_FIELDS = [
     "source_url",
 ]
 
+CIER_METRIC_IDS = ["tw_manufacturing_pmi"]
+
+NDC_METRIC_IDS = [
+    "tw_ndc_monitoring_score",
+    "tw_ndc_leading_index",
+    "tw_ndc_coincident_index",
+    "tw_ndc_lagging_index",
+]
+
 
 def write_macro_seed(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -82,6 +91,72 @@ def run(*args: str) -> None:
     command = [sys.executable, *args]
     print("+", " ".join(command), flush=True)
     subprocess.run(command, cwd=ROOT, check=True)
+
+
+def refresh_seeded_source_with_fallback(
+    *,
+    label: str,
+    script: str,
+    output_path: Path,
+) -> str | None:
+    """Refresh a rolling source, retaining the last verified seed on failure.
+
+    The seed is written from the committed canonical audit before this function
+    runs. If the live fetch fails, restore that exact seed instead of blocking
+    unrelated daily sources. The caller later annotates refresh-report.json so
+    the UI treats the source as failed rather than newly refreshed.
+    """
+    retained = output_path.read_bytes() if output_path.exists() else None
+    try:
+        run(script, "--output", str(output_path))
+        return None
+    except subprocess.CalledProcessError as exc:
+        if retained is None:
+            raise
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_bytes(retained)
+        message = (
+            f"{label} live refresh failed with exit code {exc.returncode}; "
+            "retained previous verified snapshot"
+        )
+        print(f"WARNING: {message}", file=sys.stderr, flush=True)
+        return message
+
+
+def annotate_refresh_report_source_failures(
+    output_dir: Path,
+    failures: list[tuple[list[str], str]],
+) -> None:
+    """Mark retained-source failures without discarding fresh unrelated data."""
+    if not failures:
+        return
+
+    report_path = output_dir / "refresh-report.json"
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    results = payload.setdefault("results", [])
+    by_metric = {
+        item.get("metric"): item
+        for item in results
+        if item.get("metric")
+    }
+
+    for metric_ids, message in failures:
+        for metric_id in metric_ids:
+            item = by_metric.get(metric_id)
+            if item is None:
+                item = {"metric": metric_id}
+                results.append(item)
+                by_metric[metric_id] = item
+            item["status"] = "error"
+            item["error"] = message
+            item["preserved_previous"] = True
+
+    tmp = report_path.with_suffix(".json.tmp")
+    tmp.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    tmp.replace(report_path)
 
 
 def restore_generated(backup_dir: Path, output_dir: Path) -> None:
@@ -134,8 +209,24 @@ def main() -> None:
     # completely untouched.
     download(FINRA_URL, finra_path)
     download(discover_shiller_workbook_url(), shiller_path)
-    run("scripts/bootstrap_cier_pmi.py", "--output", str(cier_path))
-    run("scripts/bootstrap_ndc_business_cycle.py", "--output", str(ndc_path))
+    source_failures: list[tuple[list[str], str]] = []
+
+    cier_failure = refresh_seeded_source_with_fallback(
+        label="CIER PMI",
+        script="scripts/bootstrap_cier_pmi.py",
+        output_path=cier_path,
+    )
+    if cier_failure:
+        source_failures.append((CIER_METRIC_IDS, cier_failure))
+
+    ndc_failure = refresh_seeded_source_with_fallback(
+        label="NDC business cycle",
+        script="scripts/bootstrap_ndc_business_cycle.py",
+        output_path=ndc_path,
+    )
+    if ndc_failure:
+        source_failures.append((NDC_METRIC_IDS, ndc_failure))
+
     run("scripts/bootstrap_cbc_rates.py", "--output", str(cbc_path))
 
     with tempfile.TemporaryDirectory(prefix="mrm-refresh-backup-") as temp:
@@ -168,6 +259,10 @@ def main() -> None:
 
         try:
             run(*refresh_args)
+            annotate_refresh_report_source_failures(
+                output_dir,
+                source_failures,
+            )
             if not args.skip_tests:
                 run("-m", "unittest", "discover", "-s", "tests")
             run("scripts/validate_data.py")
