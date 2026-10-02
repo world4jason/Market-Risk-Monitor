@@ -21,25 +21,30 @@ jobs:
     timeout-minutes: 40
 
     steps:
-      - name: Check out main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
+      # Intentionally avoid actions/checkout and actions/setup-python.
+      # Some repository Actions policies reject external marketplace actions
+      # before a runner is even assigned. This workflow only needs the
+      # GitHub-hosted runner's built-in git + Python.
+      - name: Check out main without external actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin main
+          git checkout -B main FETCH_HEAD
 
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 --version
+          python3 -m pip install -r requirements.txt
 
       - name: Refresh and validate public snapshot
         env:
           PYTHONUNBUFFERED: "1"
-        run: python scripts/refresh_public_snapshot.py
+        run: python3 scripts/refresh_public_snapshot.py
 
       - name: Verify repository diff
         run: |
@@ -48,7 +53,10 @@ jobs:
 
       - name: Commit refreshed snapshot
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           if git diff --quiet -- data/generated; then
             echo "No public snapshot changes to commit."
             exit 0
@@ -58,4 +66,5 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/generated
           git commit -m "data: refresh public market snapshot"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin HEAD:main
