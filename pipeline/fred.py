@@ -73,8 +73,11 @@ def fetch_fred_csv(series_id: str, timeout: int = 30) -> str:
     user_agent = "Market-Risk-Monitor/0.1"
     req = Request(url, headers={"User-Agent": user_agent})
     first_error = None
+    # Fail over quickly when urllib stalls on the Akamai edge; curl remains
+    # bounded by the caller's normal timeout.
+    urllib_timeout = min(timeout, 10)
     try:
-        with urlopen(req, timeout=timeout) as resp:
+        with urlopen(req, timeout=urllib_timeout) as resp:
             return resp.read().decode("utf-8")
     except Exception as exc:
         first_error = exc
