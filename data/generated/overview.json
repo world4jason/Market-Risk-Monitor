@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-10-01T11:09:36.942577Z",
+  "generated_at": "2026-10-02T12:04:50.522068Z",
   "metrics": [
     {
       "metric": {
@@ -31,13 +31,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 10000,
-        "age_days": 6499,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "age_days": 6500,
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
         "as_of": "2008-12-15",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": 1.0,
         "revision_tag": null
       },
@@ -234,7 +234,7 @@
       },
       "coverage": {
         "history_start": "2008-12-16",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 1
       },
@@ -242,12 +242,12 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": 4.0,
         "revision_tag": null
       },
@@ -262,18 +262,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6498,
-        "rolling_percentile": 56.40873015873016,
+        "observation_count": 6499,
+        "rolling_percentile": 56.388888888888886,
         "recent_change": {
           "value": 0.0,
           "comparison": "basis_points"
         },
         "preview_observations": [
-          {
-            "date": "2026-09-01",
-            "value": 3.75,
-            "status": "observed"
-          },
           {
             "date": "2026-09-02",
             "value": 3.75,
@@ -418,6 +413,11 @@
             "date": "2026-09-30",
             "value": 4.0,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 4.0,
+            "status": "observed"
           }
         ]
       }
@@ -451,13 +451,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 207641.0,
         "revision_tag": null
       },
@@ -669,13 +669,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 1453832.0,
         "revision_tag": null
       },
@@ -887,13 +887,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 2.5830055213533543,
         "revision_tag": null
       },
@@ -1102,13 +1102,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 37.18981280957383,
         "revision_tag": null
       },
@@ -1317,13 +1317,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 217499.0,
         "revision_tag": null
       },
@@ -1535,13 +1535,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 425140.0,
         "revision_tag": null
       },
@@ -1753,13 +1753,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 70,
-        "age_days": 31,
-        "evaluated_at": "2026-10-01T11:09:36.846242Z",
+        "age_days": 32,
+        "evaluated_at": "2026-10-02T12:04:50.369908Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-08-31",
-        "fetched_at": "2026-10-01T11:09:36.846242Z",
+        "fetched_at": "2026-10-02T12:04:50.369908Z",
         "value": 3.419654701980524,
         "revision_tag": null
       },
@@ -1971,13 +1971,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 6,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "age_days": 7,
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-09-25",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": -0.548,
         "revision_tag": null
       },
@@ -2189,13 +2189,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 6,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "age_days": 7,
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-09-25",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": -0.061,
         "revision_tag": null
       },
@@ -2399,13 +2399,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 6,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "age_days": 7,
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-09-25",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": -0.462,
         "revision_tag": null
       },
@@ -2609,13 +2609,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 14,
-        "age_days": 6,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "age_days": 7,
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-09-25",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": -0.629,
         "revision_tag": null
       },
@@ -2819,13 +2819,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 61,
-        "evaluated_at": "2026-10-01T11:09:36.907061Z",
+        "age_days": 62,
+        "evaluated_at": "2026-10-02T12:04:50.460776Z",
         "reason": "Current partial month intentionally excluded."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.907061Z",
+        "fetched_at": "2026-10-02T12:04:50.460776Z",
         "value": 41.11984417915712,
         "revision_tag": "partial-current-month-excluded"
       },
@@ -3037,13 +3037,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 61,
-        "evaluated_at": "2026-10-01T11:09:36.907061Z",
+        "age_days": 62,
+        "evaluated_at": "2026-10-02T12:04:50.460776Z",
         "reason": "Current partial month intentionally excluded."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.907061Z",
+        "fetched_at": "2026-10-02T12:04:50.460776Z",
         "value": 7711.323333333334,
         "revision_tag": "partial-current-month-excluded"
       },
@@ -3255,13 +3255,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 61,
-        "evaluated_at": "2026-10-01T11:09:36.907061Z",
+        "age_days": 62,
+        "evaluated_at": "2026-10-02T12:04:50.460776Z",
         "reason": "Current partial month intentionally excluded."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.907061Z",
+        "fetched_at": "2026-10-02T12:04:50.460776Z",
         "value": 5260117.469660418,
         "revision_tag": "partial-current-month-excluded"
       },
@@ -3471,7 +3471,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3479,13 +3479,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.776330Z",
+        "evaluated_at": "2026-10-02T12:04:50.279214Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.776330Z",
-        "value": 641,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:50.279214Z",
+        "value": -129,
         "revision_tag": null
       },
       "baselines": [
@@ -3507,10 +3507,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2,
+        "observation_count": 3,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 655.0,
+          "value": -770.0,
           "comparison": "absolute"
         },
         "preview_observations": [
@@ -3522,6 +3522,11 @@
           {
             "date": "2026-09-30",
             "value": 641,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": -129,
             "status": "observed"
           }
         ]
@@ -3554,7 +3559,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3562,13 +3567,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.776330Z",
+        "evaluated_at": "2026-10-02T12:04:50.279214Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.776330Z",
-        "value": 641.0,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:50.279214Z",
+        "value": -129.0,
         "revision_tag": null
       },
       "baselines": [
@@ -3590,10 +3595,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2,
+        "observation_count": 3,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 655.0,
+          "value": -770.0,
           "comparison": "absolute"
         },
         "preview_observations": [
@@ -3605,6 +3610,11 @@
           {
             "date": "2026-09-30",
             "value": 641.0,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": -129.0,
             "status": "observed"
           }
         ]
@@ -3637,7 +3647,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3645,13 +3655,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.776330Z",
+        "evaluated_at": "2026-10-02T12:04:50.279214Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.776330Z",
-        "value": 63.152709359605915,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:50.279214Z",
+        "value": -13.257965056526208,
         "revision_tag": null
       },
       "baselines": [
@@ -3673,10 +3683,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2,
+        "observation_count": 3,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 64.5783712740662,
+          "value": -76.41067441613212,
           "comparison": "percentage_points"
         },
         "preview_observations": [
@@ -3688,6 +3698,11 @@
           {
             "date": "2026-09-30",
             "value": 63.152709359605915,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": -13.257965056526208,
             "status": "observed"
           }
         ]
@@ -3720,7 +3735,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -3728,13 +3743,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.776330Z",
+        "evaluated_at": "2026-10-02T12:04:50.279214Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.776330Z",
-        "value": 828,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:50.279214Z",
+        "value": 422,
         "revision_tag": null
       },
       "baselines": [
@@ -3756,10 +3771,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2,
+        "observation_count": 3,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 344.0,
+          "value": -406.0,
           "comparison": "absolute"
         },
         "preview_observations": [
@@ -3771,6 +3786,11 @@
           {
             "date": "2026-09-30",
             "value": 828,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 422,
             "status": "observed"
           }
         ]
@@ -3810,13 +3830,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 923,
-        "evaluated_at": "2026-10-01T11:09:36.782815Z",
+        "age_days": 924,
+        "evaluated_at": "2026-10-02T12:04:50.293799Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "fetched_at": "2026-10-02T12:04:50.293799Z",
         "value": 25.0,
         "revision_tag": null
       },
@@ -4013,13 +4033,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 923,
-        "evaluated_at": "2026-10-01T11:09:36.782815Z",
+        "age_days": 924,
+        "evaluated_at": "2026-10-02T12:04:50.293799Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "fetched_at": "2026-10-02T12:04:50.293799Z",
         "value": 12.5,
         "revision_tag": null
       },
@@ -4216,13 +4236,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 923,
-        "evaluated_at": "2026-10-01T11:09:36.782815Z",
+        "age_days": 924,
+        "evaluated_at": "2026-10-02T12:04:50.293799Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "fetched_at": "2026-10-02T12:04:50.293799Z",
         "value": 12.5,
         "revision_tag": null
       },
@@ -4419,13 +4439,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 923,
-        "evaluated_at": "2026-10-01T11:09:36.782815Z",
+        "age_days": 924,
+        "evaluated_at": "2026-10-02T12:04:50.293799Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "fetched_at": "2026-10-02T12:04:50.293799Z",
         "value": 2.0,
         "revision_tag": null
       },
@@ -4625,13 +4645,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 923,
-        "evaluated_at": "2026-10-01T11:09:36.782815Z",
+        "age_days": 924,
+        "evaluated_at": "2026-10-02T12:04:50.293799Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2024-03-22",
-        "fetched_at": "2026-10-01T11:09:36.782815Z",
+        "fetched_at": "2026-10-02T12:04:50.293799Z",
         "value": 12.5,
         "revision_tag": null
       },
@@ -4821,7 +4841,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -4829,13 +4849,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.776330Z",
+        "evaluated_at": "2026-10-02T12:04:50.279214Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.776330Z",
-        "value": 187,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:50.279214Z",
+        "value": 551,
         "revision_tag": null
       },
       "baselines": [
@@ -4857,10 +4877,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2,
+        "observation_count": 3,
         "rolling_percentile": null,
         "recent_change": {
-          "value": -311.0,
+          "value": 364.0,
           "comparison": "absolute"
         },
         "preview_observations": [
@@ -4872,6 +4892,11 @@
           {
             "date": "2026-09-30",
             "value": 187,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 551,
             "status": "observed"
           }
         ]
@@ -4911,13 +4936,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 75,
-        "age_days": 30,
-        "evaluated_at": "2026-10-01T11:09:36.779446Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-02T12:04:50.290636Z",
         "reason": null
       },
       "latest": {
         "as_of": "2026-09-01",
-        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "fetched_at": "2026-10-02T12:04:50.290636Z",
         "value": 63.4,
         "revision_tag": null
       },
@@ -5047,7 +5072,7 @@
       },
       "coverage": {
         "history_start": "2026-09-01",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-02",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -5055,13 +5080,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.510093Z",
+        "evaluated_at": "2026-10-02T12:04:48.513621Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.510093Z",
-        "value": 921492702613.0,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:48.513621Z",
+        "value": 874046252416.0,
         "revision_tag": null
       },
       "baselines": [
@@ -5083,10 +5108,10 @@
         }
       ],
       "summary": {
-        "observation_count": 20,
+        "observation_count": 21,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 10.207323456175432,
+          "value": -5.148868793259032,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -5189,6 +5214,11 @@
             "date": "2026-09-30",
             "value": 921492702613.0,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 874046252416.0,
+            "status": "observed"
           }
         ]
       }
@@ -5220,7 +5250,7 @@
       },
       "coverage": {
         "history_start": "2026-09-01",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-02",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -5228,13 +5258,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.510093Z",
+        "evaluated_at": "2026-10-02T12:04:48.513621Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.510093Z",
-        "value": 10656764192,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:48.513621Z",
+        "value": 10691867330,
         "revision_tag": null
       },
       "baselines": [
@@ -5256,10 +5286,10 @@
         }
       ],
       "summary": {
-        "observation_count": 20,
+        "observation_count": 21,
         "rolling_percentile": null,
         "recent_change": {
-          "value": 10.171676561573051,
+          "value": 0.3293977174267493,
           "comparison": "percent_change"
         },
         "preview_observations": [
@@ -5362,6 +5392,11 @@
             "date": "2026-09-30",
             "value": 10656764192,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 10691867330,
+            "status": "observed"
           }
         ]
       }
@@ -5401,12 +5436,12 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-10-01T11:09:36.779446Z",
+        "evaluated_at": "2026-10-02T12:04:50.290636Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "fetched_at": "2026-10-02T12:04:50.290636Z",
         "value": 106.4711496072298,
         "revision_tag": null
       },
@@ -5438,73 +5473,73 @@
             "date": "2025-09-01",
             "value": 100.2382080610724,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-10-01",
             "value": 100.4609735042264,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-11-01",
             "value": 100.9111537332426,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-12-01",
             "value": 101.522701419293,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-01-01",
             "value": 102.3257826108551,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-02-01",
             "value": 103.1911956959414,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-03-01",
             "value": 104.0245906044521,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-04-01",
             "value": 104.6907625047655,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-05-01",
             "value": 105.2713384360013,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-06-01",
             "value": 105.7225372137442,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-07-01",
             "value": 106.0881387363426,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-08-01",
             "value": 106.4711496072298,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           }
         ]
       }
@@ -5544,12 +5579,12 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-10-01T11:09:36.779446Z",
+        "evaluated_at": "2026-10-02T12:04:50.290636Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "fetched_at": "2026-10-02T12:04:50.290636Z",
         "value": 105.7072020806007,
         "revision_tag": null
       },
@@ -5581,73 +5616,73 @@
             "date": "2025-09-01",
             "value": 96.98347056204703,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-10-01",
             "value": 96.89240722169527,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-11-01",
             "value": 96.80014970463557,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-12-01",
             "value": 96.80864208679121,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-01-01",
             "value": 97.04587193286915,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-02-01",
             "value": 97.62656448254984,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-03-01",
             "value": 98.63300923339453,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-04-01",
             "value": 100.0024181878572,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-05-01",
             "value": 101.5096698626755,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-06-01",
             "value": 102.9642451803923,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-07-01",
             "value": 104.3806572941273,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-08-01",
             "value": 105.7072020806007,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           }
         ]
       }
@@ -5687,12 +5722,12 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-10-01T11:09:36.779446Z",
+        "evaluated_at": "2026-10-02T12:04:50.290636Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "fetched_at": "2026-10-02T12:04:50.290636Z",
         "value": 104.408659877505,
         "revision_tag": null
       },
@@ -5724,73 +5759,73 @@
             "date": "2025-09-01",
             "value": 99.09137977123152,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-10-01",
             "value": 99.60483533274125,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-11-01",
             "value": 100.1337275033714,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-12-01",
             "value": 100.6135831561503,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-01-01",
             "value": 100.9587291675792,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-02-01",
             "value": 101.177572793148,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-03-01",
             "value": 101.5602023327917,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-04-01",
             "value": 102.1297298672589,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-05-01",
             "value": 102.7224030978579,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-06-01",
             "value": 103.3155185611899,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-07-01",
             "value": 103.8779135965029,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-08-01",
             "value": 104.408659877505,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           }
         ]
       }
@@ -5830,12 +5865,12 @@
         "state": "fresh",
         "max_age_days": 75,
         "age_days": 0,
-        "evaluated_at": "2026-10-01T11:09:36.779446Z",
+        "evaluated_at": "2026-10-02T12:04:50.290636Z",
         "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
       },
       "latest": {
         "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:36.779446Z",
+        "fetched_at": "2026-10-02T12:04:50.290636Z",
         "value": 41.0,
         "revision_tag": null
       },
@@ -5867,73 +5902,73 @@
             "date": "2025-09-01",
             "value": 34.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-10-01",
             "value": 35.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-11-01",
             "value": 37.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2025-12-01",
             "value": 38.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-01-01",
             "value": 39.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-02-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-03-01",
             "value": 39.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-04-01",
             "value": 40.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-05-01",
             "value": 39.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-06-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-07-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           },
           {
             "date": "2026-08-01",
             "value": 41.0,
             "status": "observed",
-            "release_date": "2026-10-01"
+            "release_date": "2026-10-02"
           }
         ]
       }
@@ -5965,21 +6000,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-02",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.510093Z",
+        "age_days": 0,
+        "evaluated_at": "2026-10-02T12:04:48.513621Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.510093Z",
-        "value": 47940.13,
+        "as_of": "2026-10-02",
+        "fetched_at": "2026-10-02T12:04:48.513621Z",
+        "value": 48475.74,
         "revision_tag": null
       },
       "baselines": [
@@ -6001,23 +6036,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6873,
-        "rolling_percentile": 99.84126984126983,
+        "observation_count": 6875,
+        "rolling_percentile": 100.0,
         "recent_change": {
-          "value": 0.6469815644789767,
+          "value": 0.2528255974904914,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-18",
-            "value": 45308.68,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-19",
-            "value": 44719.35,
-            "status": "observed"
-          },
           {
             "date": "2026-08-20",
             "value": 44933.74,
@@ -6157,6 +6182,16 @@
             "date": "2026-09-30",
             "value": 47940.13,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 48353.49,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-02",
+            "value": 48475.74,
+            "status": "observed"
           }
         ]
       }
@@ -6188,21 +6223,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-02",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.510093Z",
+        "age_days": 0,
+        "evaluated_at": "2026-10-02T12:04:48.513621Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.510093Z",
-        "value": 48379.71,
+        "as_of": "2026-10-02",
+        "fetched_at": "2026-10-02T12:04:48.513621Z",
+        "value": 48491.62,
         "revision_tag": null
       },
       "baselines": [
@@ -6224,23 +6259,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6873,
+        "observation_count": 6875,
         "rolling_percentile": 99.92063492063492,
         "recent_change": {
-          "value": 0.6963869178832516,
+          "value": 0.2856670738761613,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-18",
-            "value": 46064.09,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-19",
-            "value": 45071.34,
-            "status": "observed"
-          },
           {
             "date": "2026-08-20",
             "value": 45160.05,
@@ -6380,6 +6405,16 @@
             "date": "2026-09-30",
             "value": 48379.71,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 48353.49,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-02",
+            "value": 48491.62,
+            "status": "observed"
           }
         ]
       }
@@ -6411,21 +6446,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-02",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.510093Z",
+        "age_days": 0,
+        "evaluated_at": "2026-10-02T12:04:48.513621Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.510093Z",
-        "value": 47767.49,
+        "as_of": "2026-10-02",
+        "fetched_at": "2026-10-02T12:04:48.513621Z",
+        "value": 48205.81,
         "revision_tag": null
       },
       "baselines": [
@@ -6447,23 +6482,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6873,
-        "rolling_percentile": 99.84126984126983,
+        "observation_count": 6875,
+        "rolling_percentile": 100.0,
         "recent_change": {
-          "value": 0.40863437712370665,
+          "value": 0.652260790730752,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-18",
-            "value": 45225.42,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-19",
-            "value": 44308.71,
-            "status": "observed"
-          },
           {
             "date": "2026-08-20",
             "value": 44446.36,
@@ -6603,6 +6628,16 @@
             "date": "2026-09-30",
             "value": 47767.49,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 47893.42,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-02",
+            "value": 48205.81,
+            "status": "observed"
           }
         ]
       }
@@ -6634,21 +6669,21 @@
       },
       "coverage": {
         "history_start": "1999-01-05",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-02",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 5,
-        "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.510093Z",
+        "age_days": 0,
+        "evaluated_at": "2026-10-02T12:04:48.513621Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.510093Z",
-        "value": 47767.49,
+        "as_of": "2026-10-02",
+        "fetched_at": "2026-10-02T12:04:48.513621Z",
+        "value": 48390.65,
         "revision_tag": null
       },
       "baselines": [
@@ -6670,23 +6705,13 @@
         }
       ],
       "summary": {
-        "observation_count": 6873,
-        "rolling_percentile": 99.60317460317461,
+        "observation_count": 6875,
+        "rolling_percentile": 100.0,
         "recent_change": {
-          "value": -0.2222505837733313,
+          "value": 0.8937704406698721,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-18",
-            "value": 45922.4,
-            "status": "observed"
-          },
-          {
-            "date": "2026-08-19",
-            "value": 45071.34,
-            "status": "observed"
-          },
           {
             "date": "2026-08-20",
             "value": 44942.01,
@@ -6826,6 +6851,16 @@
             "date": "2026-09-30",
             "value": 47767.49,
             "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 47961.98,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-02",
+            "value": 48390.65,
+            "status": "observed"
           }
         ]
       }
@@ -6857,7 +6892,7 @@
       },
       "coverage": {
         "history_start": "2026-09-21",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "Asia/Taipei",
         "expected_observation_lag_days": 1
       },
@@ -6865,13 +6900,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:36.776330Z",
+        "evaluated_at": "2026-10-02T12:04:50.279214Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:36.776330Z",
-        "value": 65,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:50.279214Z",
+        "value": 107,
         "revision_tag": null
       },
       "baselines": [
@@ -6893,10 +6928,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2,
+        "observation_count": 3,
         "rolling_percentile": null,
         "recent_change": {
-          "value": -30.0,
+          "value": 42.0,
           "comparison": "absolute"
         },
         "preview_observations": [
@@ -6908,6 +6943,11 @@
           {
             "date": "2026-09-30",
             "value": 65,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 107,
             "status": "observed"
           }
         ]
@@ -6947,13 +6987,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 14,
-        "evaluated_at": "2026-10-01T11:09:36.942577Z",
+        "age_days": 15,
+        "evaluated_at": "2026-10-02T12:04:50.522068Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "fetched_at": "2026-10-02T12:04:50.522068Z",
         "value": -50.0,
         "revision_tag": null
       },
@@ -7150,13 +7190,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 14,
-        "evaluated_at": "2026-10-01T11:09:36.942577Z",
+        "age_days": 15,
+        "evaluated_at": "2026-10-02T12:04:50.522068Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "fetched_at": "2026-10-02T12:04:50.522068Z",
         "value": 25.0,
         "revision_tag": null
       },
@@ -7353,13 +7393,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 14,
-        "evaluated_at": "2026-10-01T11:09:36.942577Z",
+        "age_days": 15,
+        "evaluated_at": "2026-10-02T12:04:50.522068Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "fetched_at": "2026-10-02T12:04:50.522068Z",
         "value": 25.0,
         "revision_tag": null
       },
@@ -7556,13 +7596,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 14,
-        "evaluated_at": "2026-10-01T11:09:36.942577Z",
+        "age_days": 15,
+        "evaluated_at": "2026-10-02T12:04:50.522068Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "fetched_at": "2026-10-02T12:04:50.522068Z",
         "value": 4.0,
         "revision_tag": null
       },
@@ -7762,13 +7802,13 @@
       "freshness": {
         "state": "fresh",
         "max_age_days": 2000,
-        "age_days": 14,
-        "evaluated_at": "2026-10-01T11:09:36.942577Z",
+        "age_days": 15,
+        "evaluated_at": "2026-10-02T12:04:50.522068Z",
         "reason": "Irregular change-date series; old effective date can still be current."
       },
       "latest": {
         "as_of": "2026-09-17",
-        "fetched_at": "2026-10-01T11:09:36.942577Z",
+        "fetched_at": "2026-10-02T12:04:50.522068Z",
         "value": 25.0,
         "revision_tag": null
       },
@@ -7953,20 +7993,20 @@
       },
       "coverage": {
         "history_start": "1854-12-01",
-        "history_end": "2026-08-01",
+        "history_end": "2026-09-01",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 45
       },
       "freshness": {
         "state": "fresh",
         "max_age_days": 90,
-        "age_days": 61,
-        "evaluated_at": "2026-10-01T11:09:32.603134Z",
+        "age_days": 31,
+        "evaluated_at": "2026-10-02T12:04:05.091203Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-08-01",
-        "fetched_at": "2026-10-01T11:09:32.603134Z",
+        "as_of": "2026-09-01",
+        "fetched_at": "2026-10-02T12:04:05.091203Z",
         "value": 0.0,
         "revision_tag": null
       },
@@ -7981,15 +8021,10 @@
         }
       ],
       "summary": {
-        "observation_count": 2061,
+        "observation_count": 2062,
         "rolling_percentile": 49.166666666666664,
         "recent_change": null,
         "preview_observations": [
-          {
-            "date": "2024-03-01",
-            "value": 0.0,
-            "status": "observed"
-          },
           {
             "date": "2024-04-01",
             "value": 0.0,
@@ -8134,6 +8169,11 @@
             "date": "2026-08-01",
             "value": 0.0,
             "status": "observed"
+          },
+          {
+            "date": "2026-09-01",
+            "value": 0.0,
+            "status": "observed"
           }
         ]
       }
@@ -8160,7 +8200,7 @@
       },
       "coverage": {
         "history_start": "1990-01-02",
-        "history_end": "2026-09-30",
+        "history_end": "2026-10-01",
         "timezone": "America/Chicago",
         "expected_observation_lag_days": 1
       },
@@ -8168,13 +8208,13 @@
         "state": "fresh",
         "max_age_days": 5,
         "age_days": 1,
-        "evaluated_at": "2026-10-01T11:09:35.960828Z",
+        "evaluated_at": "2026-10-02T12:04:45.965376Z",
         "reason": null
       },
       "latest": {
-        "as_of": "2026-09-30",
-        "fetched_at": "2026-10-01T11:09:35.960828Z",
-        "value": 16.34,
+        "as_of": "2026-10-01",
+        "fetched_at": "2026-10-02T12:04:45.965376Z",
+        "value": 16.39,
         "revision_tag": null
       },
       "baselines": [
@@ -8196,18 +8236,13 @@
         }
       ],
       "summary": {
-        "observation_count": 9284,
-        "rolling_percentile": 44.464285714285715,
+        "observation_count": 9285,
+        "rolling_percentile": 45.23809523809524,
         "recent_change": {
-          "value": 1.8703241895261957,
+          "value": 0.3059975520195879,
           "comparison": "percent_change"
         },
         "preview_observations": [
-          {
-            "date": "2026-08-20",
-            "value": 16.01,
-            "status": "observed"
-          },
           {
             "date": "2026-08-21",
             "value": 15.13,
@@ -8351,6 +8386,11 @@
           {
             "date": "2026-09-30",
             "value": 16.34,
+            "status": "observed"
+          },
+          {
+            "date": "2026-10-01",
+            "value": 16.39,
             "status": "observed"
           }
         ]

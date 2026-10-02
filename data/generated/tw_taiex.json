@@ -27,15 +27,15 @@
   },
   "coverage": {
     "history_start": "1999-01-05",
-    "history_end": "2026-09-30",
+    "history_end": "2026-10-02",
     "timezone": "Asia/Taipei",
     "expected_observation_lag_days": 1
   },
   "freshness": {
     "state": "fresh",
     "max_age_days": 5,
-    "age_days": 1,
-    "evaluated_at": "2026-10-01T11:09:36.510093Z",
+    "age_days": 0,
+    "evaluated_at": "2026-10-02T12:04:48.513621Z",
     "reason": null
   },
   "lineage": {
@@ -63,9 +63,9 @@
     }
   ],
   "latest": {
-    "as_of": "2026-09-30",
-    "fetched_at": "2026-10-01T11:09:36.510093Z",
-    "value": 47940.13,
+    "as_of": "2026-10-02",
+    "fetched_at": "2026-10-02T12:04:48.513621Z",
+    "value": 48475.74,
     "revision_tag": null
   },
   "observations": [
@@ -34432,6 +34432,16 @@
     {
       "date": "2026-09-30",
       "value": 47940.13,
+      "status": "observed"
+    },
+    {
+      "date": "2026-10-01",
+      "value": 48353.49,
+      "status": "observed"
+    },
+    {
+      "date": "2026-10-02",
+      "value": 48475.74,
       "status": "observed"
     }
   ]

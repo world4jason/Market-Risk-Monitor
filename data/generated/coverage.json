@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-10-01T11:09:37.955319Z",
+  "generated_at": "2026-10-02T12:04:51.548039Z",
   "metrics": [
     {
       "id": "fed_target_legacy",
@@ -16,8 +16,8 @@
       "name": "Federal Funds Target Range Upper Limit",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2008-12-16",
-      "actual_history_end": "2026-09-30",
-      "observations": 6498,
+      "actual_history_end": "2026-10-01",
+      "observations": 6499,
       "status": "ok"
     },
     {
@@ -151,8 +151,8 @@
       "name": "TWSE Advance-Decline Difference",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-21",
-      "actual_history_end": "2026-09-30",
-      "observations": 2,
+      "actual_history_end": "2026-10-01",
+      "observations": 3,
       "status": "ok"
     },
     {
@@ -160,8 +160,8 @@
       "name": "TWSE Advance-Decline Line",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-21",
-      "actual_history_end": "2026-09-30",
-      "observations": 2,
+      "actual_history_end": "2026-10-01",
+      "observations": 3,
       "status": "ok"
     },
     {
@@ -169,8 +169,8 @@
       "name": "TWSE Advance-Decline %",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-21",
-      "actual_history_end": "2026-09-30",
-      "observations": 2,
+      "actual_history_end": "2026-10-01",
+      "observations": 3,
       "status": "ok"
     },
     {
@@ -178,8 +178,8 @@
       "name": "TWSE Advancing Stocks",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-21",
-      "actual_history_end": "2026-09-30",
-      "observations": 2,
+      "actual_history_end": "2026-10-01",
+      "observations": 3,
       "status": "ok"
     },
     {
@@ -232,8 +232,8 @@
       "name": "TWSE Declining Stocks",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-21",
-      "actual_history_end": "2026-09-30",
-      "observations": 2,
+      "actual_history_end": "2026-10-01",
+      "observations": 3,
       "status": "ok"
     },
     {
@@ -250,8 +250,8 @@
       "name": "TWSE Market Trade Value",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-01",
-      "actual_history_end": "2026-09-30",
-      "observations": 20,
+      "actual_history_end": "2026-10-02",
+      "observations": 22,
       "status": "ok"
     },
     {
@@ -259,8 +259,8 @@
       "name": "TWSE Market Trade Volume",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-01",
-      "actual_history_end": "2026-09-30",
-      "observations": 20,
+      "actual_history_end": "2026-10-02",
+      "observations": 22,
       "status": "ok"
     },
     {
@@ -304,8 +304,8 @@
       "name": "TAIEX",
       "latest_acceptable_history_start": "1999-01-05",
       "actual_history_start": "1999-01-05",
-      "actual_history_end": "2026-09-30",
-      "observations": 6873,
+      "actual_history_end": "2026-10-02",
+      "observations": 6875,
       "status": "ok"
     },
     {
@@ -313,8 +313,8 @@
       "name": "TAIEX High",
       "latest_acceptable_history_start": "1999-01-05",
       "actual_history_start": "1999-01-05",
-      "actual_history_end": "2026-09-30",
-      "observations": 6873,
+      "actual_history_end": "2026-10-02",
+      "observations": 6875,
       "status": "ok"
     },
     {
@@ -322,8 +322,8 @@
       "name": "TAIEX Low",
       "latest_acceptable_history_start": "1999-01-05",
       "actual_history_start": "1999-01-05",
-      "actual_history_end": "2026-09-30",
-      "observations": 6873,
+      "actual_history_end": "2026-10-02",
+      "observations": 6875,
       "status": "ok"
     },
     {
@@ -331,8 +331,8 @@
       "name": "TAIEX Open",
       "latest_acceptable_history_start": "1999-01-05",
       "actual_history_start": "1999-01-05",
-      "actual_history_end": "2026-09-30",
-      "observations": 6873,
+      "actual_history_end": "2026-10-02",
+      "observations": 6875,
       "status": "ok"
     },
     {
@@ -340,8 +340,8 @@
       "name": "TWSE Unchanged Stocks",
       "latest_acceptable_history_start": null,
       "actual_history_start": "2026-09-21",
-      "actual_history_end": "2026-09-30",
-      "observations": 2,
+      "actual_history_end": "2026-10-01",
+      "observations": 3,
       "status": "ok"
     },
     {
@@ -394,8 +394,8 @@
       "name": "NBER Recession Indicator",
       "latest_acceptable_history_start": "1854-12-01",
       "actual_history_start": "1854-12-01",
-      "actual_history_end": "2026-08-01",
-      "observations": 2061,
+      "actual_history_end": "2026-09-01",
+      "observations": 2062,
       "status": "ok"
     },
     {
@@ -403,8 +403,8 @@
       "name": "Cboe Volatility Index (VIX)",
       "latest_acceptable_history_start": "1990-01-31",
       "actual_history_start": "1990-01-02",
-      "actual_history_end": "2026-09-30",
-      "observations": 9284,
+      "actual_history_end": "2026-10-01",
+      "observations": 9285,
       "status": "ok"
     }
   ]

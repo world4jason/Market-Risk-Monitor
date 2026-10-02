@@ -34,8 +34,8 @@
   "freshness": {
     "state": "fresh",
     "max_age_days": 75,
-    "age_days": 30,
-    "evaluated_at": "2026-10-01T11:09:36.779446Z",
+    "age_days": 31,
+    "evaluated_at": "2026-10-02T12:04:50.290636Z",
     "reason": null
   },
   "lineage": {
@@ -56,7 +56,7 @@
   ],
   "latest": {
     "as_of": "2026-09-01",
-    "fetched_at": "2026-10-01T11:09:36.779446Z",
+    "fetched_at": "2026-10-02T12:04:50.290636Z",
     "value": 63.4,
     "revision_tag": null
   },

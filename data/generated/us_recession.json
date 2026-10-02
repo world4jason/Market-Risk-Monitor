@@ -22,15 +22,15 @@
   },
   "coverage": {
     "history_start": "1854-12-01",
-    "history_end": "2026-08-01",
+    "history_end": "2026-09-01",
     "timezone": "America/Chicago",
     "expected_observation_lag_days": 45
   },
   "freshness": {
     "state": "fresh",
     "max_age_days": 90,
-    "age_days": 61,
-    "evaluated_at": "2026-10-01T11:09:32.603134Z",
+    "age_days": 31,
+    "evaluated_at": "2026-10-02T12:04:05.091203Z",
     "reason": null
   },
   "lineage": {
@@ -50,8 +50,8 @@
     }
   ],
   "latest": {
-    "as_of": "2026-08-01",
-    "fetched_at": "2026-10-01T11:09:32.603134Z",
+    "as_of": "2026-09-01",
+    "fetched_at": "2026-10-02T12:04:05.091203Z",
     "value": 0.0,
     "revision_tag": null
   },
@@ -10358,6 +10358,11 @@
     },
     {
       "date": "2026-08-01",
+      "value": 0.0,
+      "status": "observed"
+    },
+    {
+      "date": "2026-09-01",
       "value": 0.0,
       "status": "observed"
     }

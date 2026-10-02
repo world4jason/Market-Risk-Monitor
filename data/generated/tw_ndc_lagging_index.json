@@ -35,7 +35,7 @@
     "state": "fresh",
     "max_age_days": 75,
     "age_days": 0,
-    "evaluated_at": "2026-10-01T11:09:36.779446Z",
+    "evaluated_at": "2026-10-02T12:04:50.290636Z",
     "reason": "Freshness uses the verified current-vintage snapshot watermark; this does not imply historical PIT availability."
   },
   "lineage": {
@@ -56,7 +56,7 @@
   ],
   "latest": {
     "as_of": "2026-08-01",
-    "fetched_at": "2026-10-01T11:09:36.779446Z",
+    "fetched_at": "2026-10-02T12:04:50.290636Z",
     "value": 105.7072020806007,
     "revision_tag": null
   },
@@ -71,73 +71,73 @@
       "date": "2025-09-01",
       "value": 96.98347056204703,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2025-10-01",
       "value": 96.89240722169527,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2025-11-01",
       "value": 96.80014970463557,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2025-12-01",
       "value": 96.80864208679121,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-01-01",
       "value": 97.04587193286915,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-02-01",
       "value": 97.62656448254984,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-03-01",
       "value": 98.63300923339453,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-04-01",
       "value": 100.0024181878572,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-05-01",
       "value": 101.5096698626755,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-06-01",
       "value": 102.9642451803923,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-07-01",
       "value": 104.3806572941273,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     },
     {
       "date": "2026-08-01",
       "value": 105.7072020806007,
       "status": "observed",
-      "release_date": "2026-10-01"
+      "release_date": "2026-10-02"
     }
   ]
 }

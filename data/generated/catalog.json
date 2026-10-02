@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-10-01T11:09:37.996528Z",
+  "generated_at": "2026-10-02T12:04:51.587848Z",
   "metrics": [
     {
       "id": "fed_target_legacy",
@@ -19,9 +19,9 @@
       "pillar": "context",
       "frequency": "daily",
       "history_start": "2008-12-16",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./fed_target_upper.json"
     },
     {
@@ -184,9 +184,9 @@
       "pillar": "breadth",
       "frequency": "daily",
       "history_start": "2026-09-21",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_advance_decline_diff.json"
     },
     {
@@ -195,9 +195,9 @@
       "pillar": "breadth",
       "frequency": "daily",
       "history_start": "2026-09-21",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_advance_decline_line.json"
     },
     {
@@ -206,9 +206,9 @@
       "pillar": "breadth",
       "frequency": "daily",
       "history_start": "2026-09-21",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_advance_decline_pct.json"
     },
     {
@@ -217,9 +217,9 @@
       "pillar": "breadth",
       "frequency": "daily",
       "history_start": "2026-09-21",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_advancing_stocks.json"
     },
     {
@@ -283,9 +283,9 @@
       "pillar": "breadth",
       "frequency": "daily",
       "history_start": "2026-09-21",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_declining_stocks.json"
     },
     {
@@ -305,9 +305,9 @@
       "pillar": "market",
       "frequency": "daily",
       "history_start": "2026-09-01",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-02",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_market_trade_value.json"
     },
     {
@@ -316,9 +316,9 @@
       "pillar": "market",
       "frequency": "daily",
       "history_start": "2026-09-01",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-02",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_market_trade_volume.json"
     },
     {
@@ -371,9 +371,9 @@
       "pillar": "market",
       "frequency": "daily",
       "history_start": "1999-01-05",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-02",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-02",
       "path": "./tw_taiex.json"
     },
     {
@@ -382,9 +382,9 @@
       "pillar": "market",
       "frequency": "daily",
       "history_start": "1999-01-05",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-02",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-02",
       "path": "./tw_taiex_high.json"
     },
     {
@@ -393,9 +393,9 @@
       "pillar": "market",
       "frequency": "daily",
       "history_start": "1999-01-05",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-02",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-02",
       "path": "./tw_taiex_low.json"
     },
     {
@@ -404,9 +404,9 @@
       "pillar": "market",
       "frequency": "daily",
       "history_start": "1999-01-05",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-02",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-02",
       "path": "./tw_taiex_open.json"
     },
     {
@@ -415,9 +415,9 @@
       "pillar": "breadth",
       "frequency": "daily",
       "history_start": "2026-09-21",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./tw_unchanged_stocks.json"
     },
     {
@@ -481,9 +481,9 @@
       "pillar": "context",
       "frequency": "monthly",
       "history_start": "1854-12-01",
-      "history_end": "2026-08-01",
+      "history_end": "2026-09-01",
       "freshness": "fresh",
-      "as_of": "2026-08-01",
+      "as_of": "2026-09-01",
       "path": "./us_recession.json"
     },
     {
@@ -492,9 +492,9 @@
       "pillar": "volatility",
       "frequency": "daily",
       "history_start": "1990-01-02",
-      "history_end": "2026-09-30",
+      "history_end": "2026-10-01",
       "freshness": "fresh",
-      "as_of": "2026-09-30",
+      "as_of": "2026-10-01",
       "path": "./vix.json"
     }
   ]

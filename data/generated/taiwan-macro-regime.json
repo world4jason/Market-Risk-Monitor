@@ -26,23 +26,23 @@
       {
         "id": "tw_ndc_coincident_index",
         "as_of": "2026-08-01",
-        "snapshot_at": "2026-10-01T00:00:00Z",
-        "content_digest": "sha256:f313750724ed9012cf0c819f1dee8512fcbb4f59df69ba0e8475225264a654b0"
+        "snapshot_at": "2026-10-02T00:00:00Z",
+        "content_digest": "sha256:cb192aa6337964f81ccd49f2fb40923a29f7000b4991a36abaa78b1999d99741"
       },
       {
         "id": "tw_ndc_leading_index",
         "as_of": "2026-08-01",
-        "snapshot_at": "2026-10-01T00:00:00Z",
-        "content_digest": "sha256:1ad93e28cd57f38b85f0c28ca7bd60292c8619548ee17ee61fab7d1266552a7d"
+        "snapshot_at": "2026-10-02T00:00:00Z",
+        "content_digest": "sha256:5f36f7ec8c5312f55b6fba77e1d9e7494ebc8bdeaeb18a8860aad38eca1f40a7"
       },
       {
         "id": "tw_ndc_monitoring_score",
         "as_of": "2026-08-01",
-        "snapshot_at": "2026-10-01T00:00:00Z",
-        "content_digest": "sha256:3b21f50cdcdc34dbba7654c3ee950f2bfaeaceecb5c923497fa0ad6fb30e0959"
+        "snapshot_at": "2026-10-02T00:00:00Z",
+        "content_digest": "sha256:ccf6d087afdf7269798cb580041476b522163595a3346ac6b77de4f92c2a477d"
       }
     ],
-    "generated_at": "2026-10-01T00:00:00Z"
+    "generated_at": "2026-10-02T00:00:00Z"
   },
   "name": "MRM Taiwan Macro Regime",
   "description": "Transparent public-input regime; does not reproduce MacroMicro/MM.",
@@ -98,7 +98,7 @@
     "known_components": 3,
     "total_components": 4,
     "confidence": 0.75,
-    "available_on": "2026-10-01",
+    "available_on": "2026-10-02",
     "components": {
       "tw_manufacturing_pmi": {
         "vote": 1.0,
@@ -219,7 +219,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -249,7 +249,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -279,7 +279,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -309,7 +309,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -339,7 +339,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -369,7 +369,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -399,7 +399,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -429,7 +429,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -459,7 +459,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,
@@ -489,7 +489,7 @@
       "known_components": 3,
       "total_components": 4,
       "confidence": 0.75,
-      "available_on": "2026-10-01",
+      "available_on": "2026-10-02",
       "components": {
         "tw_manufacturing_pmi": {
           "vote": 1.0,

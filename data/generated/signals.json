@@ -25,41 +25,41 @@
       {
         "id": "finra_margin_debt_yoy_pct",
         "as_of": "2026-08-31",
-        "snapshot_at": "2026-10-01T11:09:36.846242Z",
-        "content_digest": "sha256:df69449832a33ec358702a528d4983db3157840daf7ad8563e2e7198dd913239"
+        "snapshot_at": "2026-10-02T12:04:50.369908Z",
+        "content_digest": "sha256:6776d914467da275ea98206820ff45cd9ac7b0e1cc4f72a9fa0e59e0a147b873"
       },
       {
         "id": "nfci",
         "as_of": "2026-09-25",
-        "snapshot_at": "2026-10-01T11:09:32.603134Z",
-        "content_digest": "sha256:b1edba4e99424685aeba681b20b7d7a3cecd41c66e7c68e0581d1ca17cf4c7b0"
+        "snapshot_at": "2026-10-02T12:04:05.091203Z",
+        "content_digest": "sha256:5e53589ee3082dba7b2bffda8d90669c90a59308d225e1a727a351ce7e57754c"
       },
       {
         "id": "nfci_risk",
         "as_of": "2026-09-25",
-        "snapshot_at": "2026-10-01T11:09:32.603134Z",
-        "content_digest": "sha256:1ff7a4f508b7890f0f6fcb81007d73cb9a8ae6106817f13d32a5c4a0f3cddaf8"
+        "snapshot_at": "2026-10-02T12:04:05.091203Z",
+        "content_digest": "sha256:11821b10c398d55267adccaee581c9005c456f0dff0cd04b9a07924a5b09b317"
       },
       {
         "id": "shiller_real_tr_price",
         "as_of": "2026-08-01",
-        "snapshot_at": "2026-10-01T11:09:36.907061Z",
-        "content_digest": "sha256:89a15e2b63fb729650447e7051010ae3430c69721cde86feb2a5a0622a9e7110"
+        "snapshot_at": "2026-10-02T12:04:50.460776Z",
+        "content_digest": "sha256:fc0c453006e0ea6ea627e7bf1e9f37689fb6385aa1f3c76f08d28018e9f78054"
       },
       {
         "id": "vix",
-        "as_of": "2026-09-30",
-        "snapshot_at": "2026-10-01T11:09:35.960828Z",
-        "content_digest": "sha256:ef96aab7514aa14406c81fdbde8ee7c512f01c2624bfe31dd1388ce7725611f7"
+        "as_of": "2026-10-01",
+        "snapshot_at": "2026-10-02T12:04:45.965376Z",
+        "content_digest": "sha256:921d40dbec684f791ba603809a85221ad50c050c4a9122bd4808e29ad2782f83"
       }
     ],
-    "generated_at": "2026-10-01T11:09:36.907061Z"
+    "generated_at": "2026-10-02T12:04:50.460776Z"
   },
   "name": "Deleveraging Watch",
   "description": "Transparent concurrent-deterioration checks. Conditions are descriptive confirmations, not crash predictions or trading signals.",
-  "generated_at": "2026-10-01T11:09:36.907061Z",
+  "generated_at": "2026-10-02T12:04:50.460776Z",
   "current": {
-    "as_of": "2026-10-01",
+    "as_of": "2026-10-02",
     "summary": {
       "active": 1,
       "inactive": 4,
@@ -174,11 +174,11 @@
           "status": "inactive",
           "metric": "vix",
           "label": "VIX strict-past percentile ≥ 90",
-          "value": 41.68910912420554,
+          "value": 42.05622576475657,
           "threshold": 90,
           "periods": null,
-          "as_of": "2026-09-30",
-          "reason": "strict-past percentile 41.69 vs threshold 90"
+          "as_of": "2026-10-01",
+          "reason": "strict-past percentile 42.06 vs threshold 90"
         },
         "metrics": [
           "vix"
