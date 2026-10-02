@@ -38,13 +38,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 --version
-          python3 -m pip install -r requirements.txt
+          python --version
+          python -m pip install -r requirements.txt
 
       - name: Refresh and validate public snapshot
         env:
           PYTHONUNBUFFERED: "1"
-        run: python3 scripts/refresh_public_snapshot.py
+        run: python scripts/refresh_public_snapshot.py
 
       - name: Verify repository diff
         run: |
