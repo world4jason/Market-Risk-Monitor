@@ -3,6 +3,8 @@ from __future__ import annotations
 import csv
 import io
 import json
+import shutil
+import subprocess
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -68,12 +70,50 @@ def parse_fred_csv(text: str, series_id: str) -> list[dict]:
 
 def fetch_fred_csv(series_id: str, timeout: int = 30) -> str:
     url = FRED_CSV.format(series_id=series_id)
-    req = Request(url, headers={"User-Agent": "Market-Risk-Monitor/0.1"})
+    user_agent = "Market-Risk-Monitor/0.1"
+    req = Request(url, headers={"User-Agent": user_agent})
+    first_error = None
     try:
         with urlopen(req, timeout=timeout) as resp:
             return resp.read().decode("utf-8")
     except Exception as exc:
-        raise FredError(f"Failed to fetch {series_id} from FRED: {exc}") from exc
+        first_error = exc
+
+    # Some Akamai/FRED paths have intermittently stalled Python's urllib while
+    # the same URL succeeds immediately with curl. Use curl only as a transport
+    # fallback; parsing, provenance and validation remain identical.
+    curl = shutil.which("curl")
+    if curl:
+        try:
+            completed = subprocess.run(
+                [
+                    curl,
+                    "--fail",
+                    "--location",
+                    "--silent",
+                    "--show-error",
+                    "--connect-timeout",
+                    str(max(1, timeout // 3)),
+                    "--max-time",
+                    str(max(timeout, 30)),
+                    "--user-agent",
+                    user_agent,
+                    url,
+                ],
+                check=True,
+                capture_output=True,
+                timeout=max(timeout + 5, 35),
+            )
+            return completed.stdout.decode("utf-8")
+        except Exception as curl_exc:
+            raise FredError(
+                f"Failed to fetch {series_id} from FRED: "
+                f"urllib={first_error}; curl={curl_exc}"
+            ) from curl_exc
+
+    raise FredError(
+        f"Failed to fetch {series_id} from FRED: {first_error}"
+    ) from first_error
 
 
 def freshness_state(as_of: str | None, evaluated_at: datetime, max_age_days: int):
