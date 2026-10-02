@@ -93,6 +93,50 @@ def run(*args: str) -> None:
     subprocess.run(command, cwd=ROOT, check=True)
 
 
+def run_refresh_allow_preserved_errors(*args: str, output_dir: Path) -> None:
+    """Allow source-level failures only when the previous artifact survived.
+
+    refresh_data.py deliberately returns 1 when any source fails, even if it
+    preserved the prior valid metric. For a monitor, rolling back unrelated
+    successful sources would make the whole dashboard stale. Accept exit 1 only
+    when every reported source error explicitly preserved a previous snapshot;
+    all structural validation still runs after this step.
+    """
+    command = [sys.executable, *args]
+    print("+", " ".join(command), flush=True)
+    completed = subprocess.run(command, cwd=ROOT, check=False)
+    if completed.returncode == 0:
+        return
+    if completed.returncode != 1:
+        raise subprocess.CalledProcessError(completed.returncode, command)
+
+    report_path = output_dir / "refresh-report.json"
+    if not report_path.exists():
+        raise subprocess.CalledProcessError(completed.returncode, command)
+
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    errors = [
+        item
+        for item in payload.get("results", [])
+        if item.get("status") == "error"
+    ]
+    unsafe = [
+        item
+        for item in errors
+        if item.get("preserved_previous") is not True
+    ]
+    if not errors or unsafe:
+        raise subprocess.CalledProcessError(completed.returncode, command)
+
+    names = ", ".join(sorted(str(item.get("metric")) for item in errors))
+    print(
+        "WARNING: source refresh errors preserved prior valid snapshots: "
+        + names,
+        file=sys.stderr,
+        flush=True,
+    )
+
+
 def refresh_seeded_source_with_fallback(
     *,
     label: str,
@@ -258,7 +302,10 @@ def main() -> None:
         )
 
         try:
-            run(*refresh_args)
+            run_refresh_allow_preserved_errors(
+                *refresh_args,
+                output_dir=output_dir,
+            )
             annotate_refresh_report_source_failures(
                 output_dir,
                 source_failures,
