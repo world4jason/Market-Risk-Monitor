@@ -9,6 +9,7 @@ from pipeline.validate import validate_refresh_report
 from scripts.refresh_public_snapshot import (
     annotate_refresh_report_source_failures,
     refresh_seeded_source_with_fallback,
+    run_refresh_allow_preserved_errors,
 )
 
 
@@ -47,6 +48,79 @@ class RefreshPublicSnapshotFallbackTests(unittest.TestCase):
                         label="NDC business cycle",
                         script="scripts/bootstrap_ndc_business_cycle.py",
                         output_path=output,
+                    )
+
+    def test_refresh_exit_one_is_allowed_only_for_preserved_errors(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output_dir = Path(temp)
+            report_path = output_dir / "refresh-report.json"
+            report_path.write_text(
+                json.dumps(
+                    {
+                        "generated_at": "2026-10-02T00:00:00Z",
+                        "results": [
+                            {
+                                "metric": "nfci",
+                                "status": "error",
+                                "error": "timeout",
+                                "preserved_previous": True,
+                            },
+                            {
+                                "metric": "vix",
+                                "status": "updated",
+                                "path": "data/generated/vix.json",
+                            },
+                        ],
+                        "removed_artifacts": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            completed = subprocess.CompletedProcess(
+                args=["python", "refresh_data.py"],
+                returncode=1,
+            )
+            with patch(
+                "scripts.refresh_public_snapshot.subprocess.run",
+                return_value=completed,
+            ):
+                run_refresh_allow_preserved_errors(
+                    "scripts/refresh_data.py",
+                    output_dir=output_dir,
+                )
+
+    def test_refresh_exit_one_rejects_unpreserved_error(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output_dir = Path(temp)
+            (output_dir / "refresh-report.json").write_text(
+                json.dumps(
+                    {
+                        "generated_at": "2026-10-02T00:00:00Z",
+                        "results": [
+                            {
+                                "metric": "nfci",
+                                "status": "error",
+                                "error": "timeout",
+                                "preserved_previous": False,
+                            }
+                        ],
+                        "removed_artifacts": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            completed = subprocess.CompletedProcess(
+                args=["python", "refresh_data.py"],
+                returncode=1,
+            )
+            with patch(
+                "scripts.refresh_public_snapshot.subprocess.run",
+                return_value=completed,
+            ):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    run_refresh_allow_preserved_errors(
+                        "scripts/refresh_data.py",
+                        output_dir=output_dir,
                     )
 
     def test_refresh_report_marks_retained_source_as_error(self):
